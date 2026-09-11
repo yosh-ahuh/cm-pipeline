@@ -1,0 +1,172 @@
+{
+  "claim_generator": "SPOT cm-pipeline/1.0",
+  "title": "demo-saas_A_youtube.mp4",
+  "format": "video/mp4",
+  "created": "2026-09-10T09:05:42+0900",
+  "assertions": [
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.created",
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+            "softwareAgent": "lyria2",
+            "count": 1
+          },
+          {
+            "action": "c2pa.created",
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+            "softwareAgent": "minimax-speech-02-hd",
+            "count": 3
+          },
+          {
+            "action": "c2pa.created",
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+            "softwareAgent": "veo3.1",
+            "count": 2
+          },
+          {
+            "action": "c2pa.created",
+            "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+            "softwareAgent": "imagen4",
+            "count": 2
+          },
+          {
+            "action": "c2pa.edited",
+            "softwareAgent": "Remotion (SPOT cm-pipeline build)",
+            "description": "composited real product UI, telop, narration, music"
+          }
+        ]
+      }
+    },
+    {
+      "label": "stds.schema-org.CreativeWork",
+      "data": {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        "name": "デモ株式会社 ゲンバ台帳 A/youtube",
+        "publisher": "デモ株式会社",
+        "inLanguage": "ja"
+      }
+    },
+    {
+      "label": "spot.ai_disclosure",
+      "data": {
+        "enabled": true,
+        "caption": "映像の一部はAIで生成しています",
+        "guideline": "JIAA 広告クリエイティブにおけるAI利用の自主開示ガイドライン（2026-04）"
+      }
+    },
+    {
+      "label": "spot.brand_assets",
+      "data": {
+        "real_ui_only": true,
+        "likeness_check": true,
+        "logo": "mirai/app_icon.png",
+        "pronunciation": [
+          "ゲンバ台帳"
+        ]
+      }
+    },
+    {
+      "label": "spot.claims_evidence",
+      "data": {
+        "claims": [
+          {
+            "claim": "月32時間",
+            "source": "自社調べ",
+            "note": "※自社調べ"
+          },
+          {
+            "claim": "導入1,200社",
+            "source": "デモ値（実案件では要裏取り）"
+          }
+        ]
+      }
+    }
+  ],
+  "edit_history": [
+    {
+      "stage": "stills",
+      "cut": "cut01",
+      "model": "imagen4",
+      "usd": 0.04,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    },
+    {
+      "stage": "stills",
+      "cut": "cut05",
+      "model": "imagen4",
+      "usd": 0.04,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    },
+    {
+      "stage": "review",
+      "cut": "cut01",
+      "model": "vision-review",
+      "usd": 0.01,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    },
+    {
+      "stage": "review",
+      "cut": "cut05",
+      "model": "vision-review",
+      "usd": 0.01,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    },
+    {
+      "stage": "animate",
+      "cut": "cut01",
+      "model": "veo3.1",
+      "usd": 3.5,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    },
+    {
+      "stage": "animate",
+      "cut": "cut05",
+      "model": "veo3.1",
+      "usd": 3.5,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    },
+    {
+      "stage": "audio",
+      "cut": "na1",
+      "model": "minimax-speech-02-hd",
+      "usd": 0.02,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    },
+    {
+      "stage": "audio",
+      "cut": "na2",
+      "model": "minimax-speech-02-hd",
+      "usd": 0.02,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    },
+    {
+      "stage": "audio",
+      "cut": "na3",
+      "model": "minimax-speech-02-hd",
+      "usd": 0.02,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    },
+    {
+      "stage": "audio",
+      "cut": "bgm_main",
+      "model": "lyria2",
+      "usd": 0.05,
+      "dry": true,
+      "ts": "2026-09-10T09:05:04"
+    }
+  ],
+  "sha256": null
+}

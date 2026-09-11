@@ -1,0 +1,475 @@
+<!-- PRODUCTION SEO — English-first, with a Japanese (/ja) alternate.
+     Replace every occurrence of https://spot.video with the real domain once confirmed
+     (canonical, hreflang, og:url, og:image, twitter:image, JSON-LD, and SITE in the script below).
+     Create the social card at /og/spot-cover.png (1200×630). -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPOT — AI commercial studio for B2B SaaS &amp; app marketing teams</title>
+<meta name="description" content="SPOT turns three choices into a finished commercial for your SaaS or app. AI generates the live-action, composites your real product UI — never a fake screen — adds the voiceover and music, and delivers 9 ready-to-ship files the same day. Plans from $99 a month. Not an avatar tool, not a template library.">
+<meta name="keywords" content="AI video ads,video ad maker,commercial generator,AI commercial studio,in-house video ads,social video ads,vertical video ads,ad creative automation,AI CM">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="theme-color" content="#0E0F14">
+<link rel="canonical" href="https://spot.video/">
+<link rel="alternate" hreflang="en" href="https://spot.video/">
+<link rel="alternate" hreflang="ja" href="https://spot.video/ja">
+<link rel="alternate" hreflang="x-default" href="https://spot.video/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SPOT">
+<meta property="og:url" content="https://spot.video/">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ja_JP">
+<meta property="og:title" content="SPOT — Every spot, in a day.">
+<meta property="og:description" content="Pick platform, industry and audience. SPOT generates a ready-to-ship video ad the same day, at about 1/400 of agency cost.">
+<meta property="og:image" content="https://spot.video/og/spot-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SPOT — the AI commercial studio for marketing teams.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SPOT — Every spot, in a day.">
+<meta name="twitter:description" content="Pick platform, industry and audience. SPOT generates a ready-to-ship video ad the same day, at about 1/400 of agency cost.">
+<meta name="twitter:image" content="https://spot.video/og/spot-cover.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "SPOT",
+  "applicationCategory": "MultimediaApplication",
+  "applicationSubCategory": "AI video ad & commercial generator",
+  "operatingSystem": "Web",
+  "url": "https://spot.video/",
+  "description": "SPOT turns three choices into a finished commercial for B2B SaaS and app teams. AI generates the live-action, composites your real product UI, adds the voiceover and music, and delivers 9 ready-to-ship files the same day.",
+  "inLanguage": ["en", "ja"],
+  "offers": [
+    { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD", "description": "1 spot per month, watermarked" },
+    { "@type": "Offer", "name": "Starter", "price": "99", "priceCurrency": "USD", "description": "6 spots per month, 2 seats" },
+    { "@type": "Offer", "name": "Team", "price": "399", "priceCurrency": "USD", "description": "25 spots per month, 5 seats, brand kit and pronunciation guide, approval flow" },
+    { "@type": "Offer", "name": "Business", "price": "1199", "priceCurrency": "USD", "description": "80 spots per month, unlimited seats, SSO, API, audit log" }
+  ],
+  "publisher": { "@type": "Organization", "name": "SPOT", "url": "https://spot.video/" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+  /* ダーク一択（単一テーマ）。ライト/システム連動・切替は廃止。 */
+  :root {
+    color-scheme: dark;
+    --ground:#0E0F14; --surface:#181A21; --surface-2:#1E2029; --ink:#F0EFEA; --muted:#9A9AA2; --faint:#605F66;
+    --line:#262832; --line-strong:#343643; --blue:#6180F5; --blue-ink:#A9B8F8; --blue-soft:#181F45;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.5);
+    --shadow-lift:0 4px 14px rgba(0,0,0,.45),0 30px 60px rgba(0,0,0,.65);
+    --fd:"Bricolage Grotesque","Hanken Grotesk",system-ui,sans-serif;
+    --fb:"Hanken Grotesk",system-ui,-apple-system,"Zen Kaku Gothic New",sans-serif;
+    --fm:"DM Mono",ui-monospace,monospace;
+    --r:14px;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink); font-family:var(--fb); font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3 { margin:0; font-weight:700; letter-spacing:-.02em; text-wrap:balance; }
+  a { color:inherit; text-decoration:none; }
+  ::selection { background:var(--blue-soft); }
+  .wrap { max-width:1120px; margin:0 auto; padding:0 28px; }
+  .btn { border:none; border-radius:11px; padding:13px 22px; font-family:var(--fb); font-size:15px; font-weight:700; cursor:pointer; transition:.15s; display:inline-flex; align-items:center; gap:8px; }
+  .btn-primary { background:var(--blue); color:#fff; }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 12px 28px color-mix(in srgb,var(--blue) 42%,transparent); }
+  .btn-ghost { background:transparent; border:1px solid var(--line-strong); color:var(--ink); }
+  .btn-ghost:hover { border-color:var(--blue); color:var(--blue-ink); }
+  .eyebrow { font-family:var(--fm); font-size:12.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--blue-ink); }
+
+  /* nav */
+  nav { position:sticky; top:0; z-index:30; background:color-mix(in srgb,var(--ground) 82%,transparent); backdrop-filter:saturate(1.4) blur(10px); border-bottom:1px solid var(--line); }
+  .nav-in { display:flex; align-items:center; gap:26px; height:66px; }
+  .brand { display:flex; align-items:center; gap:11px; }
+  .brand .word { font-family:var(--fd); font-weight:800; font-size:22px; }
+  .brand .word .o { color:var(--blue); }
+  .nav-links { display:flex; gap:22px; margin-left:14px; }
+  .nav-links a { font-size:14.5px; color:var(--muted); font-weight:500; }
+  .nav-links a:hover { color:var(--ink); }
+  .nav-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .lang { display:inline-flex; border:1px solid var(--line-strong); border-radius:9px; overflow:hidden; font-family:var(--fm); font-size:12px; }
+  .lang button { border:none; background:transparent; padding:7px 11px; color:var(--muted); cursor:pointer; }
+  .lang button[aria-pressed="true"] { background:var(--ink); color:var(--ground); }
+
+  /* hero */
+  .hero { padding:76px 0 26px; }
+  .hero .eyebrow { display:block; margin-bottom:20px; }
+  .hero h1 { font-family:var(--fd); font-weight:800; font-size:clamp(44px,7vw,84px); line-height:1.02; }
+  .hero .sub { font-size:19px; color:var(--muted); max-width:46ch; margin:24px 0 0; line-height:1.6; }
+  .hero .cta { display:flex; gap:13px; margin-top:32px; flex-wrap:wrap; align-items:center; }
+  .hero .cta .micro { font-size:13px; color:var(--faint); font-family:var(--fm); }
+
+  /* hero visual: three format frames */
+  .stage { margin-top:56px; display:flex; gap:20px; align-items:flex-end; justify-content:center; padding:36px 24px; background:var(--surface); border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow-lift); overflow:hidden; position:relative; }
+  .stage::before { content:""; position:absolute; left:50%; top:-80px; transform:translateX(-50%); width:420px; height:420px; border-radius:50%; background:radial-gradient(circle,var(--blue-soft),transparent 68%); opacity:.9; }
+  .fr { position:relative; background:linear-gradient(160deg,#2f3947,#161b22); border-radius:12px; box-shadow:var(--shadow-lift); color:#fff; overflow:hidden; flex:none; }
+  .fr.wide { width:340px; height:191px; }
+  .fr.square { width:200px; height:200px; }
+  .fr.vert { width:120px; height:213px; }
+  .fr .lbl { position:absolute; top:9px; left:10px; font-family:var(--fm); font-size:9.5px; background:rgba(0,0,0,.35); padding:2px 7px; border-radius:5px; z-index:2; }
+  .fr .cap { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:800; font-size:15px; padding:0 14px; text-shadow:0 2px 8px rgba(0,0,0,.4); }
+  .fr.square .cap { font-size:13px; } .fr.vert .cap { font-size:11px; }
+  .fr .play { position:absolute; left:50%; bottom:10px; transform:translateX(-50%); width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,.92); color:var(--blue); display:grid; place-items:center; font-size:10px; z-index:2; }
+
+  /* logos */
+  .logos { padding:40px 0 10px; }
+  .logos .cap { text-align:center; font-family:var(--fm); font-size:12px; color:var(--faint); letter-spacing:.06em; text-transform:uppercase; }
+  .logos .row { display:flex; gap:38px; justify-content:center; flex-wrap:wrap; margin-top:18px; opacity:.62; }
+  .logos .row span { font-family:var(--fd); font-weight:700; font-size:19px; color:var(--muted); }
+
+  section.blk { padding:70px 0; }
+  .sec-head { max-width:60ch; }
+  .sec-head h2 { font-family:var(--fd); font-size:clamp(28px,4vw,42px); font-weight:800; margin-top:12px; line-height:1.1; }
+  .sec-head p { color:var(--muted); font-size:17px; margin-top:14px; line-height:1.6; }
+
+  /* steps */
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:38px; }
+  .step { background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:26px; box-shadow:var(--shadow); }
+  .step .no { font-family:var(--fm); font-size:12px; color:var(--blue); }
+  .step h3 { font-size:19px; margin:14px 0 8px; }
+  .step p { color:var(--muted); font-size:14.5px; line-height:1.6; }
+
+  /* pillars */
+  .pillars { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:38px; }
+  .pillar { background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:22px; box-shadow:var(--shadow); }
+  .pillar .ic { width:42px; height:42px; border-radius:11px; background:var(--blue-soft); color:var(--blue); display:grid; place-items:center; margin-bottom:16px; }
+  .pillar .ic svg { width:21px; height:21px; }
+  .pillar h3 { font-size:18px; } .pillar p { color:var(--muted); font-size:14.5px; margin-top:8px; line-height:1.65; }
+
+  /* partners strip */
+  .logos .row.partners { gap:14px 26px; opacity:1; align-items:center; }
+  .logos .row.partners span { font-family:var(--fb); font-weight:500; font-size:14px; color:var(--muted); }
+  .logos .row.partners span.hl { color:var(--blue-ink); font-family:var(--fm); font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; }
+  .logos .row.partners .sep { width:4px; height:4px; border-radius:50%; background:var(--line-strong); }
+
+  /* compare table */
+  .cmp-wrap { margin-top:38px; overflow-x:auto; border:1px solid var(--line); border-radius:var(--r); background:var(--surface); box-shadow:var(--shadow); }
+  table.cmp { border-collapse:collapse; width:100%; min-width:860px; font-size:14px; }
+  .cmp th, .cmp td { padding:14px 16px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; line-height:1.5; }
+  .cmp thead th { font-family:var(--fm); font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:500; background:var(--surface-2); white-space:nowrap; }
+  .cmp thead th.me { color:var(--blue-ink); }
+  .cmp tbody th { font-weight:700; color:var(--ink); font-size:14px; white-space:nowrap; }
+  .cmp tbody tr:last-child th, .cmp tbody tr:last-child td { border-bottom:none; }
+  .cmp td.me { background:var(--blue-soft); color:var(--ink); font-weight:700; }
+  .cmp td small { display:block; color:var(--muted); font-weight:400; font-size:12.5px; margin-top:2px; }
+  .cmp .y, .cmp .p, .cmp .n { font-family:var(--fm); font-size:12.5px; margin-right:6px; }
+  .cmp .y { color:#7DD3A0; } .cmp .p { color:#F0B35C; } .cmp .n { color:var(--faint); }
+  .cmp-note { color:var(--faint); font-size:12.5px; margin-top:12px; font-family:var(--fm); }
+
+  /* plans */
+  .plans { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-top:34px; }
+  .plan { background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:22px 18px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:14px; position:relative; }
+  .plan.featured { border-color:var(--blue); box-shadow:0 0 0 1px var(--blue), var(--shadow-lift); }
+  .plan .tag { position:absolute; top:-11px; left:22px; font-family:var(--fm); font-size:11px; letter-spacing:.1em; text-transform:uppercase; background:var(--blue); color:#fff; padding:3px 10px; border-radius:999px; }
+  .plan .pn { font-family:var(--fd); font-weight:800; font-size:19px; }
+  .plan .pp { font-family:var(--fd); font-weight:800; font-size:26px; letter-spacing:-.02em; line-height:1; font-variant-numeric:tabular-nums; }
+  .plan .pp small { font-family:var(--fb); font-weight:500; font-size:13px; color:var(--muted); letter-spacing:0; margin-left:4px; }
+  .plan .pu { font-family:var(--fm); font-size:12px; color:var(--blue-ink); margin-top:-6px; }
+  .plan ul { margin:0; padding:0; list-style:none; display:grid; gap:7px; font-size:13.5px; color:var(--muted); line-height:1.55; flex:1; }
+  .plan ul li::before { content:"—"; color:var(--faint); margin-right:8px; }
+  .plan .btn { justify-content:center; }
+  .fine { color:var(--faint); font-size:13px; margin-top:16px; font-family:var(--fm); }
+
+  /* metrics band */
+  .band { background:var(--ink); color:var(--ground); border-radius:22px; padding:48px; margin:8px 0; display:grid; grid-template-columns:repeat(3,1fr); gap:30px; box-shadow:var(--shadow-lift); }
+  .metric .n { font-family:var(--fd); font-weight:800; font-size:clamp(36px,5vw,54px); letter-spacing:-.03em; line-height:1; }
+  .metric .n em { color:#7E97FF; font-style:normal; }
+  .metric .k { color:color-mix(in srgb,var(--ground) 62%,transparent); font-size:14px; margin-top:10px; }
+
+  /* final cta */
+  .final { text-align:center; padding:84px 0; }
+  .final h2 { font-family:var(--fd); font-size:clamp(32px,5vw,56px); font-weight:800; }
+  .final p { color:var(--muted); font-size:18px; margin:16px auto 30px; max-width:44ch; }
+
+  footer { border-top:1px solid var(--line); padding:40px 0; color:var(--muted); font-size:13.5px; }
+  .foot-in { display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:center; }
+  .foot-in .jp { font-family:var(--fb); font-size:12.5px; color:var(--faint); }
+
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+  @media (max-width:1000px){ .pillars,.plans{grid-template-columns:repeat(2,1fr)} .plan .pp{font-size:30px} }
+  @media (max-width:820px){ .steps,.pillars,.plans,.band{grid-template-columns:1fr} .nav-links{display:none} .fr.vert{display:none} }
+</style>
+
+<nav><div class="wrap nav-in">
+  <div class="brand">
+    <svg width="30" height="30" viewBox="0 0 80 80" fill="none" aria-hidden="true"><rect width="80" height="80" rx="19" fill="var(--ink)"/><circle cx="40" cy="40" r="22" fill="none" stroke="var(--blue)" stroke-width="5"/><circle cx="40" cy="40" r="8" fill="#fff"/></svg>
+    <span class="word">SP<span class="o">O</span>T</span>
+  </div>
+  <div class="nav-links">
+    <a href="#how" data-i="nav1">How it works</a>
+    <a href="#why" data-i="nav2">Why SPOT</a>
+    <a href="#compare" data-i="nav4">Compare</a>
+    <a href="#pricing" data-i="nav3">Pricing</a>
+  </div>
+  <div class="nav-right">
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="en" aria-pressed="true">EN</button>
+      <button data-lang="ja" aria-pressed="false">日本語</button>
+    </div>
+    <button class="btn btn-primary" style="padding:10px 18px" data-i="navcta">Book a demo</button>
+  </div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <span class="eyebrow" data-i="eyebrow">The AI commercial studio for B2B SaaS &amp; app teams</span>
+  <h1 data-i="h1">Every spot,<br>in a day.</h1>
+  <p class="sub" data-i="sub">Pick your platform, industry and audience. SPOT writes the script, generates the live-action, composites your <b>real product UI</b> — never a fake screen — adds the voiceover and music, and delivers a ready-to-ship commercial the same day.</p>
+  <div class="cta">
+    <button class="btn btn-primary" data-i="cta1">Start free</button>
+    <button class="btn btn-ghost" data-i="cta2">Book a demo</button>
+    <span class="micro" data-i="micro">No prompt writing. No editing skills. No AI avatar reading a script.</span>
+  </div>
+
+  <div class="stage">
+    <div class="fr vert"><span class="lbl">9:16</span><div class="cap">Done on site.</div><span class="play">▶</span></div>
+    <div class="fr wide"><span class="lbl">16:9</span><div class="cap">Every spot, in a day.</div><span class="play">▶</span></div>
+    <div class="fr square"><span class="lbl">1:1</span><div class="cap">Ship it today.</div><span class="play">▶</span></div>
+  </div>
+</div></header>
+
+<div class="logos"><div class="wrap">
+  <div class="cap" data-i="trust">Built with in-house marketing teams at B2B SaaS and app companies</div>
+  <div class="row partners">
+    <span class="hl" data-i="tr1">Design-partner program now open</span><span class="sep"></span>
+    <span data-i="tr2">First production spot: a construction-site photo app — brief to 9 files in one day</span><span class="sep"></span>
+    <span data-i="tr3">Japanese &amp; English teams</span>
+  </div>
+</div></div>
+
+<section class="blk" id="how"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow" data-i="how-eye">How it works</span>
+    <h2 data-i="how-h">Three choices. One finished commercial.</h2>
+    <p data-i="how-p">The expertise lives in the options, not in a prompt box — so anyone on the team can ship broadcast-quality work.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="no">01</div><h3 data-i="s1h">Choose</h3><p data-i="s1p">Platform, industry, audience, tone. SPOT applies the winning ad structure behind the scenes — length, format, hook, all decided for you.</p></div>
+    <div class="step"><div class="no">02</div><h3 data-i="s2h">Generate</h3><p data-i="s2p">AI writes the script and a shot list, then produces the live-action, your real product UI, voiceover and music — routing each shot to the best model.</p></div>
+    <div class="step"><div class="no">03</div><h3 data-i="s3h">Ship</h3><p data-i="s3p">Review three intro patterns, tweak in plain words, and export nine files — three patterns across landscape, vertical and square.</p></div>
+  </div>
+</div></section>
+
+<section class="blk" id="why"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow" data-i="why-eye">Why SPOT</span>
+    <h2 data-i="why-h">Enterprise-ready, by design.</h2>
+  </div>
+  <div class="pillars">
+    <div class="pillar"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3 data-i="p1h">Brand-safe</h3><p data-i="p1p">Your real product screens are composited in — never fake UI. A brand kit and pronunciation guide keep your tone and product names exactly right.</p></div>
+    <div class="pillar"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><h3 data-i="p2h">Same-day</h3><p data-i="p2p">Brief to first cut in a day. Revisions in minutes with plain language. Refresh creative before it fatigues.</p></div>
+    <div class="pillar"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><h3 data-i="p3h">Built to scale</h3><p data-i="p3p">Spin one concept into dozens of angles and formats for always-on A/B testing. Team seats and approval flows included.</p></div>
+    <div class="pillar"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H4z"/><path d="M8 20h8M12 16v4"/><path d="M8 9l2 2 4-4"/></svg></div><h3 data-i="p4h">Compliance-ready</h3><p data-i="p4p">AI-use disclosure captions that follow Japan's JIAA guideline, Content Credentials (C2PA) and a watermark on every file, and a likeness check so no real person appears without consent.</p></div>
+  </div>
+</div></section>
+
+<section class="blk" id="compare"><div class="wrap">
+  <div class="sec-head">
+    <span class="eyebrow" data-i="cmp-eye">Compare</span>
+    <h2 data-i="cmp-h">Not another avatar tool. Not a template library.</h2>
+    <p data-i="cmp-p">Most AI ad tools put a synthetic presenter in front of a camera, or drop your images into a template. SPOT builds the commercial around your real product.</p>
+  </div>
+  <div class="cmp-wrap">
+    <table class="cmp">
+      <thead><tr>
+        <th></th>
+        <th class="me">SPOT</th>
+        <th data-i="ch1">AI avatar &amp; UGC tools</th>
+        <th data-i="ch2">Platform-native ad tools</th>
+        <th data-i="ch3">Template video tools</th>
+        <th data-i="ch4">AI production studios</th>
+      </tr></thead>
+      <tbody>
+        <tr><th data-i="r1">Your real product UI in the spot</th><td class="me"><span class="y">●</span><span data-i="r1a">Composited from your screens</span></td><td><span class="p">△</span><span data-i="r1b">Scraped images or your own B-roll</span></td><td><span class="n">○</span><span data-i="r1c">Not supported</span></td><td><span class="p">△</span><span data-i="r1d">Screen recording only</span></td><td><span class="y">●</span><span data-i="r1e">Done by hand</span></td></tr>
+        <tr><th data-i="r2">Generated live-action, voice and music</th><td class="me"><span class="y">●</span><span data-i="r2a">Every cut, routed to the best model</span></td><td><span class="p">△</span><span data-i="r2b">Presenter only</span></td><td><span class="y">●</span><span data-i="r2c">Yes, per platform</span></td><td><span class="n">○</span><span data-i="r2d">Assembles your assets</span></td><td><span class="y">●</span><span data-i="r2e">Yes</span></td></tr>
+        <tr><th data-i="r3">No prompts — choices carry the structure</th><td class="me"><span class="y">●</span><span data-i="r3a">Platform × industry × audience</span></td><td><span class="n">○</span><span data-i="r3b">Script first</span></td><td><span class="y">●</span><span data-i="r3c">Brief in a box</span></td><td><span class="y">●</span><span data-i="r3d">Pick a template</span></td><td><span class="y">●</span><span data-i="r3e">Brief a producer</span></td></tr>
+        <tr><th data-i="r4">All channels at once</th><td class="me"><span class="y">●</span><span data-i="r4a">3 patterns × 3 formats = 9 files</span></td><td><span class="p">△</span><span data-i="r4b">Re-render per format</span></td><td><span class="n">○</span><span data-i="r4c">Locked to one platform</span></td><td><span class="y">●</span><span data-i="r4d">Batch output</span></td><td><span class="p">△</span><span data-i="r4e">Per deliverable</span></td></tr>
+        <tr><th data-i="r5">Japanese &amp; English, JP ad-law aware</th><td class="me"><span class="y">●</span><span data-i="r5a">Pronunciation dictionary, AI disclosure</span></td><td><span class="n">○</span><span data-i="r5b">English-first</span></td><td><span class="p">△</span><span data-i="r5c">Localized UI, no legal review</span></td><td><span class="y">●</span><span data-i="r5d">Domestic</span></td><td><span class="y">●</span><span data-i="r5e">Domestic</span></td></tr>
+        <tr><th data-i="r6">First cut</th><td class="me"><span class="y">●</span><span data-i="r6a">Same day, revisions in minutes</span></td><td><span class="y">●</span><span data-i="r6b">Minutes</span></td><td><span class="y">●</span><span data-i="r6c">Minutes</span></td><td><span class="y">●</span><span data-i="r6d">Minutes</span></td><td><span class="n">○</span><span data-i="r6e">1.5–2 weeks</span></td></tr>
+        <tr><th data-i="r7">Cost per finished spot</th><td class="me" data-i="r7a">≈ $16 (¥2,400) on Team<small>9 files per spot, plans from $99 / mo</small></td><td data-i="r7b">$110–410 / month<small>per 10–20 presenter videos</small></td><td data-i="r7c">Free<small>with ad spend on that platform</small></td><td data-i="r7d">Subscription<small>often annual, undisclosed</small></td><td data-i="r7e">¥500,000–1,000,000<small>per spot, limited revisions</small></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="cmp-note" data-i="cmp-note">Category comparison based on public product pages and pricing as of September 2026. Individual tools vary.</p>
+</div></section>
+
+<section class="blk" id="pricing"><div class="wrap">
+  <div class="band">
+    <div class="metric"><div class="n"><em>1/400</em></div><div class="k" data-i="m1">of typical agency production cost</div></div>
+    <div class="metric"><div class="n" data-i="m2n">Same day</div><div class="k" data-i="m2">vs. an industry average of 3 weeks</div></div>
+    <div class="metric"><div class="n">3 × 3</div><div class="k" data-i="m3">patterns × formats, generated at once</div></div>
+  </div>
+
+  <div class="sec-head" style="margin-top:64px">
+    <span class="eyebrow" data-i="pr-eye">Pricing</span>
+    <h2 data-i="pr-h">Priced per spot, not per prompt.</h2>
+    <p data-i="pr-p">One spot is one finished commercial: 3 intro patterns × 3 formats = 9 ready-to-ship files. Plans include the generation cost; plain-language revisions are part of every spot.</p>
+  </div>
+  <div class="plans">
+    <div class="plan">
+      <div class="pn" data-i="pl0n">Free</div>
+      <div class="pp" data-i="pl0p">$0</div>
+      <div class="pu" data-i="pl0u">1 spot / month</div>
+      <ul>
+        <li data-i="pl0a">Watermark, 720p</li>
+        <li data-i="pl0b">1 seat, 1 brand</li>
+        <li data-i="pl0c">Community support</li>
+      </ul>
+      <button class="btn btn-ghost" data-i="pl0c2">Start free</button>
+    </div>
+    <div class="plan">
+      <div class="pn" data-i="pl1n">Starter</div>
+      <div class="pp" data-i="pl1p">$99<small>/ mo</small></div>
+      <div class="pu" data-i="pl1u">6 spots / month</div>
+      <ul>
+        <li data-i="pl1a">1080p, no watermark</li>
+        <li data-i="pl1b">2 seats, 1 brand</li>
+        <li data-i="pl1c">Basic brand kit</li>
+        <li data-i="pl1d">Extra spots $19 each</li>
+      </ul>
+      <button class="btn btn-ghost" data-i="pl1c2">Start free</button>
+    </div>
+    <div class="plan featured">
+      <span class="tag" data-i="pl2t">Most teams</span>
+      <div class="pn" data-i="pl2n">Team</div>
+      <div class="pp" data-i="pl2p">$399<small>/ mo</small></div>
+      <div class="pu" data-i="pl2u">25 spots / month</div>
+      <ul>
+        <li data-i="pl2a">5 seats, 3 brands</li>
+        <li data-i="pl2b">Brand kit + pronunciation guide</li>
+        <li data-i="pl2c">Approval flow, AI disclosure on every file</li>
+        <li data-i="pl2d">Extra spots $19 each</li>
+      </ul>
+      <button class="btn btn-primary" data-i="pl2c2">Start free, upgrade anytime</button>
+    </div>
+    <div class="plan">
+      <div class="pn" data-i="pl3n">Business</div>
+      <div class="pp" data-i="pl3p">$1,199<small>/ mo</small></div>
+      <div class="pu" data-i="pl3u">80 spots / month</div>
+      <ul>
+        <li data-i="pl3a">4K + Premium quality models</li>
+        <li data-i="pl3b">Unlimited seats, 10 brands</li>
+        <li data-i="pl3c">SSO, API, audit log, Content Credentials</li>
+        <li data-i="pl3d">Extra spots $15 each</li>
+      </ul>
+      <button class="btn btn-ghost" data-i="pl3c2">Book a demo</button>
+    </div>
+    <div class="plan">
+      <div class="pn" data-i="pl4n">Enterprise</div>
+      <div class="pp" data-i="pl4p">From $2,500</div>
+      <div class="pu" data-i="pl4u">Committed volume</div>
+      <ul>
+        <li data-i="pl4a">Unlimited brands (agencies)</li>
+        <li data-i="pl4b">White-label, DPA, security review</li>
+        <li data-i="pl4c">Custom brand models</li>
+        <li data-i="pl4d">Onboarding + CSM, invoice billing</li>
+      </ul>
+      <button class="btn btn-ghost" data-i="pl4c2">Talk to sales</button>
+    </div>
+  </div>
+  <p class="fine" data-i="pr-fine">Annual billing: 2 months free. Prices exclude tax. JPY billing: Starter ¥14,800 · Team ¥59,800 · Business ¥178,000 · Enterprise from ¥380,000.</p>
+</div></section>
+
+<section class="final"><div class="wrap">
+  <h2 data-i="final-h">Ship your next spot today.</h2>
+  <p data-i="final-p">Ship a commercial with your real product in it, the same day you brief it. Built for SaaS and app marketing teams.</p>
+  <button class="btn btn-primary" style="padding:15px 28px;font-size:16px" data-i="final-cta">Start free</button>
+</div></section>
+
+<footer><div class="wrap foot-in">
+  <div class="brand"><span class="word" style="font-family:var(--fd);font-weight:800;font-size:18px">SP<span style="color:var(--blue)">O</span>T</span></div>
+  <div>© 2026 SPOT ・ <span data-i="foot">The AI commercial studio for marketing teams.</span></div>
+  <div class="jp">日本語・English 対応 — AI動画広告・CM制作ツール SPOT</div>
+</div></footer>
+
+<script>
+  // i18n
+  const JA = {
+    nav1:"使い方", nav2:"選ばれる理由", nav3:"料金", nav4:"他ツールとの違い", navcta:"デモを予約",
+    eyebrow:"SaaS・アプリ企業のマーケティングチームのための AI CM制作スタジオ",
+    h1:"動画広告が、<br>その日のうちに。",
+    sub:"配信先・業種・ターゲットを選ぶだけ。AIが台本を書き、実写を生成し、<b>実際のプロダクト画面</b>を合成——偽のUIは作りません。ナレーションとBGMまで付けて、その日のうちに配信できるCMをお届けします。",
+    cta1:"無料ではじめる", cta2:"デモを予約", micro:"プロンプトも、動画編集スキルも、台本を読むAIアバターも要りません。",
+    trust:"SaaS・アプリ企業で動画広告を内製する、マーケティングチームと共に",
+    tr1:"デザインパートナー募集中", tr2:"最初の実案件: 工事写真アプリのCMを、ブリーフから9ファイル納品まで1日で", tr3:"日本語・英語チームに対応",
+    "how-eye":"使い方", "how-h":"3つ選ぶだけで、動画広告が1本完成。",
+    "how-p":"広告制作の勝ちパターンは、選択肢の中に。プロンプトを書かなくても、チームの誰もが放送品質の動画広告をつくれます。",
+    s1h:"選ぶ", s1p:"配信先・業種・ターゲット・トーンを選択するだけ。尺・縦横比・冒頭フックといった勝ちパターンは自動で最適化されます。",
+    s2h:"つくる", s2p:"AIが構成台本と撮影指示を作成し、実写・アプリ画面・ナレーション・BGMまで生成。カットごとに最適なAIを使い分けます。",
+    s3h:"公開する", s3p:"3つのイントロ案から選び、気になる点は言葉で修正。横型・縦型・正方形×3パターンの計9本を書き出せます。",
+    "why-eye":"選ばれる理由", "why-h":"はじめから、企業仕様。",
+    p1h:"ブランドセーフ", p1p:"実際のアプリ画面を合成し、偽のUIは作りません。ブランドガイドラインと読み仮名辞書で、トーンと商品名を守ります。景表法にも配慮。",
+    p2h:"当日納品", p2p:"ブリーフから初稿まで最短当日。修正は「もっと明るく」のひと言で数分。広告が疲弊する前に、素材を差し替え続けられます。",
+    p3h:"量産にも対応", p3p:"1つの企画を訴求軸・フォーマット違いで量産し、常時A/Bテストへ。チームでの利用や承認フローにも対応します。",
+    p4h:"法務対応、標準装備", p4p:"JIAA「広告クリエイティブにおけるAI利用の自主開示ガイドライン」に沿ったAI利用表記、全ファイルへのコンテンツ認証情報（C2PA）と電子透かし、実在人物との類似チェック。導入審査にそのまま出せます。",
+    "cmp-eye":"他ツールとの違い", "cmp-h":"アバターツールでも、テンプレ集でもない。",
+    "cmp-p":"多くのAI広告ツールは、合成の出演者に台本を読ませるか、手持ちの画像をテンプレに流し込みます。SPOTは、実際のプロダクトを主役にCMを組み立てます。",
+    ch1:"AIアバター・UGC系", ch2:"媒体内蔵ツール", ch3:"テンプレ動画ツール", ch4:"AI制作サービス",
+    r1:"実際のプロダクト画面を織り込む", r1a:"提供スクショから合成", r1b:"URLの画像を流用 or 自前B-roll", r1c:"非対応", r1d:"画面収録のみ", r1e:"人が手作業で",
+    r2:"実写・音声・BGMを生成", r2a:"全カット、最適モデルに振り分け", r2b:"出演者のみ", r2c:"媒体ごとに対応", r2d:"手持ち素材の組み立て", r2e:"対応",
+    r3:"プロンプト不要（選択肢に型を内蔵）", r3a:"媒体×業種×ターゲット", r3b:"台本を書く", r3c:"ブリーフ入力", r3d:"テンプレを選ぶ", r3e:"制作会社にブリーフ",
+    r4:"全媒体を一括出力", r4a:"3パターン×3形式 = 9ファイル", r4b:"形式ごとに再生成", r4c:"その媒体のみ", r4d:"一括出力", r4e:"納品物ごと",
+    r5:"日本語・英語、国内広告法務", r5a:"発音辞書・AI利用表記", r5b:"英語中心", r5c:"UIは日本語、法務は対象外", r5d:"国内", r5e:"国内",
+    r6:"初稿まで", r6a:"当日。修正は分単位", r6b:"数分", r6c:"数分", r6d:"数分", r6e:"1.5〜2週間",
+    r7:"完成CM 1本あたり", r7a:"Team で約 ¥2,400<small>1本 = 9ファイル。プランは月 ¥14,800〜</small>", r7b:"月 $110〜410<small>出演者動画 10〜20本分</small>", r7c:"無料<small>その媒体への出稿が前提</small>", r7d:"サブスク<small>年契約・非公開が多い</small>", r7e:"¥50万〜100万<small>1本・修正回数制限あり</small>",
+    "cmp-note":"2026年9月時点の各社公開ページ・料金に基づくカテゴリ比較。個別ツールにより異なります。",
+    "pr-eye":"料金", "pr-h":"プロンプト単位ではなく、CM 1本単位。",
+    "pr-p":"1スポット = 完成CM 1本。イントロ3パターン × 3形式 = 配信可能な9ファイル。生成コストはプランに含まれ、言葉での修正は各スポットに含まれます。",
+    pl0n:"Free", pl0p:"¥0", pl0u:"月 1 スポット", pl0a:"透かし入り・720p", pl0b:"1 席・1 ブランド", pl0c:"コミュニティサポート", pl0c2:"無料ではじめる",
+    pl1n:"Starter", pl1p:"¥14,800<small>/ 月</small>", pl1u:"月 6 スポット", pl1a:"1080p・透かしなし", pl1b:"2 席・1 ブランド", pl1c:"ブランドキット（基本）", pl1d:"追加スポット ¥2,800", pl1c2:"無料ではじめる",
+    pl2t:"標準", pl2n:"Team", pl2p:"¥59,800<small>/ 月</small>", pl2u:"月 25 スポット", pl2a:"5 席・3 ブランド", pl2b:"ブランドキット＋読み仮名辞書", pl2c:"承認フロー・全ファイルにAI利用表記", pl2d:"追加スポット ¥2,800", pl2c2:"無料で試して、いつでも移行",
+    pl3n:"Business", pl3p:"¥178,000<small>/ 月</small>", pl3u:"月 80 スポット", pl3a:"4K・Premium quality モデル", pl3b:"席無制限・10 ブランド", pl3c:"SSO・API・監査ログ・コンテンツ認証情報", pl3d:"追加スポット ¥2,200", pl3c2:"デモを予約",
+    pl4n:"Enterprise", pl4p:"¥380,000〜", pl4u:"コミット制", pl4a:"ブランド無制限（代理店向け）", pl4b:"ホワイトラベル・DPA・セキュリティ審査", pl4c:"カスタムブランドモデル", pl4d:"オンボーディング＋CSM・請求書払い", pl4c2:"営業に相談",
+    "pr-fine":"年契約は 2 か月分無料。価格は税別。USD 建て: Starter $99 · Team $399 · Business $1,199 · Enterprise $2,500〜。",
+    m1:"一般的な制作会社の外注費に対して", m2n:"当日", m2:"業界平均は約3週間", m3:"パターン×フォーマットを一括生成",
+    "final-h":"次のCMも、その日のうちに。", "final-p":"ブリーフしたその日に、実際の画面が入ったCMを配信する。SaaS・アプリのマーケティングチームのための制作スタジオです。",
+    "final-cta":"無料ではじめる", foot:"マーケティングチームのためのAI動画広告・CM制作ツール。"
+  };
+  const EN = {}; document.querySelectorAll('[data-i]').forEach(el=>EN[el.dataset.i]=el.innerHTML);
+
+  // Production domain — swap with the real one when confirmed.
+  const SITE = 'https://spot.video';
+  // Per-language SEO metadata (title / description / social / locale / canonical path).
+  const META = {
+    en: {
+      title: 'SPOT — AI video ad & commercial studio for marketing teams',
+      desc: 'SPOT turns three choices into a finished video ad. AI generates the footage, your real product UI, the voiceover and the music, then delivers a ready-to-ship commercial the same day — at about 1/400 of typical agency cost. Built for in-house marketing teams producing and A/B-testing video ads at scale.',
+      ogTitle: 'SPOT — Every spot, in a day.',
+      ogDesc: 'Pick platform, industry and audience. SPOT generates a ready-to-ship video ad the same day, at about 1/400 of agency cost.',
+      locale: 'en_US', alt: 'ja_JP', path: '/'
+    },
+    ja: {
+      title: 'SPOT（スポット）｜SaaS・アプリ企業のためのAI CM制作スタジオ',
+      desc: 'SPOT（スポット）は、SaaS・アプリ企業のマーケティングチーム向けAI CM制作スタジオ。配信先・業種・ターゲットを選ぶだけで、実写を生成し、実際のプロダクト画面を合成（偽UIなし）、ナレーション・BGM付きの9ファイルをその日のうちに納品。月 ¥14,800〜。AIアバターでもテンプレでもない、CM品質の内製ツール。',
+      ogTitle: 'SPOT｜AI動画広告・CM制作ツール',
+      ogDesc: '選ぶだけで、動画広告・CMがその日のうちに。実写もアプリ画面もナレーションもAIが生成。制作費は外注の約1/400。',
+      locale: 'ja_JP', alt: 'en_US', path: '/ja'
+    }
+  };
+  function meta(sel, val){ const el=document.head.querySelector(sel); if(el) el.setAttribute(sel.includes('property=')||sel.includes('name=')?'content':'href', val); }
+  function applySeo(l){
+    const m = META[l];
+    document.title = m.title;
+    meta('meta[name="description"]', m.desc);
+    meta('meta[property="og:title"]', m.ogTitle);
+    meta('meta[property="og:description"]', m.ogDesc);
+    meta('meta[name="twitter:title"]', m.ogTitle);
+    meta('meta[name="twitter:description"]', m.ogDesc);
+    meta('meta[property="og:locale"]', m.locale);
+    meta('meta[property="og:locale:alternate"]', m.alt);
+    meta('meta[property="og:url"]', SITE + m.path);
+    meta('link[rel="canonical"]', SITE + m.path);
+  }
+  function setLang(l){
+    const dict = l==='ja'?JA:EN;
+    document.querySelectorAll('[data-i]').forEach(el=>{ if(dict[el.dataset.i]!=null) el.innerHTML=dict[el.dataset.i]; });
+    document.documentElement.lang = l;
+    document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.lang===l));
+    applySeo(l);
+  }
+  document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+
+  // English-first: default to EN; serve Japanese at /ja (or ?lang=ja).
+  const path = location.pathname.replace(/\/+$/,'');
+  const initialLang = (path.endsWith('/ja') || new URLSearchParams(location.search).get('lang')==='ja') ? 'ja' : 'en';
+  setLang(initialLang);
+</script>

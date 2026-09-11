@@ -1,0 +1,151 @@
+# ミライ工事CM — 1件目の実案件（スキーマの実例＝型）
+# この yaml が、今日手作業で作った ad-prototype/src/MiraiCM.tsx を宣言的に表現したもの。
+
+meta:
+  name: mirai-koji
+  client: 株式会社ミライ工事
+  product: ミライ工事写真
+  goal: 認知獲得・アプリDL促進
+
+output:
+  fps: 30
+  duration_frames: 961
+  formats:
+    - {id: wide,     w: 1920, h: 1080}
+    - {id: vertical, w: 1080, h: 1920}
+    - {id: square,   w: 1080, h: 1080}
+  variants:
+    - {id: A, splash: ring-marimba}
+    - {id: B, splash: confetti-ukulele}
+    - {id: C, splash: bubble-electro}
+
+brand:
+  colors: {primary: '#D7000F', accent: '#FFC933'}
+  app_icon: assets/logo/app_icon.png
+  watermark: {text: ミライ工事, position: top-left, safe_zone_vertical: 150}
+  pronunciation:
+    ミライ工事写真: "ミライコウジシャシン"
+  facts:   # CTA実績バッジ（公開情報で裏取り済み。最新値はクライアント確認）
+    cumulative_dl: 50万
+    projects: 300万件
+
+render:
+  composition: MiraiCM     # 1件目は手作りコンポジション。2件目以降は既定の SpotAd（project.yaml 駆動）
+
+compliance:                # 省略時も全て ON。ここでは明示（型の実例として）
+  ai_disclosure: true
+  disclosure_lang: ja
+  content_credentials: true
+  likeness_check: true
+  real_ui_only: true
+  claims_evidence:
+    - {claim: "月40時間", source: "自社調べ", note: "※自社調べ"}
+    - {claim: "累計50万DL", source: "公開情報（クライアント確認済み）"}
+    - {claim: "プロジェクト300万件", source: "公開情報（クライアント確認済み）"}
+
+delivery:
+  platforms: [youtube, reels_shorts, timeline]
+
+style:
+  tone: documentary
+  grade: broadcast-cool
+  realism_fx: {grain: 0.07, handheld_drift: true, ambience_bed: 0.20}
+  living_world: contextual
+
+script:
+  voice: {model: minimax-speech-02-hd, voice_id: Japanese_LoyalKnight, speed: 1.18}
+  narration:
+    - {id: na1, text: "現場写真の整理、まだ会社に持ち帰ってますか?"}
+    - {id: na2, text: "取り込んで、仕分けて、貼り付けて。毎日、何時間かかっていますか?"}
+    - {id: na3, text: "ミライ工事写真、スマホで撮るだけで、工事台帳が自動でできあがる。"}
+    - {id: na4, text: "現場を出る前に、PDFまで完成。"}
+    - {id: na5, text: "お客様への提出も、その場で完了。持ち帰りゼロへ。"}
+    - {id: na6, text: "ミライ工事写真、今すぐ無料でダウンロード。"}
+
+cuts:
+  - id: cut01
+    type: live-action
+    scene: van-interior
+    still: {model: imagen4, subject: "疲れた40代の現場監督が停車中の車内でため息", props: [書類の山, コンパクトデジカメ]}
+    motion: {model: veo3.1, resolution: 1080p, gaze: downcast, exterior: static}
+    crop: {anchor_x: 55, portrait_native: cut01_v}
+    telop: ["写真整理は、会社に帰ってから…?"]
+    narration: na1
+
+  - id: cut02
+    type: live-action
+    scene: night-office
+    still: {model: seedream-v4-edit, subject: "夜オフィスで写真整理する監督（バストアップ・顔が明るい寄り構図）", note: "顔ぬるっと対策で寄り＋明るく"}
+    motion: {model: veo3.1, resolution: 1080p, face: expressive}   # 表情の生命感優先
+    crop: {anchor_x: 50, portrait_native: cut02_v}
+    telop: ["取り込んで、仕分けて、貼り付けて。"]
+    narration: na2
+
+  - id: stat40
+    type: graphic
+    graphic: stat-countup
+    value: {label: "その作業に、月", number: 40, unit: "時間。", note: "※自社調べ"}
+    background: papers-falling      # 高解像度の舞う書類（照明設計入り）
+    telop_style: metal              # シルバーグラデ+黒縁のCMテロップ
+
+  - id: cut03
+    type: live-action
+    scene: construction
+    still: {model: imagen4, subject: "白ヘルの監督が現場でスマホ撮影", fix: [hands]}   # 手の指を検品・修正
+    motion: {model: veo3.1, resolution: 1080p, living_world: [遠景クレーン, 歩く作業員, 揺れる安全ネット, 流れる雲]}
+    crop: {anchor_x: 55}
+    telop: ["スマホで、撮るだけ。"]
+    narration: na3
+
+  - id: ledger
+    type: ui
+    ui: auto-ledger
+    assets: {camera: ui2_camera, ledger_empty: ui2_list_empty, ledger_full: ui2_list_filled}
+    animation: photo-fly-to-ledger
+    device_frame: code-drawn        # コード描画のスマホ筐体（PNG枠依存の破綻を回避）
+    sfx: [shutter, pop, pop, pop]
+    telop: ["スマホで撮るだけ。台帳が自動作成"]
+
+  - id: pdf
+    type: ui
+    ui: pdf-sheet
+    layout: a4-portrait             # A4縦・写真3枚
+    stamp: {text: "PDF完成!", motion: soft-press}
+    telop: ["その場で、PDF完成。"]
+    narration: na4
+
+  - id: cut05
+    type: live-action
+    scene: dusk-exterior
+    still: {model: nano-banana, subject: "監督が車の横でスマホ送信して笑顔"}
+    motion: {model: veo3.1, resolution: 1080p, light: even-no-flare}   # 耳フレア対策
+    fx: [send-document]             # 台帳ミニチュアがスマホから飛ぶ
+    telop: ["お客様へ、その場で送信。"]
+    narration: na5
+
+  - id: cut05b
+    type: live-action
+    scene: client-office
+    still: {model: nano-banana, subject: "客先の担当者がPCで受信して驚き笑顔"}
+    motion: {model: veo3.1, resolution: 1080p}
+    crop: {portrait_native: cut05b_v}   # 人物+PCが縦で両立しない→縦ネイティブ
+    fx: [receive-document]          # 台帳が右からアーチで飛来+通知ポップ
+    telop: ["持ち帰りゼロへ。"]
+
+  - id: cta
+    type: cta
+    badges: ["累計50万DL突破", "プロジェクト300万件突破"]
+    search_box: {text: ミライ工事写真, animation: typing}
+    button: "今すぐ 無料ダウンロード"
+    store: [app-store, google-play]
+    narration: na6
+
+audio:
+  sound_logo: {model: elevenlabs-sfx-v2}       # variant毎に別（A/B/C）
+  brand_call: {text: "ミライコウジ!", sync_to: sound_logo}
+  bgm:
+    - {id: problem,  mood: melancholic-piano}
+    - {id: solution, mood: uplifting-corporate}
+
+# 実測原価（fal.ai）: 1本あたり概算 数百円〜（スチル・動画化・音声・リテイク込み）
+# ※ Veo 1080p は $3-4/本、Kling は $0.35/本、スチル系は数円/枚

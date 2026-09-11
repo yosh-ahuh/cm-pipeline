@@ -1,0 +1,1 @@
+ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_A_timeline.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_A_timeline.mp4

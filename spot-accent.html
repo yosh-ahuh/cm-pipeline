@@ -1,0 +1,129 @@
+<title>SPOT アクセント比較</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --ground:#F5F3EE; --surface:#FFFFFF; --ink:#15161C; --muted:#6C6A64; --faint:#A29E95;
+    --line:#E5E0D5; --line-strong:#D6D0C2; --blue:#2846D9;
+    --fd:"Bricolage Grotesque",sans-serif; --fj:"Zen Kaku Gothic New",sans-serif; --fm:"DM Mono",monospace;
+  }
+  :root:not([data-theme="light"]) { @media (prefers-color-scheme:dark){
+    --ground:#0F1015; --surface:#181920; --ink:#F0EEE7; --muted:#9A968C; --faint:#615E56; --line:#282A33; --line-strong:#353845; --blue:#5B75F0;
+  }}
+  :root[data-theme="dark"] { --ground:#0F1015; --surface:#181920; --ink:#F0EEE7; --muted:#9A968C; --faint:#615E56; --line:#282A33; --line-strong:#353845; --blue:#5B75F0; }
+  body { margin:0; background:var(--ground); color:var(--ink); font-family:var(--fj); font-size:15px; line-height:1.7; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:1040px; margin:0 auto; padding:0 26px; }
+  .head { padding:46px 0 26px; }
+  .head .eye { font-family:var(--fm); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--blue); }
+  .head h1 { font-family:var(--fd); font-weight:800; font-size:clamp(26px,4vw,38px); letter-spacing:-.02em; margin:8px 0 6px; }
+  .head p { color:var(--muted); margin:0; max-width:60ch; line-height:1.8; font-size:14.5px; }
+  .theme-toggle { position:fixed; top:18px; right:18px; width:38px; height:38px; border-radius:10px; border:1px solid var(--line-strong); background:var(--surface); color:var(--muted); cursor:pointer; font-size:16px; z-index:10; }
+
+  .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; padding-bottom:20px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:24px; box-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 28px rgba(0,0,0,.06); position:relative; }
+  .card.rec { border-color:var(--blue); border-width:1.5px; }
+  .card .badge { position:absolute; top:18px; right:20px; font-family:var(--fm); font-size:10.5px; padding:3px 9px; border-radius:999px; background:var(--blue); color:#fff; }
+  .card .cname { font-family:var(--fd); font-weight:800; font-size:18px; letter-spacing:-.01em; }
+  .card .cchar { font-size:12.5px; color:var(--muted); margin-top:2px; }
+
+  .demo { display:flex; align-items:center; gap:18px; margin:22px 0 20px; flex-wrap:wrap; }
+  .lg { display:flex; align-items:center; gap:12px; }
+  .lg .word { font-family:var(--fd); font-weight:800; font-size:30px; letter-spacing:-.02em; }
+  .btn { border:none; border-radius:10px; padding:11px 18px; font-size:13.5px; font-weight:700; font-family:var(--fj); color:#fff; }
+  .chip { display:inline-flex; align-items:baseline; gap:5px; font-family:var(--fd); font-weight:800; font-size:15px; }
+  .chip .u { font-size:11px; color:var(--muted); font-weight:500; font-family:var(--fj); }
+
+  .pal { display:flex; gap:0; border-radius:9px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,.1); width:fit-content; }
+  .pal i { width:38px; height:38px; display:block; }
+  .cnote { font-size:12px; color:var(--muted); margin-top:14px; line-height:1.6; }
+
+  .foot { text-align:center; color:var(--faint); font-size:12px; font-family:var(--fm); padding:26px 0 56px; }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  @media (max-width:720px){ .grid{grid-template-columns:1fr} }
+</style>
+
+<button class="theme-toggle" id="theme" aria-label="テーマ切替">◐</button>
+
+<div class="wrap">
+  <div class="head">
+    <div class="eye">SPOT ・ Accent Study</div>
+    <h1>青に合わせる、第二色。</h1>
+    <p>スポットブルーは固定。マリゴールドに代わる差し色の候補を、ロゴ・ボタン・数値に実際に当てて比較します。B2B・グローバル前提で、上質さと所有可能性を重視。</p>
+  </div>
+
+  <div class="grid">
+    <!-- 1 mono -->
+    <div class="card rec">
+      <span class="badge">推奨</span>
+      <div class="cname">モノブルー</div>
+      <div class="cchar">第二色なし ・ 最も規律的でプレミアム</div>
+      <div class="demo">
+        <div class="lg">
+          <svg width="46" height="46" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="19" fill="#15161C"/><circle cx="40" cy="40" r="22" fill="none" stroke="#2846D9" stroke-width="4.5"/><circle cx="40" cy="40" r="8" fill="#fff"/></svg>
+          <span class="word">SP<span style="color:#2846D9">O</span>T</span>
+        </div>
+        <button class="btn" style="background:#2846D9">デモを予約</button>
+        <span class="chip" style="color:#2846D9">1/400<span class="u">制作費</span></span>
+      </div>
+      <div class="pal"><i style="background:#2846D9"></i><i style="background:#15161C"></i><i style="background:#F5F3EE"></i><i style="background:#6C6A64"></i><i style="background:#fff;box-shadow:inset 0 0 0 1px #E5E0D5"></i></div>
+      <div class="cnote">光点は白。青だけで語り切る。Linear・Vercel系の潔さ。迷ったらこれが最も外さない。温かみは紙の地色で補う。</div>
+    </div>
+
+    <!-- 2 teal -->
+    <div class="card">
+      <div class="cname">ブルー × ティール</div>
+      <div class="cchar">#10C4B0 ・ モダンなテック二色</div>
+      <div class="demo">
+        <div class="lg">
+          <svg width="46" height="46" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="19" fill="#15161C"/><circle cx="40" cy="40" r="22" fill="none" stroke="#2846D9" stroke-width="4.5"/><circle cx="40" cy="40" r="8" fill="#10C4B0"/></svg>
+          <span class="word">SP<span style="color:#2846D9">O</span>T</span>
+        </div>
+        <button class="btn" style="background:#2846D9">デモを予約</button>
+        <span class="chip" style="color:#0C9E8D">1/400<span class="u">制作費</span></span>
+      </div>
+      <div class="pal"><i style="background:#2846D9"></i><i style="background:#10C4B0"></i><i style="background:#15161C"></i><i style="background:#F5F3EE"></i><i style="background:#6C6A64"></i></div>
+      <div class="cnote">青×緑青のクールな二色。エネルギーとテック感。所有可能でAI定番でない。ややSaaSらしさは強めで、映像の温度は出ない。</div>
+    </div>
+
+    <!-- 3 gold -->
+    <div class="card">
+      <div class="cname">ブルー × ゴールド</div>
+      <div class="cchar">#C6A15E ・ 上質な温かみ(金)</div>
+      <div class="demo">
+        <div class="lg">
+          <svg width="46" height="46" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="19" fill="#15161C"/><circle cx="40" cy="40" r="22" fill="none" stroke="#2846D9" stroke-width="4.5"/><circle cx="40" cy="40" r="8" fill="#C6A15E"/></svg>
+          <span class="word">SP<span style="color:#2846D9">O</span>T</span>
+        </div>
+        <button class="btn" style="background:#2846D9">デモを予約</button>
+        <span class="chip" style="color:#9A7638">1/400<span class="u">制作費</span></span>
+      </div>
+      <div class="pal"><i style="background:#2846D9"></i><i style="background:#C6A15E"></i><i style="background:#15161C"></i><i style="background:#F5F3EE"></i><i style="background:#6C6A64"></i></div>
+      <div class="cnote">マリゴールドの派手なオレンジを消し、くすんだ金に。映像・上質の温度は残しつつ、B2Bの落ち着き。マリゴールドが気になる人の直接の受け皿。</div>
+    </div>
+
+    <!-- 4 coral -->
+    <div class="card">
+      <div class="cname">ブルー × コーラル</div>
+      <div class="cchar">#FF6A4D ・ 明るい差し色</div>
+      <div class="demo">
+        <div class="lg">
+          <svg width="46" height="46" viewBox="0 0 80 80" fill="none"><rect width="80" height="80" rx="19" fill="#15161C"/><circle cx="40" cy="40" r="22" fill="none" stroke="#2846D9" stroke-width="4.5"/><circle cx="40" cy="40" r="8" fill="#FF6A4D"/></svg>
+          <span class="word">SP<span style="color:#2846D9">O</span>T</span>
+        </div>
+        <button class="btn" style="background:#2846D9">デモを予約</button>
+        <span class="chip" style="color:#E24E30">1/400<span class="u">制作費</span></span>
+      </div>
+      <div class="pal"><i style="background:#2846D9"></i><i style="background:#FF6A4D"></i><i style="background:#15161C"></i><i style="background:#F5F3EE"></i><i style="background:#6C6A64"></i></div>
+      <div class="cnote">元気で目を引くが、やや消費者寄り・ポップ。B2Bの落ち着きよりスピード感を優先するなら。CTAの視認性は最強。</div>
+    </div>
+  </div>
+
+  <div class="foot">SPOT アクセント比較 — 1つ選ぶ / 数値だけ微調整も可</div>
+</div>
+
+<script>
+  const root=document.documentElement;
+  document.getElementById('theme').addEventListener('click',()=>{const c=root.getAttribute('data-theme');root.setAttribute('data-theme',c==='dark'?'light':c==='light'?'dark':(matchMedia('(prefers-color-scheme: dark)').matches?'light':'dark'));});
+</script>

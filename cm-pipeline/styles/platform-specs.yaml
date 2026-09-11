@@ -1,0 +1,65 @@
+# styles/platform-specs.yaml
+# 媒体ごとの入稿仕様。build 段階で format/variant ごとの書き出しに適用する（Phase 1c）。
+# spot-app の PLATFORM_SPECS（配信前チェック表示）と同期させること。
+#
+# 競合調査（research/competitive-research-2026-09.md）の結論:
+#   媒体内蔵ツール（TikTok Symphony / Meta Advantage+ / Google Asset Studio）は単一媒体・単一形式。
+#   SPOT は「同じ企画を全媒体の入稿仕様で一括納品」で差別化する → 仕様はデータとして持つ。
+
+youtube:
+  format: wide                      # output.formats の id
+  aspect: "16:9"
+  size: [1920, 1080]
+  codec: {video: h264, profile: high, fps: 30, max_mb: 1024}
+  loudness_lufs: -14
+  duration_s: {max: 30, bumper: 6}
+  hook_window_s: 5                  # スキップ可能になるまで
+  safe_zone: {bottom_pct: 10}       # 再生UIと重なる
+  captions: optional
+
+reels_shorts:                       # Instagram リール / YouTube ショート / TikTok
+  format: vertical
+  aspect: "9:16"
+  size: [1080, 1920]
+  codec: {video: h264, profile: high, fps: 30, max_mb: 500}
+  loudness_lufs: -14
+  duration_s: {min: 15, max: 30}
+  hook_window_s: 2
+  safe_zone: {top_pct: 14, bottom_pct: 35}   # UI重なり → テロップは中央帯
+  captions: burn_in                 # 音なし再生が多い
+
+timeline:                           # X / Facebook / LinkedIn フィード
+  format: square
+  aspect: "1:1"
+  size: [1080, 1080]
+  codec: {video: h264, profile: high, fps: 30, max_mb: 500}
+  loudness_lufs: -14
+  duration_s: {min: 15, max: 30}
+  hook_window_s: 3
+  first_frame_is_thumbnail: true
+  logo_within_s: 3
+  captions: burn_in                 # 音なし前提
+
+signage:                            # 店頭サイネージ
+  format: wide
+  aspect: "16:9"
+  size: [1920, 1080]
+  codec: {video: h264, profile: high, fps: 30}
+  audio: none
+  duration_s: {loop: 15}
+  telop_min_height_pct: 8
+  loop_seamless: true               # 継ぎ目に黒を入れない
+  captions: burn_in
+
+# --- 開示・認証（compliance ブロックが ON のとき build が適用） ---
+disclosure:
+  caption_ja: "映像の一部はAIで生成しています"
+  caption_en: "Parts of this video were generated with AI"
+  position: bottom-right
+  duration_s: 2.0                   # 末尾に表示
+  min_height_pct: 3
+  guideline: "JIAA 広告クリエイティブにおけるAI利用の自主開示ガイドライン（2026-04）"
+content_credentials:
+  standard: c2pa
+  record: [generative_models, edit_history, brand_assets]
+  watermark: invisible              # SynthID 等、モデル側の透かしはそのまま保持

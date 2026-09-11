@@ -1,0 +1,6 @@
+*/generated/
+*/out/
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/

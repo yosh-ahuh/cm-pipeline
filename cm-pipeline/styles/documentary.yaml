@@ -1,0 +1,54 @@
+# styles/documentary.yaml
+# 「ドキュメンタリー調」の画づくり語彙。検証済み（ミライ工事案件）。
+# スチル生成プロンプトは subject + この語彙群を合成して作る。
+# 最大の学び: 「cinematic」「golden hour」はAI感の元凶。使わない。
+
+id: documentary
+label: 日本のTVドキュメンタリー/報道調
+
+# 全プロンプトに付与する基調語彙
+base_vocab:
+  positive:
+    - documentary style photograph
+    - muted natural colors, slightly desaturated
+    - overcast / soft diffused daylight
+    - realistic skin with visible pores and stubble
+    - candid unposed feeling
+    - natural color grading like Japanese TV documentary
+  negative:
+    - cinematic          # AI感の主因
+    - golden hour        # 同上
+    - teal and orange
+    - oversaturated
+    - glossy / waxy skin
+
+# 日本考証（必須）
+japan_check:
+  - right-hand drive vehicles
+  - Japanese kei van / Toyota HiAce
+  - ordinary Japanese office / construction site props
+
+# 光の設計（LIGHT DESIGN）。物理整合のため単一光源・拡散光を基本に。
+light_design:
+  principle: 単一光源を動機付けし、影の方向を一貫させる。窓/鏡/水面など反射面を主構図に置かない。
+  templates:
+    van-interior:   "soft overcast daylight through the windshield from front-left, gentle dashboard sheen, soft catchlight in eyes"
+    night-office:   "warm desk lamp + cool monitor glow cross-lighting the face, catchlight in eyes, rich visible shadow detail"
+    construction:   "bright overcast daylight, soft even shadows, no harsh sun"
+    dusk-exterior:  "even soft dusk daylight, NO bright glow or flare touching the face or ears"   # ⑤耳フレア対策
+  forbid:
+    - lens flare / light leak / glowing orb on face or ear
+
+# 生きた世界（LIVING WORLD）。人物だけ動いて世界が止まるとAI感が出る。
+# ただし文脈依存: 停車中の車内など「動いてはいけない」場面ではOFF。
+living_world:
+  enable_when: 屋外・広い空間・オフィス
+  disable_when: 停車中の車内（窓外は完全静止）、静物クローズアップ
+  elements: [通る車, 揺れる街路樹, 流れる雲, 歩く人, 湯気, 揺れる安全ネット, 明滅する光]
+
+# シーン別プロンプト断片（subject に足す）
+scene_fragments:
+  van-interior:  "interior of a parked Japanese work van, documents and a compact digital camera on the passenger seat"
+  night-office:  "dim Japanese construction company office at night, desk lamp, PC monitor, photo prints, binders"
+  construction:  "Japanese construction site, scaffolding, blue safety netting, white helmet"
+  client-office: "Japanese company office, desktop PC monitor visible, window light"

@@ -1,0 +1,71 @@
+{
+  "claim_generator": "SPOT cm-pipeline/1.0",
+  "title": "mirai-koji_B_timeline.mp4",
+  "format": "video/mp4",
+  "created": "2026-09-10T09:03:37+0900",
+  "assertions": [
+    {
+      "label": "c2pa.actions",
+      "data": {
+        "actions": [
+          {
+            "action": "c2pa.edited",
+            "softwareAgent": "Remotion (SPOT cm-pipeline build)",
+            "description": "composited real product UI, telop, narration, music"
+          }
+        ]
+      }
+    },
+    {
+      "label": "stds.schema-org.CreativeWork",
+      "data": {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        "name": "株式会社ミライ工事 ミライ工事写真 B/timeline",
+        "publisher": "株式会社ミライ工事",
+        "inLanguage": "ja"
+      }
+    },
+    {
+      "label": "spot.ai_disclosure",
+      "data": {
+        "enabled": true,
+        "caption": "映像の一部はAIで生成しています",
+        "guideline": "JIAA 広告クリエイティブにおけるAI利用の自主開示ガイドライン（2026-04）"
+      }
+    },
+    {
+      "label": "spot.brand_assets",
+      "data": {
+        "real_ui_only": true,
+        "likeness_check": true,
+        "logo": "assets/logo/app_icon.png",
+        "pronunciation": [
+          "ミライ工事写真"
+        ]
+      }
+    },
+    {
+      "label": "spot.claims_evidence",
+      "data": {
+        "claims": [
+          {
+            "claim": "月40時間",
+            "source": "自社調べ",
+            "note": "※自社調べ"
+          },
+          {
+            "claim": "累計50万DL",
+            "source": "公開情報（クライアント確認済み）"
+          },
+          {
+            "claim": "プロジェクト300万件",
+            "source": "公開情報（クライアント確認済み）"
+          }
+        ]
+      }
+    }
+  ],
+  "edit_history": [],
+  "sha256": null
+}

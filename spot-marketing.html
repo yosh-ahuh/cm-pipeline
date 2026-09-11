@@ -1,0 +1,588 @@
+<title>SPOT マーケティング設計</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --ground:#F5F3EE; --surface:#FFFFFF; --surface-2:#EEEBE3; --ink:#15161C; --muted:#6C6A64; --faint:#9C9A93;
+    --line:#DEDBD3; --line-strong:#C9C6BC;
+    --blue:#2846D9; --blue-ink:#2846D9; --blue-soft:#E4E7FA; --blue-soft-2:#F0F2FC;
+    --good:#1E7A4F; --warn:#B0611A; --bad:#B4262A;
+    --fd:"Bricolage Grotesque","Hanken Grotesk",system-ui,sans-serif;
+    --fb:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;
+    --fm:"DM Mono",ui-monospace,SFMono-Regular,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground:#0E0F14; --surface:#181A21; --surface-2:#1E2029; --ink:#F0EFEA; --muted:#9A9AA2; --faint:#605F66;
+      --line:#262832; --line-strong:#343643;
+      --blue:#6180F5; --blue-ink:#A9B8F8; --blue-soft:#181F45; --blue-soft-2:#141833;
+      --good:#5CC48C; --warn:#E0A05A; --bad:#EF7B7E;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground:#0E0F14; --surface:#181A21; --surface-2:#1E2029; --ink:#F0EFEA; --muted:#9A9AA2; --faint:#605F66;
+    --line:#262832; --line-strong:#343643;
+    --blue:#6180F5; --blue-ink:#A9B8F8; --blue-soft:#181F45; --blue-soft-2:#141833;
+    --good:#5CC48C; --warn:#E0A05A; --bad:#EF7B7E;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink); font-family:var(--fb); font-size:15.5px; line-height:1.85; -webkit-font-smoothing:antialiased; }
+  a { color:var(--blue-ink); text-decoration:none; border-bottom:1px solid color-mix(in srgb,var(--blue) 35%,transparent); }
+  a:hover { border-bottom-color:var(--blue); }
+  a:focus-visible, button:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+  h1,h2,h3,h4 { margin:0; font-weight:700; text-wrap:balance; line-height:1.25; }
+  p { margin:0; }
+  .page { display:grid; grid-template-columns:1fr; max-width:1180px; margin:0 auto; padding:0 24px 96px; }
+  @media (min-width:1080px) { .page { grid-template-columns:220px minmax(0,760px); gap:64px; } }
+  /* toc */
+  .toc { display:none; }
+  @media (min-width:1080px) {
+    .toc { display:block; position:sticky; top:32px; align-self:start; padding-top:96px; font-size:13px; }
+    .toc ol { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+    .toc a { color:var(--muted); border:none; display:block; padding-left:12px; border-left:2px solid var(--line); }
+    .toc a:hover { color:var(--ink); border-left-color:var(--blue); }
+    .toc .eyebrow { margin-bottom:14px; display:block; }
+  }
+  .eyebrow { font-family:var(--fm); font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--blue-ink); }
+  main { min-width:0; }
+  /* header */
+  header { padding:88px 0 40px; border-bottom:1px solid var(--line); }
+  .brand { display:flex; align-items:center; gap:10px; font-family:var(--fd); font-weight:800; font-size:20px; margin-bottom:28px; }
+  .brand .o { display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; border:3px solid var(--blue); }
+  .brand .o::after { content:""; width:6px; height:6px; border-radius:50%; background:var(--ink); }
+  header h1 { font-family:var(--fd); font-weight:800; font-size:clamp(34px,5vw,50px); letter-spacing:-.02em; margin-top:14px; }
+  header .lede { font-size:17px; color:var(--muted); max-width:38em; margin-top:18px; }
+  .meta { display:flex; gap:22px; flex-wrap:wrap; margin-top:26px; font-family:var(--fm); font-size:12px; color:var(--faint); }
+  .meta b { color:var(--muted); font-weight:500; }
+  /* sections */
+  section { padding:56px 0 8px; }
+  section > h2 { font-family:var(--fd); font-weight:800; font-size:clamp(26px,3.4vw,34px); letter-spacing:-.015em; margin-top:10px; }
+  section > .lede { color:var(--muted); font-size:16px; margin-top:12px; max-width:40em; }
+  h3 { font-size:19px; margin-top:44px; padding-top:8px; }
+  h4 { font-size:15.5px; margin-top:26px; color:var(--ink); }
+  h3 + p, h4 + p, h3 + ul, h4 + ul { margin-top:10px; }
+  p + p { margin-top:12px; }
+  ul, ol { margin:10px 0 0; padding-left:1.3em; }
+  li { margin:5px 0; }
+  li::marker { color:var(--muted); }
+  strong { font-weight:700; }
+  .src { font-family:var(--fm); font-size:11.5px; color:var(--faint); }
+  .src a { color:var(--muted); border-bottom-color:var(--line-strong); }
+  /* callout */
+  .call { margin-top:22px; padding:20px 22px; background:var(--blue-soft-2); border-left:3px solid var(--blue); }
+  .call .eyebrow { display:block; margin-bottom:8px; }
+  .call p + p { margin-top:8px; }
+  .verdict { margin-top:22px; padding:22px 24px; background:var(--ink); color:var(--ground); border-radius:6px; }
+  .verdict .eyebrow { color:color-mix(in srgb,var(--ground) 70%,transparent); display:block; margin-bottom:10px; }
+  .verdict p { font-size:16.5px; line-height:1.7; }
+  .verdict p + p { margin-top:10px; }
+  /* tables */
+  .tw { overflow-x:auto; margin-top:16px; border:1px solid var(--line); border-radius:6px; background:var(--surface); }
+  table { border-collapse:collapse; width:100%; font-size:13.5px; line-height:1.55; font-variant-numeric:tabular-nums; }
+  th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-family:var(--fm); font-weight:500; font-size:11.5px; letter-spacing:.06em; color:var(--muted); background:var(--surface-2); white-space:nowrap; }
+  tr:last-child td { border-bottom:none; }
+  td.n { font-family:var(--fm); font-size:12.5px; white-space:nowrap; }
+  td.hl { background:var(--blue-soft); font-weight:700; }
+  .cap { font-size:12.5px; color:var(--muted); margin-top:8px; }
+  /* tags */
+  .tag { display:inline-block; font-family:var(--fm); font-size:11px; letter-spacing:.06em; padding:2px 8px; border-radius:4px; border:1px solid var(--line-strong); color:var(--muted); white-space:nowrap; }
+  .tag.p0 { border-color:var(--blue); color:var(--blue-ink); }
+  .ok { color:var(--good); } .mid { color:var(--warn); } .ng { color:var(--bad); }
+  /* stat row */
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-top:22px; }
+  .stat { background:var(--surface); padding:18px 18px 16px; }
+  .stat .n { font-family:var(--fd); font-weight:800; font-size:28px; letter-spacing:-.02em; line-height:1; color:var(--blue-ink); }
+  .stat .k { font-size:12.5px; color:var(--muted); margin-top:8px; line-height:1.5; }
+  /* tree */
+  pre.tree { margin-top:14px; padding:18px 20px; background:var(--surface); border:1px solid var(--line); border-radius:6px; font-family:var(--fm); font-size:12.5px; line-height:1.7; overflow-x:auto; color:var(--ink); }
+  pre.tree .c { color:var(--faint); }
+  pre.tree .ja { color:var(--blue-ink); }
+  /* two col */
+  .cols { display:grid; grid-template-columns:1fr; gap:18px; margin-top:16px; }
+  @media (min-width:700px) { .cols { grid-template-columns:1fr 1fr; } }
+  .col { padding:18px 20px; background:var(--surface); border:1px solid var(--line); border-radius:6px; }
+  .col h4 { margin-top:0; }
+  .col ul { padding-left:1.15em; font-size:14px; }
+  /* phases */
+  .phase { display:grid; grid-template-columns:72px 1fr; gap:18px; margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
+  .phase .w { font-family:var(--fm); font-size:12px; color:var(--blue-ink); letter-spacing:.06em; padding-top:4px; }
+  .phase h4 { margin-top:0; }
+  .phase ul { font-size:14.5px; }
+  footer { margin-top:72px; padding-top:24px; border-top:1px solid var(--line); font-size:12.5px; color:var(--faint); }
+  @media (prefers-reduced-motion:reduce){ * { transition:none!important; } }
+</style>
+
+<div class="page">
+<nav class="toc" aria-label="目次">
+  <span class="eyebrow">Contents</span>
+  <ol>
+    <li><a href="#summary">要約と決めること</a></li>
+    <li><a href="#audit">現状診断</a></li>
+    <li><a href="#geo">SEO/GEOの原則</a></li>
+    <li><a href="#structure">サイト構成</a></li>
+    <li><a href="#keywords">キーワード設計</a></li>
+    <li><a href="#offsite">サイト外の施策</a></li>
+    <li><a href="#market">料金・市場調査</a></li>
+    <li><a href="#unit">原価と単位経済</a></li>
+    <li><a href="#pricing">料金プラン提案</a></li>
+    <li><a href="#model">ビジネスモデル</a></li>
+    <li><a href="#plan">90日計画</a></li>
+  </ol>
+</nav>
+
+<main>
+<header>
+  <div class="brand"><span class="o"></span> SPOT</div>
+  <span class="eyebrow">Marketing · SEO / GEO · Pricing</span>
+  <h1>マーケティング設計</h1>
+  <p class="lede">SEO と GEO（生成エンジン最適化）に強いサイト構成、および競合・国内市場の料金調査にもとづく料金プランとビジネスモデルの提案。</p>
+  <div class="meta"><span><b>作成</b> 2026-09-10</span><span><b>換算</b> ¥150 / USD</span><span><b>出典</b> 各社料金ページ・調査レポート（本文にリンク）</span></div>
+</header>
+
+<!-- ============================================================ -->
+<section id="summary">
+  <span class="eyebrow">01 · Summary</span>
+  <h2>要約と、いま決めること</h2>
+  <p class="lede">調査から出た結論は3つ。サイトは「1ページ＋JS翻訳」から「英日それぞれ実体のある多ページ構成」へ。料金は「1クレジット ≒ ¥1,200」から「1スポット ≒ ¥2,000〜3,000 相当のプラン内包」へ。ビジネスモデルは席＋スポット数のハイブリッドで、UGCツールと制作会社の間の空白を取る。</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">85%</div><div class="k">AIの回答で企業が言及される経路のうち、自社サイト以外（第三者）の割合</div></div>
+    <div class="stat"><div class="n">$3–11</div><div class="k">UGC系AI広告ツールの「動画1本あたり」実質単価（Creatify・Arcads 等）</div></div>
+    <div class="stat"><div class="n">¥50,000〜</div><div class="k">国内で「1本」売りの最安帯（Kaizen Ad）。CyberAgent の生成AI CMは3本300万円</div></div>
+    <div class="stat"><div class="n">53%</div><div class="k">現行「¥1,200/クレジット」の粗利率（原価 $3.8 想定）。リテイク込みだと赤字圏</div></div>
+  </div>
+
+  <div class="verdict">
+    <span class="eyebrow">Decisions</span>
+    <p><strong>① 課金単位を「スポット」に固定する。</strong> 1スポット＝3パターン×3フォーマット＝9ファイル。クレジットという抽象を捨て、料金ページに「Team: 月 25 スポット」と平文で書けるようにする。これは GEO の要件（AIが読める価格文）でもある。</p>
+    <p><strong>② /ja を静的な別ページ群にする。</strong> いまの JS 差し替えは検索エンジンには英語ページに見える。日本語は競合SaaSが未参入の空白なので、ここは早く埋める。</p>
+    <p><strong>③ 生成の既定モデルを原価で選ぶ。</strong> Veo 3.1 Standard（$0.40/秒）を既定にすると Team プランでも粗利が消える。Kling 3.0 / Gen-4.5 / Veo Fast を既定、Veo Standard は「Premium quality」として上位プランに紐づける。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="audit">
+  <span class="eyebrow">02 · Audit</span>
+  <h2>現状のランディングの診断</h2>
+  <p class="lede"><code>spot-landing.html</code> はメタ情報・JSON-LD・hreflang まで整っている。問題は「土台は良いが、検索エンジンとAIが読めるページが1枚しかない」こと。</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>項目</th><th>いまの状態</th><th>影響</th><th>対応</th></tr></thead>
+    <tbody>
+      <tr><td>日本語版</td><td>同一HTMLをJSで文字列差し替え。canonical も JS で書き換え</td><td class="ng">クローラには /ja も英語ページ。hreflang が空振り</td><td>/ja/ 配下に静的HTMLを生成。ビルド時に i18n を展開</td></tr>
+      <tr><td>料金</td><td>#pricing はメトリクス帯のみ。JSON-LD の Offer は price 0</td><td class="ng">「pricing」意図で拾われない。ChatGPT が価格を答えられない</td><td>/pricing を独立ページに。プラン別 Offer と平文の価格文</td></tr>
+      <tr><td>ページ数</td><td>1ページ。ブログ・比較・ユースケースなし</td><td class="ng">上位AI引用の 63% はリスト記事。土俵に立っていない</td><td>後述のサイト構成へ（初期 30〜40 ページ）</td></tr>
+      <tr><td>構造化データ</td><td>SoftwareApplication のみ</td><td class="mid">Bing/Copilot はスキーマを使うと公式に明言</td><td>Organization・FAQPage・VideoObject・Breadcrumb を追加</td></tr>
+      <tr><td>証拠</td><td>「+120 teams」「1/400」に出典・事例なし</td><td class="mid">GEO では統計＋出典で引用率 +30〜40%</td><td>事例ページ、数値の出典、原価比較の計算根拠を公開</td></tr>
+      <tr><td>ドメイン</td><td>spot.video は仮置き</td><td class="mid">全URL・OGP・JSON-LD に影響</td><td>確定後に一括置換（ファイル冒頭コメントの通り）</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============================================================ -->
+<section id="geo">
+  <span class="eyebrow">03 · Principles</span>
+  <h2>2026年時点の SEO / GEO の原則</h2>
+  <p class="lede">AI 回答エンジン（Google AI Overviews / AI Mode、ChatGPT、Perplexity、Gemini、Claude）に引用されるために効くこと、効かないことを、根拠つきで整理する。</p>
+
+  <h3>効くこと</h3>
+  <ul>
+    <li><strong>第三者での言及がサイト内容より効く。</strong> ブランド言及数と AI Overviews 露出の相関 0.66 に対し、被リンク数は 0.22。YouTube 言及は 0.74。<span class="src"><a href="https://ahrefs.com/blog/ai-overview-brand-correlation/">Ahrefs</a></span></li>
+    <li><strong>Reddit・YouTube・Wikipedia が引用源の中心。</strong> ChatGPT の引用の 29% が Reddit、23% が Wikipedia。B2B SaaS の「best X for Y」型クエリでは Google AI 面に Reddit が 94% で出る。<span class="src"><a href="https://www.semrush.com/news/463141-semrush-releases-expanded-2026-ai-visibility-index-analyzing-126-million-ai-search-prompts/">Semrush 2026</a> · <a href="https://octolens.com/reddit-b2b-saas-study">Octolens</a></span></li>
+    <li><strong>リスト記事が最強の形式。</strong> AI 引用の 63% がリスト記事、うち 7〜8割は「Top N」形式。自社作成のリストも 1 割程度は引用されており、補正されていない。<span class="src"><a href="https://almcorp.com/blog/ai-citations-listicles-articles-product-pages/">ALM</a> · <a href="https://peec.ai/ai-search-geo-statistics">Peec</a></span></li>
+    <li><strong>引用・統計・出典を入れる。</strong> 引用文 +41%、統計 +30〜40%、出典リンク +30%。1位サイトより 5位前後のサイトのほうが伸びる。挑戦者に有利。<span class="src"><a href="https://peec.ai/ai-search-geo-statistics">Princeton GEO / Peec</a></span></li>
+    <li><strong>答えを先に、ナビは軽く。</strong> リンク 60 本超のページは AI エージェントの初回読み取りで本文の 33% しか届かない（軽量ページは 78%）。H2 を質問文、直後に 40〜60 語の直答、次に表。<span class="src"><a href="https://www.growth-memo.com/p/ai-halftime-report-h1-2026">Growth Memo</a></span></li>
+    <li><strong>一次データは 3.3 倍引用される。</strong> 年 1 本の独自調査（例：生成した 5,000 本の 15 秒広告でフック長と CTR の関係）を持つ。<span class="src"><a href="https://almcorp.com/blog/ai-citations-listicles-articles-product-pages/">ALM</a></span></li>
+    <li><strong>G2 / Capterra は「入場券」。</strong> ChatGPT が薦めたツールの 99〜100% に G2 掲載があった。引用元にはなりにくいが、無いと候補に入らない。<span class="src"><a href="https://strivelabs.ai/blog/g2-capterra-ai-answers/">StriveLabs</a></span></li>
+    <li><strong>価格は平文で。</strong> ChatGPT は複雑な表や新旧価格の混在を読み違える。「Team: $399/月、月 25 スポット」の一文と更新日、旧 URL の 301。<span class="src"><a href="https://trakkr.ai/article/pricing-pages-for-chatgpt">trakkr</a></span></li>
+    <li><strong>Bing はスキーマと IndexNow を使う。</strong> Copilot 側の LLM がスキーマを参照すると Bing が明言。鮮度確認にも使う。<span class="src"><a href="https://searchengineland.com/microsoft-bing-copilot-use-schema-for-its-llms-453455">SEL</a></span></li>
+  </ul>
+
+  <h3>効かない・優先度が低いこと</h3>
+  <ul>
+    <li><strong>llms.txt。</strong> 公開ドメインの 28% が置いているが 97% は一度も読まれていない。Google は使わないと明言。5 分で置けるなら置く程度。<span class="src"><a href="https://ahrefs.com/blog/llmstxt-study/">Ahrefs</a></span></li>
+    <li><strong>FAQ リッチリザルト。</strong> 2026-05 に廃止。FAQPage マークアップ自体は有効なので、実際の Q&A ブロックにだけ残す。<span class="src"><a href="https://www.quattr.com/blog/faq-schema-in-2026">Quattr</a></span></li>
+    <li><strong>AI 専用の特別対応。</strong> Google は「AI Overviews / AI Mode に追加要件はない、特別なスキーマも AI 用ファイルも不要」と公式に明言。GEO は SEO の延長。<span class="src"><a href="https://developers.google.com/search/docs/appearance/ai-features">Google Search Central</a></span></li>
+    <li><strong>キーワード詰め込み。</strong> GEO 実験でマイナス。</li>
+  </ul>
+
+  <h3>2025〜26 に変わったこと</h3>
+  <ul>
+    <li>Google AI Mode が MAU 10 億。日本語は 2025-09-09 に開始。AI Mode 利用者は提示されたショートリストをそのまま受け入れる率 88%、うち 75% が先頭を選ぶ。<strong>「上位 3 に入るか、存在しないか」</strong>の世界。</li>
+    <li>ChatGPT に広告（2026-02、日本も対象）とセルフサーブ Ads Manager（2026-05）。会話トピック連動の CPC/CPM で最低出稿額なし。有料の入口ができた。</li>
+    <li>エンジン間の引用重複は 9%。Google 上位 10 位からの AI Overviews 引用は 38% まで低下。エンジンごとに別々に計測する。</li>
+    <li>非英語圏の AI Overviews が引用する Reddit の 52〜73% は機械翻訳ページ。<strong>日本語の一次コミュニティ情報が枯渇している</strong>ので、/ja の解説コンテンツは引用されやすい。</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="structure">
+  <span class="eyebrow">04 · Site structure</span>
+  <h2>SEO / GEO に強いサイト構成</h2>
+  <p class="lede">HeyGen の「/tool/ ロングテール 140 ページ」、Creatify の「/compare 17 ページ＋価格スキーマ」、Synthesia の「/alternatives」を参考に、SPOT の規模で回る 30〜40 ページから始める。英語を正、日本語は /ja/ 配下に同じ木を静的生成する。</p>
+
+  <pre class="tree">/                              <span class="c">ホーム。H1 は現行のまま。証拠（事例・数値の出典）を追加</span>
+/pricing                       <span class="c">プラン別 Offer スキーマ ＋ 平文の価格文 ＋ FAQ ＋ 更新日</span>
+/how-it-works                  <span class="c">3ステップの詳細。VideoObject（デモ動画）</span>
+/brand-safety                  <span class="c">実 UI 合成・偽UI禁止・発音辞書・景表法配慮。法務向け</span>
+/security                      <span class="c">SSO・データ保持・学習不使用。エンタープライズ審査用</span>
+/use-cases/                    <span class="c">誰が何に使うか（8〜12）</span>
+  saas-demo-ads · app-install-ads · fintech-ads · d2c-ads
+  youtube-bumper-ads · ctv-ott-spots · ab-testing-at-scale · in-house-teams
+/tools/                        <span class="c">意図別ロングテール（20〜40）。HeyGen 型</span>
+  ai-commercial-generator · ai-tv-commercial-maker · 15-second-ad-maker
+  6-second-bumper-ad-generator · youtube-ad-generator · tiktok-ad-generator
+  vertical-video-ad-generator · product-demo-video-ad-generator · …
+/compare/                      <span class="c">比較（6〜10）＋ ハブ /compare/alternatives</span>
+  creatify · arcads · heygen · waymark · poolday · synthesia · spot-vs-agency
+/customers/                    <span class="c">事例。数字（CPA・納期・本数）を必ず入れる</span>
+/guides/                       <span class="c">購買前の疑問に答える。長文・表・出典</span>
+  how-much-does-a-15-second-commercial-cost
+  video-ad-specs-2026 · how-long-should-a-video-ad-be
+  best-ai-video-ad-generators-2026      <span class="c">← 自社作成のリスト記事。競合も正直に載せる</span>
+/research/                     <span class="c">年 1 本の一次調査</span>
+/blog/                         <span class="c">更新履歴・製品ニュース。量産しない</span>
+<span class="ja">/ja/</span>                          <span class="c">上記と同じ木を静的生成。hreflang ＋ x-default は EN</span>
+<span class="ja">/ja/guides/</span>video-ad-cost      <span class="c">日本固有の意図：動画広告 制作 費用 相場 / 15秒 CM 制作 費用</span>
+<span class="ja">/ja/guides/</span>ai-cm-copyright    <span class="c">AI CM 商用利用 著作権 / 景表法</span>
+<span class="ja">/ja/compare/</span>richka · video-brain · kaizen-ad
+sitemap.xml · sitemap-ja.xml · robots.txt · llms.txt（任意）</pre>
+
+  <h3>ページの共通テンプレート</h3>
+  <p>すべての /tools /use-cases /guides /compare に同じ骨格を使う。骨格自体が GEO 対策になる。</p>
+  <ol>
+    <li><strong>H1 ＝ 検索意図そのもの</strong>（例：AI TV commercial maker for marketing teams）。</li>
+    <li><strong>直答ブロック</strong>：H2 を質問文にし、40〜60 語で答える。ここだけ読めば要点が分かる。</li>
+    <li><strong>表 1 つ</strong>：比較・仕様・価格のいずれか。表の前に 1 文で結論。</li>
+    <li><strong>数字と出典 2〜3 個</strong>、<strong>引用 1 つ</strong>（顧客の声または業界データ）。</li>
+    <li><strong>デモ動画</strong>：VideoObject スキーマ、字幕テキストを HTML に書き出す。</li>
+    <li><strong>FAQ 4〜6 問</strong>：FAQPage スキーマ。</li>
+    <li><strong>更新日</strong>を目に見える形で。8〜12 週ごとに数字を更新する。</li>
+    <li><strong>ナビは軽く</strong>：ヘッダ＋フッタのリンクは合計 40 本以下。</li>
+  </ol>
+
+  <h3>構造化データの割り当て</h3>
+  <div class="tw"><table>
+    <thead><tr><th>ページ</th><th>スキーマ</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td>全ページ</td><td>Organization · BreadcrumbList · WebSite</td><td>sameAs に G2・LinkedIn・YouTube・X</td></tr>
+      <tr><td>/ · /pricing</td><td>SoftwareApplication ＋ AggregateOffer ＋ Offer × プラン</td><td>Creatify と同型。price は数値、priceCurrency は USD と JPY を各言語で</td></tr>
+      <tr><td>/how-it-works · /tools/*</td><td>VideoObject · FAQPage · HowTo（残すなら）</td><td>HowTo リッチリザルトは廃止済み、マークアップは害なし</td></tr>
+      <tr><td>/compare/*</td><td>FAQPage · ItemList</td><td>比較表の各行を ItemList に</td></tr>
+      <tr><td>/customers/*</td><td>Article · Organization（顧客）</td><td>数値を text に含める</td></tr>
+      <tr><td>/guides · /research</td><td>Article · Dataset（研究）</td><td>datePublished / dateModified を実際に更新</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>技術要件</h3>
+  <ul>
+    <li><strong>静的生成。</strong> 現行 i18n の JA 辞書をビルド時に展開し、/ja/ 配下に実 HTML を出す。canonical と hreflang はサーバ側 HTML に書く（JS で書き換えない）。</li>
+    <li><strong>hreflang</strong>：en ↔ ja を相互に、x-default は EN。Creatify と同じ型。</li>
+    <li><strong>サイトマップ</strong>を言語別に分け、Google Search Console と <strong>Bing Webmaster Tools</strong> の両方に登録。Bing の AI Performance レポートで Copilot 引用を見る。</li>
+    <li><strong>IndexNow</strong> を公開フローに組み込む（Bing / Copilot の鮮度）。</li>
+    <li><strong>本文は HTML テキストに。</strong> 動画・画像だけに乗せた事実は AI に読まれない。</li>
+    <li><strong>旧 URL は 301</strong>。価格改定時は旧価格ページを残さない。</li>
+    <li><strong>OGP 画像</strong> /og/spot-cover.png（1200×630）を実際に作る。</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="keywords">
+  <span class="eyebrow">05 · Keywords</span>
+  <h2>キーワードと意図の設計</h2>
+  <p class="lede">公開情報から検索ボリュームは取れなかった（Ahrefs 連携の認証後に補完する）。ここでは SERP の構成から「勝てる余地」を判定する。</p>
+
+  <h3>英語</h3>
+  <div class="tw"><table>
+    <thead><tr><th>クエリ</th><th>いま上位にいるもの</th><th>余地</th><th>SPOT の受けページ</th></tr></thead>
+    <tbody>
+      <tr><td>AI video ad generator</td><td>HeyGen（2 URL）・Creatify・InVideo・Zeely ほかベンダー一色</td><td class="mid">激戦</td><td>/tools/ai-video-ad-generator（守り）</td></tr>
+      <tr><td>AI commercial maker / generator</td><td>Renderforest・VEED・Canva。広告特化ベンダー不在</td><td class="ok">SPOT 向き</td><td>/tools/ai-commercial-generator・ai-tv-commercial-maker</td></tr>
+      <tr><td>AI video ad generator for SaaS</td><td>小規模ベンダーとガイドのみ、支配者なし</td><td class="ok">最も安く取れる</td><td>/use-cases/saas-demo-ads</td></tr>
+      <tr><td>best AI tools for video ads 2026</td><td>HeyGen の自社リスト（自社 1 位）・Cometly</td><td class="ok">自社リストで参戦</td><td>/guides/best-ai-video-ad-generators-2026</td></tr>
+      <tr><td>UGC ad generator AI</td><td>Imagine・Bandy・LTX・ディレクトリ多数。DTC 色</td><td class="mid">SPOT の主戦場ではない</td><td>/compare/arcads で受ける</td></tr>
+      <tr><td>how much does a 15 second commercial cost</td><td>Vidico・制作会社。相場 $5k〜15k</td><td class="ok">購買前の意図</td><td>/guides/how-much-does-a-15-second-commercial-cost</td></tr>
+      <tr><td>[競合] alternative / vs</td><td>各社の /alternatives 相互言及</td><td class="ok">定石</td><td>/compare/*</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>日本語</h3>
+  <div class="tw"><table>
+    <thead><tr><th>クエリ</th><th>いま上位にいるもの</th><th>余地</th><th>SPOT の受けページ</th></tr></thead>
+    <tbody>
+      <tr><td>AI 動画広告 生成</td><td>Amazon Ads ガイド・CyberAgent 発表・HubSpot・制作会社コラム。<strong>SaaS のツールページが 1 つもない</strong></td><td class="ok">空白</td><td>/ja/tools/ai-video-ad-generator</td></tr>
+      <tr><td>AI CM 制作 / AI CM 制作 ツール</td><td>解説記事・note の「作ってみた」・PR TIMES</td><td class="ok">空白</td><td>/ja/tools/ai-cm-maker</td></tr>
+      <tr><td>動画広告 自動生成 ツール</td><td>Amazon・HubSpot・Google 広告ヘルプ（無料の自動動画）</td><td class="mid">Google Ads が価格アンカー</td><td>/ja/compare/google-ads-auto-video</td></tr>
+      <tr><td>AI 広告クリエイティブ 生成</td><td>「おすすめ 10 選」型の記事が支配</td><td class="ok">おすすめ〇選 形式で参戦</td><td>/ja/guides/ai-ad-creative-tools-2026</td></tr>
+      <tr><td>動画広告 制作 費用 相場 / 15秒 CM 制作 費用</td><td>制作会社（15 秒で 5〜15 万円、上は 300 万円）</td><td class="ok">購買前の意図</td><td>/ja/guides/video-ad-cost</td></tr>
+      <tr><td>AI CM 商用利用 著作権</td><td>法律事務所・解説記事</td><td class="ok">法務の懸念を先回り</td><td>/ja/guides/ai-cm-copyright ＋ /ja/brand-safety</td></tr>
+      <tr><td>動画広告 内製化 ツール</td><td>RICHKA・Video BRAIN 系の記事</td><td class="mid">国内競合と直接比較</td><td>/ja/compare/richka · video-brain</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call">
+    <span class="eyebrow">判断</span>
+    <p>英語は「commercial」「for SaaS」「cost」の 3 軸で入り、UGC 系の激戦区は比較ページで受けるにとどめる。日本語は主要クエリのすべてに SaaS ベンダーが不在で、AI Mode も日本語対応済み。<strong>日本語ページは翻訳ではなく、日本固有の意図（費用相場・著作権・景表法・国内ツール比較）を先に書く</strong>ほうが引用を取りやすい。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="offsite">
+  <span class="eyebrow">06 · Off-site</span>
+  <h2>サイトの外でやること</h2>
+  <p class="lede">AI に言及される経路の 85% はサイトの外にある。サイト構築と同じ予算を、言及を作る活動に割く。</p>
+  <div class="cols">
+    <div class="col"><h4>入場券（最初の 30 日）</h4><ul>
+      <li>G2・Capterra に掲載、レビュー 20 件以上を初期ユーザーから集める（G2 は Capterra を買収済み、両方に載る）</li>
+      <li>Product Hunt・alternativeto.net・SaaS ディレクトリ 10 件</li>
+      <li>PR TIMES（日本）と英語プレス 1 本。Wikipedia が引用できる第三者記事を作る</li>
+      <li>LinkedIn・X・YouTube チャンネルの Organization sameAs 整備</li>
+    </ul></div>
+    <div class="col"><h4>引用源を育てる（継続）</h4><ul>
+      <li>YouTube：3 分のデモを「AI TV commercial maker」等のキーワード題名で。AI Mode の第 1 引用源</li>
+      <li>Reddit：r/marketing・r/PPC・r/SaaS・r/advertising で一人称の正直な回答。宣伝でなく体験</li>
+      <li>第三者のリスト記事へ掲載依頼（HeyGen・Cometly 型の「best AI video ad tools」）。順位 1 位で可視性 +16.5pt</li>
+      <li>ポッドキャスト・ニュースレター寄稿（マーケ運用系）</li>
+      <li>日本：note・Zenn・ferret・LISKUL 等への寄稿、ITreview 掲載</li>
+    </ul></div>
+  </div>
+
+  <h3>計測</h3>
+  <ul>
+    <li>月 1 回、20 クエリ × 4 エンジン（ChatGPT・Gemini・Perplexity・Google AI Mode、英日）で SPOT の言及と引用元を手で記録。ツール（Peec / Otterly）は言及が出始めてから。</li>
+    <li>Bing Webmaster Tools の AI Performance、Search Console、G2 のプロフィール閲覧数。</li>
+    <li>ChatGPT Ads は「AI commercial」文脈で少額テストし、オーガニックの有無と比較する。</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="market">
+  <span class="eyebrow">07 · Market research</span>
+  <h2>料金プランとビジネスモデルの調査</h2>
+  <p class="lede">2026-09-10 時点の各社料金ページから。取得できなかったものは第三者情報で、⚠ を付けた。</p>
+
+  <h3>直接競合：AI 広告動画ツール（USD）</h3>
+  <div class="tw"><table>
+    <thead><tr><th>社名</th><th>入口</th><th>中位</th><th>課金単位</th><th>動画 1 本あたり</th><th>無料</th><th>売り方</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://creatify.ai/pricing">Creatify</a></td><td class="n">$39</td><td class="n">$99</td><td>クレジット（15 秒 = 5）</td><td class="n">$3.3–3.9</td><td>10 cr</td><td>セルフサーブ → 営業</td><td>ARR $9M（2025-05）。2026 年に Pro を $49→$99 に値上げ</td></tr>
+      <tr><td>Arcads ⚠</td><td class="n">$110（−30% で $77）</td><td class="n">$220</td><td>クレジット（俳優 1 分 = 800）</td><td class="n">≈ $11</td><td>なし</td><td>セルフサーブ</td><td>ARR $10M、顧客 6,000、社員 10 名。料金はアプリ内のみ</td></tr>
+      <tr><td><a href="https://www.makeugc.ai/pricing">MakeUGC</a></td><td class="n">$59</td><td class="n">$149</td><td>クレジット（本数非公開）</td><td>—</td><td>$1 / 72h</td><td>セルフサーブ</td><td>API $99 / $299</td></tr>
+      <tr><td><a href="https://poolday.ai/pricing">Poolday</a></td><td class="n">$1,250</td><td class="n">$2,500〜</td><td>$ クレジット</td><td class="n">$5–25</td><td>なし（初月 $500）</td><td>営業同伴</td><td>アプリ・ゲーム向け。「完成品」売り</td></tr>
+      <tr><td><a href="https://cms.waymark.com/marketing/pricing">Waymark</a></td><td class="n">$399</td><td class="n">$1,125〜</td><td>完成動画の本数（月 2 本）</td><td class="n">$87–200</td><td>7 日</td><td>営業主導</td><td>放送局・メディア営業向け。SPOT に最も近い「CM」ポジション</td></tr>
+      <tr><td><a href="https://www.trypencil.com/pricing">Pencil</a></td><td class="n">$14</td><td class="n">$55</td><td>生成回数</td><td class="n">≈ $0.25 / 生成</td><td>6 本</td><td>両方</td><td>Brandtech 傘下。企業向けは Pro カスタム</td></tr>
+      <tr><td><a href="https://www.adcreative.ai/">AdCreative.ai</a></td><td class="n">$39</td><td class="n">$249</td><td>ダウンロード数</td><td class="n">$3.9–10</td><td>7 日</td><td>セルフサーブ</td><td>2026 年に付与クレジットを半減（同額）。Appier が $38.7M で買収</td></tr>
+      <tr><td><a href="https://predis.ai/pricing/">Predis</a></td><td class="n">$24</td><td class="n">$55</td><td>クレジット</td><td class="n">$2.5–3</td><td>あり</td><td>セルフサーブ</td><td>SMB 向け、席数無制限</td></tr>
+      <tr><td><a href="https://www.captions.ai/pricing">Captions / Mirage</a></td><td class="n">$9.99</td><td class="n">$69.99</td><td>クレジット</td><td>非公開</td><td>あり</td><td>セルフサーブ</td><td>$75M 調達（2026-03）。広告特化の $399 Business は統合され消滅</td></tr>
+      <tr><td><a href="https://www.heygen.com/pricing">HeyGen</a></td><td class="n">$29</td><td class="n">$149 + $20/席</td><td>クレジット（Video Agent 30〜120/分）</td><td class="n">≈ $1–1.5</td><td>3 本</td><td>セルフサーブ</td><td>2026-07 に Video Agent の消費を 20→30/分へ</td></tr>
+      <tr><td>Icon.com</td><td colspan="7">2026-02〜03 に事実上撤退。現在は「人間 UGC 6 本 $1,000/月」。競合から外す</td></tr>
+    </tbody>
+  </table></div>
+  <p class="cap">出典は各社料金ページ（リンク）。Arcads・Omneky・Motion は第三者情報のみ。</p>
+
+  <h3>国内：日本市場の料金（JPY）</h3>
+  <div class="tw"><table>
+    <thead><tr><th>社名</th><th>型</th><th>価格</th><th>課金単位・対象</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://kaizenplatform.com/contents/video-advertising-costs">Kaizen Ad</a></td><td>制作代行＋運用</td><td class="n">¥50,000 / 本〜</td><td>1 本売り。5 営業日納品。広告主・代理店</td></tr>
+      <tr><td><a href="https://www.cyberagent.co.jp/news/detail/id=32619">CyberAgent「ブランド300万動画」</a></td><td>生成 AI CM 制作</td><td class="n">¥3,000,000 / 3 本</td><td>案件売り。1.5〜2 週。従来「数千万円・3 か月」への対抗</td></tr>
+      <tr><td>RICHKA（リチカ）⚠</td><td>テンプレ型 SaaS</td><td class="n">月額定額・要問合せ（初期 ¥200k 情報あり）</td><td>本数無制限。代理店・内製マーケ。400 社</td></tr>
+      <tr><td><a href="https://video-b.com/plan/">Video BRAIN</a> ⚠</td><td>自動編集 SaaS</td><td class="n">¥150,000 / 月〜、年契約</td><td>会社単位。30 ユーザー〜。「高い部類」の評価</td></tr>
+      <tr><td><a href="https://no-lang.com/pricing">NoLang</a></td><td>日本語ネイティブの解説動画 AI</td><td class="n">¥2,980 / ¥7,980 / 法人 ¥100k〜⚠</td><td>1 分 ≈ 100 cr。SMB・個人</td></tr>
+      <tr><td><a href="https://www.shuttlerock.co.jp/studio/price/">Shuttlerock Studio</a></td><td>作り放題スタジオ</td><td class="n">要問合せ（同時 3 / 5 / 10 案件）</td><td>月額リテナー。初稿 3〜5 営業日</td></tr>
+      <tr><td><a href="https://vidweb.co.jp/price/">VIDWEB</a></td><td>制作会社</td><td class="n">広告・CM ¥500k〜3M</td><td>案件売り</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>相場のアンカー</h3>
+  <div class="tw"><table>
+    <thead><tr><th>項目</th><th>値</th><th>出典</th></tr></thead>
+    <tbody>
+      <tr><td>TV CM 制作（タレント別）</td><td class="n">¥1M〜5M（放送枠は 15 秒 ¥750k〜/回）</td><td><a href="https://douga-kanji.com/posts/commercial-price">動画幹事</a></td></tr>
+      <tr><td>Web / SNS 15〜30 秒動画広告</td><td class="n">¥50k〜500k、平均発注 ¥798k（中央値 ¥600k）</td><td><a href="https://0120.co.jp/blog/video-33/">0120.co.jp</a></td></tr>
+      <tr><td>AI 動画制作（2026 年、三極化）</td><td class="n">クラウド ¥30〜100k / AI 専業 ¥100〜500k / 高級 ¥500k〜1.5M</td><td><a href="https://movieimpact.net/columns/2026-04-05-ai-video-production-cost-2026-latest-guide">movieimpact</a></td></tr>
+      <tr><td>米国 15 秒 CM 制作</td><td class="n">$5,000〜15,000</td><td>Vidico ほか</td></tr>
+      <tr><td>SaaS / アプリの動画広告予算</td><td class="n">初期テスト ¥100〜300k/月、月合計 ¥150k〜900k</td><td><a href="https://media-radar.jp/contents/meditsubu/inappadvertising/">media-radar</a></td></tr>
+      <tr><td>国内動画広告市場</td><td class="n">2025 ¥885.5B → 2026 ¥1,043.7B → 2029 ¥1,633.6B。縦型 +55.9%</td><td><a href="https://www.cyberagent.co.jp/news/detail/id=33050">CyberAgent 2026-03</a></td></tr>
+      <tr><td>広告業界の生成 AI 利用</td><td class="n">90% が利用、60% が毎日</td><td><a href="https://www.eyez.jp/info/20260416/">Eyez 2026-04</a></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>2025〜26 の料金トレンド</h3>
+  <ul>
+    <li><strong>同額で付与を減らす。</strong> AdCreative（100→50）、HeyGen（20→30 cr/分）、Creatify（Pro 倍額）。生成原価が価格に押し返している。</li>
+    <li><strong>掲載価格は割引前提。</strong> Arcads −30%、MakeUGC の $1 トライアル、Poolday の初月 $500。</li>
+    <li><strong>API 枠は $99 / $299 に収れん</strong>（Creatify・MakeUGC）。</li>
+    <li><strong>席・ブランドキット・承認フロー・ホワイトラベルは Pro / Enterprise の壁</strong>で一貫。</li>
+    <li><strong>「完成品」売りは 10〜30 倍の単価</strong>（Waymark・Poolday・Kaizen・CyberAgent）。UGC ツールと制作会社の間に価格帯の空白がある。</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="unit">
+  <span class="eyebrow">08 · Unit economics</span>
+  <h2>原価と単位経済</h2>
+  <p class="lede">アプリの見積（still $0.05・review $0.01・animate $3.5・audio $0.28 = 1 生成 $3.84）と、モデル API の公開単価から、1 スポットの原価レンジを出す。</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>モデル</th><th>公開単価</th><th>15 秒 1 テイク</th><th>出典</th></tr></thead>
+    <tbody>
+      <tr><td>Veo 3.1 Standard</td><td class="n">$0.40 / 秒（音声込み）</td><td class="n">$6.00</td><td><a href="https://ai.google.dev/gemini-api/docs/pricing">Gemini API</a></td></tr>
+      <tr><td>Veo 3.1 Fast / Lite</td><td class="n">$0.10 / $0.05 / 秒</td><td class="n">$1.50 / $0.75</td><td>同上</td></tr>
+      <tr><td>Runway Gen-4.5</td><td class="n">$0.12 / 秒</td><td class="n">$1.80</td><td><a href="https://docs.dev.runwayml.com/guides/pricing/">Runway</a></td></tr>
+      <tr><td>Kling 3.0 ⚠</td><td class="n">≈ $0.08〜0.11 / 秒（再販経由）</td><td class="n">$1.2–1.7</td><td>EvoLink / Renderful</td></tr>
+      <tr><td>Luma Ray3.2</td><td class="n">$0.06〜0.24 / 秒</td><td class="n">$0.9–3.6</td><td><a href="https://lumalabs.ai/api/pricing">Luma</a></td></tr>
+      <tr><td>ElevenLabs（NA）</td><td class="n">1 文字 1 cr、Pro $99 で 60 万 cr</td><td class="n">≈ $0.03</td><td><a href="https://elevenlabs.io/pricing">ElevenLabs</a></td></tr>
+      <tr><td>OpenAI Sora</td><td colspan="3">2026-04 に消費者向け終了、API は 2026-09-24 で廃止。供給元にしない</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>1 スポットの原価シナリオ</h3>
+  <p>1 スポット = 3 パターン。動画化はパターンごとに走り、検品 NG のリテイクが平均 1 回入る前提。</p>
+  <div class="tw"><table>
+    <thead><tr><th>シナリオ</th><th>既定モデル</th><th>1 スポット原価</th><th>¥1,200 課金時の粗利</th></tr></thead>
+    <tbody>
+      <tr><td>A · 現行見積のまま</td><td>1 生成 $3.84 と仮定</td><td class="n">$4（¥570）</td><td class="n ok">53%</td></tr>
+      <tr><td>B · 低コスト既定</td><td>Kling 3.0 / Gen-4.5 / Veo Fast × 3 パターン × リテイク 1</td><td class="n">$8（¥1,200）</td><td class="n ng">0%</td></tr>
+      <tr><td>C · Veo Standard 既定</td><td>Veo 3.1 Standard × 3 × リテイク 1</td><td class="n">$15〜20（¥2,250〜3,000）</td><td class="n ng">−90% 〜 −150%</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call">
+    <span class="eyebrow">結論</span>
+    <p>「1 本 ≒ ¥1,200」は市場最安のUGCツール（$3〜11）並みで、かつ SPOT が売っている「9 ファイルの完成 CM」に対して安すぎる。「制作会社の 1/400」という約束を守るなら、TV CM ¥1M〜5M の 1/400 は <strong>¥2,500〜12,500 / スポット</strong>。この帯にプランを置けば、約束と粗利が両立する。</p>
+    <p>README の未決事項「クレジットモデルの確定＋残高ガード」は、<strong>1 クレジット = 1 スポット（= 9 ファイル）</strong>に固定し、修正の再レンダ 0.25、1 カットの再生成 0.1 とするのが最も説明しやすい。</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="pricing">
+  <span class="eyebrow">09 · Pricing proposal</span>
+  <h2>料金プランの提案</h2>
+  <p class="lede">UGC ツール（$39〜149）と完成品売り（$399〜2,500）の間、Waymark の「$399 で 2 本」に対して「$399 で 25 スポット」を置く。課金単位はスポット、席は無制限に近づけてチーム導入の摩擦を消す。</p>
+
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Free</th><th>Starter</th><th>Team</th><th>Business</th><th>Enterprise</th></tr></thead>
+    <tbody>
+      <tr><th>月額（USD）</th><td class="n">$0</td><td class="n">$99</td><td class="n hl">$399</td><td class="n">$1,199</td><td class="n">$2,500〜</td></tr>
+      <tr><th>月額（JPY）</th><td class="n">¥0</td><td class="n">¥14,800</td><td class="n hl">¥59,800</td><td class="n">¥178,000</td><td class="n">¥380,000〜</td></tr>
+      <tr><th>年契約</th><td>—</td><td colspan="3">2 か月分無料（−17%）。日本は請求書払い・年一括を標準に</td><td>カスタム</td></tr>
+      <tr><th>スポット / 月</th><td class="n">1（透かし・720p）</td><td class="n">6</td><td class="n hl">25</td><td class="n">80</td><td>コミット制</td></tr>
+      <tr><th>1 スポット換算</th><td>—</td><td class="n">$16.5</td><td class="n hl">$16</td><td class="n">$15</td><td class="n">$10〜12</td></tr>
+      <tr><th>追加スポット</th><td>—</td><td class="n">$19</td><td class="n">$19</td><td class="n">$15</td><td>契約単価</td></tr>
+      <tr><th>席</th><td class="n">1</td><td class="n">2</td><td class="n hl">5</td><td>無制限</td><td>無制限</td></tr>
+      <tr><th>ブランド</th><td class="n">1</td><td class="n">1</td><td class="n">3</td><td class="n">10</td><td>無制限（代理店）</td></tr>
+      <tr><th>ブランドキット・発音辞書</th><td>—</td><td>基本</td><td>○</td><td>○</td><td>○＋専任セットアップ</td></tr>
+      <tr><th>承認フロー</th><td>—</td><td>—</td><td>○</td><td>○＋監査ログ</td><td>○</td></tr>
+      <tr><th>画質</th><td>720p</td><td>1080p</td><td>1080p</td><td>4K・Premium quality（Veo Standard）</td><td>同左</td></tr>
+      <tr><th>SSO・API</th><td>—</td><td>—</td><td>—</td><td>SSO・API</td><td>SSO・API・ホワイトラベル・DPA</td></tr>
+      <tr><th>サポート</th><td>コミュニティ</td><td>メール</td><td>優先メール</td><td>Slack 共有チャンネル</td><td>CSM・オンボーディング</td></tr>
+    </tbody>
+  </table></div>
+  <p class="cap">日本円は $1 = ¥150 で丸め、税別。Starter は個人・少人数、Team が主力、Business が「Enterprise-ready」の受け皿。</p>
+
+  <h3>粗利の見通し</h3>
+  <p>付与スポットを使い切った場合（最悪ケース）と、SaaS で一般的な利用率 50% の場合。</p>
+  <div class="tw"><table>
+    <thead><tr><th>プラン</th><th>原価 $4 / 100%</th><th>原価 $8 / 100%</th><th>原価 $8 / 50%</th><th>原価 $15 / 100%</th></tr></thead>
+    <tbody>
+      <tr><td>Starter $99 · 6</td><td class="n ok">76%</td><td class="n ok">52%</td><td class="n ok">76%</td><td class="n mid">9%</td></tr>
+      <tr><td>Team $399 · 25</td><td class="n ok">75%</td><td class="n ok">50%</td><td class="n ok">75%</td><td class="n mid">6%</td></tr>
+      <tr><td>Business $1,199 · 80</td><td class="n ok">73%</td><td class="n ok">47%</td><td class="n ok">73%</td><td class="n ng">0%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Veo Standard を既定にすると全プランで粗利が消える。<strong>既定を低コストモデルにし、Veo Standard は Business 以上の「Premium quality」か、追加 $9 / スポットの有料オプション</strong>にする。原価 $8 ラインで 50% を確保し、利用率を含めれば 70% 台に乗る。</p>
+
+  <h3>設計の根拠</h3>
+  <ul>
+    <li><strong>スポット課金</strong>：秒やクレジットより説明しやすく、「9 ファイル」という差別化が価格の単位に乗る。競合はほぼ全社クレジットで不透明。</li>
+    <li><strong>Team を主力に</strong>：日本の SaaS / アプリの初期テスト予算（¥100〜300k/月）に収まる。Waymark（$399 で 2 本）と同額で 12 倍の本数。</li>
+    <li><strong>Business の $1,199</strong>：Video BRAIN（¥150k/月〜）と同帯で、席無制限・SSO・API。Poolday（$1,250）の直接対抗。</li>
+    <li><strong>無料は 1 スポット透かし付き</strong>：Creatify の 2 本より少なく、Arcads の「無料なし」より入りやすい。G2 レビュー獲得の母数になる。</li>
+    <li><strong>追加スポット $19</strong>：Poolday の「$5〜25 / 本」の上限側。プラン移行を促す値。</li>
+    <li><strong>年契約は 2 か月無料</strong>：ElevenLabs・HeyGen と同水準。日本は年一括・請求書払いが商習慣なので標準にする。</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="model">
+  <span class="eyebrow">10 · Business model</span>
+  <h2>ビジネスモデルの選択肢</h2>
+  <p class="lede">調査で見つかった 6 つの型を SPOT に当てはめる。推奨は「席＋スポット」のセルフサーブを軸に、日本ではマネージドを併設する二層。</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>型</th><th>代表例</th><th>強み</th><th>SPOT への適合</th></tr></thead>
+    <tbody>
+      <tr><td>クレジット制セルフサーブ</td><td>Creatify · HeyGen · Runway</td><td>低 CAC、PLG</td><td class="mid">単価が $3〜11 に引きずられる。単位をスポットに変えて採用</td></tr>
+      <tr><td>席＋利用量ハイブリッド</td><td>HeyGen Business（$149 + $20/席）</td><td>チーム拡大で伸びる</td><td class="ok"><strong>推奨。</strong>席は上位で無制限、スポットで課金</td></tr>
+      <tr><td>完成品の本数売り</td><td>Waymark · Kaizen Ad（¥50k/本）</td><td>高単価、営業しやすい</td><td class="ok">Enterprise のコミット制と追加スポットで取り込む</td></tr>
+      <tr><td>マネージド併設</td><td>QuickAds（$199〜2,999）· Shuttlerock</td><td>「誰かにやってほしい」層を逃さない</td><td class="ok">日本向けに「初回 3 スポットを伴走で作る」オンボーディング（¥100k）を Business 以上に付ける</td></tr>
+      <tr><td>成果報酬</td><td>CyberAgent 極予測AI</td><td>広告主のリスクゼロ</td><td class="ng">配信データが必要。代理店パートナー経由の将来枠</td></tr>
+      <tr><td>代理店ホワイトラベル</td><td>Creatify · Waymark · AI/AD MAKERS</td><td>1 契約で多ブランド</td><td class="ok">Enterprise で提供。日本の中小代理店は有力チャネル</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>推奨モデルの骨子</h3>
+  <ul>
+    <li><strong>収益</strong>：月額サブスク（Starter〜Business）＋追加スポット＋Enterprise コミット。目標構成は Team 6 割、Business 3 割、Starter 1 割の MRR。</li>
+    <li><strong>獲得</strong>：英語は PLG（無料 → Starter → Team）、日本は「デモ予約 → Team / Business 年契約」の営業併用。日本語 SEO の空白を営業リードの供給源にする。</li>
+    <li><strong>拡張</strong>：ブランド数と席で上位へ。承認フロー・監査ログ・SSO を法務・情シスの要求に合わせて Business に置く。</li>
+    <li><strong>原価管理</strong>：モデル配役表（cm-pipeline の model-casting.yaml）を「プラン別」に持ち、既定モデルの単価をプランで切り替える。粗利の管理点はここ 1 か所。</li>
+    <li><strong>指標</strong>：スポットあたり原価、プラン別粗利、利用率、追加スポット比率、Free→有料転換、G2 レビュー数、AI 言及数（エンジン別）。</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="plan">
+  <span class="eyebrow">11 · 90-day plan</span>
+  <h2>90 日の実行順</h2>
+  <p class="lede">売上に直結する順。土台（価格ページ・/ja・入場券）を最初の 2 週間で終える。</p>
+
+  <div class="phase"><div class="w">WEEK 1–2</div><div>
+    <h4>土台 <span class="tag p0">P0</span></h4>
+    <ul>
+      <li>クレジット = スポットに確定、残高ガード実装、プラン定数を DB に移す（PLAN_CREDITS 固定値の廃止）</li>
+      <li>/pricing を独立ページ化。Offer スキーマ・平文価格・FAQ・更新日</li>
+      <li>/ja/ を静的生成に切替。canonical / hreflang をサーバ HTML に</li>
+      <li>サイトマップ（言語別）、GSC・Bing WMT 登録、IndexNow</li>
+      <li>G2・Capterra・ITreview 掲載申請、OGP 画像作成</li>
+    </ul>
+  </div></div>
+
+  <div class="phase"><div class="w">WEEK 3–6</div><div>
+    <h4>意図を受けるページ <span class="tag p0">P0</span></h4>
+    <ul>
+      <li>/compare × 6（Creatify・Arcads・HeyGen・Waymark・Poolday・spot-vs-agency）＋ハブ</li>
+      <li>/use-cases × 8、/brand-safety、/security</li>
+      <li>/guides × 3（15 秒 CM の費用・広告尺・入稿規定）を英日で。日本語は「費用相場」「著作権・景表法」を先に</li>
+      <li>自社リスト記事「best AI video ad generators 2026」「AI 広告動画ツール おすすめ 2026」</li>
+      <li>デモ動画 3 本を YouTube に。VideoObject と字幕テキストを各ページに</li>
+    </ul>
+  </div></div>
+
+  <div class="phase"><div class="w">WEEK 7–12</div><div>
+    <h4>ロングテールと言及 <span class="tag">P1</span></h4>
+    <ul>
+      <li>/tools × 20（commercial・15-second・bumper・CTV・SaaS demo を優先）</li>
+      <li>事例 3 本（CPA・納期・本数の数字つき）</li>
+      <li>第三者リスト記事への掲載依頼 20 件、Reddit で月 8 回答、PR TIMES 1 本</li>
+      <li>一次調査の設計（生成した広告のフック長 × CTR）。公開は Q1</li>
+      <li>月次 AI 言及計測（20 クエリ × 4 エンジン × 英日）を開始</li>
+    </ul>
+  </div></div>
+
+  <h3>残っている不確実性</h3>
+  <ul>
+    <li>検索ボリューム・難易度は未取得。Ahrefs 連携（marketing プラグイン）の認証後に補完し、/tools の 20 本の優先順位を確定する。</li>
+    <li>1 スポットの実原価は cm-pipeline の <code>cm cost</code> で実測する。上の A〜C は見積。</li>
+    <li>Arcads・Kling・Video BRAIN・RICHKA の価格は第三者情報。営業資料に使う前に一次確認。</li>
+    <li>ドメイン未確定。確定まで /ja とサイトマップの公開は待つ。</li>
+  </ul>
+</section>
+
+<footer>SPOT マーケティング設計 · 2026-09-10 · 価格はすべて調査日時点、¥150/USD 換算。第三者情報は ⚠ 付き。</footer>
+</main>
+</div>

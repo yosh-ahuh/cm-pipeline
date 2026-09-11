@@ -1,0 +1,31 @@
+# styles/grades.yaml
+# カラーグレード定義。実写カットの色を「本物のカメラの癖」に寄せてAI感を抑える。
+# Remotion では SVG feComponentTransfer のトーンカーブ + 周辺減光で実装。
+
+broadcast-cool:                 # 採用（ミライ工事）
+  label: 放送用クール（日本のTVドキュメンタリー/報道調）
+  saturation: 0.86
+  contrast: 1.04
+  tone_curve:                   # 影が青緑に浮き、ハイライトが緩やかに落ちる（0-1正規化）
+    r: [0.024, 0.227, 0.494, 0.755, 0.980]
+    g: [0.039, 0.243, 0.502, 0.759, 0.984]
+    b: [0.063, 0.267, 0.510, 0.750, 0.965]
+  vignette: 0.24                # 周辺減光
+
+film-warm:                      # 候補（未採用）
+  label: フィルム・ウォーム（映画的）
+  saturation: 0.82
+  contrast: 1.07
+  tone_curve:
+    r: [0.031, 0.235, 0.518, 0.824, 0.996]
+    g: [0.047, 0.251, 0.506, 0.800, 0.973]
+    b: [0.047, 0.235, 0.478, 0.753, 0.933]
+  vignette: 0.30
+  caveat: 暖色ハイライトが商品UIの赤と喧嘩することがある
+
+neutral:                        # 補正最小（AI感が残る）
+  label: 現行ニュートラル
+  saturation: 0.90
+  contrast: 1.0
+  tone_curve: null
+  vignette: 0.0

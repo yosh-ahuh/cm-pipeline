@@ -1,0 +1,343 @@
+{
+  "project": "mirai-koji",
+  "compliance": {
+    "ai_disclosure": true,
+    "disclosure_lang": "ja",
+    "content_credentials": true,
+    "likeness_check": true,
+    "real_ui_only": true,
+    "claims_evidence": [
+      {
+        "claim": "月40時間",
+        "source": "自社調べ",
+        "note": "※自社調べ"
+      },
+      {
+        "claim": "累計50万DL",
+        "source": "公開情報（クライアント確認済み）"
+      },
+      {
+        "claim": "プロジェクト300万件",
+        "source": "公開情報（クライアント確認済み）"
+      }
+    ]
+  },
+  "generated_at": "2026-09-10T09:03:37",
+  "items": [
+    {
+      "platform": "youtube",
+      "src": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_A_youtube.mp4",
+      "dst": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/youtube/mirai-koji_A_youtube.mp4",
+      "cmd": "ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_A_youtube.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/youtube/mirai-koji_A_youtube.mp4",
+      "warnings": [],
+      "variant": "A",
+      "format": "wide",
+      "composition": "MiraiCM",
+      "props": {
+        "variant": "A",
+        "splashVariant": "A",
+        "format": "wide",
+        "width": 1920,
+        "height": 1080,
+        "platform": "youtube",
+        "compliance": {
+          "disclosure": {
+            "text": "映像の一部はAIで生成しています",
+            "seconds": 2.0,
+            "position": "bottom-right",
+            "minHeightPct": 3.0
+          },
+          "safeZone": {
+            "topPct": 0.0,
+            "bottomPct": 10.0
+          },
+          "captions": "optional"
+        }
+      },
+      "credentials": {
+        "mode": "planned",
+        "sidecar": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/youtube/mirai-koji_A_youtube.mp4.c2pa.json"
+      }
+    },
+    {
+      "platform": "youtube",
+      "src": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_B_youtube.mp4",
+      "dst": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/youtube/mirai-koji_B_youtube.mp4",
+      "cmd": "ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_B_youtube.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/youtube/mirai-koji_B_youtube.mp4",
+      "warnings": [],
+      "variant": "B",
+      "format": "wide",
+      "composition": "MiraiCM-B",
+      "props": {
+        "variant": "B",
+        "splashVariant": "B",
+        "format": "wide",
+        "width": 1920,
+        "height": 1080,
+        "platform": "youtube",
+        "compliance": {
+          "disclosure": {
+            "text": "映像の一部はAIで生成しています",
+            "seconds": 2.0,
+            "position": "bottom-right",
+            "minHeightPct": 3.0
+          },
+          "safeZone": {
+            "topPct": 0.0,
+            "bottomPct": 10.0
+          },
+          "captions": "optional"
+        }
+      },
+      "credentials": {
+        "mode": "planned",
+        "sidecar": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/youtube/mirai-koji_B_youtube.mp4.c2pa.json"
+      }
+    },
+    {
+      "platform": "youtube",
+      "src": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_C_youtube.mp4",
+      "dst": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/youtube/mirai-koji_C_youtube.mp4",
+      "cmd": "ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_C_youtube.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/youtube/mirai-koji_C_youtube.mp4",
+      "warnings": [],
+      "variant": "C",
+      "format": "wide",
+      "composition": "MiraiCM-C",
+      "props": {
+        "variant": "C",
+        "splashVariant": "C",
+        "format": "wide",
+        "width": 1920,
+        "height": 1080,
+        "platform": "youtube",
+        "compliance": {
+          "disclosure": {
+            "text": "映像の一部はAIで生成しています",
+            "seconds": 2.0,
+            "position": "bottom-right",
+            "minHeightPct": 3.0
+          },
+          "safeZone": {
+            "topPct": 0.0,
+            "bottomPct": 10.0
+          },
+          "captions": "optional"
+        }
+      },
+      "credentials": {
+        "mode": "planned",
+        "sidecar": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/youtube/mirai-koji_C_youtube.mp4.c2pa.json"
+      }
+    },
+    {
+      "platform": "reels_shorts",
+      "src": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_A_reels_shorts.mp4",
+      "dst": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/reels_shorts/mirai-koji_A_reels_shorts.mp4",
+      "cmd": "ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_A_reels_shorts.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/reels_shorts/mirai-koji_A_reels_shorts.mp4",
+      "warnings": [],
+      "variant": "A",
+      "format": "vertical",
+      "composition": "MiraiCM-V",
+      "props": {
+        "variant": "A",
+        "splashVariant": "A",
+        "format": "vertical",
+        "width": 1080,
+        "height": 1920,
+        "platform": "reels_shorts",
+        "compliance": {
+          "disclosure": {
+            "text": "映像の一部はAIで生成しています",
+            "seconds": 2.0,
+            "position": "bottom-right",
+            "minHeightPct": 3.0
+          },
+          "safeZone": {
+            "topPct": 14.0,
+            "bottomPct": 35.0
+          },
+          "captions": "burn_in"
+        }
+      },
+      "credentials": {
+        "mode": "planned",
+        "sidecar": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/reels_shorts/mirai-koji_A_reels_shorts.mp4.c2pa.json"
+      }
+    },
+    {
+      "platform": "reels_shorts",
+      "src": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_B_reels_shorts.mp4",
+      "dst": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/reels_shorts/mirai-koji_B_reels_shorts.mp4",
+      "cmd": "ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_B_reels_shorts.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/reels_shorts/mirai-koji_B_reels_shorts.mp4",
+      "warnings": [],
+      "variant": "B",
+      "format": "vertical",
+      "composition": "MiraiCM-B-V",
+      "props": {
+        "variant": "B",
+        "splashVariant": "B",
+        "format": "vertical",
+        "width": 1080,
+        "height": 1920,
+        "platform": "reels_shorts",
+        "compliance": {
+          "disclosure": {
+            "text": "映像の一部はAIで生成しています",
+            "seconds": 2.0,
+            "position": "bottom-right",
+            "minHeightPct": 3.0
+          },
+          "safeZone": {
+            "topPct": 14.0,
+            "bottomPct": 35.0
+          },
+          "captions": "burn_in"
+        }
+      },
+      "credentials": {
+        "mode": "planned",
+        "sidecar": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/reels_shorts/mirai-koji_B_reels_shorts.mp4.c2pa.json"
+      }
+    },
+    {
+      "platform": "reels_shorts",
+      "src": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_C_reels_shorts.mp4",
+      "dst": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/reels_shorts/mirai-koji_C_reels_shorts.mp4",
+      "cmd": "ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_C_reels_shorts.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/reels_shorts/mirai-koji_C_reels_shorts.mp4",
+      "warnings": [],
+      "variant": "C",
+      "format": "vertical",
+      "composition": "MiraiCM-C-V",
+      "props": {
+        "variant": "C",
+        "splashVariant": "C",
+        "format": "vertical",
+        "width": 1080,
+        "height": 1920,
+        "platform": "reels_shorts",
+        "compliance": {
+          "disclosure": {
+            "text": "映像の一部はAIで生成しています",
+            "seconds": 2.0,
+            "position": "bottom-right",
+            "minHeightPct": 3.0
+          },
+          "safeZone": {
+            "topPct": 14.0,
+            "bottomPct": 35.0
+          },
+          "captions": "burn_in"
+        }
+      },
+      "credentials": {
+        "mode": "planned",
+        "sidecar": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/reels_shorts/mirai-koji_C_reels_shorts.mp4.c2pa.json"
+      }
+    },
+    {
+      "platform": "timeline",
+      "src": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_A_timeline.mp4",
+      "dst": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_A_timeline.mp4",
+      "cmd": "ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_A_timeline.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_A_timeline.mp4",
+      "warnings": [],
+      "variant": "A",
+      "format": "square",
+      "composition": "MiraiCM-SQ",
+      "props": {
+        "variant": "A",
+        "splashVariant": "A",
+        "format": "square",
+        "width": 1080,
+        "height": 1080,
+        "platform": "timeline",
+        "compliance": {
+          "disclosure": {
+            "text": "映像の一部はAIで生成しています",
+            "seconds": 2.0,
+            "position": "bottom-right",
+            "minHeightPct": 3.0
+          },
+          "safeZone": {
+            "topPct": 0.0,
+            "bottomPct": 0.0
+          },
+          "captions": "burn_in"
+        }
+      },
+      "credentials": {
+        "mode": "planned",
+        "sidecar": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_A_timeline.mp4.c2pa.json"
+      }
+    },
+    {
+      "platform": "timeline",
+      "src": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_B_timeline.mp4",
+      "dst": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_B_timeline.mp4",
+      "cmd": "ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_B_timeline.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_B_timeline.mp4",
+      "warnings": [],
+      "variant": "B",
+      "format": "square",
+      "composition": "MiraiCM-B-SQ",
+      "props": {
+        "variant": "B",
+        "splashVariant": "B",
+        "format": "square",
+        "width": 1080,
+        "height": 1080,
+        "platform": "timeline",
+        "compliance": {
+          "disclosure": {
+            "text": "映像の一部はAIで生成しています",
+            "seconds": 2.0,
+            "position": "bottom-right",
+            "minHeightPct": 3.0
+          },
+          "safeZone": {
+            "topPct": 0.0,
+            "bottomPct": 0.0
+          },
+          "captions": "burn_in"
+        }
+      },
+      "credentials": {
+        "mode": "planned",
+        "sidecar": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_B_timeline.mp4.c2pa.json"
+      }
+    },
+    {
+      "platform": "timeline",
+      "src": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_C_timeline.mp4",
+      "dst": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_C_timeline.mp4",
+      "cmd": "ffmpeg -y -hide_banner -loglevel error -i /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_C_timeline.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:a aac -b:a 192k -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p -r 30 -movflags +faststart /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_C_timeline.mp4",
+      "warnings": [],
+      "variant": "C",
+      "format": "square",
+      "composition": "MiraiCM-C-SQ",
+      "props": {
+        "variant": "C",
+        "splashVariant": "C",
+        "format": "square",
+        "width": 1080,
+        "height": 1080,
+        "platform": "timeline",
+        "compliance": {
+          "disclosure": {
+            "text": "映像の一部はAIで生成しています",
+            "seconds": 2.0,
+            "position": "bottom-right",
+            "minHeightPct": 3.0
+          },
+          "safeZone": {
+            "topPct": 0.0,
+            "bottomPct": 0.0
+          },
+          "captions": "burn_in"
+        }
+      },
+      "credentials": {
+        "mode": "planned",
+        "sidecar": "/Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/timeline/mirai-koji_C_timeline.mp4.c2pa.json"
+      }
+    }
+  ]
+}

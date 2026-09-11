@@ -1,0 +1,213 @@
+<title>SPOT · REEL · TAKE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,900;1,9..144,500&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E9E4DB; color: #1B1B22; font-family: "Zen Kaku Gothic New", sans-serif; -webkit-font-smoothing: antialiased; }
+  .page-head { max-width: 1000px; margin: 0 auto; padding: 46px 26px 22px; }
+  .page-head .eye { font-family: "DM Mono", monospace; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #8A5410; }
+  .page-head h1 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: clamp(26px,4vw,40px); letter-spacing: -.02em; margin: 8px 0 6px; }
+  .page-head p { font-size: 14.5px; color: #6b6a63; margin: 0; max-width: 64ch; line-height: 1.8; }
+  .page-head .cond { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .page-head .cond span { font-size: 11.5px; font-family: "DM Mono", monospace; background: #fff; border: 1px solid #E0DACB; border-radius: 999px; padding: 5px 11px; color: #78756B; }
+
+  .panel { padding: 76px 26px; border-top: 1px solid rgba(0,0,0,.08); }
+  .inner { max-width: 1000px; margin: 0 auto; }
+  .p-tag { display: inline-flex; align-items: center; gap: 9px; font-family: "DM Mono", monospace; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; padding: 6px 13px; border-radius: 999px; margin-bottom: 30px; }
+  .lockup { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+  .name-big { line-height: .9; }
+  .reading { font-family: "DM Mono", monospace; letter-spacing: .1em; font-size: 13px; margin-top: 14px; }
+  .tagline-en { margin: 28px 0 4px; }
+  .tagline-jp { font-size: clamp(16px,2.6vw,20px); font-weight: 700; }
+  .posline { font-size: 14.5px; line-height: 1.85; max-width: 56ch; margin-top: 14px; }
+  .global { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 30px; }
+  .g-cell { border-radius: 12px; padding: 15px 16px; }
+  .g-cell .gk { font-family: "DM Mono", monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+  .g-cell .gv { font-size: 13px; line-height: 1.6; }
+  .kit { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 30px; align-items: flex-end; }
+  .palette { display: flex; border-radius: 10px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+  .palette i { width: 44px; height: 44px; display: block; }
+  .kit-meta { font-family: "DM Mono", monospace; font-size: 11.5px; line-height: 1.9; }
+
+  /* ===== SPOT — confident / marketer-native ===== */
+  .dir-spot { background: #F6F4EF; color: #17171C; }
+  .dir-spot .p-tag { background: #E4ECFB; color: #2C4C9E; }
+  .dir-spot .name-big { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: clamp(72px,14vw,150px); letter-spacing: -.03em; }
+  .dir-spot .name-big .o { position: relative; color: #2C5CE6; }
+  .dir-spot .reading { color: #2C5CE6; }
+  .dir-spot .tagline-en { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: clamp(24px,4.6vw,40px); letter-spacing: -.02em; }
+  .dir-spot .tagline-jp { color: #55545c; }
+  .dir-spot .posline { color: #55545c; }
+  .dir-spot .g-cell { background: #fff; border: 1px solid #E7E3DA; }
+  .dir-spot .g-cell .gk { color: #2C5CE6; }
+  .dir-spot .kit-meta { color: #78756B; }
+
+  /* ===== REEL — social / friendly / bright ===== */
+  .dir-reel { background: #FFF6F2; color: #2A1E1A; }
+  .dir-reel .p-tag { background: #FFE0D2; color: #D64A2A; }
+  .dir-reel .name-big { font-family: "Baloo 2", "Zen Maru Gothic", sans-serif; font-weight: 800; font-size: clamp(72px,14vw,150px); letter-spacing: -.01em; color: #FF5B39; }
+  .dir-reel .reading { color: #D64A2A; }
+  .dir-reel .tagline-en { font-family: "Baloo 2", sans-serif; font-weight: 800; font-size: clamp(24px,4.6vw,40px); }
+  .dir-reel .tagline-jp { color: #7a5c50; }
+  .dir-reel .posline { color: #7a5c50; }
+  .dir-reel .g-cell { background: #fff; border: 1px solid #FADDD0; }
+  .dir-reel .g-cell .gk { color: #D64A2A; }
+  .dir-reel .kit-meta { color: #9a7c70; }
+
+  /* ===== TAKE — premium / craft / editorial ===== */
+  .dir-take { background: #14140F; color: #EFEBE0; }
+  .dir-take .p-tag { background: rgba(199,150,90,.18); color: #D9B382; }
+  .dir-take .name-big { font-family: "Fraunces", serif; font-weight: 900; font-size: clamp(70px,13vw,140px); letter-spacing: -.01em; }
+  .dir-take .reading { color: #C79B5A; }
+  .dir-take .tagline-en { font-family: "Fraunces", serif; font-weight: 500; font-style: italic; font-size: clamp(24px,4.4vw,38px); }
+  .dir-take .tagline-jp { color: #b8b1a1; }
+  .dir-take .posline { color: #a8a190; }
+  .dir-take .g-cell { background: #1E1E17; border: 1px solid #2E2D22; }
+  .dir-take .g-cell .gk { color: #C79B5A; }
+  .dir-take .g-cell .gv { color: #cfc8b8; }
+  .dir-take .kit-meta { color: #86826f; }
+  .dir-take .palette { box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+
+  /* compare */
+  .compare { max-width: 1000px; margin: 0 auto; padding: 56px 26px 30px; }
+  .compare h2 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 24px; letter-spacing: -.02em; margin: 0 0 20px; }
+  .ctable { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .ctable th, .ctable td { text-align: left; padding: 13px 14px; border-bottom: 1px solid rgba(0,0,0,.09); vertical-align: top; }
+  .ctable th { font-family: "DM Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #8A5410; font-weight: 500; }
+  .ctable td:first-child { font-weight: 700; white-space: nowrap; }
+  .ctable .sn { color: #2C5CE6; } .ctable .rn { color: #D64A2A; } .ctable .tn { color: #9a6b2a; }
+  .note-box { max-width: 1000px; margin: 0 auto; padding: 0 26px 60px; }
+  .note-box .nb { background: #fff; border: 1px solid #E0DACB; border-radius: 14px; padding: 20px 24px; font-size: 13.5px; color: #6b6a63; line-height: 1.8; }
+  .note-box .nb b { color: #1B1B22; }
+  .foot { text-align: center; color: #a8a398; font-size: 12px; font-family: "DM Mono", monospace; padding: 0 0 50px; }
+
+  @media (max-width: 720px) { .global { grid-template-columns: 1fr; } }
+</style>
+
+<div class="page-head">
+  <div class="eye">Global Brand Directions ・ 海外展開3案</div>
+  <h1>世界でも売る、という前提で。</h1>
+  <p>カタカナ名は海外では読めず意味も通じない。英語圏で発音でき、動画広告の世界で意味が通り、日英どちらでも自然な名前を3つ。各案をその世界のスタイルで、日英バイリンガルで示します。</p>
+  <div class="cond">
+    <span>◦ 英語で発音しやすい</span><span>◦ 意味が通る/喚起する</span><span>◦ カタカナ表記も成立</span><span>◦ .com・商標は要確認</span>
+  </div>
+</div>
+
+<!-- ===== SPOT ===== -->
+<section class="panel dir-spot">
+  <div class="inner">
+    <span class="p-tag">Direction 1 ・ Confident / Marketer-native</span>
+    <div class="lockup">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+        <rect width="80" height="80" rx="20" fill="#17171C"/>
+        <circle cx="40" cy="40" r="22" fill="none" stroke="#2C5CE6" stroke-width="4"/>
+        <circle cx="40" cy="40" r="8" fill="#2C5CE6"/>
+      </svg>
+      <div>
+        <div class="name-big">SP<span class="o">O</span>T</div>
+        <div class="reading">/spɒt/ ・ スポット</div>
+      </div>
+    </div>
+    <div class="tagline-en">Every spot, in a day.</div>
+    <div class="tagline-jp">その広告、今日中に。</div>
+    <div class="posline">広告業界で "a spot" は「CM・広告枠」そのもの。マーケターの母国語であり、"on the spot（その場で・即座に）"の速さも重なる。説明不要で刺さる、最も確信に満ちた名前。</div>
+    <div class="global">
+      <div class="g-cell"><div class="gk">Meaning</div><div class="gv">広告=a spot（業界用語）+ 即座さ。二重に効く</div></div>
+      <div class="g-cell"><div class="gk">Says as</div><div class="gv">EN: spot ・ JP: スポット。両方1音節で言いやすい</div></div>
+      <div class="g-cell"><div class="gk">Watch-out</div><div class="gv">一般語ゆえ商標は要工夫（Spot◯◯等の可能性）</div></div>
+    </div>
+    <div class="kit">
+      <div class="palette"><i style="background:#2C5CE6"></i><i style="background:#17171C"></i><i style="background:#F6F4EF"></i><i style="background:#A9BEF2"></i></div>
+      <div class="kit-meta">書体 Bricolage Grotesque<br>気分 確信・モダン・グローバルSaaS</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REEL ===== -->
+<section class="panel dir-reel">
+  <div class="inner">
+    <span class="p-tag">Direction 2 ・ Social / Friendly</span>
+    <div class="lockup">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+        <rect width="80" height="80" rx="22" fill="#FF5B39"/>
+        <circle cx="40" cy="40" r="21" fill="none" stroke="#fff" stroke-width="4"/>
+        <circle cx="40" cy="40" r="6" fill="#fff"/>
+        <circle cx="40" cy="21" r="3.4" fill="#fff"/><circle cx="40" cy="59" r="3.4" fill="#fff"/>
+        <circle cx="21" cy="40" r="3.4" fill="#fff"/><circle cx="59" cy="40" r="3.4" fill="#fff"/>
+      </svg>
+      <div>
+        <div class="name-big">REEL</div>
+        <div class="reading">/riːl/ ・ リール</div>
+      </div>
+    </div>
+    <div class="tagline-en">Your brand, on a reel.</div>
+    <div class="tagline-jp">ブランドを、リールに。</div>
+    <div class="posline">動画のリール、そしてSNSの Reels。今いちばん動画広告が流れる場所を名前に。明るく親しみやすく、ソーシャルネイティブ。P1マーケターの日常に最も近い言葉。</div>
+    <div class="global">
+      <div class="g-cell"><div class="gk">Meaning</div><div class="gv">フィルムのリール + SNS Reels。動画の代名詞</div></div>
+      <div class="g-cell"><div class="gk">Says as</div><div class="gv">EN: reel ・ JP: リール。世界中で通じる</div></div>
+      <div class="g-cell"><div class="gk">Watch-out</div><div class="gv">Meta の Reels と近い。差別化と商標に注意</div></div>
+    </div>
+    <div class="kit">
+      <div class="palette"><i style="background:#FF5B39"></i><i style="background:#2A1E1A"></i><i style="background:#FFF6F2"></i><i style="background:#FFC7B3"></i></div>
+      <div class="kit-meta">書体 Baloo 2（丸みのある太字）<br>気分 明るい・軽快・ソーシャル</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TAKE ===== -->
+<section class="panel dir-take">
+  <div class="inner">
+    <span class="p-tag">Direction 3 ・ Premium / Craft</span>
+    <div class="lockup">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+        <rect width="80" height="80" rx="16" fill="#1E1E17" stroke="#C79B5A" stroke-width="2"/>
+        <path d="M14 30h52" stroke="#C79B5A" stroke-width="2.5"/>
+        <path d="M18 22l9 8M34 22l9 8M50 22l9 8" stroke="#C79B5A" stroke-width="2.5"/>
+        <text x="40" y="58" text-anchor="middle" fill="#EFEBE0" font-family="Fraunces, serif" font-size="20" font-weight="900">1</text>
+      </svg>
+      <div>
+        <div class="name-big">TAKE</div>
+        <div class="reading">/teɪk/ ・ テイク</div>
+      </div>
+    </div>
+    <div class="tagline-en">Nailed in one take.</div>
+    <div class="tagline-jp">一発で、決まる。</div>
+    <div class="posline">映画の「テイク」。そして "our take（私たちの視点）"。"in one take" は「一発OK」——プロが一発で決める確信を名前に。明朝×セリフの余白で、量産でなく一本の質を語る、最も上質な人格。</div>
+    <div class="global">
+      <div class="g-cell"><div class="gk">Meaning</div><div class="gv">映画のtake + one take（一発OK）+ 視点</div></div>
+      <div class="g-cell"><div class="gk">Says as</div><div class="gv">EN: take ・ JP: テイク。誰でも言える</div></div>
+      <div class="g-cell"><div class="gk">Watch-out</div><div class="gv">超一般語。商標は Take◯◯ 型の造語推奨</div></div>
+    </div>
+    <div class="kit">
+      <div class="palette"><i style="background:#C79B5A"></i><i style="background:#14140F"></i><i style="background:#EFEBE0"></i><i style="background:#7A5C33"></i></div>
+      <div class="kit-meta">書体 Fraunces（セリフ・エディトリアル）<br>気分 上質・確信・映画的</div>
+    </div>
+  </div>
+</section>
+
+<div class="compare">
+  <h2>3方向、ひと目で。</h2>
+  <table class="ctable">
+    <thead><tr><th>観点</th><th class="sn">SPOT</th><th class="rn">REEL</th><th class="tn">TAKE</th></tr></thead>
+    <tbody>
+      <tr><td>意味</td><td>CM・広告枠 / 即座</td><td>動画リール / SNS Reels</td><td>映画テイク / 一発OK</td></tr>
+      <tr><td>人格</td><td>確信・モダン</td><td>明るい・ソーシャル</td><td>上質・クラフト</td></tr>
+      <tr><td>発音(EN/JP)</td><td>spot / スポット</td><td>reel / リール</td><td>take / テイク</td></tr>
+      <tr><td>響く相手</td><td>マーケ全般・グローバル</td><td>SNS運用・若年</td><td>ブランド重視・上位層</td></tr>
+      <tr><td>タグライン</td><td>Every spot, in a day.</td><td>Your brand, on a reel.</td><td>Nailed in one take.</td></tr>
+      <tr><td>商標のしやすさ</td><td>△ 工夫要</td><td>△ Reels近接</td><td>△ 造語推奨</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="note-box">
+  <div class="nb">
+    <b>命名の次ステップ（海外前提で必須）:</b> 3案とも一般英単語のため、そのままの単独商標は取りにくい可能性があります。実務では
+    <b>①.com等ドメイン空き確認 ②主要国の商標調査 ③各言語での不適切語チェック ④SNSハンドル空き</b> を、方向決定の直後に行います。
+    単独で厳しい場合は <b>Spotcraft / GetSpot / Reelkit / OneTake</b> のような造語化で回避できます。
+  </div>
+</div>
+
+<div class="foot">SPOT · REEL · TAKE ・ 海外展開ブランド3案 — 方向を選ぶ / 名前と見せ方を混ぜるも可</div>

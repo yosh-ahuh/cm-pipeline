@@ -1,0 +1,2 @@
+npx remotion render src/index.ts MiraiCM-C /Users/yosh/work/SPOT/cm-pipeline/projects/mirai-koji/out/_render/mirai-koji_C_youtube.mp4 --props={"variant": "C", "splashVariant": "C", "format": "wide", "width": 1920, "height": 1080, "platform": "youtube", "compliance": {"disclosure": {"text": "映像の一部はAIで生成しています", "seconds": 2.0, "position": "bottom-right", "minHeightPct": 3.0}, "safeZone": {"topPct": 0.0, "bottomPct": 10.0}, "captions": "optional"}}
+(cwd: /Users/yosh/work/SPOT/ad-prototype)

@@ -1,0 +1,428 @@
+#!/usr/bin/env python3
+"""SPOT 生成ワーカー（Supabase jobs 駆動）.
+
+`jobs` テーブルを見て、依存が揃った pending ジョブを実行し status/usd を更新、
+credit_ledger を積む。service_role キーで PostgREST を叩く（RLS を貫通）。
+
+Web の DEV ランナー（index.html の __devRunJobs）と同じループのサーバ版。
+既定は DRY-RUN（課金なし・原価は概算計上）。--live では projects.spec を cm-pipeline の
+project.yaml に写像し（projects/_supabase/<project_id>/）、still/review/animate/audio/build の
+各ステージを実行、生成物を Storage(assets) にアップロードして generations / renders に記録する。
+build は spec.compliance / spec.delivery を読み、開示テロップ・C2PA・媒体仕様を適用する。
+
+環境変数:
+  SUPABASE_URL                 例: https://xxxx.supabase.co
+  SUPABASE_SERVICE_ROLE_KEY    service_role キー（サーバ専用・絶対に公開しない）
+  FAL_KEY                      （--live）fal.ai キー。未設定なら ../../.fal_key を読む
+  CM_PIPELINE_DIR              （任意）cm-pipeline のパス。既定は ../../cm-pipeline
+
+使い方:
+  export SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=...
+  python3 worker.py            # 全プロジェクトの pending を処理して終了
+  python3 worker.py --watch    # 5秒間隔でポーリング常駐
+  python3 worker.py --project <uuid>
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import mimetypes
+import os
+import sys
+import time
+import urllib.request
+import urllib.parse
+import urllib.error
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+SPOT_ROOT = HERE.parent.parent                                   # SPOT/
+CM_DIR = Path(os.environ.get("CM_PIPELINE_DIR") or SPOT_ROOT / "cm-pipeline")
+
+# cm-pipeline の概算原価と揃える（実生成時は実測に置換）。
+JOB_USD = {"still": 0.05, "review": 0.01, "animate": 3.50, "audio": 0.28, "build": 0.0}
+CREDIT_USD = 0.30
+SUCCESS = {"done", "skipped"}
+
+
+def env(name: str) -> str:
+    v = os.environ.get(name)
+    if not v:
+        sys.exit(f"環境変数 {name} が未設定です（README 参照）。")
+    return v
+
+
+class Supa:
+    """PostgREST への薄いクライアント（service_role）。"""
+    def __init__(self, url: str, key: str):
+        self.base = url.rstrip("/") + "/rest/v1"
+        self.h = {"apikey": key, "Authorization": f"Bearer {key}",
+                  "Content-Type": "application/json"}
+
+    def _req(self, method: str, path: str, params=None, body=None, prefer=None):
+        q = ("?" + urllib.parse.urlencode(params)) if params else ""
+        headers = dict(self.h)
+        if prefer:
+            headers["Prefer"] = prefer
+        data = json.dumps(body).encode() if body is not None else None
+        req = urllib.request.Request(self.base + path + q, data=data, headers=headers, method=method)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                txt = r.read().decode()
+                return json.loads(txt) if txt else None
+        except urllib.error.HTTPError as e:
+            raise RuntimeError(f"{method} {path} HTTP {e.code}: {e.read().decode()[:300]}") from e
+
+    def select(self, table, **params):
+        params.setdefault("select", "*")
+        return self._req("GET", f"/{table}", params) or []
+
+    def update(self, table, match: dict, body: dict):
+        return self._req("PATCH", f"/{table}", match, body, prefer="return=representation")
+
+    def insert(self, table, body: dict):
+        return self._req("POST", f"/{table}", None, body, prefer="return=representation")
+
+    def download(self, bucket: str, path: str, dest: Path) -> Path:
+        """Storage からダウンロード（service_role）。"""
+        url = self.base.replace("/rest/v1", "/storage/v1") + f"/object/{bucket}/{path}"
+        req = urllib.request.Request(url, headers={k: v for k, v in self.h.items() if k != "Content-Type"})
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.write_bytes(r.read())
+        except urllib.error.HTTPError as e:
+            raise RuntimeError(f"download {path} HTTP {e.code}: {e.read().decode()[:300]}") from e
+        return dest
+
+    def upload(self, bucket: str, path: str, file: Path) -> str:
+        """Storage へアップロード（upsert）。戻り値は bucket 内パス。"""
+        url = self.base.replace("/rest/v1", "/storage/v1") + f"/object/{bucket}/{path}"
+        ctype = mimetypes.guess_type(str(file))[0] or "application/octet-stream"
+        headers = {k: v for k, v in self.h.items() if k != "Content-Type"}
+        headers.update({"Content-Type": ctype, "x-upsert": "true"})
+        req = urllib.request.Request(url, data=file.read_bytes(), headers=headers, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                r.read()
+        except urllib.error.HTTPError as e:
+            raise RuntimeError(f"upload {path} HTTP {e.code}: {e.read().decode()[:300]}") from e
+        return path
+
+
+def job_key(j: dict) -> str:
+    return f"{j['stage']}:{j['cut']}" if j.get("cut") else j["stage"]
+
+
+def ready(j: dict, all_jobs: list[dict]) -> bool:
+    if j["status"] != "pending":
+        return False
+    deps = j.get("deps") or []
+    done = {job_key(x) for x in all_jobs if x["status"] in SUCCESS}
+    return all(d in done for d in deps)
+
+
+# ---------------------------------------------------------------- live: cm-pipeline 接続
+_CM_LOADED = False
+
+
+def _load_cm():
+    """cm-pipeline を import 可能にする（venv の site-packages も追加）。"""
+    global _CM_LOADED
+    if _CM_LOADED:
+        return
+    if not (CM_DIR / "cm").is_dir():
+        raise RuntimeError(f"cm-pipeline が見つかりません: {CM_DIR}（CM_PIPELINE_DIR で指定）")
+    sys.path.insert(0, str(CM_DIR))
+    try:
+        import yaml  # noqa: F401
+    except ModuleNotFoundError:
+        # cm-pipeline/.venv の site-packages を借りる（pyyaml）
+        for sp in sorted((CM_DIR / ".venv" / "lib").glob("python*/site-packages")):
+            sys.path.append(str(sp))
+    _CM_LOADED = True
+
+
+def _fal_key() -> str | None:
+    k = os.environ.get("FAL_KEY")
+    if k:
+        return k.strip()
+    f = SPOT_ROOT / ".fal_key"
+    return f.read_text(encoding="utf-8").strip() if f.is_file() else None
+
+
+# spot-app の spec（ウィザード生成）→ cm-pipeline project.yaml。
+# cuts は {id, role, type} なので role を被写体に、業種/トーンを語彙に落とす。
+_TONE = {"ドキュメンタリー": "documentary", "documentary": "documentary"}
+
+
+def spec_to_project(project_id: str, spec: dict, product: str | None) -> dict:
+    sel = spec.get("selections", {}) or {}
+    meta = spec.get("meta", {}) or {}
+    out = spec.get("output", {}) or {}
+    formats = out.get("formats") or [{"id": "wide", "w": 1920, "h": 1080}]
+    cuts = []
+    for c in spec.get("cuts") or []:
+        if isinstance(c, str):
+            c = {"id": c, "type": "live-action"}
+        cut = {"id": c["id"], "type": c.get("type", "live-action")}
+        role = c.get("role") or c["id"]
+        if cut["type"] == "live-action":
+            subj = c.get("subject") or f"{sel.get('industry') or product or 'プロダクト'}の{sel.get('target') or '利用者'}。{role}"
+            cut["still"] = {"subject": subj}
+            cut["motion"] = {"resolution": "1080p"}
+            cut["telop"] = c.get("telop") or [role]
+        elif cut["type"] == "cta":
+            cut.update({"button": c.get("button") or "今すぐ 無料ではじめる", "badges": c.get("badges") or [],
+                        "search": c.get("search") or product, "note": c.get("note")})
+        elif cut["type"] == "graphic":
+            cut["value"] = c.get("value") or {"label": role}
+        elif cut["type"] == "ui":
+            # assets: アプリが Storage に上げたスクショのパス配列（LiveRunner が assets/ にダウンロードして差し替え）
+            cut.update({"assets": list(c.get("assets") or []), "caption": c.get("caption") or role, "telop": c.get("telop") or [role]})
+        else:
+            cut["role"] = role
+        cuts.append(cut)
+    return {
+        "meta": {"name": project_id, "client": meta.get("client"), "product": product or meta.get("name"),
+                 "goal": meta.get("goal") or sel.get("angle"), "source": "spot-app"},
+        "output": {"fps": 30, "duration_frames": out.get("duration_frames", 961), "formats": formats,
+                   "variants": out.get("variants") or [{"id": "A"}, {"id": "B"}, {"id": "C"}]},
+        "brand": spec.get("brand") or {},
+        "style": {"tone": _TONE.get(sel.get("tone"), "documentary"), "grade": "broadcast-cool"},
+        "script": spec.get("script") or {},
+        "cuts": cuts,
+        "audio": spec.get("audio") or {"bgm": [{"id": "main", "model": "lyria2", "mood": "uplifting-corporate"}]},
+        "compliance": spec.get("compliance") or {},
+        "delivery": spec.get("delivery") or {},
+        # 既定は project.yaml 駆動の汎用コンポジション SpotAd（cm-pipeline/cm/remotion_props.py が props を組む）
+        "render": spec.get("render") or {"composition": "SpotAd", "prototype": str(SPOT_ROOT / "ad-prototype")},
+    }
+
+
+def localize_assets(sb: Supa, root: Path, d: dict, prefixes: list[str]) -> int:
+    """project.yaml 内の Storage パス（<org_id>/... または旧 <owner>/...）を root/assets/ にダウンロードして相対パスに置換。"""
+    n = 0
+    pres = [p for p in prefixes if p]
+
+    def fetch(p):
+        nonlocal n
+        if not isinstance(p, str) or not any(p.startswith(f"{pre}/") for pre in pres):
+            return p
+        dest = root / "assets" / Path(p).name
+        if not dest.is_file():
+            sb.download("assets", p, dest)
+            n += 1
+        return f"assets/{dest.name}"
+
+    brand = d.get("brand") or {}
+    for k in ("app_icon", "logo"):
+        if brand.get(k):
+            brand[k] = fetch(brand[k])
+    for cut in d.get("cuts") or []:
+        a = cut.get("assets")
+        if isinstance(a, list):
+            cut["assets"] = [fetch(x) for x in a]
+        elif isinstance(a, dict):
+            cut["assets"] = {k: fetch(v) for k, v in a.items()}
+    return n
+
+
+class LiveRunner:
+    """1プロジェクト分の cm-pipeline 実行コンテキスト（spec → project.yaml → ステージ）。"""
+
+    def __init__(self, sb: Supa, project_id: str, owner: str, spec: dict, product: str | None, org: str | None = None):
+        _load_cm()
+        import yaml
+        from cm import ledger, pipeline, project as project_mod
+        self.sb, self.project_id, self.owner, self.org = sb, project_id, owner, org
+        self.pipeline, self.ledger = pipeline, ledger
+        root = CM_DIR / "projects" / "_supabase" / project_id
+        root.mkdir(parents=True, exist_ok=True)
+        d = spec_to_project(project_id, spec, product)
+        got = localize_assets(sb, root, d, [org, owner])   # 新 <org_id>/… と旧 <owner>/… の両対応
+        if got:
+            print(f"  assets: {got} file(s) downloaded", flush=True)
+        (root / "project.yaml").write_text(
+            yaml.safe_dump(d, allow_unicode=True, sort_keys=False), encoding="utf-8")
+        self.proj = project_mod.load(str(root / "project.yaml"))
+        issues = project_mod.validate(self.proj)
+        if issues:
+            raise RuntimeError("spec → project.yaml の検証NG: " + "; ".join(issues))
+        self.ctx = pipeline.Ctx(dry_run=False, force=False, key=_fal_key())
+        self.cuts = {c["id"]: c for c in self.proj.cuts}
+
+    def _usd_delta(self, before: float) -> float:
+        return round(sum(r["usd"] for r in self.ledger.read(self.proj)) - before, 4)
+
+    def _ledger_total(self) -> float:
+        return sum(r["usd"] for r in self.ledger.read(self.proj))
+
+    def _put(self, file: Path, kind: str, cut: str | None, model: str | None, usd: float, table: str = "generations",
+             extra: dict | None = None) -> None:
+        scope = self.org or self.owner   # 新パス規約 <org_id>/<project>/...（org未解決なら owner）
+        path = f"{scope}/{self.project_id}/{file.name}"
+        self.sb.upload("assets", path, file)
+        row = {"project_id": self.project_id, "owner": self.owner, "storage_path": path}
+        if self.org:
+            row["org_id"] = self.org
+        if table == "generations":
+            row.update({"cut": cut, "kind": kind, "model": model, "usd": usd, "status": "done"})
+        else:
+            row.update(extra or {})
+        self.sb.insert(table, row)
+
+    def run(self, job: dict) -> float:
+        stage, cut_id = job["stage"], job.get("cut")
+        before = self._ledger_total()
+        p, ctx = self.pipeline, self.ctx
+        if stage in ("still", "review", "animate"):
+            cut = self.cuts.get(cut_id)
+            if not cut:
+                raise RuntimeError(f"cut '{cut_id}' が spec に無い")
+        if stage == "still":
+            r = p.still_one(self.proj, ctx, cut)
+            f = self.proj.generated / f"{cut_id}.still.png"
+            if f.is_file():
+                self._put(f, "still", cut_id, r.get("model"), r.get("usd", 0.0))
+        elif stage == "review":
+            r = p.review_one(self.proj, ctx, cut, retake=True)
+            if r.get("status") == "ng":
+                # NG → スチルを再生成して再検品（1回）。それでもNGなら失敗扱い
+                p.still_one(self.proj, ctx, cut)
+                r = p.review_one(self.proj, ctx, cut, retake=False)
+                if r.get("status") == "ng":
+                    raise RuntimeError("検品NG: " + ", ".join(r.get("ng") or []))
+        elif stage == "animate":
+            r = p.animate_one(self.proj, ctx, cut)
+            if r.get("status") == "blocked":
+                raise RuntimeError(f"animate blocked: {r.get('why')}")
+            f = self.proj.generated / f"{cut_id}.mp4"
+            if f.is_file():
+                self._put(f, "clip", cut_id, r.get("model"), r.get("usd", 0.0))
+        elif stage == "audio":
+            p.audio(self.proj, ctx)
+            adir = self.proj.generated / "audio"
+            for f in sorted(adir.glob("*.mp3")) if adir.is_dir() else []:
+                self._put(f, "audio", None, None, 0.0)
+        elif stage == "build":
+            res = p.build(self.proj, ctx)
+            report = Path(res.get("report", ""))
+            if report.is_file():
+                self._put(report, "render", None, None, 0.0)
+            for item in (json.loads(report.read_text(encoding="utf-8")).get("items", []) if report.is_file() else []):
+                dst = Path(item["dst"])
+                if dst.is_file():
+                    self._put(dst, "render", None, None, 0.0, table="renders",
+                              extra={"variant": item.get("variant"), "format": item.get("platform")})
+                side = Path((item.get("credentials") or {}).get("sidecar", ""))
+                if side.is_file():
+                    self._put(side, "render", None, None, 0.0)
+        else:
+            raise RuntimeError(f"未知のステージ: {stage}")
+        return self._usd_delta(before)
+
+
+def execute(job: dict, live: bool, runner: "LiveRunner | None" = None) -> float:
+    """ジョブを実行して実コスト(USD)を返す。
+
+    DRY-RUN: 概算原価を返すだけ（生成物なし）。
+    LIVE: LiveRunner が cm-pipeline のステージを実行し、生成物を Storage(assets) へ
+      アップロードして generations / renders 行を作る。
+    """
+    if live:
+        if runner is None:
+            raise RuntimeError("live 実行には LiveRunner が必要です")
+        return runner.run(job)
+    return JOB_USD.get(job["stage"], 0.05)
+
+
+def process_project(sb: Supa, project_id: str, owner: str, live: bool) -> int:
+    """1プロジェクトの ready ジョブを可能な限り進める。処理件数を返す。"""
+    processed = 0
+    runner = None
+    if live:
+        proj = sb.select("projects", id=f"eq.{project_id}", select="spec,product,name,org_id")
+        if not proj:
+            return 0
+        try:
+            runner = LiveRunner(sb, project_id, owner, proj[0].get("spec") or {},
+                                proj[0].get("product") or proj[0].get("name"), proj[0].get("org_id"))
+        except Exception as e:  # noqa: BLE001
+            print(f"  FAIL  project setup: {e}", flush=True)
+            sb.update("jobs", {"project_id": f"eq.{project_id}", "status": "eq.pending"},
+                      {"status": "failed", "detail": {"error": f"setup: {e!r}"[:300]}})
+            return 0
+    for _ in range(500):
+        jobs = sb.select("jobs", project_id=f"eq.{project_id}")
+        pend = [j for j in jobs if ready(j, jobs)]
+        if not pend:
+            break
+        for j in pend:
+            sb.update("jobs", {"id": f"eq.{j['id']}"}, {"status": "running"})
+            try:
+                usd = execute(j, live, runner)
+                sb.update("jobs", {"id": f"eq.{j['id']}"}, {"status": "done", "usd": usd})
+                if usd > 0:
+                    # コストのみ記録（credits=0）。残高消費は生成時に spend_credits(RPC) で実施済み。
+                    sb.insert("credit_ledger", {
+                        "owner": owner, "project_id": project_id, "stage": j["stage"],
+                        "model": j["stage"], "usd": usd, "credits": 0,
+                    })
+                print(f"  done  {job_key(j):16} ${usd:.2f}", flush=True)
+            except Exception as e:  # noqa: BLE001
+                sb.update("jobs", {"id": f"eq.{j['id']}"},
+                          {"status": "failed", "detail": {"error": repr(e)[:300]}})
+                print(f"  FAIL  {job_key(j):16} {e}", flush=True)
+            processed += 1
+    # 全 build まで終わっていれば done に
+    jobs = sb.select("jobs", project_id=f"eq.{project_id}")
+    if jobs and all(j["status"] in SUCCESS for j in jobs):
+        sb.update("projects", {"id": f"eq.{project_id}"}, {"status": "done"})
+    return processed
+
+
+def tick(sb: Supa, only_project: str | None, live: bool) -> int:
+    """処理すべきプロジェクトを見つけて進める。処理件数を返す。"""
+    params = {"select": "project_id", "status": "eq.pending"}
+    if only_project:
+        params["project_id"] = f"eq.{only_project}"
+    pending = sb.select("jobs", **params)
+    project_ids = sorted({p["project_id"] for p in pending})
+    total = 0
+    for pid in project_ids:
+        proj = sb.select("projects", id=f"eq.{pid}", select="owner,status")
+        if not proj:
+            continue
+        owner = proj[0]["owner"]
+        print(f"project {pid} …", flush=True)
+        total += process_project(sb, pid, owner, live)
+    return total
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description="SPOT 生成ワーカー（Supabase jobs 駆動）")
+    ap.add_argument("--project", help="対象プロジェクトID（省略時は全て）")
+    ap.add_argument("--watch", action="store_true", help="ポーリング常駐")
+    ap.add_argument("--interval", type=float, default=5.0, help="--watch のポーリング間隔秒")
+    ap.add_argument("--live", action="store_true", help="実生成（既定は DRY-RUN）")
+    args = ap.parse_args(argv)
+
+    sb = Supa(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"))
+    mode = "LIVE" if args.live else "DRY-RUN"
+    print(f"SPOT worker start (mode={mode}, project={args.project or 'ALL'})", flush=True)
+
+    if not args.watch:
+        n = tick(sb, args.project, args.live)
+        print(f"done. processed {n} job(s).", flush=True)
+        return 0
+    while True:
+        try:
+            tick(sb, args.project, args.live)
+        except Exception as e:  # noqa: BLE001
+            print("tick error:", e, flush=True)
+        time.sleep(args.interval)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

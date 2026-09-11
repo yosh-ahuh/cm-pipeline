@@ -1,0 +1,97 @@
+# demo-saas — 2件目の型検証（Phase 1 完了条件「2案件目を cm コマンドで半日で回せる」）。
+# コンポジションは書かず、既定の SpotAd（project.yaml 駆動）で 9 ファイルを出す。
+# 実写素材は ad-prototype/public/mirai の生成済みクリップを src で参照（public 配下は staging 不要）。
+
+meta:
+  name: demo-saas
+  client: デモ株式会社
+  product: ゲンバ台帳
+  goal: 認知獲得・アプリDL促進
+
+output:
+  fps: 30
+  duration_frames: 961
+  splash_frames: 60
+  formats:
+    - {id: wide,     w: 1920, h: 1080}
+    - {id: vertical, w: 1080, h: 1920}
+    - {id: square,   w: 1080, h: 1080}
+  variants:
+    - {id: A, splash: ring}
+    - {id: B, splash: confetti}
+    - {id: C, splash: bubble}
+
+brand:
+  name: ゲンバ台帳
+  colors: {primary: '#2846D9', accent: '#6180F5', dark: '#15161C'}
+  app_icon: mirai/app_icon.png        # デモ用に既存アイコンを流用
+  watermark: {text: ゲンバ台帳, position: top-left}
+  pronunciation:
+    ゲンバ台帳: "ゲンバダイチョウ"
+
+style:
+  tone: documentary
+  grade: broadcast-cool
+
+script:
+  voice: {model: minimax-speech-02-hd, voice_id: Japanese_LoyalKnight, speed: 1.15}
+  narration:
+    - {id: na1, text: "現場の記録、まだ会社に持ち帰ってますか?"}
+    - {id: na2, text: "ゲンバダイチョウなら、撮るだけで台帳が自動でできあがる。"}
+    - {id: na3, text: "その場で提出まで完了。今すぐ無料でダウンロード。"}
+
+cuts:
+  - id: cut01
+    type: live-action
+    scene: van-interior
+    src: mirai/cut01_veo.mp4
+    src_vertical: mirai/cut01_v_veo.mp4
+    dur: 150
+    still: {subject: "疲れた40代の現場監督が停車中の車内でため息"}
+    crop: {anchor_x: 55}
+    telop: ["記録は、会社に帰ってから…?"]
+    narration: na1
+
+  - id: stat
+    type: graphic
+    dur: 80
+    value: {label: "その作業に、月", number: 32, unit: "時間。", note: "※自社調べ"}
+    background_src: mirai/papers_veo.mp4
+
+  - id: ledger
+    type: ui
+    dur: 200
+    assets: {camera: mirai/ui2_camera.png, ledger_full: mirai/ui2_list_filled.png}
+    caption: "撮るだけで、台帳が自動作成"
+    telop: ["スマホで、撮るだけ。"]
+    narration: na2
+
+  - id: cut05
+    type: live-action
+    scene: dusk-exterior
+    src: mirai/cut05_veo.mp4
+    dur: 150
+    still: {subject: "監督が車の横でスマホ送信して笑顔"}
+    telop: ["その場で、提出完了。"]
+
+  - id: cta
+    type: cta
+    badges: ["導入1,200社", "無料プランあり"]
+    button: "今すぐ 無料ダウンロード"
+    search: "ゲンバ台帳"
+    note: "App Store / Google Play 対応"
+    narration: na3
+
+audio:
+  bgm:
+    - {id: main, model: lyria2, mood: uplifting-corporate}
+
+compliance:
+  ai_disclosure: true
+  content_credentials: true
+  claims_evidence:
+    - {claim: "月32時間", source: "自社調べ", note: "※自社調べ"}
+    - {claim: "導入1,200社", source: "デモ値（実案件では要裏取り）"}
+
+delivery:
+  platforms: [youtube, reels_shorts, timeline]

@@ -1,0 +1,39 @@
+# --- secrets（絶対にコミットしない） ---
+.fal_key
+spot-app/config.js
+**/.env
+*.env
+*.key
+
+# --- dependencies ---
+**/node_modules/
+**/.venv/
+.venv/
+
+# --- OS / editor ---
+.DS_Store
+**/.DS_Store
+
+# --- python ---
+**/__pycache__/
+*.pyc
+
+# --- logs ---
+*.log
+
+# --- build / generated ---
+dist/
+generated/
+cm-pipeline/projects/_supabase/
+ad-prototype/out/
+
+# --- root-level のスクラッチ生成メディア（大容量。アプリ/サイトのアセットは残す） ---
+/*.mp3
+/*.wav
+/*.mp4
+/*.mov
+mirai-assets/
+
+# --- ad-prototype の生成クリップ（~300MB。fal生成物。必要なら git add -f / Git LFS で追加） ---
+ad-prototype/public/**/*.mp4
+ad-prototype/public/**/*.mov

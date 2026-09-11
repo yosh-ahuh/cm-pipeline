@@ -1,0 +1,365 @@
+<title>コマドリ ブランドボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+  :root {
+    --ground: #F4F0E7;
+    --surface: #FFFFFF;
+    --surface-2: #FBF7EF;
+    --ink: #1B1B22;
+    --muted: #78756B;
+    --faint: #A8A398;
+    --line: #E6E0D2;
+    --line-strong: #D8D1BF;
+    --accent: #DE8E24;
+    --accent-ink: #8A5410;
+    --accent-soft: #FAEACE;
+    --brand-red: #D7000F;
+    --robin: #C96A3A;
+    --shadow: 0 1px 2px rgba(27,27,34,.04), 0 10px 30px rgba(27,27,34,.07);
+    --shadow-lift: 0 3px 10px rgba(27,27,34,.08), 0 24px 50px rgba(27,27,34,.13);
+    --font-display: "Bricolage Grotesque", "Zen Kaku Gothic New", sans-serif;
+    --font-round: "Zen Maru Gothic", "Zen Kaku Gothic New", sans-serif;
+    --font-jp: "Zen Kaku Gothic New", -apple-system, "Hiragino Sans", sans-serif;
+    --font-mono: "DM Mono", ui-monospace, monospace;
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --ground: #14140F; --surface: #1D1D18; --surface-2: #232219;
+      --ink: #F1EDE2; --muted: #9C988C; --faint: #67645B;
+      --line: #2E2D25; --line-strong: #3A3930;
+      --accent: #EDA53C; --accent-ink: #F6C77E; --accent-soft: #33280F;
+      --robin: #DB8556;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.45);
+      --shadow-lift: 0 3px 12px rgba(0,0,0,.4), 0 28px 56px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #14140F; --surface: #1D1D18; --surface-2: #232219;
+    --ink: #F1EDE2; --muted: #9C988C; --faint: #67645B;
+    --line: #2E2D25; --line-strong: #3A3930;
+    --accent: #EDA53C; --accent-ink: #F6C77E; --accent-soft: #33280F;
+    --robin: #DB8556;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px rgba(0,0,0,.45);
+    --shadow-lift: 0 3px 12px rgba(0,0,0,.4), 0 28px 56px rgba(0,0,0,.6);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--font-jp); font-size: 15px; line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 26px; }
+  h1,h2,h3 { margin: 0; font-weight: 700; text-wrap: balance; }
+  ::selection { background: var(--accent-soft); }
+
+  /* section frame — フィルムのコマ */
+  .reel { border-top: 1px solid var(--line); }
+  .frameno { font-family: var(--font-mono); font-size: 12px; color: var(--accent-ink); letter-spacing: .1em; display: inline-flex; align-items: center; gap: 9px; margin-bottom: 18px; }
+  .frameno::before { content: ""; width: 22px; height: 14px; border: 1.5px solid var(--accent); border-radius: 2px; background: repeating-linear-gradient(90deg, transparent 0 3px, var(--accent-soft) 3px 4px); }
+  section { padding: 62px 0; }
+  .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .lead { font-size: 17px; color: var(--muted); max-width: 60ch; line-height: 1.85; }
+
+  /* hero */
+  .hero { padding: 90px 0 70px; text-align: center; position: relative; overflow: hidden; }
+  .hero-bird { display: block; margin: 0 auto 26px; }
+  .hero h1 { font-family: var(--font-round); font-weight: 900; font-size: clamp(56px, 12vw, 108px); letter-spacing: .02em; line-height: 1; }
+  .hero .romaji { font-family: var(--font-mono); font-size: 14px; letter-spacing: .4em; color: var(--accent-ink); text-transform: uppercase; margin-top: 20px; padding-left: .4em; }
+  .hero .tag { font-family: var(--font-display); font-weight: 800; font-size: clamp(22px, 4vw, 32px); letter-spacing: -.01em; margin-top: 26px; }
+  .hero .pos { font-size: 15px; color: var(--muted); margin-top: 16px; max-width: 46ch; margin-left: auto; margin-right: auto; }
+  .theme-toggle { position: fixed; top: 18px; right: 18px; z-index: 10; width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--muted); cursor: pointer; font-size: 16px; }
+
+  /* name meaning */
+  .etymo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 30px; }
+  .etymo-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 26px; box-shadow: var(--shadow); }
+  .etymo-card .big { font-family: var(--font-round); font-weight: 900; font-size: 40px; color: var(--accent-ink); line-height: 1; }
+  .etymo-card .big.robin { color: var(--robin); }
+  .etymo-card h3 { font-size: 15px; margin: 16px 0 6px; }
+  .etymo-card p { font-size: 13.5px; color: var(--muted); margin: 0; line-height: 1.7; }
+  .etymo-note { margin-top: 20px; font-size: 14.5px; background: var(--accent-soft); border-radius: 12px; padding: 18px 22px; color: var(--accent-ink); line-height: 1.8; }
+  .etymo-note b { font-weight: 700; }
+
+  /* positioning */
+  .pos-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 28px; }
+  .pos-cell { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .pos-cell .k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-ink); }
+  .pos-cell .v { font-size: 15px; font-weight: 700; margin-top: 8px; line-height: 1.6; }
+  .pos-cell .s { font-size: 12.5px; color: var(--muted); margin-top: 5px; }
+  .vs { margin-top: 22px; display: flex; align-items: stretch; gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .vs > div { flex: 1; padding: 20px 22px; }
+  .vs .old { background: var(--surface-2); }
+  .vs .new { background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface)); border-left: 1px solid var(--line); }
+  .vs .k { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .vs .new .k { color: var(--accent-ink); }
+  .vs .big2 { font-family: var(--font-display); font-weight: 800; font-size: 21px; margin-top: 8px; letter-spacing: -.01em; }
+
+  /* taglines */
+  .tags { display: flex; flex-direction: column; gap: 10px; margin-top: 26px; }
+  .tagline { background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: 18px 24px; display: flex; align-items: baseline; gap: 16px; box-shadow: var(--shadow); }
+  .tagline.primary { border-color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 35%, var(--surface)); }
+  .tagline .t { font-family: var(--font-round); font-weight: 700; font-size: 22px; letter-spacing: .01em; }
+  .tagline.primary .t { color: var(--accent-ink); }
+  .tagline .note { font-size: 12.5px; color: var(--muted); margin-left: auto; text-align: right; white-space: nowrap; }
+
+  /* color */
+  .swatches { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 26px; }
+  .swatch { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+  .swatch .chip { height: 84px; }
+  .swatch .info { padding: 12px 14px; }
+  .swatch .nm { font-size: 13px; font-weight: 700; }
+  .swatch .hx { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+  .swatch .role { font-size: 11px; color: var(--faint); margin-top: 3px; }
+
+  /* typography */
+  .type-row { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px 26px; margin-top: 14px; box-shadow: var(--shadow); display: grid; grid-template-columns: 130px 1fr; gap: 24px; align-items: center; }
+  .type-row .meta { font-size: 12px; color: var(--muted); }
+  .type-row .meta b { display: block; font-size: 14px; color: var(--ink); font-weight: 700; margin-bottom: 3px; }
+  .type-row .meta .mono { font-family: var(--font-mono); font-size: 11px; margin-top: 6px; }
+  .spec-display { font-family: var(--font-display); font-weight: 800; font-size: 34px; letter-spacing: -.02em; line-height: 1.2; }
+  .spec-round { font-family: var(--font-round); font-weight: 900; font-size: 32px; }
+  .spec-jp { font-family: var(--font-jp); font-weight: 500; font-size: 19px; line-height: 1.7; }
+  .spec-mono { font-family: var(--font-mono); font-size: 17px; letter-spacing: .02em; }
+
+  /* logo */
+  .logo-stage { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 46px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 26px; box-shadow: var(--shadow); align-items: center; }
+  .logo-lockup { display: flex; align-items: center; gap: 16px; }
+  .logo-word { font-family: var(--font-round); font-weight: 900; font-size: 40px; letter-spacing: .02em; }
+  .logo-variants { display: flex; flex-direction: column; gap: 14px; }
+  .logo-mini { display: flex; align-items: center; gap: 11px; font-size: 12.5px; color: var(--muted); }
+  .logo-note { font-size: 13px; color: var(--muted); line-height: 1.8; margin-top: 18px; }
+  .on-dark { background: #14140F; border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: center; gap: 13px; }
+  .on-dark .logo-word { color: #F1EDE2; font-size: 28px; }
+
+  /* voice */
+  .voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 26px; }
+  .voice-card { border-radius: 14px; padding: 20px 22px; border: 1px solid var(--line); }
+  .voice-card.do { background: color-mix(in srgb, var(--accent-soft) 30%, var(--surface)); }
+  .voice-card.dont { background: var(--surface-2); }
+  .voice-card .vh { font-size: 12px; font-family: var(--font-mono); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 12px; }
+  .voice-card.do .vh { color: var(--accent-ink); }
+  .voice-card.dont .vh { color: var(--muted); }
+  .voice-card ul { margin: 0; padding-left: 18px; }
+  .voice-card li { font-size: 13.5px; margin-bottom: 7px; line-height: 1.6; }
+  .voice-card.dont li { color: var(--muted); }
+
+  /* name decision */
+  .names { display: flex; flex-direction: column; gap: 12px; margin-top: 26px; }
+  .name-opt { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; box-shadow: var(--shadow); }
+  .name-opt.rec { border-color: var(--accent); border-width: 1.5px; }
+  .name-opt .nh { display: flex; align-items: baseline; gap: 12px; }
+  .name-opt .nn { font-family: var(--font-round); font-weight: 900; font-size: 26px; }
+  .name-opt.rec .nn { color: var(--accent-ink); }
+  .name-opt .badge { font-family: var(--font-mono); font-size: 10.5px; padding: 3px 9px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 500; }
+  .name-opt .rr { font-family: var(--font-mono); font-size: 12px; color: var(--faint); letter-spacing: .2em; text-transform: uppercase; }
+  .name-opt p { font-size: 13.5px; color: var(--muted); margin: 9px 0 0; line-height: 1.7; }
+
+  .foot { text-align: center; color: var(--faint); font-size: 12px; font-family: var(--font-mono); padding: 40px 0 60px; border-top: 1px solid var(--line); }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  @media (max-width: 720px) {
+    .etymo, .pos-grid, .swatches, .voice-grid, .logo-stage { grid-template-columns: 1fr 1fr; }
+    .pos-grid { grid-template-columns: 1fr; }
+    .type-row { grid-template-columns: 1fr; gap: 12px; }
+  }
+</style>
+
+<button class="theme-toggle" id="theme" aria-label="テーマ切替">◐</button>
+
+<header class="hero">
+  <div class="wrap">
+    <!-- mark: film frame + robin silhouette -->
+    <svg class="hero-bird" width="92" height="92" viewBox="0 0 92 92" fill="none" aria-hidden="true">
+      <rect x="6" y="6" width="80" height="80" rx="20" fill="var(--accent)"/>
+      <rect x="6" y="6" width="80" height="80" rx="20" fill="url(#g)" fill-opacity="0.25"/>
+      <!-- film perforations -->
+      <rect x="15" y="15" width="7" height="7" rx="1.5" fill="#fff" fill-opacity=".9"/>
+      <rect x="15" y="70" width="7" height="7" rx="1.5" fill="#fff" fill-opacity=".9"/>
+      <rect x="70" y="15" width="7" height="7" rx="1.5" fill="#fff" fill-opacity=".9"/>
+      <rect x="70" y="70" width="7" height="7" rx="1.5" fill="#fff" fill-opacity=".9"/>
+      <!-- robin: round body + beak (a friendly bird holding a "frame") -->
+      <circle cx="42" cy="48" r="19" fill="#fff"/>
+      <circle cx="42" cy="42" r="12" fill="#fff"/>
+      <path d="M42 34c-4 0-7 3-7 7h14c0-4-3-7-7-7z" fill="var(--robin)"/>
+      <circle cx="38" cy="40" r="2.2" fill="var(--ink)"/>
+      <path d="M52 41l7-2-5 5z" fill="var(--accent-ink)"/>
+      <defs><radialGradient id="g" cx="0.3" cy="0.2"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+    </svg>
+    <h1>コマドリ</h1>
+    <div class="romaji">Komadori</div>
+    <div class="tag">選ぶだけで、広告動画。</div>
+    <p class="pos">プロンプトも、編集スキルもいらない。マーケター自身が、その日のうちにCMをつくれる。</p>
+  </div>
+</header>
+
+<div class="reel"><div class="wrap"><section>
+  <div class="frameno">FRAME 01 — 名前の由来</div>
+  <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;letter-spacing:-.02em">「コマ」を「撮り」、運んでくる鳥。</h2>
+  <p class="lead" style="margin-top:14px">映像の最小単位＝コマ。それを撮り集めて動画にする道具であり、同時に「駒鳥（コマドリ）」という親しみやすい鳥の名でもある。</p>
+  <div class="etymo">
+    <div class="etymo-card">
+      <div class="big">コマ + 撮り</div>
+      <h3>映像の道具として</h3>
+      <p>フィルムのコマ（frame）を撮り集めて、1本のCMに編む。制作の本質そのものを名前に。</p>
+    </div>
+    <div class="etymo-card">
+      <div class="big robin">駒鳥</div>
+      <h3>親しみの象徴として</h3>
+      <p>完成した動画を「運んでくる」小さな相棒。プロ向けの威圧感でなく、ひとりのマーケターの味方。</p>
+    </div>
+  </div>
+  <div class="etymo-note">
+    この二重の意味が、プロダクトの性格そのもの。<b>専門性は裏に隠し、表は親しみやすく。</b>
+    「選ぶだけ」で誰でも使えるのに、裏では広告制作の勝ちパターンが動いている——その両面を1つの名前が持つ。
+  </div>
+</section></div></div>
+
+<div class="reel"><div class="wrap"><section>
+  <div class="frameno">FRAME 02 — ポジショニング</div>
+  <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;letter-spacing:-.02em">ひとことで。</h2>
+  <div class="pos-grid">
+    <div class="pos-cell"><div class="k">Who</div><div class="v">SaaS・アプリ企業のマーケター</div><div class="s">広告素材が枯渇し、外注予算も人手もない1人目マーケター</div></div>
+    <div class="pos-cell"><div class="k">What</div><div class="v">選ぶだけでCMをつくるAIスタジオ</div><div class="s">媒体×業種×ターゲットを選ぶと、実写もUIも音声もAIが生成</div></div>
+    <div class="pos-cell"><div class="k">Why</div><div class="v">翌日には、出せる初稿</div><div class="s">制作会社の1/400のコスト、1/20の納期。修正は分単位</div></div>
+  </div>
+  <div class="vs">
+    <div class="old"><div class="k">これまで（制作会社）</div><div class="big2">¥50万 ・ 3週間</div><div class="s" style="color:var(--muted);font-size:12.5px;margin-top:6px">修正2回まで・打ち合わせ前提</div></div>
+    <div class="new"><div class="k">コマドリ</div><div class="big2">¥1,200前後 ・ 当日</div><div class="s" style="color:var(--accent-ink);font-size:12.5px;margin-top:6px">修正無制限・選ぶだけ</div></div>
+  </div>
+</section></div></div>
+
+<div class="reel"><div class="wrap"><section>
+  <div class="frameno">FRAME 03 — タグライン</div>
+  <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;letter-spacing:-.02em">言葉の候補。</h2>
+  <div class="tags">
+    <div class="tagline primary"><span class="t">選ぶだけで、広告動画。</span><span class="note">推奨 ・ プロダクトの約束そのもの</span></div>
+    <div class="tagline"><span class="t">つくれない、を、つくる。</span><span class="note">「作れなかった人」が主役という視点</span></div>
+    <div class="tagline"><span class="t">その日のうちに、出せるCM。</span><span class="note">スピードを前面に</span></div>
+    <div class="tagline"><span class="t">プロンプト、いりません。</span><span class="note">選択UIの核心を逆説的に</span></div>
+  </div>
+</section></div></div>
+
+<div class="reel"><div class="wrap"><section>
+  <div class="frameno">FRAME 04 — カラー</div>
+  <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;letter-spacing:-.02em">色。</h2>
+  <p class="lead" style="margin-top:14px">主役はマリゴールド——撮影現場のタングステン光の色。映像制作の温度を1色に託す。AI定番のクリームや紫グラデは意図的に避ける。</p>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:#DE8E24"></div><div class="info"><div class="nm">マリゴールド</div><div class="hx">#DE8E24</div><div class="role">アクセント・CTA</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#1B1B22"></div><div class="info"><div class="nm">インク</div><div class="hx">#1B1B22</div><div class="role">文字・ブランド黒</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#F4F0E7"></div><div class="info"><div class="nm">ペーパー</div><div class="hx">#F4F0E7</div><div class="role">地・温かい余白</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#C96A3A"></div><div class="info"><div class="nm">ロビン</div><div class="hx">#C96A3A</div><div class="role">マスコット・差し色</div></div></div>
+  </div>
+</section></div></div>
+
+<div class="reel"><div class="wrap"><section>
+  <div class="frameno">FRAME 05 — タイポグラフィ</div>
+  <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;letter-spacing:-.02em">書体。</h2>
+  <div class="type-row">
+    <div class="meta"><b>Zen Maru Gothic</b>ロゴ・見出し<div class="mono">900 / 丸ゴシック</div></div>
+    <div class="spec-round">コマドリ ・ 選ぶだけ</div>
+  </div>
+  <div class="type-row">
+    <div class="meta"><b>Bricolage Grotesque</b>欧文ディスプレイ・数字<div class="mono">800 / display</div></div>
+    <div class="spec-display">Komadori ¥1,200 / 30s</div>
+  </div>
+  <div class="type-row">
+    <div class="meta"><b>Zen Kaku Gothic New</b>本文・UI<div class="mono">400–700</div></div>
+    <div class="spec-jp">媒体・業種・ターゲットを選ぶだけ。あとはコマドリが運んでくる。</div>
+  </div>
+  <div class="type-row">
+    <div class="meta"><b>DM Mono</b>データ・ラベル・尺<div class="mono">400–500</div></div>
+    <div class="spec-mono">CUT-03 · 00:11–00:14 · Veo</div>
+  </div>
+</section></div></div>
+
+<div class="reel"><div class="wrap"><section>
+  <div class="frameno">FRAME 06 — ロゴ</div>
+  <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;letter-spacing:-.02em">ロゴ。</h2>
+  <div class="logo-stage">
+    <div>
+      <div class="logo-lockup">
+        <svg width="56" height="56" viewBox="0 0 92 92" fill="none" aria-hidden="true">
+          <rect x="6" y="6" width="80" height="80" rx="20" fill="var(--accent)"/>
+          <rect x="15" y="15" width="7" height="7" rx="1.5" fill="#fff" fill-opacity=".9"/>
+          <rect x="15" y="70" width="7" height="7" rx="1.5" fill="#fff" fill-opacity=".9"/>
+          <rect x="70" y="15" width="7" height="7" rx="1.5" fill="#fff" fill-opacity=".9"/>
+          <rect x="70" y="70" width="7" height="7" rx="1.5" fill="#fff" fill-opacity=".9"/>
+          <circle cx="42" cy="48" r="19" fill="#fff"/><circle cx="42" cy="42" r="12" fill="#fff"/>
+          <path d="M42 34c-4 0-7 3-7 7h14c0-4-3-7-7-7z" fill="var(--robin)"/>
+          <circle cx="38" cy="40" r="2.2" fill="var(--ink)"/>
+          <path d="M52 41l7-2-5 5z" fill="var(--accent-ink)"/>
+        </svg>
+        <span class="logo-word">コマドリ</span>
+      </div>
+      <div class="logo-note">シンボルは「フィルムのコマ（角の4つの穴）」の中に「駒鳥」。道具と相棒、専門性と親しみの二面を1つのマークに。</div>
+    </div>
+    <div class="logo-variants">
+      <div class="on-dark">
+        <svg width="34" height="34" viewBox="0 0 92 92" fill="none" aria-hidden="true">
+          <rect x="6" y="6" width="80" height="80" rx="20" fill="var(--accent)"/>
+          <circle cx="42" cy="48" r="19" fill="#fff"/><circle cx="42" cy="42" r="12" fill="#fff"/>
+          <path d="M42 34c-4 0-7 3-7 7h14c0-4-3-7-7-7z" fill="var(--robin)"/>
+          <circle cx="38" cy="40" r="2.2" fill="#1B1B22"/><path d="M52 41l7-2-5 5z" fill="var(--accent-ink)"/>
+        </svg>
+        <span class="logo-word">コマドリ</span>
+      </div>
+      <div class="logo-mini"><span style="font-family:var(--font-mono);font-size:11px">▸ アプリアイコン / ファビコン / 動画ウォーターマーク に展開</span></div>
+    </div>
+  </div>
+</section></div></div>
+
+<div class="reel"><div class="wrap"><section>
+  <div class="frameno">FRAME 07 — ボイス & トーン</div>
+  <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;letter-spacing:-.02em">話し方。</h2>
+  <p class="lead" style="margin-top:14px">相手は「作れなくて困っている1人目マーケター」。教える先生でも、威圧するプロツールでもなく、隣で助ける相棒として話す。</p>
+  <div class="voice-grid">
+    <div class="voice-card do">
+      <div class="vh">こう話す</div>
+      <ul>
+        <li>やさしく、断定的に。「選ぶだけです」</li>
+        <li>専門用語は裏に隠す（"訴求軸"より"どう見せる?"）</li>
+        <li>結果を約束する。「翌日には出せます」</li>
+        <li>相手を主役に。「あなたのプロダクトを、あなたの手で」</li>
+      </ul>
+    </div>
+    <div class="voice-card dont">
+      <div class="vh">こう話さない</div>
+      <ul>
+        <li>AI・生成モデルの自慢をしない</li>
+        <li>「プロンプト」「レンダリング」等の裏側用語を出さない</li>
+        <li>過度にカジュアル・チャラくしない（信頼は崩さない）</li>
+        <li>できないことを曖昧にごまかさない</li>
+      </ul>
+    </div>
+  </div>
+</section></div></div>
+
+<div class="reel"><div class="wrap"><section>
+  <div class="frameno">FRAME 08 — 名前は、これでいく?</div>
+  <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;letter-spacing:-.02em">最終決定は、あなたに。</h2>
+  <p class="lead" style="margin-top:14px">「コマドリ」を推奨として、比較用に別方向も。最終的な名前はプロダクトの根なので、あなたの判断で。</p>
+  <div class="names">
+    <div class="name-opt rec">
+      <div class="nh"><span class="nn">コマドリ</span><span class="badge">推奨</span><span class="rr">Komadori</span></div>
+      <p>映像（コマ撮り）と親しみ（駒鳥）の二重の意味。マスコット展開可。読みやすく、覚えやすく、日本のSaaSとして自然。P1の「威圧しない」トーンに最適。</p>
+    </div>
+    <div class="name-opt">
+      <div class="nh"><span class="nn">パラパラ</span><span class="rr">Para Para</span></div>
+      <p>パラパラ漫画＝コマの連なりで動画になる比喩。軽快で覚えやすいが、やや軽い。若年・ポップ寄せなら。</p>
+    </div>
+    <div class="name-opt">
+      <div class="nh"><span class="nn">キリトリ</span><span class="rr">Kiritori</span></div>
+      <p>「切り撮り」＝現場を切り撮って広告にする。動詞的で行為が伝わるが、コマドリより硬め。</p>
+    </div>
+  </div>
+</section></div></div>
+
+<div class="foot">コマドリ ブランドボード ・ v1 ドラフト — フィードバックで更新します</div>
+
+<script>
+  const root = document.documentElement;
+  document.getElementById('theme').addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : cur === 'light' ? 'dark'
+      : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark');
+    root.setAttribute('data-theme', next);
+  });
+</script>

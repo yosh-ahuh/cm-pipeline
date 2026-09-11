@@ -1,0 +1,1645 @@
+<title>SPOT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<style>
+  /* ダーク一択（単一テーマ）。ライト/システム連動・切替は廃止。 */
+  :root {
+    color-scheme: dark;
+    --ground: #15151B;
+    --surface: #1E1E26;
+    --surface-2: #23232E;
+    --ink: #F1EDE4;
+    --muted: #9C988C;
+    --faint: #67645B;
+    --line: #2E2E39;
+    --line-strong: #3A3A46;
+    --accent: #6180F5;
+    --accent-ink: #A9B8F8;
+    --accent-soft: #181F45;
+    --cool: #3FB8A6;
+    --cool-soft: #12332E;
+    --good: #6DB98C;
+    --good-soft: #17281E;
+    --crit: #D9705A;
+    --brand-red: #D7000F;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.4);
+    --shadow-lift: 0 2px 10px rgba(0,0,0,.4), 0 22px 48px rgba(0,0,0,.55);
+    --font-display: "Bricolage Grotesque", "Zen Kaku Gothic New", sans-serif;
+    --font-jp: "Zen Kaku Gothic New", -apple-system, "Hiragino Sans", sans-serif;
+    --font-mono: "DM Mono", ui-monospace, monospace;
+    --radius: 14px;
+    --radius-sm: 9px;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-jp);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { margin: 0; font-weight: 700; text-wrap: balance; }
+  button { font-family: inherit; cursor: pointer; color: inherit; }
+  ::selection { background: var(--accent-soft); }
+
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- top bar ---------- */
+  header {
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    backdrop-filter: saturate(1.4) blur(8px);
+    position: sticky; top: 0; z-index: 20;
+  }
+  .topbar { display: flex; align-items: center; gap: 18px; height: 62px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .mark {
+    width: 30px; height: 30px; border-radius: 8px; flex: none;
+    background: var(--ink);
+    display: grid; place-items: center; color: #fff; position: relative;
+  }
+  .mark::before { content: ""; width: 17px; height: 17px; border-radius: 50%; border: 3px solid var(--accent); box-sizing: border-box; }
+  .mark::after { content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+  .wordmark { font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.01em; }
+  .breadcrumb { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; margin-left: 4px; }
+  .breadcrumb .sep { color: var(--faint); }
+  .breadcrumb b { color: var(--ink); font-weight: 700; }
+  .spacer { flex: 1; }
+  .credits {
+    display: flex; align-items: center; gap: 9px; font-family: var(--font-mono);
+    font-size: 12.5px; color: var(--muted); padding: 6px 12px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  }
+  .credits b { color: var(--ink); }
+  .credits .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--good); }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line);
+    background: var(--surface); display: grid; place-items: center; color: var(--muted);
+    font-size: 15px; transition: .15s;
+  }
+  .icon-btn:hover { color: var(--ink); border-color: var(--line-strong); }
+
+  /* ---------- context strip ---------- */
+  .context { display: flex; align-items: flex-end; gap: 20px; padding: 26px 0 20px; flex-wrap: wrap; }
+  .title-h1 { font-family: var(--font-display); font-size: 27px; font-weight: 800; letter-spacing: -.02em; }
+  .title-sub { color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .meta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  .meta {
+    display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+    font-size: 12.5px; color: var(--muted); white-space: nowrap;
+  }
+  .meta b { color: var(--ink); font-weight: 700; }
+  .meta svg { width: 14px; height: 14px; color: var(--faint); }
+
+  /* ---------- layout grid ---------- */
+  .board { display: grid; grid-template-columns: 210px minmax(0,1fr) 300px; gap: 20px; padding-bottom: 60px; align-items: start; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .panel-pad { padding: 16px; }
+  .panel-h {
+    font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--muted); padding: 14px 16px 0; display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ---------- pipeline rail ---------- */
+  .rail { position: sticky; top: 78px; }
+  .stages { list-style: none; margin: 8px 0 0; padding: 6px; display: flex; flex-direction: column; }
+  .stage {
+    display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start;
+    padding: 9px 8px; border-radius: 9px; position: relative;
+  }
+  .stage + .stage::before {
+    content: ""; position: absolute; left: 20px; top: -8px; width: 2px; height: 12px;
+    background: var(--line-strong);
+  }
+  .stage.done + .stage::before { background: var(--good); }
+  .stage:hover { background: var(--surface-2); }
+  .stage .node {
+    width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 12px; font-weight: 700; border: 2px solid var(--line-strong);
+    color: var(--faint); background: var(--surface); font-family: var(--font-mono);
+  }
+  .stage.done .node { background: var(--good); border-color: var(--good); color: #fff; }
+  .stage.active .node { border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .stage .s-name { font-size: 13px; font-weight: 700; line-height: 1.35; }
+  .stage .s-desc { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+  .stage.active .s-name { color: var(--accent-ink); }
+  .stage-foot { padding: 10px 12px 12px; }
+  .shotlist {
+    border: 1px dashed var(--line-strong); border-radius: 10px; padding: 11px 12px;
+    background: var(--surface-2); font-size: 12px; color: var(--muted); line-height: 1.5;
+  }
+  .shotlist b { color: var(--ink); display: block; font-size: 12.5px; margin-bottom: 2px; }
+
+  /* ---------- main stage ---------- */
+  .stage-main { display: flex; flex-direction: column; gap: 16px; }
+
+  .variants { display: flex; gap: 8px; }
+  .variant {
+    flex: 1; text-align: left; background: var(--surface); border: 1.5px solid var(--line);
+    border-radius: 12px; padding: 12px 13px; transition: .16s; position: relative;
+  }
+  .variant:hover { border-color: var(--line-strong); }
+  .variant[aria-selected="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface)); }
+  .variant .v-top { display: flex; align-items: center; justify-content: space-between; }
+  .variant .v-id {
+    font-family: var(--font-display); font-weight: 800; font-size: 15px;
+    width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center;
+    background: var(--surface-2); color: var(--muted); border: 1px solid var(--line);
+  }
+  .variant[aria-selected="true"] .v-id { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .variant .v-check { color: var(--accent); font-size: 15px; opacity: 0; transition: .16s; }
+  .variant[aria-selected="true"] .v-check { opacity: 1; }
+  .variant .v-name { font-size: 12.5px; font-weight: 700; margin-top: 8px; }
+  .variant .v-desc { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+
+  .stagebar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .tabs { display: inline-flex; padding: 3px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; gap: 2px; }
+  .tab {
+    border: none; background: transparent; padding: 7px 13px; border-radius: 7px;
+    font-size: 12.5px; font-weight: 700; color: var(--muted); display: inline-flex; align-items: center; gap: 7px;
+  }
+  .tab .glyph { width: 13px; border: 1.6px solid currentColor; border-radius: 2px; }
+  .tab[data-f="wide"] .glyph { height: 8px; }
+  .tab[data-f="vertical"] .glyph { height: 15px; width: 9px; }
+  .tab[data-f="square"] .glyph { height: 13px; width: 13px; }
+  .tab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+  .stagebar .len { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-left: auto; }
+
+  /* preview */
+  .preview-area {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 26px; display: grid; place-items: center; min-height: 380px;
+  }
+  .frame {
+    position: relative; background: var(--brand-red); border-radius: 12px; overflow: hidden;
+    box-shadow: var(--shadow-lift); transition: width .28s cubic-bezier(.2,.7,.3,1), height .28s cubic-bezier(.2,.7,.3,1);
+    color: #fff; flex: none;
+  }
+  .frame.wide { width: 560px; height: 315px; }
+  .frame.vertical { width: 219px; height: 390px; }
+  .frame.square { width: 360px; height: 360px; }
+  .frame-logo { position: absolute; top: 15px; left: 16px; display: flex; align-items: center; gap: 8px; z-index: 2; }
+  .frame-logo .fl-mark { width: 22px; height: 22px; border-radius: 6px; background: #fff; display: grid; place-items: center; }
+  .frame-logo .fl-mark::before { content: ""; width: 9px; height: 9px; border-radius: 2px; background: var(--brand-red); }
+  .frame-logo span { font-weight: 900; font-size: 13px; letter-spacing: .02em; text-shadow: 0 1px 3px rgba(0,0,0,.3); }
+  .frame-copy {
+    position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center;
+    padding: 0 8% ; text-align: center; align-items: center; gap: 2px;
+  }
+  .frame.vertical .frame-copy { padding: 0 7%; }
+  .frame-copy .fc-line { font-weight: 900; line-height: 1.28; letter-spacing: .01em; text-shadow: 0 2px 10px rgba(0,0,0,.25); }
+  .frame.wide .fc-line { font-size: 33px; }
+  .frame.square .fc-line { font-size: 27px; }
+  .frame.vertical .fc-line { font-size: 22px; }
+  .fc-hl { color: #FFC933; }
+  .frame-phones { display: flex; gap: 9px; margin-top: 14px; }
+  .frame-phones i {
+    display: block; width: 42px; height: 86px; border-radius: 8px; background: rgba(255,255,255,.16);
+    border: 1.5px solid rgba(255,255,255,.55);
+  }
+  .frame.vertical .frame-phones i { width: 34px; height: 70px; }
+  .frame-badge {
+    position: absolute; top: 14px; right: 14px; z-index: 3; font-family: var(--font-mono);
+    font-size: 10.5px; background: rgba(0,0,0,.28); color: #fff; padding: 4px 9px; border-radius: 999px;
+    backdrop-filter: blur(4px); display: flex; align-items: center; gap: 6px;
+  }
+  .frame-badge .pulse { width: 6px; height: 6px; border-radius: 50%; background: #FFC933; box-shadow: 0 0 0 0 rgba(255,201,51,.7); animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(255,201,51,.6)} 70%{box-shadow:0 0 0 7px rgba(255,201,51,0)} 100%{box-shadow:0 0 0 0 rgba(255,201,51,0)} }
+  .play {
+    position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 3;
+    display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,.35); backdrop-filter: blur(6px);
+    padding: 7px 8px 7px 12px; border-radius: 999px; font-size: 11px; font-family: var(--font-mono);
+  }
+  .play .pbtn { width: 24px; height: 24px; border-radius: 50%; background: #fff; color: var(--brand-red); display: grid; place-items: center; font-size: 10px; }
+
+  /* timeline */
+  .timeline-h { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+  .timeline-h h3 { font-size: 13px; font-weight: 700; }
+  .timeline-h span { font-size: 11.5px; color: var(--muted); }
+  .track { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin; }
+  .cut {
+    flex: none; width: 132px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; overflow: hidden; text-align: left; transition: .15s;
+  }
+  .cut:hover { border-color: var(--line-strong); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .cut[aria-selected="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .cut-thumb { height: 74px; position: relative; display: grid; place-items: center; padding: 8px; }
+  .cut-thumb .tl { font-size: 11px; font-weight: 900; color: #fff; text-align: center; line-height: 1.3; text-shadow: 0 1px 4px rgba(0,0,0,.5); z-index: 2; }
+  .cut-thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,.35)); }
+  .cut-kind { position: absolute; top: 6px; left: 6px; z-index: 2; font-family: var(--font-mono); font-size: 9px; padding: 2px 6px; border-radius: 999px; background: rgba(0,0,0,.4); color: #fff; }
+  .cut-meta { padding: 8px 9px; }
+  .cut-scene { font-size: 11.5px; font-weight: 700; }
+  .cut-model { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+  .cut-model .mchip { padding: 1px 5px; border-radius: 4px; background: var(--surface-2); border: 1px solid var(--line); }
+
+  /* ---------- right panel ---------- */
+  .side { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 78px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; padding: 12px 16px 16px; }
+  .chip {
+    border: 1px solid var(--line-strong); background: var(--surface); border-radius: 999px;
+    padding: 7px 13px; font-size: 12.5px; font-weight: 500; color: var(--ink); transition: .14s;
+  }
+  .chip:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
+  .chip .plus { color: var(--faint); margin-right: 4px; font-weight: 700; }
+  .edit-field { padding: 0 16px 16px; }
+  .edit-field input {
+    width: 100%; border: 1px solid var(--line-strong); border-radius: 9px; padding: 10px 12px;
+    font-family: inherit; font-size: 12.5px; background: var(--surface-2); color: var(--ink);
+  }
+  .edit-field input::placeholder { color: var(--faint); }
+  .edit-field input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+
+  .qc { padding: 8px 16px 14px; display: flex; flex-direction: column; gap: 3px; }
+  .qc-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 12.5px; }
+  .qc-row .qc-ic { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; flex: none; }
+  .qc-row.pass .qc-ic { background: var(--good-soft); color: var(--good); }
+  .qc-row.run .qc-ic { background: var(--cool-soft); color: var(--cool); }
+  .qc-row .qc-name { flex: 1; }
+  .qc-row .qc-tag { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+  .qc-note { font-size: 11px; color: var(--muted); padding: 8px 16px 14px; border-top: 1px dashed var(--line); line-height: 1.5; }
+
+  .cost { padding: 6px 16px 16px; }
+  .cost-big { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: -.02em; display: flex; align-items: baseline; gap: 4px; }
+  .cost-big .yen { font-size: 17px; color: var(--muted); }
+  .cost-big .est { font-size: 12px; color: var(--muted); font-weight: 500; font-family: var(--font-jp); margin-left: 6px; }
+  .cost-bars { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; }
+  .cost-item { font-size: 12px; }
+  .cost-item .cl { display: flex; justify-content: space-between; color: var(--muted); margin-bottom: 3px; }
+  .cost-item .cl b { color: var(--ink); font-family: var(--font-mono); font-weight: 500; }
+  .cost-item .bar { height: 5px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+  .cost-item .bar i { display: block; height: 100%; border-radius: 3px; }
+
+  .cta-row { display: flex; gap: 10px; margin-top: 4px; }
+  .btn {
+    flex: 1; border: none; border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px; transition: .15s;
+  }
+  .btn-primary { background: var(--ink); color: var(--ground); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+  .btn-ghost { background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink); flex: 0 0 auto; padding: 12px 15px; }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent-ink); }
+
+  /* toast */
+  .toast-wrap { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 50; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .toast {
+    background: var(--ink); color: var(--ground); padding: 11px 18px; border-radius: 999px;
+    font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lift); display: flex; align-items: center; gap: 10px;
+    animation: rise .3s cubic-bezier(.2,.8,.3,1);
+  }
+  .toast .tsp { width: 13px; height: 13px; border: 2px solid var(--ground); border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; opacity: .8; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .foot { text-align: center; color: var(--faint); font-size: 11.5px; padding: 8px 0 30px; font-family: var(--font-mono); }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* ---------- wizard ---------- */
+  .wiz-head { padding: 30px 0 18px; }
+  .wiz-eyebrow { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); }
+  .wiz-title { font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -.02em; margin-top: 6px; }
+  .wiz-title small { font-family: var(--font-jp); font-weight: 500; font-size: 14px; color: var(--muted); display: block; margin-top: 5px; letter-spacing: 0; }
+
+  .wiz-board { display: grid; grid-template-columns: 172px minmax(0,1fr) 320px; gap: 24px; padding-bottom: 60px; align-items: start; }
+
+  /* step nav */
+  .steps { position: sticky; top: 84px; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .step-nav { display: grid; grid-template-columns: 24px 1fr; gap: 11px; align-items: center; padding: 11px 10px; border-radius: 10px; position: relative; }
+  .step-nav + .step-nav::before { content:""; position:absolute; left:21px; top:-10px; height:12px; width:2px; background: var(--line-strong); }
+  .step-nav.done + .step-nav::before { background: var(--accent); }
+  .step-nav .sn { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-mono); font-size: 12px; border: 2px solid var(--line-strong); color: var(--faint); background: var(--surface); }
+  .step-nav.done .sn { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step-nav.current .sn { border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 4px var(--accent-soft); }
+  .step-nav .st { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .step-nav.current .st, .step-nav.done .st { color: var(--ink); }
+
+  /* option area */
+  .wiz-step { display: none; }
+  .wiz-step.on { display: block; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } }
+  .step-q { font-size: 19px; font-weight: 700; margin-bottom: 3px; }
+  .step-hint { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+  .opt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px,1fr)); gap: 10px; }
+  .opt {
+    text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px;
+    padding: 15px; transition: .15s; position: relative; display: flex; flex-direction: column; gap: 7px; min-height: 108px;
+  }
+  .opt:hover { border-color: var(--line-strong); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .opt[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface)); }
+  .opt .o-ic { width: 34px; height: 34px; border-radius: 9px; background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center; color: var(--accent-ink); }
+  .opt[aria-pressed="true"] .o-ic { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .opt .o-ic svg { width: 18px; height: 18px; }
+  .opt .o-name { font-size: 14px; font-weight: 700; }
+  .opt .o-desc { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+  .opt .o-tick { position: absolute; top: 12px; right: 13px; color: var(--accent); opacity: 0; font-size: 14px; }
+  .opt[aria-pressed="true"] .o-tick { opacity: 1; }
+  .multi-note { font-size: 11.5px; color: var(--faint); margin-top: 12px; font-family: var(--font-mono); }
+
+  .wiz-nav { display: flex; gap: 10px; margin-top: 26px; }
+  .wiz-nav .grow { flex: 1; }
+
+  /* prescription panel */
+  .rx { position: sticky; top: 84px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .rx-h { padding: 15px 16px 13px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 9px; }
+  .rx-h .rx-mark { width: 26px; height: 26px; border-radius: 7px; background: radial-gradient(120% 120% at 30% 20%, var(--accent), var(--accent-ink)); display: grid; place-items: center; color: #fff; font-size: 13px; }
+  .rx-h b { font-size: 13.5px; font-weight: 700; }
+  .rx-h small { display: block; font-size: 11px; color: var(--muted); font-weight: 400; }
+  .rx-body { padding: 15px 16px; display: flex; flex-direction: column; gap: 13px; }
+  .rx-sel { display: flex; flex-direction: column; gap: 8px; }
+  .rx-line { display: flex; align-items: baseline; gap: 9px; font-size: 12.5px; }
+  .rx-line .rl-k { font-family: var(--font-mono); font-size: 10.5px; color: var(--faint); width: 58px; flex: none; text-transform: uppercase; letter-spacing: .04em; }
+  .rx-line .rl-v { font-weight: 700; }
+  .rx-line .rl-v.empty { color: var(--faint); font-weight: 400; }
+  .rx-derived { border-top: 1px dashed var(--line); padding-top: 13px; display: flex; flex-direction: column; gap: 11px; opacity: .5; transition: opacity .3s; }
+  .rx-derived.live { opacity: 1; }
+  .rx-block .rb-k { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent-ink); margin-bottom: 5px; }
+  .rx-struct { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .rx-struct span { font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-ink); }
+  .rx-struct .arw { color: var(--faint); font-weight: 400; padding: 0; background: none; }
+  .rx-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .rx-pill { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface-2); }
+  .rx-foot { padding: 13px 16px; background: var(--surface-2); border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+
+  @media (max-width: 1080px) {
+    .board { grid-template-columns: 1fr; }
+    .rail, .side { position: static; }
+    .stages { flex-direction: row; overflow-x: auto; }
+    .stage + .stage::before { display: none; }
+    .stage { grid-template-columns: 1fr; min-width: 130px; }
+    .wiz-board { grid-template-columns: 1fr; }
+    .steps { flex-direction: row; overflow-x: auto; position: static; }
+    .step-nav + .step-nav::before { display: none; }
+    .rx, .rail, .side { position: static; }
+    .script-board { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- script / storyboard view ---------- */
+  .mode-switch { display: inline-flex; padding: 3px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; gap: 2px; }
+  .mode-switch button { border: none; background: transparent; padding: 8px 15px; border-radius: 7px; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+  .mode-switch button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+  .script-board { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 22px; padding-bottom: 56px; align-items: start; }
+
+  .board-list { display: flex; flex-direction: column; gap: 10px; }
+  .scut {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+    display: grid; grid-template-columns: 128px minmax(0,1fr); overflow: hidden;
+  }
+  .scut-frame { position: relative; display: grid; place-items: center; padding: 10px; }
+  .scut-frame .n { position: absolute; top: 8px; left: 9px; font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: #fff; opacity: .85; z-index: 2; }
+  .scut-frame .kd { position: absolute; bottom: 8px; left: 9px; z-index: 2; font-family: var(--font-mono); font-size: 9px; padding: 2px 6px; border-radius: 999px; background: rgba(0,0,0,.4); color: #fff; }
+  .scut-frame .tl { font-size: 11px; font-weight: 900; color: #fff; text-align: center; line-height: 1.3; text-shadow: 0 1px 4px rgba(0,0,0,.5); z-index: 2; }
+  .scut-frame::after { content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.4)); }
+  .scut-body { padding: 13px 15px; display: flex; flex-direction: column; gap: 8px; }
+  .scut-top { display: flex; align-items: center; gap: 8px; }
+  .scut-scene { font-size: 13.5px; font-weight: 700; }
+  .scut-secs { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-left: auto; }
+  .scut-na { font-size: 13px; line-height: 1.55; }
+  .scut-na .lab { font-family: var(--font-mono); font-size: 10px; color: var(--accent-ink); background: var(--accent-soft); padding: 1px 6px; border-radius: 5px; margin-right: 7px; vertical-align: 1px; }
+  .scut-na.editable { border: 1px dashed var(--line-strong); border-radius: 8px; padding: 8px 10px; background: var(--surface-2); outline: none; }
+  .scut-na.editable:focus { border-color: var(--accent); border-style: solid; background: var(--surface); }
+  .scut-telop { font-size: 12px; color: var(--muted); }
+  .scut-telop .lab { font-family: var(--font-mono); font-size: 10px; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); padding: 1px 6px; border-radius: 5px; margin-right: 7px; }
+  .scut-shot { margin-top: 2px; font-size: 12px; display: flex; gap: 9px; align-items: flex-start; }
+  .scut-shot .cam { color: var(--cool); flex: none; margin-top: 1px; }
+  .scut-shot .txt { color: var(--muted); line-height: 1.5; }
+  .scut-shot .txt b { color: var(--ink); font-weight: 700; }
+
+  /* shot-list side panel */
+  .shot-panel { position: sticky; top: 84px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .shot-list { padding: 6px 8px 10px; display: flex; flex-direction: column; }
+  .shot-item { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; padding: 10px 8px; border-radius: 9px; }
+  .shot-item + .shot-item { border-top: 1px solid var(--line); }
+  .shot-item .sck { width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--line-strong); display: grid; place-items: center; font-size: 10px; color: var(--faint); }
+  .shot-item.up .sck { background: var(--good); border-color: var(--good); color: #fff; }
+  .shot-item .si-name { font-size: 12.5px; font-weight: 700; }
+  .shot-item .si-desc { font-size: 11px; color: var(--muted); }
+  .shot-item .si-tag { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+  .shot-item.up .si-tag { color: var(--good); }
+  .ai-shot { padding: 12px 15px; background: var(--surface-2); border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); line-height: 1.55; }
+  .ai-shot b { color: var(--ink); }
+
+  /* ---------- dashboard ---------- */
+  .dash-hero { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 22px; padding: 30px 0 26px; align-items: stretch; }
+  .hero-new {
+    position: relative; overflow: hidden; border-radius: 18px; padding: 30px 32px;
+    background: linear-gradient(135deg, #1B2352, #14151C); color: #EEF0F8; display: flex; flex-direction: column; justify-content: center;
+    box-shadow: var(--shadow-lift);
+  }
+  .hero-new::after { content:""; position:absolute; right:-40px; top:-40px; width:200px; height:200px; border-radius:50%; background: radial-gradient(circle, var(--accent), transparent 70%); opacity:.35; }
+  .hero-new .hn-eye { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  .hero-new h2 { font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -.02em; margin: 8px 0 6px; text-wrap: balance; }
+  .hero-new p { font-size: 13.5px; color: #AEB4CE; max-width: 42ch; line-height: 1.6; margin: 0 0 22px; }
+  .hero-new .hn-btn { align-self: flex-start; background: var(--accent); color: #fff; border: none; border-radius: 11px; padding: 13px 22px; font-size: 14px; font-weight: 800; display: inline-flex; align-items: center; gap: 9px; transition: .15s; z-index: 1; }
+  .hero-new .hn-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(40,70,217,.4); }
+
+  .usage { display: flex; flex-direction: column; gap: 12px; }
+  .usage .u-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; box-shadow: var(--shadow); }
+  .u-card .u-k { font-size: 11.5px; color: var(--muted); font-weight: 700; letter-spacing: .04em; }
+  .u-card .u-v { font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -.02em; margin-top: 4px; display: flex; align-items: baseline; gap: 6px; }
+  .u-card .u-v small { font-size: 12px; color: var(--muted); font-weight: 500; font-family: var(--font-jp); }
+  .u-meter { height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; margin-top: 11px; }
+  .u-meter i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+  .u-card .u-note { font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+  .dash-h { display: flex; align-items: baseline; gap: 12px; margin: 8px 0 14px; }
+  .dash-h h3 { font-size: 15px; font-weight: 700; }
+  .dash-h .filters { margin-left: auto; display: flex; gap: 6px; }
+  .filter { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 12px; color: var(--muted); }
+  .filter[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); font-weight: 700; }
+
+  .proj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px,1fr)); gap: 16px; padding-bottom: 50px; }
+  .proj { background: var(--surface); border: 1px solid var(--line); border-radius: 15px; overflow: hidden; box-shadow: var(--shadow); text-align: left; transition: .16s; }
+  .proj:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); border-color: var(--line-strong); }
+  .proj-thumb { height: 128px; position: relative; display: grid; place-items: center; overflow: hidden; }
+  .proj-thumb .pt-mini { display: flex; gap: 6px; }
+  .proj-thumb .pt-mini i { width: 34px; height: 60px; border-radius: 6px; background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.5); }
+  .proj-thumb .pt-copy { position: absolute; font-weight: 900; color: #fff; font-size: 15px; text-shadow: 0 2px 8px rgba(0,0,0,.4); text-align:center; line-height:1.3; padding: 0 14px; }
+  .proj-status { position: absolute; top: 10px; left: 11px; z-index: 3; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.92); }
+  .proj-status .sd { width: 6px; height: 6px; border-radius: 50%; }
+  .ps-done { color: var(--good); } .ps-done .sd { background: var(--good); }
+  .ps-review { color: var(--accent-ink); } .ps-review .sd { background: var(--accent); }
+  .ps-gen { color: var(--cool); } .ps-gen .sd { background: var(--cool); animation: pulse2 1.5s infinite; }
+  .ps-draft { color: var(--muted); } .ps-draft .sd { background: var(--faint); }
+  @keyframes pulse2 { 50% { opacity: .3; } }
+  .proj-body { padding: 13px 15px 15px; }
+  .proj-name { font-size: 14.5px; font-weight: 700; }
+  .proj-meta { font-size: 11.5px; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 8px; }
+  .proj-meta .fmts { display: inline-flex; gap: 3px; }
+  .proj-meta .fmts i { display:inline-block; border: 1.4px solid var(--faint); border-radius: 2px; }
+  .proj-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 11px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); }
+  .proj-foot .cost { font-family: var(--font-mono); color: var(--ink); }
+
+  @media (max-width: 1080px) {
+    .dash-hero { grid-template-columns: 1fr; }
+    .export-board { grid-template-columns: 1fr !important; }
+  }
+
+  /* ---------- export / delivery ---------- */
+  .exp-head { display: flex; align-items: center; gap: 14px; padding: 32px 0 8px; }
+  .exp-check { width: 46px; height: 46px; border-radius: 50%; background: var(--good); color: #fff; display: grid; place-items: center; font-size: 22px; flex: none; box-shadow: 0 6px 20px color-mix(in srgb, var(--good) 40%, transparent); }
+  .exp-head h1 { font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .exp-head .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .export-board { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 22px; padding: 20px 0 56px; align-items: start; }
+
+  .deliv { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .deliv-row { border-top: 1px solid var(--line); }
+  .deliv-row:first-child { border-top: none; }
+  .deliv-rh { display: flex; align-items: center; gap: 10px; padding: 13px 16px 10px; }
+  .deliv-rh .vbadge { font-family: var(--font-display); font-weight: 800; font-size: 13px; width: 22px; height: 22px; border-radius: 6px; background: var(--accent); color: #fff; display: grid; place-items: center; }
+  .deliv-rh b { font-size: 13.5px; } .deliv-rh small { color: var(--muted); font-size: 12px; }
+  .deliv-files { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; padding: 4px 16px 16px; }
+  .dfile { border: 1px solid var(--line); border-radius: 11px; overflow: hidden; background: var(--surface-2); transition: .15s; }
+  .dfile:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+  .dfile-thumb { position: relative; background: var(--brand-red); display: grid; place-items: center; overflow: hidden; }
+  .dfile-thumb.wide { aspect-ratio: 16/9; } .dfile-thumb.vertical { aspect-ratio: 9/16; } .dfile-thumb.square { aspect-ratio: 1/1; }
+  .dfile-thumb .mini-copy { color: #fff; font-weight: 900; font-size: 13px; text-align: center; text-shadow: 0 1px 4px rgba(0,0,0,.4); line-height: 1.3; padding: 0 10px; z-index: 1; }
+  .dfile-thumb .ff { position: absolute; top: 7px; left: 8px; z-index: 2; }
+  .dfile-thumb .ff i { display:block; width:15px;height:15px;border-radius:4px;background:#fff; }
+  .dfile-thumb .dur { position: absolute; bottom: 6px; right: 7px; z-index: 2; font-family: var(--font-mono); font-size: 9.5px; background: rgba(0,0,0,.4); color: #fff; padding: 1px 5px; border-radius: 4px; }
+  .dfile-meta { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; }
+  .dfile-meta .fmt { font-size: 11.5px; font-weight: 700; }
+  .dfile-meta .fmt small { color: var(--muted); font-weight: 400; font-family: var(--font-mono); }
+  .dfile-meta .dl { width: 26px; height: 26px; border-radius: 7px; border: 1px solid var(--line-strong); background: var(--surface); display: grid; place-items: center; color: var(--muted); }
+  .dfile-meta .dl:hover { border-color: var(--accent); color: var(--accent-ink); }
+
+  .exp-side { display: flex; flex-direction: column; gap: 18px; position: sticky; top: 84px; }
+  .compare { padding: 4px 0 8px; }
+  .cmp-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 11px 16px; align-items: center; }
+  .cmp-row + .cmp-row { border-top: 1px solid var(--line); }
+  .cmp-row.komadori { background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface)); }
+  .cmp-k { font-size: 12px; color: var(--muted); }
+  .cmp-k b { display: block; color: var(--ink); font-size: 13px; font-weight: 700; }
+  .cmp-v { text-align: right; font-family: var(--font-display); font-weight: 800; font-size: 17px; letter-spacing: -.01em; }
+  .cmp-v small { font-family: var(--font-jp); font-size: 11px; color: var(--muted); font-weight: 500; display: block; }
+  .cmp-row.komadori .cmp-v { color: var(--accent-ink); }
+  .exp-actions { display: flex; flex-direction: column; gap: 9px; }
+</style>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand">
+      <div class="mark"></div>
+      <div class="wordmark">SP<span style="color:var(--accent)">O</span>T</div>
+    </div>
+    <div class="breadcrumb" id="crumb">
+      <span class="sep">/</span> <b>ホーム</b>
+    </div>
+    <div class="spacer"></div>
+    <div class="credits"><span class="dot"></span> <span data-t="クレジット残">クレジット残</span> <b>18.5</b></div>
+    <div class="lang" role="group" aria-label="Language" style="display:inline-flex;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden;font-family:var(--font-mono);font-size:12px">
+      <button data-lang="en" aria-pressed="true" style="border:none;background:var(--ink);color:var(--ground);padding:6px 10px;cursor:pointer">EN</button>
+      <button data-lang="ja" aria-pressed="false" style="border:none;background:transparent;color:var(--muted);padding:6px 10px;cursor:pointer">日本語</button>
+    </div>
+    <button class="icon-btn" title="Settings">⚙</button>
+  </div>
+</header>
+
+<!-- ============================ DASHBOARD VIEW ============================ -->
+<main class="wrap" id="view-dash">
+  <section class="dash-hero">
+    <div class="hero-new">
+      <div class="hn-eye">SPOT</div>
+      <h2>選ぶだけで、広告動画。</h2>
+      <p>媒体・業種・ターゲットを選ぶだけ。AIがディレクターとして台本を組み、実写もUIも音声も生成。その日のうちに、クライアント確認できる初稿が出てきます。</p>
+      <button class="hn-btn" id="newCM">＋ 新規CMをつくる</button>
+    </div>
+    <div class="usage">
+      <div class="u-card">
+        <div class="u-k">今月つくったCM</div>
+        <div class="u-v">12<small>本 / 全形式込み</small></div>
+        <div class="u-note">先月比 +5本。制作会社見積り換算で約 ¥360万分。</div>
+      </div>
+      <div class="u-card">
+        <div class="u-k">クレジット残</div>
+        <div class="u-v">18.5<small>/ 40</small></div>
+        <div class="u-meter"><i style="width:46%"></i></div>
+        <div class="u-note">1本あたり平均 ¥1,200前後。CM1本 ≒ 1クレジット。</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="dash-h">
+    <h3>制作中・完成したCM</h3>
+    <div class="filters">
+      <button class="filter" aria-pressed="true">すべて</button>
+      <button class="filter" aria-pressed="false">制作中</button>
+      <button class="filter" aria-pressed="false">完成</button>
+    </div>
+  </div>
+  <div class="proj-grid" id="projGrid"></div>
+  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ WIZARD VIEW ============================ -->
+<main class="wrap" id="view-wizard" hidden>
+  <div class="wiz-head">
+    <div class="wiz-eyebrow">新規CM ・ ステップ <span id="stepNum">1</span> / 4</div>
+    <h1 class="wiz-title">つくりたいCMを、選ぶだけ。
+      <small>プロンプトは書かなくていい。選択肢の裏に、広告制作の勝ちパターンが入っています。</small>
+    </h1>
+  </div>
+
+  <div class="wiz-board">
+    <!-- step nav -->
+    <ol class="steps" id="stepNav">
+      <li class="step-nav current" data-s="0"><span class="sn">1</span><span class="st">媒体</span></li>
+      <li class="step-nav" data-s="1"><span class="sn">2</span><span class="st">業種</span></li>
+      <li class="step-nav" data-s="2"><span class="sn">3</span><span class="st">ターゲット</span></li>
+      <li class="step-nav" data-s="3"><span class="sn">4</span><span class="st">訴求・トーン</span></li>
+    </ol>
+
+    <!-- steps -->
+    <section>
+      <!-- STEP 1: 媒体 -->
+      <div class="wiz-step on" data-step="0">
+        <div class="step-q">どこで流す広告ですか?</div>
+        <div class="step-hint">選んだ媒体に合わせて、尺・縦横・冒頭フックの型が自動で決まります。複数選択できます。</div>
+        <div class="opt-grid" data-multi="true" data-key="media">
+          <button class="opt" aria-pressed="true" data-val="YouTube" data-fmt="16:9" data-len="15〜30秒">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.6-.5-5.3a2.8 2.8 0 0 0-2-2C18.8 4.2 12 4.2 12 4.2s-6.8 0-8.5.5a2.8 2.8 0 0 0-2 2C1 8.4 1 12 1 12s0 3.6.5 5.3a2.8 2.8 0 0 0 2 2c1.7.5 8.5.5 8.5.5s6.8 0 8.5-.5a2.8 2.8 0 0 0 2-2C23 15.6 23 12 23 12zM10 15.5v-7l6 3.5z"/></svg></span>
+            <span class="o-name">YouTube</span>
+            <span class="o-desc">16:9・課題提起型が効く</span>
+          </button>
+          <button class="opt" aria-pressed="true" data-val="リール/ショート" data-fmt="9:16" data-len="15秒">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></span>
+            <span class="o-name">リール / ショート</span>
+            <span class="o-desc">9:16・冒頭2秒フック必須</span>
+          </button>
+          <button class="opt" aria-pressed="true" data-val="SNSタイムライン" data-fmt="1:1" data-len="15〜30秒">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/></svg></span>
+            <span class="o-name">SNSタイムライン</span>
+            <span class="o-desc">1:1・音なし前提・字幕重視</span>
+          </button>
+          <button class="opt" data-val="店頭サイネージ" data-fmt="16:9" data-len="15秒">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+            <span class="o-name">店頭サイネージ</span>
+            <span class="o-desc">16:9・音なし・大テロップ</span>
+          </button>
+        </div>
+        <div class="multi-note">選択中の媒体から、書き出す形式が決まります。</div>
+      </div>
+
+      <!-- STEP 2: 業種 -->
+      <div class="wiz-step" data-step="1">
+        <div class="step-q">どんなプロダクトですか?</div>
+        <div class="step-hint">業種ごとに、画づくりの語彙と訴求の型が変わります。ひとつ選んでください。</div>
+        <div class="opt-grid" data-multi="false" data-key="industry">
+          <button class="opt" aria-pressed="true" data-val="建設SaaS">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg></span>
+            <span class="o-name">SaaS・アプリ</span>
+            <span class="o-desc">実UI訴求・信頼感。画面を織り込む</span>
+          </button>
+          <button class="opt" data-val="EC・D2C">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg></span>
+            <span class="o-name">EC・D2C</span>
+            <span class="o-desc">商品ビジュアル・ベネフィット訴求</span>
+          </button>
+          <button class="opt" data-val="不動産">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10 12 3l9 7M5 9v11h14V9"/></svg></span>
+            <span class="o-name">不動産</span>
+            <span class="o-desc">空間・立地・安心感</span>
+          </button>
+          <button class="opt" data-val="採用">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M17 11l2 2 4-4"/></svg></span>
+            <span class="o-name">採用</span>
+            <span class="o-desc">共感・カルチャー・働く人</span>
+          </button>
+          <button class="opt" data-val="飲食">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 10v11M17 3c-2 0-3 2-3 5s1 4 3 4 3-1 3-4-1-5-3-5zM17 12v9"/></svg></span>
+            <span class="o-name">飲食</span>
+            <span class="o-desc">シズル・食欲・臨場感</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: ターゲット -->
+      <div class="wiz-step" data-step="2">
+        <div class="step-q">誰に届けますか?</div>
+        <div class="step-hint">見る人によって、訴求の入口とテンポが変わります。ひとつ選んでください。</div>
+        <div class="opt-grid" data-multi="false" data-key="target">
+          <button class="opt" aria-pressed="true" data-val="現場担当">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20a8 8 0 0 1 16 0M12 3a5 5 0 0 0-5 5h10a5 5 0 0 0-5-5zM7 8v2M17 8v2"/></svg></span>
+            <span class="o-name">現場担当</span>
+            <span class="o-desc">手軽さ・時短。悩み共感から入る</span>
+          </button>
+          <button class="opt" data-val="経営層">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18M6 20V9l6-4 6 4v11M9 20v-5h6v5"/></svg></span>
+            <span class="o-name">経営層</span>
+            <span class="o-desc">実績・ROI。数字と信頼で入る</span>
+          </button>
+          <button class="opt" data-val="一般消費者">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+            <span class="o-name">一般消費者</span>
+            <span class="o-desc">ベネフィット・感情で入る</span>
+          </button>
+          <button class="opt" data-val="Z世代">
+            <span class="o-tick">✓</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h14l-2 8 2 10H5l2-10z"/></svg></span>
+            <span class="o-name">Z世代</span>
+            <span class="o-desc">テンポ・世界観・共感で入る</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 4: 訴求・トーン -->
+      <div class="wiz-step" data-step="3">
+        <div class="step-q">どう見せますか?</div>
+        <div class="step-hint">訴求の型とトーンを選びます。ひとつずつ。</div>
+        <div class="opt-grid" data-multi="false" data-key="angle" style="margin-bottom:20px">
+          <button class="opt" aria-pressed="true" data-val="課題解決">
+            <span class="o-tick">✓</span><span class="o-name">課題解決</span>
+            <span class="o-desc">悩み → 解決を見せる。SaaS王道</span>
+          </button>
+          <button class="opt" data-val="実績・信頼">
+            <span class="o-tick">✓</span><span class="o-name">実績・信頼</span>
+            <span class="o-desc">数字・導入実績で信頼を積む</span>
+          </button>
+          <button class="opt" data-val="機能デモ">
+            <span class="o-tick">✓</span><span class="o-name">機能デモ</span>
+            <span class="o-desc">使い方をそのまま見せる</span>
+          </button>
+          <button class="opt" data-val="感情・共感">
+            <span class="o-tick">✓</span><span class="o-name">感情・共感</span>
+            <span class="o-desc">ストーリーで感情を動かす</span>
+          </button>
+        </div>
+        <div class="step-q" style="font-size:15px">トーン</div>
+        <div class="opt-grid" data-multi="false" data-key="tone" style="margin-top:12px">
+          <button class="opt" aria-pressed="true" data-val="ドキュメンタリー">
+            <span class="o-tick">✓</span><span class="o-name">ドキュメンタリー</span>
+            <span class="o-desc">自然光・等身大。AI感が出にくい</span>
+          </button>
+          <button class="opt" data-val="明るいCM">
+            <span class="o-tick">✓</span><span class="o-name">明るいCM</span>
+            <span class="o-desc">ポップ・軽快・前向き</span>
+          </button>
+          <button class="opt" data-val="エモーショナル">
+            <span class="o-tick">✓</span><span class="o-name">エモーショナル</span>
+            <span class="o-desc">映画的・情感・余韻</span>
+          </button>
+          <button class="opt" data-val="スタイリッシュ">
+            <span class="o-tick">✓</span><span class="o-name">スタイリッシュ</span>
+            <span class="o-desc">洗練・ミニマル・都会的</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="wiz-nav">
+        <button class="btn btn-ghost" id="wizBack" style="visibility:hidden">← 戻る</button>
+        <div class="grow"></div>
+        <button class="btn btn-primary" id="wizNext" style="flex:0 0 auto;padding:12px 22px">次へ →</button>
+      </div>
+    </section>
+
+    <!-- prescription -->
+    <aside class="rx">
+      <div class="rx-h">
+        <div class="rx-mark">Rx</div>
+        <div><b>AIの処方箋</b><small>選ぶほど、構成が決まっていく</small></div>
+      </div>
+      <div class="rx-body">
+        <div class="rx-sel">
+          <div class="rx-line"><span class="rl-k">媒体</span><span class="rl-v empty" data-rx="media">未選択</span></div>
+          <div class="rx-line"><span class="rl-k">業種</span><span class="rl-v empty" data-rx="industry">未選択</span></div>
+          <div class="rx-line"><span class="rl-k">ターゲット</span><span class="rl-v empty" data-rx="target">未選択</span></div>
+          <div class="rx-line"><span class="rl-k">訴求</span><span class="rl-v empty" data-rx="angle">未選択</span></div>
+          <div class="rx-line"><span class="rl-k">トーン</span><span class="rl-v empty" data-rx="tone">未選択</span></div>
+        </div>
+        <div class="rx-derived" id="rxDerived">
+          <div class="rx-block">
+            <div class="rb-k">推奨構成</div>
+            <div class="rx-struct" id="rxStruct">
+              <span>冒頭フック</span><span class="arw">→</span><span>課題提起</span><span class="arw">→</span><span>機能デモ</span><span class="arw">→</span><span>CTA</span>
+            </div>
+          </div>
+          <div class="rx-block">
+            <div class="rb-k">書き出し形式</div>
+            <div class="rx-pills" id="rxFmt"><span class="rx-pill">16:9</span><span class="rx-pill">9:16</span><span class="rx-pill">1:1</span></div>
+          </div>
+          <div class="rx-block">
+            <div class="rb-k">推奨尺</div>
+            <div class="rx-pills"><span class="rx-pill" id="rxLen">30秒</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="rx-foot" id="rxFoot">この処方は、実案件のA/Bテスト知見をもとに自動で組み立てられます。</div>
+    </aside>
+  </div>
+  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ SCRIPT / STORYBOARD VIEW ============================ -->
+<main class="wrap" id="view-script" hidden>
+  <section class="context">
+    <div>
+      <h1 class="title-h1">台本と絵コンテ</h1>
+      <div class="title-sub">選択から、AIがディレクターとして構成を組みました。各カットは言葉で直せます。</div>
+    </div>
+    <div class="meta-row" style="align-items:center">
+      <div class="mode-switch" id="scriptMode" role="tablist" aria-label="モード">
+        <button role="tab" aria-selected="true" data-m="ai">AIにおまかせ</button>
+        <button role="tab" aria-selected="false" data-m="own">台本を持ち込む</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="script-board">
+    <div class="board-list" id="boardList"></div>
+
+    <aside class="shot-panel">
+      <div class="panel-h" style="padding:15px 16px 12px;border-bottom:1px solid var(--line)">撮影指示リスト <span style="margin-left:auto;color:var(--good);font-weight:700">4/4</span></div>
+      <div class="shot-list">
+        <div class="shot-item up"><span class="sck">✓</span><div><div class="si-name">ダッシュボード画面</div><div class="si-desc">一覧・撮影・PDFの3画面</div></div><span class="si-tag">UP済</span></div>
+        <div class="shot-item up"><span class="sck">✓</span><div><div class="si-name">アプリアイコン・ロゴ</div><div class="si-desc">SVG / PNG</div></div><span class="si-tag">UP済</span></div>
+        <div class="shot-item up"><span class="sck">✓</span><div><div class="si-name">工事写真サンプル</div><div class="si-desc">帳票に使う現場写真 3枚</div></div><span class="si-tag">UP済</span></div>
+        <div class="shot-item up"><span class="sck">✓</span><div><div class="si-name">参考サウンドロゴ</div><div class="si-desc">構造のみ参照・本番は自社生成</div></div><span class="si-tag">UP済</span></div>
+      </div>
+      <div class="ai-shot">
+        <b>AIがディレクター。</b>台本の各カットから「何を撮ればいいか」を自動でリスト化。あなたは指示どおりに素材を上げるだけ。実写の人物・背景はAIが生成します。
+      </div>
+    </aside>
+  </div>
+
+  <div class="wiz-nav" style="max-width:none">
+    <button class="btn btn-ghost" id="scriptBack">← 選択に戻る</button>
+    <div class="grow"></div>
+    <button class="btn btn-primary" id="scriptNext" style="flex:0 0 auto;padding:12px 22px">この構成で生成する →</button>
+  </div>
+  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ EXPORT / DELIVERY VIEW ============================ -->
+<main class="wrap" id="view-export" hidden>
+  <div class="exp-head">
+    <div class="exp-check">✓</div>
+    <div>
+      <h1>書き出し完了 ・ 9本</h1>
+      <div class="sub">3パターン（A/B/C）× 3形式（横・縦・正方形）。クライアントには「イントロを選んで、その3形式を納品」で提示できます。</div>
+    </div>
+  </div>
+
+  <div class="export-board">
+    <div class="deliv" id="delivList"></div>
+
+    <aside class="exp-side">
+      <div class="panel">
+        <div class="panel-h">制作会社に頼むと</div>
+        <div class="compare">
+          <div class="cmp-row"><div class="cmp-k">従来の外注<b>制作費</b></div><div class="cmp-v">¥500,000<small>1本・税別</small></div></div>
+          <div class="cmp-row"><div class="cmp-k">従来の外注<b>納期</b></div><div class="cmp-v">3週間<small>修正2回まで</small></div></div>
+          <div class="cmp-row komadori"><div class="cmp-k">SPOT<b>生成原価</b></div><div class="cmp-v">¥1,240<small>9本・修正無制限</small></div></div>
+          <div class="cmp-row komadori"><div class="cmp-k">SPOT<b>納期</b></div><div class="cmp-v">当日<small>修正は分単位</small></div></div>
+        </div>
+      </div>
+      <div class="exp-actions">
+        <button class="btn btn-primary" id="dlAll" style="padding:13px">すべてダウンロード（ZIP）</button>
+        <button class="btn btn-ghost" id="shareLink" style="flex:1;padding:13px">共有リンクを作成 ↗</button>
+        <button class="btn btn-ghost" id="backToWork" style="flex:1;padding:13px">ワークスペースに戻る</button>
+      </div>
+      <div class="panel">
+        <div class="panel-h">サムネイル（静止画）</div>
+        <div class="qc-note" style="border:none">各パターンのカバー画像も同梱。YouTube等のサムネイルにそのまま使えます。</div>
+      </div>
+    </aside>
+  </div>
+  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ WORKSPACE VIEW ============================ -->
+<main class="wrap" id="view-workspace" hidden>
+  <section class="context">
+    <div>
+      <h1 class="title-h1">工事台帳CM ・ 制作ワークスペース</h1>
+      <div class="title-sub">サンプル案件を読み込み中 — 実データの代わりにミライ工事の制作データを表示しています</div>
+    </div>
+    <div class="meta-row">
+      <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg>業種 <b>建設SaaS</b></span>
+      <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 8l7-5 7 5"/></svg>媒体 <b>YouTube・リール</b></span>
+      <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>尺 <b>30秒</b></span>
+      <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>トーン <b>ドキュメンタリー</b></span>
+    </div>
+  </section>
+
+  <div class="board">
+    <!-- ============ pipeline rail ============ -->
+    <aside class="panel rail">
+      <div class="panel-h">制作パイプライン</div>
+      <ol class="stages">
+        <li class="stage done"><div class="node">✓</div><div><div class="s-name">ブリーフ</div><div class="s-desc">媒体×業種×訴求を選択</div></div></li>
+        <li class="stage done"><div class="node">✓</div><div><div class="s-name">台本・絵コンテ</div><div class="s-desc">AIが構成 → 共同編集</div></div></li>
+        <li class="stage done"><div class="node">✓</div><div><div class="s-name">撮影指示</div><div class="s-desc">必要素材リストを自動生成</div></div></li>
+        <li class="stage done"><div class="node">✓</div><div><div class="s-name">生成</div><div class="s-desc">工程別にAIを使い分け</div></div></li>
+        <li class="stage active"><div class="node">5</div><div><div class="s-name">検品・調整</div><div class="s-desc">品質チェック → 好み選び</div></div></li>
+        <li class="stage"><div class="node">6</div><div><div class="s-name">書き出し</div><div class="s-desc">3形式・3パターン</div></div></li>
+      </ol>
+      <div class="stage-foot">
+        <div class="shotlist">
+          <b>撮影指示リスト</b>
+          台本から自動生成。ユーザーは指示どおりに素材を上げるだけ。
+          <div style="margin-top:8px;color:var(--good);font-weight:700;font-size:11.5px">✓ 4/4 素材アップ済み</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============ main stage ============ -->
+    <section class="stage-main">
+      <div class="variants" id="variants" role="tablist" aria-label="イントロ パターン">
+        <button class="variant" role="tab" aria-selected="true" data-v="A" data-red="#D7000F">
+          <div class="v-top"><span class="v-id">A</span><span class="v-check">✓</span></div>
+          <div class="v-name">リング + マリンバ</div>
+          <div class="v-desc">上品・信頼感</div>
+        </button>
+        <button class="variant" role="tab" aria-selected="false" data-v="B" data-red="#D7000F">
+          <div class="v-top"><span class="v-id">B</span><span class="v-check">✓</span></div>
+          <div class="v-name">コンフェッティ + ウクレレ</div>
+          <div class="v-desc">明るい・ポップ</div>
+        </button>
+        <button class="variant" role="tab" aria-selected="false" data-v="C" data-red="#D7000F">
+          <div class="v-top"><span class="v-id">C</span><span class="v-check">✓</span></div>
+          <div class="v-name">赤バブル + エレクトロ</div>
+          <div class="v-desc">若い・エネルギッシュ</div>
+        </button>
+      </div>
+
+      <div class="stagebar">
+        <div class="tabs" id="formats" role="tablist" aria-label="書き出し形式">
+          <button class="tab" role="tab" data-f="wide" aria-selected="true"><span class="glyph"></span>横 16:9</button>
+          <button class="tab" role="tab" data-f="vertical" aria-selected="false"><span class="glyph"></span>縦 9:16</button>
+          <button class="tab" role="tab" data-f="square" aria-selected="false"><span class="glyph"></span>正方形 1:1</button>
+        </div>
+        <span class="len">パターン<b id="vlabel" style="color:var(--ink)"> A</b> ・ 00:30:03</span>
+      </div>
+
+      <div class="preview-area">
+        <div class="frame wide" id="frame">
+          <div class="frame-badge"><span class="pulse"></span><span id="introChip">リング+マリンバ</span></div>
+          <div class="frame-logo"><span class="fl-mark"></span><span>ミライ工事</span></div>
+          <div class="frame-copy">
+            <div class="fc-line">現場で完結。</div>
+            <div class="fc-line">作業時間を<span class="fc-hl">40時間</span>短縮!</div>
+            <div class="frame-phones"><i></i><i></i></div>
+          </div>
+          <div class="play"><span class="pbtn">▶</span> プレビュー再生</div>
+        </div>
+      </div>
+
+      <div class="panel panel-pad">
+        <div class="timeline-h">
+          <h3>カット構成</h3>
+          <span>8カット ・ 実写=AI生成 / UI・図版=コード描画</span>
+        </div>
+        <div class="track" id="track"></div>
+      </div>
+    </section>
+
+    <!-- ============ right panel ============ -->
+    <aside class="side">
+      <div class="panel">
+        <div class="panel-h">気になるところは、言葉で直す</div>
+        <div class="chips" id="chips">
+          <button class="chip"><span class="plus">+</span>もっと明るく</button>
+          <button class="chip"><span class="plus">+</span>動きを控えめに</button>
+          <button class="chip"><span class="plus">+</span>もっとポップに</button>
+          <button class="chip"><span class="plus">+</span>ナレーションを速く</button>
+          <button class="chip"><span class="plus">+</span>BGMを明るく</button>
+          <button class="chip"><span class="plus">+</span>テロップを大きく</button>
+        </div>
+        <div class="edit-field">
+          <input id="freeEdit" placeholder="自由に指示… 例「②の表情をもっと自然に」" />
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h">品質チェック <span style="margin-left:auto;color:var(--good);font-weight:700">7/8 合格</span></div>
+        <div class="qc">
+          <div class="qc-row pass"><span class="qc-ic">✓</span><span class="qc-name">手・指の破綻</span><span class="qc-tag">③修正済</span></div>
+          <div class="qc-row pass"><span class="qc-ic">✓</span><span class="qc-name">小道具の形状</span><span class="qc-tag">カメラ修正済</span></div>
+          <div class="qc-row pass"><span class="qc-ic">✓</span><span class="qc-name">光のフレア</span><span class="qc-tag">⑤修正済</span></div>
+          <div class="qc-row pass"><span class="qc-ic">✓</span><span class="qc-name">文字化け・偽UI</span><span class="qc-tag">実素材のみ</span></div>
+          <div class="qc-row pass"><span class="qc-ic">✓</span><span class="qc-name">人物の一貫性</span><span class="qc-tag">全カット</span></div>
+          <div class="qc-row pass"><span class="qc-ic">✓</span><span class="qc-name">日本考証</span><span class="qc-tag">右ハンドル他</span></div>
+          <div class="qc-row run"><span class="qc-ic">◐</span><span class="qc-name">背景モーション</span><span class="qc-tag">①再検証中</span></div>
+        </div>
+        <div class="qc-note">不合格のカットはあなたに見せません。合格した候補の中から、好みを選ぶだけ。</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-h">この案件の生成原価</div>
+        <div class="cost">
+          <div class="cost-big"><span class="yen">¥</span>1,240<span class="est">概算 / 3パターン込み</span></div>
+          <div class="cost-bars">
+            <div class="cost-item"><div class="cl">動画化 <b>¥980</b></div><div class="bar"><i style="width:79%;background:var(--accent)"></i></div></div>
+            <div class="cost-item"><div class="cl">スチル生成 <b>¥120</b></div><div class="bar"><i style="width:10%;background:var(--cool)"></i></div></div>
+            <div class="cost-item"><div class="cl">音声・BGM <b>¥140</b></div><div class="bar"><i style="width:11%;background:var(--good)"></i></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn btn-primary" id="exportBtn">この3形式を書き出す</button>
+        <button class="btn btn-ghost" title="共有リンク">↗</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+  const CUTS = [
+    { id:'cut01', kind:'実写', scene:'車内 / ため息', model:'Veo', tl:'写真整理は、会社に帰ってから…?', c1:'#4a5560', c2:'#20272e' },
+    { id:'cut02', kind:'実写', scene:'夜オフィス', model:'Veo', tl:'取り込んで、仕分けて、貼り付けて。', c1:'#3a2f22', c2:'#14100a' },
+    { id:'stat',  kind:'図版', scene:'月40時間', model:'コード', tl:'その作業に、月40時間。', c1:'#2a1010', c2:'#0a0505' },
+    { id:'cut03', kind:'実写', scene:'現場で撮影', model:'Veo', tl:'スマホで、撮るだけ。', c1:'#5b6b78', c2:'#38424a' },
+    { id:'ledger',kind:'UI',  scene:'台帳が自動作成', model:'コード', tl:'撮るだけで、台帳に。', c1:'#e9ebef', c2:'#c9ced6', dark:true },
+    { id:'pdf',   kind:'UI',  scene:'PDF完成', model:'コード', tl:'その場で、PDF完成。', c1:'#e4e7ea', c2:'#c2c8cf', dark:true },
+    { id:'cut05', kind:'実写', scene:'送信して笑顔', model:'Veo', tl:'お客様へ、その場で送信。', c1:'#8a94a0', c2:'#5c6570' },
+    { id:'cut05b',kind:'実写', scene:'客先で受信', model:'Veo', tl:'持ち帰りゼロへ。', c1:'#c9c4ba', c2:'#9a958b' },
+  ];
+  const KIND_TINT = { '実写':'var(--accent)', 'UI':'var(--cool)', '図版':'var(--good)' };
+
+  const track = document.getElementById('track');
+  CUTS.forEach((c, i) => {
+    const el = document.createElement('button');
+    el.className = 'cut';
+    el.setAttribute('role','tab');
+    el.setAttribute('aria-selected', i===4 ? 'true':'false');
+    el.innerHTML = `
+      <div class="cut-thumb" style="background:linear-gradient(155deg, ${c.c1}, ${c.c2})">
+        <span class="cut-kind">${c.kind}</span>
+        <span class="tl" style="${c.dark?'color:#1b1b22;text-shadow:0 1px 3px rgba(255,255,255,.4)':''}">${c.tl}</span>
+      </div>
+      <div class="cut-meta">
+        <div class="cut-scene">${i+1}. <span>${c.scene}</span></div>
+        <div class="cut-model"><span class="mchip" style="color:${KIND_TINT[c.kind]}">${c.model}</span></div>
+      </div>`;
+    el.addEventListener('click', () => {
+      track.querySelectorAll('.cut').forEach(x=>x.setAttribute('aria-selected','false'));
+      el.setAttribute('aria-selected','true');
+    });
+    track.appendChild(el);
+  });
+
+  // format tabs
+  const frame = document.getElementById('frame');
+  document.getElementById('formats').addEventListener('click', e => {
+    const t = e.target.closest('.tab'); if(!t) return;
+    document.querySelectorAll('#formats .tab').forEach(x=>x.setAttribute('aria-selected','false'));
+    t.setAttribute('aria-selected','true');
+    frame.className = 'frame ' + t.dataset.f;
+  });
+
+  // variant tabs
+  const introChip = document.getElementById('introChip');
+  const vlabel = document.getElementById('vlabel');
+  const INTRO = { A:'リング+マリンバ', B:'コンフェッティ+ウクレレ', C:'赤バブル+エレクトロ' };
+  document.getElementById('variants').addEventListener('click', e => {
+    const v = e.target.closest('.variant'); if(!v) return;
+    document.querySelectorAll('#variants .variant').forEach(x=>x.setAttribute('aria-selected','false'));
+    v.setAttribute('aria-selected','true');
+    introChip.textContent = INTRO[v.dataset.v];
+    vlabel.textContent = ' ' + v.dataset.v;
+  });
+
+  // toast helper
+  const toasts = document.getElementById('toasts');
+  function toast(msg, spin=true, ms=2200) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = (spin?'<span class="tsp"></span>':'✓ ') + msg;
+    toasts.appendChild(t);
+    setTimeout(()=>{ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, ms);
+  }
+
+  document.getElementById('chips').addEventListener('click', e => {
+    const c = e.target.closest('.chip'); if(!c) return;
+    const lab = c.textContent.trim().replace('+','').trim();
+    toast(L('Applying “'+lab+'” to all variants…', '「'+lab+'」を全パターンに反映中…'));
+  });
+  document.getElementById('freeEdit').addEventListener('keydown', e => {
+    if(e.key==='Enter' && e.target.value.trim()){ const v=e.target.value.trim(); toast(L('Applying “'+v+'”…','「'+v+'」を反映中…')); e.target.value=''; }
+  });
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    toast(L('Exporting wide · vertical · square × 3 variants = 9 videos…','横・縦・正方形 × 3パターン = 9本を書き出し中…'), true, 1600);
+    setTimeout(gotoExport, 1600);
+  });
+
+  // ---------- export / delivery view ----------
+  const VAR = [
+    { id:'A', name:'リング + マリンバ' },
+    { id:'B', name:'コンフェッティ + ウクレレ' },
+    { id:'C', name:'赤バブル + エレクトロ' },
+  ];
+  const FMT = [
+    { k:'wide', label:'横 16:9', use:'YouTube・サイト', ff:[15,15] },
+    { k:'vertical', label:'縦 9:16', use:'リール・ショート', ff:[9,15] },
+    { k:'square', label:'正方形 1:1', use:'タイムライン', ff:[13,13] },
+  ];
+  document.getElementById('delivList').innerHTML = VAR.map(v => `
+    <div class="deliv-row">
+      <div class="deliv-rh"><span class="vbadge">${v.id}</span><b><span>パターン</span>${v.id}</b><small>${v.name}</small></div>
+      <div class="deliv-files">
+        ${FMT.map(f => `
+          <div class="dfile">
+            <div class="dfile-thumb ${f.k}">
+              <span class="ff"><i style="width:${f.ff[0]}px;height:${f.ff[1]}px"></i></span>
+              <span class="mini-copy">現場で完結。</span>
+              <span class="dur">0:30</span>
+            </div>
+            <div class="dfile-meta"><span class="fmt">${f.label} <small>${f.use}</small></span><button class="dl" title="ダウンロード">↓</button></div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+  document.getElementById('delivList').addEventListener('click', e => {
+    if (e.target.closest('.dl')) toast(L('Download started','ダウンロードを開始しました'), false, 1600);
+  });
+  document.getElementById('dlAll').addEventListener('click', () => toast(L('Downloading 9 videos + thumbnails as ZIP…','9本 + サムネイルをZIPでダウンロード中…'), true, 1800));
+  document.getElementById('shareLink').addEventListener('click', () => toast(L('Share link copied','共有リンクをコピーしました'), false, 1600));
+  document.getElementById('backToWork').addEventListener('click', gotoWorkspace);
+
+  function gotoExport() {
+    hideAll(); vExport.hidden = false;
+    crumb.innerHTML = '<span class="sep">/</span> <b>ミライ工事写真</b> <span class="sep">/</span> 書き出し';
+  }
+
+  // ---------- wizard ----------
+  const sel = { media: [], industry: null, target: null, angle: null, tone: null };
+  const RX_LABELS = { media:'媒体', industry:'業種', target:'ターゲット', angle:'訴求', tone:'トーン' };
+
+  function renderRx() {
+    for (const k of ['media','industry','target','angle','tone']) {
+      const el = document.querySelector(`[data-rx="${k}"]`);
+      const v = k === 'media' ? sel.media : sel[k];
+      if ((Array.isArray(v) && v.length) || (!Array.isArray(v) && v)) {
+        el.innerHTML = (Array.isArray(v) ? v : [v]).map(x=>'<span>'+x+'</span>').join(' ・ ');
+        el.classList.remove('empty');
+      } else { el.textContent = '未選択'; el.classList.add('empty'); }
+    }
+    // derived: formats from media
+    const fmtSet = new Set(sel.media.map(m => ({'YouTube':'16:9','リール/ショート':'9:16','SNSタイムライン':'1:1','店頭サイネージ':'16:9'}[m])));
+    const rxFmt = document.getElementById('rxFmt');
+    rxFmt.innerHTML = [...fmtSet].map(f=>`<span class="rx-pill">${f}</span>`).join('') || '<span class="rx-pill" style="opacity:.5">媒体を選択</span>';
+    // length: shortest wins if リール
+    document.getElementById('rxLen').textContent = sel.media.includes('リール/ショート') ? '15秒〜' : '30秒';
+    // structure by angle
+    const STRUCT = {
+      '課題解決': ['冒頭フック','課題提起','機能デモ','CTA'],
+      '実績・信頼': ['冒頭フック','実績・数字','導入の様子','CTA'],
+      '機能デモ': ['冒頭フック','使い方','ビフォーアフター','CTA'],
+      '感情・共感': ['情景','葛藤','転機','余韻・CTA'],
+    };
+    const st = STRUCT[sel.angle] || STRUCT['課題解決'];
+    document.getElementById('rxStruct').innerHTML = st.map((s,i)=>`<span>${s}</span>${i<st.length-1?'<span class="arw">→</span>':''}`).join('');
+    // foot note derived from target
+    const NOTE = {
+      '現場担当':'現場担当向けは「悩み共感」から入り、テンポ速め・大テロップが効きます。',
+      '経営層':'経営層向けは「実績・数字」を冒頭に。落ち着いたトーンと信頼設計を優先します。',
+      '一般消費者':'一般消費者向けはベネフィットを2秒で提示。感情の起伏を作ります。',
+      'Z世代':'Z世代向けはテンポと世界観を最優先。冒頭0.5秒で世界に引き込みます。',
+    };
+    document.getElementById('rxFoot').textContent = NOTE[sel.target] || 'この処方は、実案件のA/Bテスト知見をもとに自動で組み立てられます。';
+    const derived = document.getElementById('rxDerived');
+    derived.classList.toggle('live', sel.media.length>0);
+  }
+
+  document.querySelectorAll('.opt-grid').forEach(grid => {
+    const multi = grid.dataset.multi === 'true';
+    const key = grid.dataset.key;
+    grid.addEventListener('click', e => {
+      const o = e.target.closest('.opt'); if(!o) return;
+      if (multi) {
+        const on = o.getAttribute('aria-pressed') === 'true';
+        o.setAttribute('aria-pressed', on ? 'false' : 'true');
+        sel[key] = [...grid.querySelectorAll('[aria-pressed="true"]')].map(x=>x.dataset.val);
+      } else {
+        grid.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed','false'));
+        o.setAttribute('aria-pressed','true');
+        sel[key] = o.dataset.val;
+      }
+      renderRx();
+    });
+  });
+  // seed defaults (Mirai Koji-matching) so the panel opens live
+  sel.media = ['YouTube','リール/ショート','SNSタイムライン'];
+  sel.industry = '建設SaaS'; sel.target = '現場担当'; sel.angle = '課題解決'; sel.tone = 'ドキュメンタリー';
+  renderRx();
+
+  // step nav
+  let step = 0;
+  const steps = document.querySelectorAll('.wiz-step');
+  const navs = document.querySelectorAll('.step-nav');
+  const wizNext = document.getElementById('wizNext');
+  const wizBack = document.getElementById('wizBack');
+  function showStep(n) {
+    step = n;
+    steps.forEach(s => s.classList.toggle('on', +s.dataset.step === n));
+    navs.forEach(nv => {
+      const i = +nv.dataset.s;
+      nv.classList.toggle('current', i === n);
+      nv.classList.toggle('done', i < n);
+    });
+    document.getElementById('stepNum').textContent = n + 1;
+    wizBack.style.visibility = n === 0 ? 'hidden' : 'visible';
+    wizNext.textContent = n === 3 ? 'AIが構成を設計 →' : '次へ →';
+  }
+  wizNext.addEventListener('click', () => {
+    if (step < 3) showStep(step + 1);
+    else { toast(L('Generating script and shot list…','台本と撮影指示を生成中…'), true, 1400); setTimeout(gotoScript, 1400); }
+  });
+  wizBack.addEventListener('click', () => { if (step>0) showStep(step-1); });
+  navs.forEach(nv => nv.addEventListener('click', () => showStep(+nv.dataset.s)));
+
+  // ---------- script / storyboard view ----------
+  const SCUT = [
+    { n:'#1', kind:'実写', scene:'車内 / ため息', secs:'0:00–0:04', tl:'写真整理は、会社に帰ってから…?',
+      na:'現場写真の整理、まだ会社に持ち帰ってますか?', telop:'写真整理は、会社に帰ってから…?',
+      shot:'停車中の車内。疲れた40代の現場監督。助手席に書類の山とデジカメ。<b>AI生成</b>', c1:'#4a5560', c2:'#20272e' },
+    { n:'#2', kind:'実写', scene:'夜オフィス', secs:'0:04–0:09', tl:'取り込んで、仕分けて、貼り付けて。',
+      na:'取り込んで、仕分けて、貼り付けて。毎日、何時間かかっていますか?', telop:'取り込んで、仕分けて、貼り付けて。',
+      shot:'夜のオフィスで写真整理。デスクランプ+モニター光。バストアップ。<b>AI生成</b>', c1:'#3a2f22', c2:'#14100a' },
+    { n:'#3', kind:'図版', scene:'月40時間', secs:'0:09–0:11', tl:'その作業に、月40時間。',
+      na:'—', telop:'その作業に、月40時間。※自社調べ',
+      shot:'舞う書類の背景に大きな数字「40」。<b>コード描画</b>', c1:'#2a1010', c2:'#0a0505' },
+    { n:'#4', kind:'実写', scene:'現場で撮影', secs:'0:11–0:14', tl:'スマホで、撮るだけ。',
+      na:'ミライ工事写真、スマホで撮るだけで、工事台帳が自動でできあがる。', telop:'スマホで、撮るだけ。',
+      shot:'白ヘルの監督が現場でスマホ撮影。両手のグリップに注意。<b>AI生成</b>', c1:'#5b6b78', c2:'#38424a' },
+    { n:'#5', kind:'UI', scene:'台帳が自動作成', secs:'0:14–0:18', tl:'撮るだけで、台帳に。',
+      na:'—', telop:'スマホで撮るだけ。台帳が自動作成',
+      shot:'カメラ画面 → 写真が飛んで台帳の行がポップイン。<b>提供UIスクショ</b>', c1:'#e9ebef', c2:'#c9ced6', dark:true },
+    { n:'#6', kind:'UI', scene:'PDF完成', secs:'0:18–0:22', tl:'その場で、PDF完成。',
+      na:'現場を出る前に、PDFまで完成。', telop:'その場で、PDF完成。',
+      shot:'A4縦の帳票（写真3枚）が組み上がり「PDF完成!」スタンプ。<b>コード描画</b>', c1:'#e4e7ea', c2:'#c2c8cf', dark:true },
+    { n:'#7', kind:'実写', scene:'送信して笑顔', secs:'0:22–0:26', tl:'お客様へ、その場で送信。',
+      na:'お客様への提出も、その場で完了。持ち帰りゼロへ。', telop:'お客様へ、その場で送信。',
+      shot:'車の横でスマホ送信して笑顔。顔への光の被りに注意。<b>AI生成</b>', c1:'#8a94a0', c2:'#5c6570' },
+    { n:'#8', kind:'CTA', scene:'CTA', secs:'0:26–0:30', tl:'今すぐ無料ダウンロード',
+      na:'ミライ工事写真、今すぐ無料でダウンロード。', telop:'累計50万DL突破 / 今すぐ無料ダウンロード',
+      shot:'ロゴ+検索窓+実績バッジ+ストアバッジ。<b>コード描画</b>', c1:'#D7000F', c2:'#8a0009' },
+  ];
+  const boardList = document.getElementById('boardList');
+  let scriptEditable = false;
+  function renderBoard() {
+    boardList.innerHTML = SCUT.map(c => `
+      <article class="scut">
+        <div class="scut-frame" style="background:linear-gradient(155deg, ${c.c1}, ${c.c2})">
+          <span class="n">${c.n}</span>
+          <span class="kd">${c.kind}</span>
+          <span class="tl" style="${c.dark?'color:#1b1b22;text-shadow:0 1px 3px rgba(255,255,255,.4)':''}">${c.tl}</span>
+        </div>
+        <div class="scut-body">
+          <div class="scut-top"><span class="scut-scene">${c.scene}</span><span class="scut-secs">${c.secs}</span></div>
+          ${c.na!=='—' ? `<div class="scut-na${scriptEditable?' editable':''}" ${scriptEditable?'contenteditable="true"':''}><span class="lab">NA</span>${c.na}</div>` : ''}
+          <div class="scut-telop"><span class="lab">テロップ</span>${c.telop}</div>
+          <div class="scut-shot"><span class="cam">◉</span><span class="txt"><b>撮影指示:</b> ${c.shot}</span></div>
+        </div>
+      </article>`).join('');
+  }
+  renderBoard();
+
+  document.getElementById('scriptMode').addEventListener('click', e => {
+    const b = e.target.closest('button'); if(!b) return;
+    document.querySelectorAll('#scriptMode button').forEach(x=>x.setAttribute('aria-selected','false'));
+    b.setAttribute('aria-selected','true');
+    scriptEditable = b.dataset.m === 'own';
+    renderBoard();
+    toast(scriptEditable ? L('Edit mode: narration is directly editable','編集モード: ナレーションを直接編集できます') : L('AI-handled mode','AIにおまかせモード'), false, 1800);
+  });
+
+  // ---------- dashboard ----------
+  const PROJ = [
+    { name:'ミライ工事写真 / 30秒CM', status:'done', st:'書き出し済み', cls:'ps-done', tag:'建設SaaS',
+      date:'今日', cost:'¥1,240', fmts:[[13,8],[8,13],[11,11]], copy:'現場で完結。', c1:'#D7000F', c2:'#8a0009', open:'work' },
+    { name:'夏の新規登録キャンペーン', status:'gen', st:'生成中 4/8', cls:'ps-gen', tag:'EC・D2C',
+      date:'2分前', cost:'¥680〜', fmts:[[8,13],[11,11]], copy:'', mini:true, c1:'#2E7D6B', c2:'#1a4c40' },
+    { name:'採用ブランディング / 15秒', status:'review', st:'検品待ち', cls:'ps-review', tag:'採用',
+      date:'1時間前', cost:'¥920', fmts:[[13,8],[8,13]], copy:'ここで、働く。', c1:'#3A5BA0', c2:'#233a6b' },
+    { name:'機能アップデート告知', status:'draft', st:'下書き', cls:'ps-draft', tag:'SaaS',
+      date:'昨日', cost:'—', fmts:[[13,8]], copy:'', mini:true, c1:'#6B6A63', c2:'#43423c' },
+    { name:'店頭サイネージ / 秋メニュー', status:'done', st:'書き出し済み', cls:'ps-done', tag:'飲食',
+      date:'3日前', cost:'¥1,050', fmts:[[13,8]], copy:'できたて、あります。', c1:'#C4553D', c2:'#8a3826' },
+    { name:'導入事例インタビュー風', status:'done', st:'書き出し済み', cls:'ps-done', tag:'SaaS',
+      date:'先週', cost:'¥1,380', fmts:[[13,8],[8,13],[11,11]], copy:'', mini:true, c1:'#4a5560', c2:'#20272e' },
+  ];
+  const projGrid = document.getElementById('projGrid');
+  function fmtGlyphs(fmts){ return `<span class="fmts">${fmts.map(([w,h])=>`<i style="width:${w}px;height:${h}px"></i>`).join('')}</span>`; }
+  projGrid.innerHTML = PROJ.map((p,i)=>`
+    <button class="proj" data-open="${p.open||''}">
+      <div class="proj-thumb" style="background:linear-gradient(150deg, ${p.c1}, ${p.c2})">
+        <span class="proj-status ${p.cls}"><span class="sd"></span>${p.st}</span>
+        ${p.mini ? `<div class="pt-mini"><i></i><i></i></div>` : `<div class="pt-copy">${p.copy}</div>`}
+      </div>
+      <div class="proj-body">
+        <div class="proj-name">${p.name}</div>
+        <div class="proj-meta"><span>${p.tag}</span> ・ <span>${p.date}</span> ${fmtGlyphs(p.fmts)}</div>
+        <div class="proj-foot"><span>生成原価</span><span class="cost">${p.cost}</span></div>
+      </div>
+    </button>`).join('');
+  projGrid.addEventListener('click', e => {
+    const p = e.target.closest('.proj'); if(!p) return;
+    if (p.dataset.open === 'work') gotoWorkspace();
+    else toast(L('Opening this project…','このプロジェクトを開いています…'), true, 1200);
+  });
+  document.querySelector('.dash-h .filters').addEventListener('click', e => {
+    const f = e.target.closest('.filter'); if(!f) return;
+    document.querySelectorAll('.dash-h .filter').forEach(x=>x.setAttribute('aria-pressed','false'));
+    f.setAttribute('aria-pressed','true');
+  });
+
+  // view switching
+  const vDash = document.getElementById('view-dash');
+  const vWiz = document.getElementById('view-wizard');
+  const vScript = document.getElementById('view-script');
+  const vWork = document.getElementById('view-workspace');
+  const vExport = document.getElementById('view-export');
+  const crumb = document.getElementById('crumb');
+  function hideAll(){ [vDash,vWiz,vScript,vWork,vExport].forEach(v=>v.hidden=true); window.scrollTo(0,0); }
+  document.getElementById('newCM').addEventListener('click', () => { hideAll(); vWiz.hidden=false; crumb.innerHTML='<span class="sep">/</span> <b>新規CM</b> <span class="sep">/</span> 制作をはじめる'; });
+  function gotoScript() {
+    hideAll(); vScript.hidden = false;
+    crumb.innerHTML = '<span class="sep">/</span> <b>新規CM</b> <span class="sep">/</span> 台本・絵コンテ';
+  }
+  function gotoWorkspace() {
+    hideAll(); vWork.hidden = false;
+    crumb.innerHTML = '<span class="sep">/</span> <b>ミライ工事写真</b> <span class="sep">/</span> 30秒CM';
+  }
+  function gotoWizard() {
+    hideAll(); vWiz.hidden = false;
+    crumb.innerHTML = '<span class="sep">/</span> <b>新規CM</b> <span class="sep">/</span> 制作をはじめる';
+  }
+  function gotoDash() {
+    hideAll(); vDash.hidden = false;
+    crumb.innerHTML = '<span class="sep">/</span> <b>ホーム</b>';
+  }
+  document.querySelector('.brand').style.cursor = 'pointer';
+  document.querySelector('.brand').addEventListener('click', gotoDash);
+  document.getElementById('scriptBack').addEventListener('click', gotoWizard);
+  document.getElementById('scriptNext').addEventListener('click', () => {
+    toast(L('Generating 8 cuts… live-action = AI / UI = code-drawn','8カットを生成中… 実写=AI / UI=コード描画'), true, 1600);
+    setTimeout(gotoWorkspace, 1600);
+  });
+
+</script>
+
+<script>
+/* ============================ i18n (English-first, EN/JA) ============================
+   Source strings live in Japanese (markup + JS renders). A MutationObserver-driven
+   walker translates JA→EN on load and re-applies after any dynamic render; toggling
+   to 日本語 restores the stored originals. Composed/interpolated strings (toasts,
+   variant labels) use the global L(en, ja) helper instead of the dictionary. */
+(function () {
+  var LANG = 'en';
+  // JA→EN dictionary, keyed by the trimmed text-node content (or attribute value).
+  var D = {
+    // --- header / breadcrumb ---
+    'ホーム': 'Home', 'クレジット残': 'Credits', '新規CM': 'New ad',
+    '制作をはじめる': 'Start creating', '台本・絵コンテ': 'Script & storyboard',
+    '書き出し': 'Export', 'ミライ工事写真': 'Mirai Koji', '30秒CM': '30-sec ad',
+    // --- dashboard ---
+    '選ぶだけで、広告動画。': 'Ad videos, just by choosing.',
+    '媒体・業種・ターゲットを選ぶだけ。AIがディレクターとして台本を組み、実写もUIも音声も生成。その日のうちに、クライアント確認できる初稿が出てきます。':
+      'Pick your channel, industry, and audience. AI directs the script and generates the footage, UI, and voiceover — a client-ready first cut lands the same day.',
+    '＋ 新規CMをつくる': '＋ New ad video',
+    '今月つくったCM': 'Ads made this month',
+    '本 / 全形式込み': 'made / all formats',
+    '先月比 +5本。制作会社見積り換算で約 ¥360万分。': '+5 vs. last month — about ¥3.6M at agency rates.',
+    '1本あたり平均 ¥1,200前後。CM1本 ≒ 1クレジット。': '≈¥1,200 per ad. 1 ad ≈ 1 credit.',
+    '制作中・完成したCM': 'In progress & finished',
+    'すべて': 'All', '制作中': 'In progress', '完成': 'Finished',
+    'SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ': 'SPOT · Ad videos, just by choosing. — Prototype',
+    // --- wizard shell ---
+    '新規CM ・ ステップ': 'New ad · Step',
+    'つくりたいCMを、選ぶだけ。': 'Just choose the ad you want.',
+    'プロンプトは書かなくていい。選択肢の裏に、広告制作の勝ちパターンが入っています。':
+      'No prompts to write — every option carries a proven ad-making playbook underneath.',
+    '媒体': 'Channel', '業種': 'Industry', 'ターゲット': 'Audience', '訴求・トーン': 'Angle & tone',
+    // step 1
+    'どこで流す広告ですか?': 'Where will this ad run?',
+    '選んだ媒体に合わせて、尺・縦横・冒頭フックの型が自動で決まります。複数選択できます。':
+      'Length, aspect ratio, and opening hook adapt to the channels you pick. Choose as many as you like.',
+    '16:9・課題提起型が効く': '16:9 · problem-led works best',
+    'リール / ショート': 'Reels / Shorts', 'リール/ショート': 'Reels / Shorts', '9:16・冒頭2秒フック必須': '9:16 · 2-sec hook is a must',
+    'SNSタイムライン': 'Social feed', '1:1・音なし前提・字幕重視': '1:1 · sound-off · caption-first',
+    '店頭サイネージ': 'In-store signage', '16:9・音なし・大テロップ': '16:9 · sound-off · big captions',
+    '選択中の媒体から、書き出す形式が決まります。': 'Your selected channels set the export formats.',
+    // step 2
+    'どんなプロダクトですか?': 'What kind of product is it?',
+    '業種ごとに、画づくりの語彙と訴求の型が変わります。ひとつ選んでください。':
+      'Each industry shifts the visual vocabulary and the angle. Pick one.',
+    'SaaS・アプリ': 'SaaS / App', '実UI訴求・信頼感。画面を織り込む': 'Real-UI, trust-building. Weaves in your screens',
+    'EC・D2C': 'E-commerce / D2C', '商品ビジュアル・ベネフィット訴求': 'Product visuals, benefit-led',
+    '不動産': 'Real estate', '空間・立地・安心感': 'Space, location, reassurance',
+    '採用': 'Recruiting', '共感・カルチャー・働く人': 'Empathy, culture, people at work',
+    '飲食': 'Food & beverage', 'シズル・食欲・臨場感': 'Sizzle, appetite, presence',
+    // step 3
+    '誰に届けますか?': "Who's it for?",
+    '見る人によって、訴求の入口とテンポが変わります。ひとつ選んでください。':
+      'The entry point and pacing change with the viewer. Pick one.',
+    '現場担当': 'Field staff', '手軽さ・時短。悩み共感から入る': 'Ease and time saved. Opens on the pain',
+    '経営層': 'Executives', '実績・ROI。数字と信頼で入る': 'Results and ROI. Opens on numbers',
+    '一般消費者': 'Consumers', 'ベネフィット・感情で入る': 'Opens on benefit and emotion',
+    'Z世代': 'Gen Z', 'テンポ・世界観・共感で入る': 'Tempo, aesthetic, resonance',
+    // step 4
+    'どう見せますか?': 'How should it feel?',
+    '訴求の型とトーンを選びます。ひとつずつ。': 'Choose the angle and the tone. One each.',
+    '課題解決': 'Problem-solving', '悩み → 解決を見せる。SaaS王道': 'Pain → solution. The SaaS classic',
+    '実績・信頼': 'Proof & trust', '数字・導入実績で信頼を積む': 'Build trust with numbers and adoption',
+    '機能デモ': 'Feature demo', '使い方をそのまま見せる': 'Show it in action, as-is',
+    '感情・共感': 'Emotion & empathy', 'ストーリーで感情を動かす': 'Move people with story',
+    'トーン': 'Tone',
+    'ドキュメンタリー': 'Documentary', '自然光・等身大。AI感が出にくい': 'Natural light, true-to-life. Least AI-looking',
+    '明るいCM': 'Bright & upbeat', 'ポップ・軽快・前向き': 'Poppy, light, positive',
+    'エモーショナル': 'Emotional', '映画的・情感・余韻': 'Cinematic, tender, lingering',
+    'スタイリッシュ': 'Stylish', '洗練・ミニマル・都会的': 'Refined, minimal, urban',
+    '← 戻る': '← Back', '次へ →': 'Next →', 'AIが構成を設計 →': 'AI designs the structure →',
+    // prescription
+    'AIの処方箋': "AI's prescription", '選ぶほど、構成が決まっていく': 'The more you pick, the clearer it gets',
+    '訴求': 'Angle', '未選択': 'Not set',
+    '推奨構成': 'Suggested structure', '冒頭フック': 'Opening hook', '課題提起': 'Problem',
+    '書き出し形式': 'Export formats', '推奨尺': 'Suggested length', '30秒': '30 sec',
+    'この処方は、実案件のA/Bテスト知見をもとに自動で組み立てられます。':
+      'This prescription is assembled automatically from A/B-test learnings on real campaigns.',
+    // renderRx derived
+    '実績・数字': 'Proof & numbers', '導入の様子': 'Adoption in action', '使い方': 'How to use',
+    'ビフォーアフター': 'Before / after', '情景': 'Scene', '葛藤': 'Tension', '転機': 'Turning point',
+    '余韻・CTA': 'Resonance · CTA', '15秒〜': '15 sec+', '媒体を選択': 'Pick a channel',
+    '現場担当向けは「悩み共感」から入り、テンポ速め・大テロップが効きます。':
+      'For field staff, open on shared frustration; a faster tempo and big captions work well.',
+    '経営層向けは「実績・数字」を冒頭に。落ち着いたトーンと信頼設計を優先します。':
+      'For executives, lead with proof and numbers. Favor a calm tone and trust-building.',
+    '一般消費者向けはベネフィットを2秒で提示。感情の起伏を作ります。':
+      'For consumers, show the benefit within 2 seconds and build an emotional arc.',
+    'Z世代向けはテンポと世界観を最優先。冒頭0.5秒で世界に引き込みます。':
+      'For Gen Z, tempo and aesthetic come first — pull them in within the first 0.5 seconds.',
+    // --- script / storyboard ---
+    '台本と絵コンテ': 'Script & storyboard',
+    '選択から、AIがディレクターとして構成を組みました。各カットは言葉で直せます。':
+      'From your choices, AI directed the structure. Edit any cut in plain words.',
+    'AIにおまかせ': 'Let AI handle it', '台本を持ち込む': 'Bring your own script',
+    '撮影指示リスト': 'Shot list',
+    'ダッシュボード画面': 'Dashboard screens', '一覧・撮影・PDFの3画面': 'List, capture, PDF — 3 screens',
+    'UP済': 'Uploaded', 'アプリアイコン・ロゴ': 'App icon & logo',
+    '工事写真サンプル': 'Sample site photos', '帳票に使う現場写真 3枚': '3 site photos for the report',
+    '参考サウンドロゴ': 'Reference sound logo', '構造のみ参照・本番は自社生成': 'Structure only — final generated in-house',
+    'AIがディレクター。': 'AI is the director.',
+    '台本の各カットから「何を撮ればいいか」を自動でリスト化。あなたは指示どおりに素材を上げるだけ。実写の人物・背景はAIが生成します。':
+      'It turns every cut into a clear shot list of what to capture. You just upload what’s asked — AI generates the live-action people and backgrounds.',
+    '← 選択に戻る': '← Back to choices', 'この構成で生成する →': 'Generate from this →',
+    // SCUT scenes
+    '車内 / ため息': 'In the car / a sigh', '夜オフィス': 'Office at night', '月40時間': '40 hrs a month',
+    '現場で撮影': 'Shooting on site', '台帳が自動作成': 'Ledger builds itself', 'PDF完成': 'PDF ready',
+    '送信して笑顔': 'Sent, with a smile', '客先で受信': 'Received at the client',
+    // kinds / models
+    '実写': 'Live-action', '図版': 'Graphic', 'コード': 'Code',
+    // telops / cut lines
+    '写真整理は、会社に帰ってから…?': 'Sorting photos... back at the office?',
+    '取り込んで、仕分けて、貼り付けて。': 'Import, sort, paste. Repeat.',
+    'その作業に、月40時間。': '40 hours a month on that.',
+    'スマホで、撮るだけ。': 'Just shoot, on your phone.',
+    '撮るだけで、台帳に。': 'Shoot, and it’s in the ledger.',
+    'その場で、PDF完成。': 'PDF, done on the spot.',
+    'お客様へ、その場で送信。': 'Sent to the client, on the spot.',
+    '持ち帰りゼロへ。': 'Zero work taken home.',
+    '今すぐ無料ダウンロード': 'Download free now',
+    // narration
+    '現場写真の整理、まだ会社に持ち帰ってますか?': 'Still hauling site photos back to the office to sort?',
+    '取り込んで、仕分けて、貼り付けて。毎日、何時間かかっていますか?':
+      'Import, sort, paste — how many hours does that eat every day?',
+    'ミライ工事写真、スマホで撮るだけで、工事台帳が自動でできあがる。':
+      'With Mirai Koji, just shoot on your phone and the site ledger builds itself.',
+    '現場を出る前に、PDFまで完成。': 'The PDF is finished before you leave the site.',
+    'お客様への提出も、その場で完了。持ち帰りゼロへ。': 'Client hand-off is done on the spot. Nothing taken home.',
+    'ミライ工事写真、今すぐ無料でダウンロード。': 'Mirai Koji — download it free, right now.',
+    // telop variants
+    'その作業に、月40時間。※自社調べ': '40 hours a month on that. *Internal data',
+    'スマホで撮るだけ。台帳が自動作成': 'Just shoot. The ledger builds itself.',
+    '累計50万DL突破 / 今すぐ無料ダウンロード': '500K+ downloads / Download free now',
+    // shot descriptions
+    '停車中の車内。疲れた40代の現場監督。助手席に書類の山とデジカメ。':
+      'Parked car. A worn-out site manager in their 40s. A pile of paperwork and a camera on the passenger seat.',
+    '夜のオフィスで写真整理。デスクランプ+モニター光。バストアップ。':
+      'Sorting photos in the office at night. Desk lamp + monitor glow. Bust shot.',
+    '舞う書類の背景に大きな数字「40」。': 'A big “40” over swirling paperwork.',
+    '白ヘルの監督が現場でスマホ撮影。両手のグリップに注意。':
+      'A manager in a white helmet shooting on-site with a phone. Watch the two-handed grip.',
+    'カメラ画面 → 写真が飛んで台帳の行がポップイン。': 'Camera view → the photo flies in and a ledger row pops in.',
+    'A4縦の帳票（写真3枚）が組み上がり「PDF完成!」スタンプ。':
+      'An A4 portrait report (3 photos) assembles, then a “PDF ready!” stamp.',
+    '車の横でスマホ送信して笑顔。顔への光の被りに注意。':
+      'By the car, sending on the phone with a smile. Watch for light hitting the face.',
+    'ロゴ+検索窓+実績バッジ+ストアバッジ。': 'Logo + search box + proof badge + store badges.',
+    'AI生成': 'AI-generated', 'コード描画': 'Code-drawn', '提供UIスクショ': 'Client UI screenshot',
+    'テロップ': 'Caption', '撮影指示:': 'Shot:',
+    // --- export view ---
+    '書き出し完了 ・ 9本': 'Export complete · 9 videos',
+    '3パターン（A/B/C）× 3形式（横・縦・正方形）。クライアントには「イントロを選んで、その3形式を納品」で提示できます。':
+      '3 variants (A/B/C) × 3 formats (wide, vertical, square). Present it to the client as “pick an intro, deliver its three formats.”',
+    '制作会社に頼むと': 'If you hired an agency',
+    '従来の外注': 'Outsourced', '制作費': 'Production cost', '納期': 'Turnaround',
+    '1本・税別': 'per video, ex. tax', '3週間': '3 weeks', '修正2回まで': 'up to 2 revisions',
+    '生成原価': 'Generation cost', '9本・修正無制限': '9 videos · unlimited revisions',
+    '当日': 'Same day', '修正は分単位': 'revisions in minutes',
+    'すべてダウンロード（ZIP）': 'Download all (ZIP)', '共有リンクを作成 ↗': 'Create share link ↗',
+    'ワークスペースに戻る': 'Back to workspace', 'サムネイル（静止画）': 'Thumbnails (stills)',
+    '各パターンのカバー画像も同梱。YouTube等のサムネイルにそのまま使えます。':
+      'A cover image for each variant is included — ready to use as a YouTube thumbnail.',
+    'パターン': 'Variant',
+    // --- workspace view ---
+    '工事台帳CM ・ 制作ワークスペース': 'Site-ledger ad · Production workspace',
+    'サンプル案件を読み込み中 — 実データの代わりにミライ工事の制作データを表示しています':
+      'Loading a sample project — showing Mirai Koji’s production data in place of your own.',
+    '建設SaaS': 'Construction SaaS', 'YouTube・リール': 'YouTube · Reels', '尺': 'Length',
+    '制作パイプライン': 'Production pipeline',
+    'ブリーフ': 'Brief', '媒体×業種×訴求を選択': 'Channel × industry × angle',
+    'AIが構成 → 共同編集': 'AI drafts → you co-edit', '撮影指示': 'Shot list',
+    '必要素材リストを自動生成': 'Auto-lists the assets needed', '生成': 'Generation',
+    '工程別にAIを使い分け': 'A different AI per step', '検品・調整': 'Review & tune',
+    '品質チェック → 好み選び': 'Quality check → pick favorites', '3形式・3パターン': '3 formats · 3 variants',
+    '台本から自動生成。ユーザーは指示どおりに素材を上げるだけ。':
+      'Auto-generated from the script. You just upload what’s asked.',
+    '✓ 4/4 素材アップ済み': '✓ 4/4 assets uploaded',
+    'リング + マリンバ': 'Ring + marimba', 'リング+マリンバ': 'Ring + marimba', '上品・信頼感': 'Elegant, trustworthy',
+    'コンフェッティ + ウクレレ': 'Confetti + ukulele', 'コンフェッティ+ウクレレ': 'Confetti + ukulele', '明るい・ポップ': 'Bright, poppy',
+    '赤バブル + エレクトロ': 'Red bubbles + electro', '赤バブル+エレクトロ': 'Red bubbles + electro', '若い・エネルギッシュ': 'Young, energetic',
+    '横 16:9': 'Wide 16:9', '縦 9:16': 'Vertical 9:16', '正方形 1:1': 'Square 1:1',
+    'YouTube・サイト': 'YouTube · Site', 'リール・ショート': 'Reels · Shorts', 'タイムライン': 'Feed',
+    '現場で完結。': 'Done on site.', '作業時間を': 'Save ', '40時間': '40 hrs', '短縮!': ' of work!',
+    'プレビュー再生': 'Play preview', 'カット構成': 'Cut breakdown',
+    '8カット ・ 実写=AI生成 / UI・図版=コード描画': '8 cuts · live-action = AI-generated / UI & graphics = code-drawn',
+    '気になるところは、言葉で直す': 'Fix what bugs you, in words',
+    'もっと明るく': 'Brighter', '動きを控えめに': 'Less motion', 'もっとポップに': 'More poppy',
+    'ナレーションを速く': 'Faster narration', 'BGMを明るく': 'Brighter music', 'テロップを大きく': 'Bigger captions',
+    '品質チェック': 'Quality check', '7/8 合格': '7/8 passed',
+    '手・指の破綻': 'Hand & finger defects', '③修正済': '③ fixed', '小道具の形状': 'Prop shapes',
+    'カメラ修正済': 'Camera fixed', '光のフレア': 'Light flare', '⑤修正済': '⑤ fixed',
+    '文字化け・偽UI': 'Garbled text / fake UI', '実素材のみ': 'Real assets only',
+    '人物の一貫性': 'Character consistency', '全カット': 'All cuts', '日本考証': 'JP authenticity',
+    '右ハンドル他': 'RHD & more', '背景モーション': 'Background motion', '①再検証中': '① re-checking',
+    '不合格のカットはあなたに見せません。合格した候補の中から、好みを選ぶだけ。':
+      'Failed cuts never reach you. Just pick your favorite from the ones that passed.',
+    'この案件の生成原価': 'Generation cost for this project', '概算 / 3パターン込み': 'est. / 3 variants incl.',
+    '動画化': 'Video gen', 'スチル生成': 'Still gen', '音声・BGM': 'Voice & music',
+    'この3形式を書き出す': 'Export these 3 formats',
+    // --- dashboard project cards ---
+    'ミライ工事写真 / 30秒CM': 'Mirai Koji / 30-sec ad', '書き出し済み': 'Exported',
+    '夏の新規登録キャンペーン': 'Summer sign-up campaign', '生成中 4/8': 'Generating 4/8',
+    '採用ブランディング / 15秒': 'Employer branding / 15-sec', '検品待ち': 'Awaiting review',
+    '機能アップデート告知': 'Feature-update announcement', '下書き': 'Draft',
+    '店頭サイネージ / 秋メニュー': 'In-store signage / fall menu',
+    '導入事例インタビュー風': 'Case-study interview style',
+    'ここで、働く。': 'Work here.', 'できたて、あります。': 'Made fresh, here.',
+    '¥680〜': '¥680+',
+    // dates
+    '今日': 'Today', '2分前': '2 min ago', '1時間前': '1 hr ago',
+    '昨日': 'Yesterday', '3日前': '3 days ago', '先週': 'Last week',
+    // --- attributes (title / placeholder) ---
+    '共有リンク': 'Share link', 'ダウンロード': 'Download',
+    '自由に指示… 例「②の表情をもっと自然に」': 'Type any note… e.g. “make the face in ② more natural”',
+  };
+
+  // Composed/interpolated strings pick their language explicitly.
+  window.L = function (en, ja) { return LANG === 'en' ? en : ja; };
+
+  var ORIG = new WeakMap();      // text node -> original JA content (core, whitespace-trimmed handled separately)
+  var ATTR_ORIG = new WeakMap(); // element -> { attrName: originalValue }
+  var ATTRS = ['placeholder', 'title'];
+  var SKIP = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1 };
+
+  function translateNode(node) {
+    var raw = node.nodeValue;
+    if (!raw) return;
+    var core = raw.trim();
+    if (!core) return;
+    // record original once
+    if (!ORIG.has(node)) ORIG.set(node, raw);
+    var original = ORIG.get(node);
+    if (LANG === 'ja') { if (node.nodeValue !== original) node.nodeValue = original; return; }
+    var oCore = original.trim();
+    var hit = D[oCore];
+    if (hit === undefined) return;
+    var lead = original.slice(0, original.indexOf(oCore));
+    var trail = original.slice(original.indexOf(oCore) + oCore.length);
+    var next = lead + hit + trail;
+    if (node.nodeValue !== next) node.nodeValue = next;
+  }
+
+  function translateAttrs(el) {
+    for (var i = 0; i < ATTRS.length; i++) {
+      var a = ATTRS[i];
+      if (!el.hasAttribute || !el.hasAttribute(a)) continue;
+      var rec = ATTR_ORIG.get(el) || {};
+      if (!(a in rec)) { rec[a] = el.getAttribute(a); ATTR_ORIG.set(el, rec); }
+      var orig = rec[a];
+      if (LANG === 'ja') { el.setAttribute(a, orig); continue; }
+      var hit = D[orig.trim()];
+      if (hit !== undefined) el.setAttribute(a, hit);
+    }
+  }
+
+  function walk(root) {
+    if (root.nodeType === 3) { translateNode(root); return; }
+    if (root.nodeType !== 1 || SKIP[root.tagName]) return;
+    if (root.hasAttribute) translateAttrs(root);
+    for (var n = root.firstChild; n; n = n.nextSibling) walk(n);
+  }
+
+  var obs = new MutationObserver(function (muts) {
+    obs.disconnect();
+    for (var i = 0; i < muts.length; i++) {
+      var m = muts[i];
+      if (m.type === 'characterData') translateNode(m.target);
+      else if (m.type === 'attributes' && m.target.nodeType === 1) translateAttrs(m.target);
+      else for (var j = 0; j < m.addedNodes.length; j++) walk(m.addedNodes[j]);
+    }
+    connect();
+  });
+  function connect() {
+    obs.observe(document.body, {
+      childList: true, subtree: true, characterData: true,
+      attributes: true, attributeFilter: ATTRS
+    });
+  }
+
+  function apply() {
+    obs.disconnect();
+    document.documentElement.lang = LANG;
+    walk(document.body);
+    connect();
+  }
+
+  // toggle wiring
+  var btns = document.querySelectorAll('.lang [data-lang]');
+  function setLang(lang) {
+    LANG = lang;
+    btns.forEach(function (b) {
+      var on = b.dataset.lang === lang;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.style.background = on ? 'var(--ink)' : 'transparent';
+      b.style.color = on ? 'var(--ground)' : 'var(--muted)';
+    });
+    apply();
+  }
+  btns.forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.lang); }); });
+
+  // English by default
+  apply();
+})();
+</script>

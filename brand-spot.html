@@ -1,0 +1,278 @@
+<title>SPOT ブランド</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<style>
+  :root {
+    --ground: #F5F3EE;
+    --surface: #FFFFFF;
+    --surface-2: #FAF8F3;
+    --ink: #15161C;
+    --muted: #6C6A64;
+    --faint: #A29E95;
+    --line: #E5E0D5;
+    --line-strong: #D6D0C2;
+    --blue: #2846D9;
+    --blue-ink: #1B2E8F;
+    --blue-soft: #E4E7FA;
+    --marigold: #DE8E24;
+    --marigold-soft: #FAEACE;
+    --shadow: 0 1px 2px rgba(21,22,28,.04), 0 10px 30px rgba(21,22,28,.07);
+    --shadow-lift: 0 3px 12px rgba(21,22,28,.09), 0 26px 54px rgba(21,22,28,.14);
+    --fd: "Bricolage Grotesque", "Zen Kaku Gothic New", sans-serif;
+    --fj: "Zen Kaku Gothic New", -apple-system, "Hiragino Sans", sans-serif;
+    --fm: "DM Mono", ui-monospace, monospace;
+  }
+  :root:not([data-theme="light"]) { @media (prefers-color-scheme: dark) {
+    --ground:#0F1015; --surface:#181920; --surface-2:#1E1F27; --ink:#F0EEE7; --muted:#9A968C; --faint:#615E56;
+    --line:#282A33; --line-strong:#353845; --blue:#5B75F0; --blue-ink:#A9B7F7; --blue-soft:#1A2050;
+    --marigold:#EDA53C; --marigold-soft:#33280F;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.45); --shadow-lift:0 3px 12px rgba(0,0,0,.4),0 28px 56px rgba(0,0,0,.6);
+  }}
+  :root[data-theme="dark"] {
+    --ground:#0F1015; --surface:#181920; --surface-2:#1E1F27; --ink:#F0EEE7; --muted:#9A968C; --faint:#615E56;
+    --line:#282A33; --line-strong:#353845; --blue:#5B75F0; --blue-ink:#A9B7F7; --blue-soft:#1A2050;
+    --marigold:#EDA53C; --marigold-soft:#33280F;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.45); --shadow-lift:0 3px 12px rgba(0,0,0,.4),0 28px 56px rgba(0,0,0,.6);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--fj); font-size: 15px; line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 26px; }
+  h1,h2,h3 { margin: 0; font-weight: 700; text-wrap: balance; }
+  ::selection { background: var(--blue-soft); }
+  .theme-toggle { position: fixed; top: 18px; right: 18px; z-index: 10; width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--muted); cursor: pointer; font-size: 16px; }
+  section { padding: 60px 0; border-top: 1px solid var(--line); }
+  .eyebrow { font-family: var(--fm); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--blue-ink); display: inline-flex; align-items: center; gap: 9px; margin-bottom: 18px; }
+  .eyebrow::before { content:""; width: 20px; height: 2px; background: var(--blue); }
+  .h2 { font-family: var(--fd); font-size: clamp(24px,3.4vw,32px); font-weight: 800; letter-spacing: -.02em; }
+  .lead { font-size: 16px; color: var(--muted); max-width: 62ch; line-height: 1.85; margin-top: 12px; }
+
+  /* hero */
+  .hero { padding: 74px 0 56px; }
+  .logo-lockup { display: flex; align-items: center; gap: 16px; }
+  .logo-word { font-family: var(--fd); font-weight: 800; font-size: 40px; letter-spacing: -.02em; }
+  .logo-word .o { color: var(--blue); }
+  .hero h1 { font-family: var(--fd); font-weight: 800; font-size: clamp(38px,6.4vw,68px); letter-spacing: -.03em; line-height: 1.04; margin: 34px 0 0; }
+  .hero .sub { font-size: 17px; color: var(--muted); margin-top: 20px; max-width: 52ch; line-height: 1.8; }
+  .hero .sub b { color: var(--ink); font-weight: 700; }
+  .cta { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
+  .btn { border: none; border-radius: 11px; padding: 14px 24px; font-size: 14.5px; font-weight: 700; font-family: var(--fj); cursor: pointer; transition: .15s; }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px color-mix(in srgb, var(--blue) 40%, transparent); }
+  .btn-ghost { background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--blue); color: var(--blue-ink); }
+
+  /* proof strip */
+  .proof { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 48px; }
+  .proof-cell { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); }
+  .proof-cell .n { font-family: var(--fd); font-weight: 800; font-size: 30px; letter-spacing: -.02em; }
+  .proof-cell .n .u { font-size: 15px; color: var(--muted); font-weight: 500; font-family: var(--fj); }
+  .proof-cell .k { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .proof-cell.hl { background: var(--ink); color: var(--ground); border-color: var(--ink); }
+  .proof-cell.hl .k { color: color-mix(in srgb, var(--ground) 65%, transparent); }
+  .proof-cell.hl .n .u { color: color-mix(in srgb, var(--ground) 65%, transparent); }
+  .proof-cell.hl .n em { color: #fff; font-style: normal; }
+
+  /* positioning */
+  .pos-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 26px; }
+  .pos-cell { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); }
+  .pos-cell .k { font-family: var(--fm); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--blue-ink); }
+  .pos-cell .v { font-size: 15px; font-weight: 700; margin-top: 9px; line-height: 1.6; }
+  .pos-cell .s { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  /* pillars */
+  .pillars { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-top: 26px; }
+  .pillar { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px; box-shadow: var(--shadow); }
+  .pillar .ic { width: 40px; height: 40px; border-radius: 10px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; margin-bottom: 14px; }
+  .pillar .ic svg { width: 20px; height: 20px; }
+  .pillar h3 { font-size: 16px; font-weight: 700; }
+  .pillar p { font-size: 13.5px; color: var(--muted); margin: 7px 0 0; line-height: 1.7; }
+
+  /* palette */
+  .swatches { display: grid; grid-template-columns: repeat(5,1fr); gap: 11px; margin-top: 26px; }
+  .swatch { border-radius: 13px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
+  .swatch .chip { height: 74px; }
+  .swatch .info { padding: 11px 13px; }
+  .swatch .nm { font-size: 12.5px; font-weight: 700; }
+  .swatch .hx { font-family: var(--fm); font-size: 11px; color: var(--muted); }
+  .swatch .role { font-size: 10.5px; color: var(--faint); margin-top: 2px; }
+  .pal-note { font-size: 13.5px; color: var(--muted); margin-top: 16px; line-height: 1.8; }
+  .pal-note b { color: var(--ink); }
+
+  /* type */
+  .type-row { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; margin-top: 12px; box-shadow: var(--shadow); display: grid; grid-template-columns: 150px 1fr; gap: 22px; align-items: center; }
+  .type-row .meta { font-size: 12px; color: var(--muted); } .type-row .meta b { display: block; font-size: 14px; color: var(--ink); font-weight: 700; margin-bottom: 3px; } .type-row .meta .m { font-family: var(--fm); font-size: 11px; margin-top: 6px; }
+  .sp-d { font-family: var(--fd); font-weight: 800; font-size: 32px; letter-spacing: -.02em; }
+  .sp-j { font-family: var(--fj); font-weight: 500; font-size: 18px; line-height: 1.7; }
+  .sp-m { font-family: var(--fm); font-size: 16px; }
+
+  /* logo system */
+  .logo-stage { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 40px; margin-top: 26px; box-shadow: var(--shadow); display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+  .logo-on-dark { background: var(--ink); border-radius: 12px; padding: 28px; display: flex; align-items: center; justify-content: center; gap: 14px; }
+  .logo-on-dark .logo-word { color: var(--ground); font-size: 30px; }
+  .logo-note { font-size: 13px; color: var(--muted); line-height: 1.8; }
+
+  /* voice */
+  .voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 26px; }
+  .vcard { border-radius: 14px; padding: 22px; border: 1px solid var(--line); }
+  .vcard.do { background: var(--blue-soft); } .vcard.dont { background: var(--surface-2); }
+  .vcard .vh { font-family: var(--fm); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 12px; }
+  .vcard.do .vh { color: var(--blue-ink); } .vcard.dont .vh { color: var(--muted); }
+  .vcard ul { margin: 0; padding-left: 18px; } .vcard li { font-size: 13.5px; margin-bottom: 7px; line-height: 1.6; } .vcard.dont li { color: var(--muted); }
+
+  /* landing framing */
+  .landing { background: var(--ink); color: var(--ground); border-radius: 18px; padding: 46px; margin-top: 26px; box-shadow: var(--shadow-lift); text-align: center; position: relative; overflow: hidden; }
+  .landing::after { content:""; position:absolute; left:50%; top:-60px; transform:translateX(-50%); width:280px; height:280px; border-radius:50%; background: radial-gradient(circle, var(--blue), transparent 70%); opacity:.4; }
+  .landing .lh { font-family: var(--fd); font-weight: 800; font-size: clamp(26px,4vw,40px); letter-spacing: -.02em; position: relative; }
+  .landing .ls { color: color-mix(in srgb, var(--ground) 68%, transparent); margin-top: 14px; font-size: 15px; position: relative; }
+  .landing .llogos { display: flex; gap: 22px; justify-content: center; margin-top: 26px; flex-wrap: wrap; opacity: .6; font-family: var(--fm); font-size: 12px; position: relative; }
+  .landing .lcta { margin-top: 26px; position: relative; }
+
+  .foot { text-align: center; color: var(--faint); font-size: 12px; font-family: var(--fm); padding: 40px 0 60px; border-top: 1px solid var(--line); }
+
+  @media (prefers-reduced-motion: reduce) { *{ transition:none!important; } }
+  @media (max-width: 760px) { .proof,.pos-grid,.pillars,.swatches,.voice-grid,.logo-stage { grid-template-columns: 1fr 1fr; } .type-row{grid-template-columns:1fr;gap:12px} }
+</style>
+
+<button class="theme-toggle" id="theme" aria-label="テーマ切替">◐</button>
+
+<header class="hero"><div class="wrap">
+  <div class="logo-lockup">
+    <svg width="52" height="52" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+      <rect width="80" height="80" rx="19" fill="var(--ink)"/>
+      <circle cx="40" cy="40" r="22" fill="none" stroke="var(--blue)" stroke-width="4.5"/>
+      <circle cx="40" cy="40" r="8" fill="#fff"/>
+    </svg>
+    <span class="logo-word">SP<span class="o">O</span>T</span>
+  </div>
+  <h1>Every spot,<br>in a day.</h1>
+  <p class="sub">マーケティングチームのための、AIコマーシャル制作スタジオ。<b>選ぶだけで、実写もUIも音声もAIが生成</b>。その日のうちにブランド確認できる初稿が、全フォーマットで。</p>
+  <div class="cta">
+    <button class="btn btn-primary">デモを予約</button>
+    <button class="btn btn-ghost">無料ではじめる</button>
+  </div>
+  <div class="proof">
+    <div class="proof-cell hl"><div class="n"><em>1/400</em></div><div class="k">従来の外注制作費に対して</div></div>
+    <div class="proof-cell"><div class="n">当日<span class="u"> 納品</span></div><div class="k">制作会社の平均3週間に対して</div></div>
+    <div class="proof-cell"><div class="n">3×3<span class="u"> 形式</span></div><div class="k">パターン×フォーマットを一括生成</div></div>
+  </div>
+</div></header>
+
+<section><div class="wrap">
+  <div class="eyebrow">Positioning</div>
+  <h2 class="h2">誰に、何を、なぜ。</h2>
+  <div class="pos-grid">
+    <div class="pos-cell"><div class="k">Who — 企業</div><div class="v">SaaS・アプリ企業のマーケティングチーム</div><div class="s">広告素材が枯渇し、外注予算も制作人員も足りない事業会社</div></div>
+    <div class="pos-cell"><div class="k">What</div><div class="v">選ぶだけのAIコマーシャル制作スタジオ</div><div class="s">媒体×業種×ターゲットを選ぶと、実写もUIも音声も生成・合成</div></div>
+    <div class="pos-cell"><div class="k">Why</div><div class="v">制作費と納期を、桁で変える</div><div class="s">1/400のコスト・当日納品・修正は分単位。運用のスピードに乗る</div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="eyebrow">Brand Pillars</div>
+  <h2 class="h2">企業が選ぶ、3つの理由。</h2>
+  <div class="pillars">
+    <div class="pillar">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <h3>ブランドセーフ</h3>
+      <p>実在するプロダクト画面をそのまま織り込み、偽UIは作らない。ブランドキットと発音辞書で、トンマナと商品名を守る。景表法にも配慮。</p>
+    </div>
+    <div class="pillar">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div>
+      <h3>圧倒的スピード</h3>
+      <p>ブリーフから初稿まで当日。修正は「もっと明るく」の一言で分単位。広告が疲弊する前に、次の素材を出し続けられる。</p>
+    </div>
+    <div class="pillar">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+      <h3>運用スケール</h3>
+      <p>1本の企画から訴求違い・フォーマット違いを一括量産。A/Bテスト前提の広告運用に、素材供給が追いつく。チーム席・承認フローに対応。</p>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="eyebrow">Color</div>
+  <h2 class="h2">青だけで、語る。</h2>
+  <div class="swatches">
+    <div class="swatch"><div class="chip" style="background:#2846D9"></div><div class="info"><div class="nm">スポットブルー</div><div class="hx">#2846D9</div><div class="role">主役・信頼</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#E4E7FA"></div><div class="info"><div class="nm">ブルーソフト</div><div class="hx">#E4E7FA</div><div class="role">面・背景</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#15161C"></div><div class="info"><div class="nm">インク</div><div class="hx">#15161C</div><div class="role">文字・黒</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#F5F3EE"></div><div class="info"><div class="nm">ペーパー</div><div class="hx">#F5F3EE</div><div class="role">地</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#6C6A64"></div><div class="info"><div class="nm">グレー</div><div class="hx">#6C6A64</div><div class="role">補助文字</div></div></div>
+  </div>
+  <p class="pal-note"><b>単色ブルー + 無彩色。</b>一流のB2B SaaSと同じ規律で、信頼とプレミアム感を出す。第二色は持たず、温かみは紙のグラウンドで補う。スポットライトの光点は白。</p>
+</div></section>
+
+<section><div class="wrap">
+  <div class="eyebrow">Typography</div>
+  <h2 class="h2">書体。</h2>
+  <div class="type-row"><div class="meta"><b>Bricolage Grotesque</b>ロゴ・見出し・数字<div class="m">700–800</div></div><div class="sp-d">SPOT ・ Every spot, in a day.</div></div>
+  <div class="type-row"><div class="meta"><b>Zen Kaku Gothic New</b>本文・UI(日本語)<div class="m">400–700</div></div><div class="sp-j">選ぶだけで、実写もUIも音声もAIが生成。</div></div>
+  <div class="type-row"><div class="meta"><b>DM Mono</b>データ・ラベル<div class="m">400–500</div></div><div class="sp-m">CPA -18% · 9 assets · same-day</div></div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="eyebrow">Logo</div>
+  <h2 class="h2">ロゴ。</h2>
+  <div class="logo-stage">
+    <div>
+      <div class="logo-lockup">
+        <svg width="60" height="60" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+          <rect width="80" height="80" rx="19" fill="var(--ink)"/>
+          <circle cx="40" cy="40" r="22" fill="none" stroke="var(--blue)" stroke-width="4.5"/>
+          <circle cx="40" cy="40" r="8" fill="#fff"/>
+        </svg>
+        <span class="logo-word">SP<span class="o">O</span>T</span>
+      </div>
+      <p class="logo-note" style="margin-top:18px">シンボルは「スポットライト」——被写体に当たる光の輪。青いリングの中心に、白い光点。"O" が光る。ワードマークの O にも同じ光を宿す。</p>
+    </div>
+    <div class="logo-on-dark">
+      <svg width="34" height="34" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+        <circle cx="40" cy="40" r="22" fill="none" stroke="var(--blue)" stroke-width="4.5"/>
+        <circle cx="40" cy="40" r="8" fill="#fff"/>
+      </svg>
+      <span class="logo-word">SP<span class="o">O</span>T</span>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="eyebrow">Voice & Tone</div>
+  <h2 class="h2">話し方（B2B）。</h2>
+  <p class="lead">相手は事業会社のマーケター。意思決定には上長・法務も関わる。信頼を土台に、成果とスピードを具体で語る。チャラさは禁物、しかし堅すぎず。</p>
+  <div class="voice-grid">
+    <div class="vcard do"><div class="vh">こう話す</div><ul>
+      <li>成果を数字で。「CPA、当日、1/400」</li>
+      <li>ブランドを守ることを約束する</li>
+      <li>専門用語(プロンプト等)は裏に隠す</li>
+      <li>確信を持って、簡潔に。誇張はしない</li>
+    </ul></div>
+    <div class="vcard dont"><div class="vh">こう話さない</div><ul>
+      <li>AI・モデル自慢に終始しない</li>
+      <li>消費者向けのノリ・過度なカジュアルさ</li>
+      <li>できることを曖昧にぼかさない</li>
+      <li>「爆速」「神」等の軽い誇張語</li>
+    </ul></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="eyebrow">In Context</div>
+  <h2 class="h2">ランディングでの見え方。</h2>
+  <div class="landing">
+    <div class="lh">Every spot, in a day.</div>
+    <div class="ls">The AI commercial studio for marketing teams. 選ぶだけで、その日のうちに。</div>
+    <div class="llogos"><span>SaaS Co.</span><span>App Inc.</span><span>D2C Brand</span><span>+ 120 teams</span></div>
+    <div class="lcta"><button class="btn btn-primary">Book a demo</button></div>
+  </div>
+</div></section>
+
+<div class="foot">SPOT ブランド ・ B2B / グローバル向け v1 — フィードバックで更新します</div>
+
+<script>
+  const root = document.documentElement;
+  document.getElementById('theme').addEventListener('click', () => {
+    const c = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', c==='dark'?'light':c==='light'?'dark':(matchMedia('(prefers-color-scheme: dark)').matches?'light':'dark'));
+  });
+</script>

@@ -1,0 +1,41 @@
+# styles/model-casting.yaml
+# 工程別のモデル配役表。fal.ai の1キーで全工程をカバー。
+# cut の motion.model 等が未指定なら、ここのデフォルトが適用される。
+
+still_generation:
+  default: imagen4              # 肌質感・構図忠実度で採用
+  reason: FLUXはワックス肌でNG。Seedream 4は肌◎だが構図が暴れる
+  hi_res_redo: seedream-v4-edit # 甘いスチルを2048pxで作り直す（同一構図・同一人物指定）
+
+consistency:                   # 人物一貫性（顔・髪型・服装を固定）
+  model: nano-banana-edit
+  must_specify: ["顔・髪型・服装を完全一致", "ロゴなし", "ONE single photograph（コラージュ化防止）"]
+
+animation:                     # 動画化（image-to-video）の振り分け
+  rule: |
+    暗部・ディテール重視カット → kling（細部保持◎、23Mbps出力。暗所でVeoは甘くなる）
+    明部・動きの自然さ重視カット → veo3.1（表情の生命感◎）
+  kling:
+    model: kling-2.5-turbo-pro
+    duration: 5
+    good_for: [暗いシーン, ディテール勝負, 静的な画]
+    caveat: 顔が固まりやすい。顔の微細表情（まばたき・視線移動・眉）を明示振り付けする
+  veo:
+    model: veo3.1
+    duration: 6s
+    resolution: 1080p          # 必須。デフォルト720pは引き伸ばしで甘くなる
+    good_for: [明るいシーン, 表情の生命感, カメラワーク]
+    must_specify: ["伏し目固定・カメラ目線禁止", "肌ディテール保持", "crisp sharp motion without motion blur"]
+    negative: [ghosting, trailing, motion blur, soft focus]
+  note: 動画アップスケーラーは肌が塗り絵化する。ネイティブ高解像度生成が正解
+
+audio:
+  narration: {model: minimax-speech-02-hd, voice: Japanese_LoyalKnight}
+  bgm:       {model: lyria2}
+  sfx:       {model: elevenlabs-sfx-v2, post: 波形解析で頭の無音をトリム}
+
+# 顔がぬるっと・表情が固い問題への根本解（モデル選定では解決しない）
+face_quality_fix:
+  problem: 暗い引きの画で顔が小さいと Kling=固まる / Veo=甘い のトレードオフ
+  solution: 構図で解く。顔を大きく明るくしたバストアップのスチルに撮り直せば両モデルとも改善
+  proven: ミライ工事②で実証（Veo寄り構図を採用）
