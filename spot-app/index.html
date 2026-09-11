@@ -2505,6 +2505,18 @@
     '保存': 'Save', '保存しました': 'Saved', 'プラン': 'Plan', 'プランと請求を見る': 'View plan & billing',
     '表示言語': 'Language', '画面右上の': 'Use the', 'で切り替えられます。': 'toggle at the top-right to switch.',
     'プランと請求': 'Plan & billing', 'クレジットを追加': 'Add credits', 'サインアウト': 'Sign out',
+    // team / members
+    'チーム・メンバー': 'Team members',
+    'メンバー（制作できる）': 'Member (can create)',
+    '閲覧のみ（無料・席を使わない）': 'Viewer (free — no seat)',
+    '招待リンクを作成': 'Create invite link',
+    '招待リンク（コピーして相手に共有）': 'Invite link (copy and share)',
+    '7日間有効。相手が開いてサインインすると参加します。': 'Valid for 7 days. They join by opening it and signing in.',
+    'メンバーの招待・管理はオーナーのみ可能です。': 'Only the owner can invite and manage members.',
+    // device verification (new-device OTP)
+    'この端末を確認します': 'Verify this device',
+    '初めての端末からのログインです。メールに送った6桁のコードを入力してください。': 'First sign-in from this device. Enter the 6-digit code we emailed you.',
+    '確認コード': 'Verification code', '確認する': 'Verify', 'コードを再送する': 'Resend code',
     '現在のプランと利用状況。アップグレードで毎月のスポット数が増えます。': 'Your current plan and usage. Upgrade for more spots each month.',
     '現在のプラン': 'Current plan', 'プラン一覧': 'Plans', 'アップグレード': 'Upgrade', '利用中': 'Current',
     'アップグレードの決済連携（Stripe / 請求書）は準備中です。ご希望のプランはお問い合わせください。': 'Payment (Stripe / invoice) is coming soon — contact us for the plan you want.',
@@ -2840,7 +2852,7 @@
   }
   async function sendDeviceOtp(email) {
     try { const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } }); if (error) throw error; }
-    catch (e) { if (window.toast) window.toast('確認コードの送信に失敗しました: ' + e.message, false, 3200); }
+    catch (e) { if (window.toast) window.toast(window.L('Failed to send code: ', '確認コードの送信に失敗しました: ') + e.message, false, 3200); }
   }
   function showDeviceGate(email, dev) {
     const gate = document.getElementById('deviceGate'); if (!gate) return;
@@ -2856,13 +2868,13 @@
         if (error) throw error;
         await sb.rpc('trust_device', { p_device: dev });
         gate.hidden = true;
-        if (window.toast) window.toast('この端末を確認しました', true, 1800);
-      } catch (e) { if (window.toast) window.toast('コードが正しくないか期限切れです', false, 2800); }
+        if (window.toast) window.toast(window.L('Device verified', 'この端末を確認しました'), true, 1800);
+      } catch (e) { if (window.toast) window.toast(window.L('Code is incorrect or expired', 'コードが正しくないか期限切れです'), false, 2800); }
       finally { verify.disabled = false; }
     };
     if (verify) verify.onclick = doVerify;
     if (code) code.onkeydown = (e) => { if (e.key === 'Enter') doVerify(); };
-    if (resend) resend.onclick = () => { sendDeviceOtp(email); if (window.toast) window.toast('コードを再送しました', true, 1800); };
+    if (resend) resend.onclick = () => { sendDeviceOtp(email); if (window.toast) window.toast(window.L('Code resent', 'コードを再送しました'), true, 1800); };
   }
 
   // 端末id（localStorage 永続）。共有検知＝1ユーザーの distinct デバイス数。
@@ -2886,7 +2898,7 @@
       const { data: n } = await sb.rpc('login_device_count', { p_days: 30 });
       let dismissed = null; try { dismissed = localStorage.getItem('spot-nudge-dismissed'); } catch (_) {}
       if (Number(n) > Number(seats) && !dismissed && window.toast) {
-        window.toast('このアカウントが直近30日で ' + n + ' 台の端末で使われています。メンバーを招待すると各自のログインで安全に使えます（設定 → チーム）。', true, 6000);
+        window.toast(window.L('This account was used on ' + n + ' devices in the last 30 days. Invite members so everyone gets their own login (Settings → Team).', 'このアカウントが直近30日で ' + n + ' 台の端末で使われています。メンバーを招待すると各自のログインで安全に使えます（設定 → チーム）。'), true, 6000);
         try { localStorage.setItem('spot-nudge-dismissed', '1'); } catch (_) {}
       }
     } catch (_) { /* noop */ }
@@ -2993,18 +3005,22 @@
     catch (_) { members = []; }
     const seats = plan ? Number(plan.seats) : 1;   // 0 = 無制限
     const used = members.filter(m => m.role === 'owner' || m.role === 'member').length;
-    const seatTxt = (seats === 0) ? `メンバー ${used} 名（席数: 無制限）` : `席 ${used} / ${seats} 使用中`;
+    const seatTxt = (seats === 0)
+      ? window.L(`${used} member(s) (unlimited seats)`, `メンバー ${used} 名（席数: 無制限）`)
+      : window.L(`${used} / ${seats} seats used`, `席 ${used} / ${seats} 使用中`);
     const viewers = members.filter(m => m.role === 'viewer').length;
-    setText('teamSeats', seatTxt + (viewers ? ` ・ 閲覧のみ ${viewers} 名（無料）` : ''));
-    const roleLabel = { owner: 'オーナー', member: 'メンバー', viewer: '閲覧のみ' };
+    const viewerTxt = viewers ? window.L(` · ${viewers} viewer(s) (free)`, ` ・ 閲覧のみ ${viewers} 名（無料）`) : '';
+    setText('teamSeats', seatTxt + viewerTxt);
+    const roleLabel = { owner: window.L('Owner', 'オーナー'), member: window.L('Member', 'メンバー'), viewer: window.L('Viewer', '閲覧のみ') };
+    const youTxt = window.L('(you)', '（あなた）'), rmTxt = window.L('Remove', '削除'), userTxt = window.L('User', 'ユーザー');
     const list = document.getElementById('memberList');
     if (list) list.innerHTML = members.map(m => {
       const canRemove = isOwner && m.user_id !== currentUid && !(m.role === 'owner');
       return `<div class="member-row">
-        <span class="mn">${esc(m.display_name || 'ユーザー')}</span>
-        ${m.user_id === currentUid ? '<span class="me">（あなた）</span>' : ''}
+        <span class="mn">${esc(m.display_name || userTxt)}</span>
+        ${m.user_id === currentUid ? `<span class="me">${youTxt}</span>` : ''}
         <span class="badge ${m.role === 'owner' ? 'owner' : ''}">${roleLabel[m.role] || m.role}</span>
-        ${canRemove ? `<button class="rm" data-remove="${m.user_id}" title="削除">削除</button>` : ''}
+        ${canRemove ? `<button class="rm" data-remove="${m.user_id}" title="${rmTxt}">${rmTxt}</button>` : ''}
       </div>`;
     }).join('');
     document.getElementById('inviteBox').hidden = !isOwner;
@@ -3028,18 +3044,18 @@
         const url = location.origin + location.pathname + '?invite=' + token;
         const box = document.getElementById('inviteResult'); const inp = document.getElementById('inviteLink');
         if (inp) inp.value = url; if (box) box.hidden = false;
-        try { await navigator.clipboard.writeText(url); if (window.toast) window.toast('招待リンクをコピーしました', true, 2000); } catch (_) {}
-      } catch (e) { if (window.toast) window.toast('招待の作成に失敗: ' + e.message, false, 2600); }
+        try { await navigator.clipboard.writeText(url); if (window.toast) window.toast(window.L('Invite link copied', '招待リンクをコピーしました'), true, 2000); } catch (_) {}
+      } catch (e) { if (window.toast) window.toast(window.L('Failed to create invite: ', '招待の作成に失敗: ') + e.message, false, 2600); }
       finally { create.disabled = false; }
     });
     panel.addEventListener('click', async (e) => {
       const rm = e.target.closest('[data-remove]'); if (!rm || !currentOrg) return;
-      if (!confirm('このメンバーを削除しますか?')) return;
+      if (!confirm(window.L('Remove this member?', 'このメンバーを削除しますか?'))) return;
       try {
         const { error } = await sb.rpc('remove_member', { p_org: currentOrg.id, p_user: rm.getAttribute('data-remove') });
         if (error) throw error;
         loadMembers(await currentPlan());
-      } catch (err) { if (window.toast) window.toast('削除に失敗: ' + err.message, false, 2600); }
+      } catch (err) { if (window.toast) window.toast(window.L('Remove failed: ', '削除に失敗: ') + err.message, false, 2600); }
     });
   })();
   async function currentPlan() {
@@ -3056,19 +3072,22 @@
     try {
       const { data: info } = await sb.rpc('get_invite', { p_token: token });
       const inv = Array.isArray(info) ? info[0] : info;
-      if (!inv) { if (window.toast) window.toast('招待が見つかりません。', false, 3000); return stripInvite(); }
-      if (inv.accepted) { if (window.toast) window.toast('この招待は使用済みです。', false, 3000); return stripInvite(); }
-      if (inv.expired) { if (window.toast) window.toast('この招待は期限切れです。', false, 3000); return stripInvite(); }
-      const roleLabel = { member: 'メンバー', viewer: '閲覧のみ' };
-      if (!confirm(`「${inv.org_name}」に${roleLabel[inv.role] || inv.role}として参加しますか?`)) return stripInvite();
+      if (!inv) { if (window.toast) window.toast(window.L('Invite not found.', '招待が見つかりません。'), false, 3000); return stripInvite(); }
+      if (inv.accepted) { if (window.toast) window.toast(window.L('This invite was already used.', 'この招待は使用済みです。'), false, 3000); return stripInvite(); }
+      if (inv.expired) { if (window.toast) window.toast(window.L('This invite has expired.', 'この招待は期限切れです。'), false, 3000); return stripInvite(); }
+      const roleLabel = { member: window.L('member', 'メンバー'), viewer: window.L('viewer', '閲覧のみ') };
+      const askJoin = window.L(`Join “${inv.org_name}” as ${roleLabel[inv.role] || inv.role}?`, `「${inv.org_name}」に${roleLabel[inv.role] || inv.role}として参加しますか?`);
+      if (!confirm(askJoin)) return stripInvite();
       const { data: orgId, error } = await sb.rpc('accept_invite', { p_token: token });
       if (error) throw error;
       try { localStorage.setItem('spot-org', orgId); } catch (_) {}
-      if (window.toast) window.toast(`「${inv.org_name}」に参加しました`, true, 2600);
+      if (window.toast) window.toast(window.L(`Joined “${inv.org_name}”`, `「${inv.org_name}」に参加しました`), true, 2600);
       stripInvite();
       await loadOrg(); loadProjects(); refreshCredits(); refreshUsage();
     } catch (e) {
-      const m = /seat limit/i.test(e.message) ? 'このチームは席が満席です。オーナーに席の追加を依頼してください。' : ('参加に失敗: ' + e.message);
+      const m = /seat limit/i.test(e.message)
+        ? window.L('This team has no free seats. Ask the owner to add seats.', 'このチームは席が満席です。オーナーに席の追加を依頼してください。')
+        : (window.L('Failed to join: ', '参加に失敗: ') + e.message);
       if (window.toast) window.toast(m, false, 3200); stripInvite();
     }
   }
