@@ -972,7 +972,11 @@
   body.readonly-role .shot-item.uploadable,
   body.readonly-role .member-row .rm,
   body.readonly-role #inviteBox,
-  body.readonly-role #adjustPanel { display: none !important; }
+  body.readonly-role #adjustPanel,
+  body.readonly-role #exportBtn,
+  body.readonly-role #dlAll,
+  body.readonly-role #shareLink,
+  body.readonly-role .dfile .dl { display: none !important; }
   /* workspace switcher (account menu) */
   .menu-ws { padding: 4px 6px; }
   .menu-ws .ws-label { font-size: var(--t-label-sm); color: var(--muted); padding: 2px 10px 4px; letter-spacing: .04em; text-transform: uppercase; }
@@ -1050,7 +1054,7 @@
     <button class="icon-btn nav-back" id="navBack" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
     <nav class="breadcrumb" id="crumb" aria-label="現在地"></nav>
     <div class="spacer"></div>
-    <div class="credits" title="クレジット残"><span class="dot"></span> <span class="lbl">クレジット残</span> <b>18.5</b></div>
+    <div class="credits" title="クレジット残"><span class="dot"></span> <span class="lbl">クレジット残</span> <b>—</b></div>
     <div class="lang seg" role="group" aria-label="Language">
       <button data-lang="en" aria-pressed="true">EN</button>
       <button data-lang="ja" aria-pressed="false" aria-label="日本語"><span class="full">日本語</span><span class="short" aria-hidden="true">JA</span></button>
@@ -1069,8 +1073,8 @@
     </div>
   </div>
   <div class="menu-credits">
-    <div class="mc-row"><span>クレジット残</span><b><span id="acctCredits">18.5</span> / <span id="acctMax">40</span></b></div>
-    <div class="u-meter" id="acctMeter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="18.5"><i style="width:46%"></i></div>
+    <div class="mc-row"><span>クレジット残</span><b><span id="acctCredits">—</span> / <span id="acctMax">—</span></b></div>
+    <div class="u-meter" id="acctMeter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
   </div>
   <div class="menu-sep" role="separator"></div>
   <div class="menu-ws" id="workspaceList" hidden></div>
@@ -1093,13 +1097,13 @@
     <div class="usage">
       <div class="u-card">
         <div class="u-k">今月つくったCM</div>
-        <div class="u-v">12<small>本 / 全形式込み</small></div>
+        <div class="u-v">—<small>本 / 全形式込み</small></div>
         <div class="u-note">先月比 +5本。制作会社見積り換算で約 ¥360万分。</div>
       </div>
       <div class="u-card">
         <div class="u-k">クレジット残</div>
-        <div class="u-v">18.5<small>/ 40</small></div>
-        <div class="u-meter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="18.5"><i style="width:46%"></i></div>
+        <div class="u-v">—<small>/ —</small></div>
+        <div class="u-meter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
         <div class="u-note" data-t="1クレジット = 1スポット（CM1本・3パターン×3フォーマット = 9ファイル）">1クレジット = 1スポット（CM1本・3パターン×3フォーマット = 9ファイル）</div>
       </div>
     </div>
@@ -1962,6 +1966,7 @@
     }
   };
   document.getElementById('exportBtn').addEventListener('click', () => {
+    if (window.__canWrite && !window.__canWrite()) { toast(L('View-only access — you cannot export.', '閲覧のみの権限のため、書き出しはできません。'), false, 2400); return; }
     toast(L('Exporting wide · vertical · square × 3 variants = 9 videos…','横・縦・正方形 × 3パターン = 9本を書き出し中…'), true, 1600);
     if (window.onExportSettings) window.onExportSettings(complianceSettings());   // spec.compliance を保存
     setTimeout(gotoExport, 1600);
@@ -1993,11 +1998,12 @@
           </div>`).join('')}
       </div>
     </div>`).join('');
+  const dlGuard = () => (window.__canWrite && !window.__canWrite()) ? (toast(L('View-only access — download is disabled.', '閲覧のみの権限のため、ダウンロードはできません。'), false, 2400), true) : false;
   document.getElementById('delivList').addEventListener('click', e => {
-    if (e.target.closest('.dl')) toast(L('Download started','ダウンロードを開始しました'), false, 1600);
+    if (e.target.closest('.dl')) { if (dlGuard()) return; toast(L('Download started','ダウンロードを開始しました'), false, 1600); }
   });
-  document.getElementById('dlAll').addEventListener('click', () => toast(L('Downloading 9 videos + thumbnails as ZIP…','9本 + サムネイルをZIPでダウンロード中…'), true, 1800));
-  document.getElementById('shareLink').addEventListener('click', () => toast(L('Share link copied','共有リンクをコピーしました'), false, 1600));
+  document.getElementById('dlAll').addEventListener('click', () => { if (dlGuard()) return; toast(L('Downloading 9 videos + thumbnails as ZIP…','9本 + サムネイルをZIPでダウンロード中…'), true, 1800); });
+  document.getElementById('shareLink').addEventListener('click', () => { if (dlGuard()) return; toast(L('Share link copied','共有リンクをコピーしました'), false, 1600); });
   document.getElementById('backToWork').addEventListener('click', gotoWorkspace);
 
   function gotoExport() {
@@ -2995,6 +3001,7 @@
 
   // 初回オンボーディング（初めての人に「どこから始めるか」を示す）。
   function maybeShowOnboarding() {
+    if (!canWrite()) return;   // 閲覧のみ（招待された viewer）には「動画をつくろう」の動線を出さない
     let seen = null; try { seen = localStorage.getItem('spot-onboarded'); } catch (_) {}
     if (seen) return;
     const el = document.getElementById('onboard'); if (el) el.hidden = false;
