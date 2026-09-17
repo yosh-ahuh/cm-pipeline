@@ -963,6 +963,15 @@
   .member-row .rm { border: none; background: none; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 8px; }
   .member-row .rm:hover { background: var(--hover); color: var(--bad, #c4553d); }
   .sel { height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); font: inherit; }
+  /* view-only (viewer role): hide write controls, show banner */
+  .ro-banner { position: sticky; top: 0; z-index: 120; background: var(--accent); color: #fff;
+    font-size: var(--t-label); text-align: center; padding: 7px 14px; letter-spacing: .01em; }
+  body.readonly-role #newCM,
+  body.readonly-role #scriptNext,
+  body.readonly-role #voicePanel,
+  body.readonly-role .shot-item.uploadable,
+  body.readonly-role .member-row .rm,
+  body.readonly-role #inviteBox { display: none !important; }
 </style>
 <script>/* テーマ復元（描画前・FOUC防止）。既定=ライト。 */try{var _t=localStorage.getItem('spot-theme');if(_t==='dark'||_t==='light')document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
 </head>
@@ -2824,9 +2833,25 @@
   }
   window.__getOrg = () => currentOrg;
 
+  // viewer は読み取り専用。org 未解決（個人利用）は書き込み可。
+  function canWrite() { return !currentOrg || currentOrg.role !== 'viewer'; }
+  window.__canWrite = canWrite;
+  function applyRoleUI() {
+    const ro = !canWrite();
+    document.body.classList.toggle('readonly-role', ro);
+    let banner = document.getElementById('roBanner');
+    if (ro) {
+      if (!banner) { banner = document.createElement('div'); banner.id = 'roBanner'; banner.className = 'ro-banner'; document.body.insertBefore(banner, document.body.firstChild); }
+      banner.textContent = (window.L ? window.L('View-only access — you can browse this workspace but not create or edit.', '閲覧のみの権限です。閲覧はできますが、作成・編集はできません。') : '閲覧のみ');
+      banner.hidden = false;
+    } else if (banner) { banner.hidden = true; }
+  }
+  window.__applyRoleUI = applyRoleUI;
+
   window.onAppReady = async function (session, client) {
     sb = client; currentUid = session.user.id;
     await loadOrg();
+    applyRoleUI();                         // viewer を読み取り専用に
     recordLogin();                         // 共有検知の記録（007 未適用なら無害にスキップ）
     enforceSessionCap();                   // 同時セッション上限=2（008 未適用ならスキップ）
     deviceGateCheck(session.user.email);   // 新デバイスOTP（config.deviceOtp が true のときだけ）
@@ -3083,7 +3108,7 @@
       try { localStorage.setItem('spot-org', orgId); } catch (_) {}
       if (window.toast) window.toast(window.L(`Joined “${inv.org_name}”`, `「${inv.org_name}」に参加しました`), true, 2600);
       stripInvite();
-      await loadOrg(); loadProjects(); refreshCredits(); refreshUsage();
+      await loadOrg(); applyRoleUI(); loadProjects(); refreshCredits(); refreshUsage();
     } catch (e) {
       const m = /seat limit/i.test(e.message)
         ? window.L('This team has no free seats. Ask the owner to add seats.', 'このチームは席が満席です。オーナーに席の追加を依頼してください。')
@@ -3177,6 +3202,7 @@
 
   window.onWizardComplete = async function (sel) {
     if (!sb) return;
+    if (!canWrite()) { if (window.toast) window.toast(window.L('View-only access — you cannot create videos.', '閲覧のみの権限のため、作成はできません。'), false, 2600); return; }
     window.__projectReady = new Promise(r => { window.__projectReadyResolve = r; });
     const formats = dedupeFormats((sel.media || []).map(m => MEDIA_FMT[m]).filter(Boolean));
     const spec = {
@@ -3242,6 +3268,7 @@
     list.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const row = e.target.closest('.shot-item'); if (row) { e.preventDefault(); row.querySelector('input').click(); } } });
     list.addEventListener('change', async e => {
       const input = e.target; if (!input.matches('input[type=file]') || !input.files.length) return;
+      if (!canWrite()) { if (window.toast) window.toast(window.L('View-only access.', '閲覧のみの権限です。'), false, 2200); return; }
       const row = input.closest('.shot-item'); const it = items.find(x => x.key === row.dataset.key); if (!it) return;
       row.classList.add('busy'); row.querySelector('.si-tag').textContent = 'アップロード中…';
       try {
@@ -3401,6 +3428,7 @@
 
   window.onGenerate = async function (projectId) {
     if (!sb || !projectId) return;
+    if (!canWrite()) { if (window.toast) window.toast(window.L('View-only access — you cannot generate.', '閲覧のみの権限のため、生成はできません。'), false, 2600); return; }
     try {
       window.__currentProjectId = projectId;
       // 既に生成中/済みなら購読だけして戻る（二重課金・二重投入の防止）
@@ -3497,6 +3525,7 @@
   }
   async function saveVoice() {
     if (!sb || !window.__currentProjectId) { renderVoicePicker(); return; }
+    if (!canWrite()) return;   // 閲覧のみは保存不可（UIも #voicePanel を非表示）
     try {
       const tone = TONES.find(t => t.id === voiceSel.tone) || TONES[0];
       const { data: proj } = await sb.from('projects').select('spec').eq('id', window.__currentProjectId).single();
