@@ -971,7 +971,8 @@
   body.readonly-role #voicePanel,
   body.readonly-role .shot-item.uploadable,
   body.readonly-role .member-row .rm,
-  body.readonly-role #inviteBox { display: none !important; }
+  body.readonly-role #inviteBox,
+  body.readonly-role #adjustPanel { display: none !important; }
   /* workspace switcher (account menu) */
   .menu-ws { padding: 4px 6px; }
   .menu-ws .ws-label { font-size: var(--t-label-sm); color: var(--muted); padding: 2px 10px 4px; letter-spacing: .04em; text-transform: uppercase; }
@@ -1511,7 +1512,7 @@
           <div class="tone-row" id="toneRow" role="radiogroup" aria-label="トーン"></div></div>
         <div class="save-note" id="voiceSaved" hidden>保存しました</div>
       </div>
-      <div class="panel">
+      <div class="panel" id="adjustPanel">
         <div class="panel-h">気になるところは、言葉で直す</div>
         <div class="chips" id="chips">
           <button class="chip"><span class="plus">+</span>もっと明るく</button>
@@ -1794,13 +1795,16 @@
     setTimeout(()=>{ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, ms);
   }
 
+  const roGuard = () => (window.__canWrite && !window.__canWrite()) ? (toast(L('View-only access.', '閲覧のみの権限です。'), false, 1800), true) : false;
   document.getElementById('chips').addEventListener('click', e => {
     const c = e.target.closest('.chip'); if(!c) return;
+    if (roGuard()) return;
     const lab = c.textContent.trim().replace('+','').trim();
     toast(L('Applying “'+lab+'” to all variants…', '「'+lab+'」を全パターンに反映中…'));
   });
   const freeEdit = document.getElementById('freeEdit');
   function sendFreeEdit() {
+    if (roGuard()) return;
     const v = freeEdit.value.trim();
     if (!v) { freeEdit.focus(); return; }
     toast(L('Applying “'+v+'”…','「'+v+'」を反映中…')); freeEdit.value='';
