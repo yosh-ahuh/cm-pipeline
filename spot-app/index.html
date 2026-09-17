@@ -972,6 +972,17 @@
   body.readonly-role .shot-item.uploadable,
   body.readonly-role .member-row .rm,
   body.readonly-role #inviteBox { display: none !important; }
+  /* workspace switcher (account menu) */
+  .menu-ws { padding: 4px 6px; }
+  .menu-ws .ws-label { font-size: var(--t-label-sm); color: var(--muted); padding: 2px 10px 4px; letter-spacing: .04em; text-transform: uppercase; }
+  .menu-ws .ws-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border: none; background: none; border-radius: 8px; cursor: pointer; color: var(--ink); font: inherit; text-align: left; }
+  .menu-ws .ws-item:hover { background: var(--hover); }
+  .menu-ws .ws-item .ws-ic { width: 20px; height: 20px; border-radius: 6px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 11px; flex: none; }
+  .menu-ws .ws-item .ws-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .menu-ws .ws-item .ws-role { font-size: var(--t-label-sm); color: var(--muted); }
+  .menu-ws .ws-item[aria-current="true"] .ws-name { font-weight: 600; }
+  .menu-ws .ws-item .ws-check { color: var(--accent); opacity: 0; }
+  .menu-ws .ws-item[aria-current="true"] .ws-check { opacity: 1; }
 </style>
 <script>/* テーマ復元（描画前・FOUC防止）。既定=ライト。 */try{var _t=localStorage.getItem('spot-theme');if(_t==='dark'||_t==='light')document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
 </head>
@@ -1061,9 +1072,10 @@
     <div class="u-meter" id="acctMeter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="18.5"><i style="width:46%"></i></div>
   </div>
   <div class="menu-sep" role="separator"></div>
+  <div class="menu-ws" id="workspaceList" hidden></div>
   <button type="button" class="menu-item" role="menuitem" data-act="profile"><svg class="ic"><use href="#i-user"/></svg><span>プロフィール・設定</span></button>
-  <button type="button" class="menu-item" role="menuitem" data-act="billing"><svg class="ic"><use href="#i-card"/></svg><span>プランと請求</span></button>
-  <button type="button" class="menu-item" role="menuitem" data-act="credits"><svg class="ic"><use href="#i-plus"/></svg><span>クレジットを追加</span></button>
+  <button type="button" class="menu-item" role="menuitem" data-act="billing" data-owner-only><svg class="ic"><use href="#i-card"/></svg><span>プランと請求</span></button>
+  <button type="button" class="menu-item" role="menuitem" data-act="credits" data-owner-only><svg class="ic"><use href="#i-plus"/></svg><span>クレジットを追加</span></button>
   <div class="menu-sep" role="separator"></div>
   <button type="button" class="menu-item" role="menuitem" data-act="logout"><svg class="ic"><use href="#i-logout"/></svg><span>サインアウト</span></button>
 </div>
@@ -1844,8 +1856,44 @@
     acctMenu.style.top = Math.round(r.bottom + 8) + 'px';
     acctMenu.style.right = Math.round(Math.max(8, window.innerWidth - r.right)) + 'px';
   }
+  function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+  function renderWorkspaces() {
+    const box = document.getElementById('workspaceList'); if (!box) return;
+    const orgs = (window.__orgs || []);
+    const cur = window.__getOrg && window.__getOrg();
+    if (orgs.length < 2) { box.hidden = true; box.innerHTML = ''; return; }   // 参加先が1つなら切替不要
+    box.hidden = false;
+    const roleL = { owner: L('Owner', 'オーナー'), member: L('Member', 'メンバー'), viewer: L('View-only', '閲覧のみ') };
+    box.innerHTML = '<div class="ws-label">' + L('Workspace', 'ワークスペース') + '</div>' +
+      orgs.map(o => {
+        const nm = o.is_personal ? L('Personal', '個人') : o.name;
+        const isCur = cur && o.id === cur.id;
+        return `<button type="button" class="ws-item" data-org="${o.id}" aria-current="${isCur ? 'true' : 'false'}">
+          <span class="ws-ic">${escHtml((nm || '?').slice(0, 1))}</span>
+          <span class="ws-name">${escHtml(nm)}</span>
+          <span class="ws-role">${roleL[o.role] || o.role}</span>
+          <span class="ws-check" aria-hidden="true">✓</span>
+        </button>`;
+      }).join('');
+  }
+  window.__renderWorkspaces = renderWorkspaces;
+  function refreshAcctMenu() {
+    renderWorkspaces();
+    const owner = !window.__isOwner || window.__isOwner();   // 課金導線はオーナーのみ
+    acctMenu.querySelectorAll('[data-owner-only]').forEach(el => { el.hidden = !owner; });
+  }
+  // ワークスペース切替
+  const wsList = document.getElementById('workspaceList');
+  if (wsList) wsList.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-org]'); if (!b) return;
+    const id = b.getAttribute('data-org');
+    closeAcct(false);
+    if (window.__switchOrg) window.__switchOrg(id);
+    if (window.gotoDash) window.gotoDash();
+  });
   function openAcct(focusLast) {
     if (!userChip || acctOpen()) return;
+    refreshAcctMenu();
     acctMenu.hidden = false; acctScrim.hidden = false;
     acctMenu.setAttribute('aria-hidden', 'false'); userChip.setAttribute('aria-expanded', 'true');
     placeAcct();
@@ -2278,6 +2326,10 @@
     if (window.loadSettings) window.loadSettings();
   }
   function gotoBilling() {
+    if (window.__isOwner && !window.__isOwner()) {   // 請求はオーナー限定
+      toast(L('Only the workspace owner can view billing.', '請求情報はワークスペースのオーナーのみ閲覧できます。'), false, 2600);
+      return;
+    }
     hideAll(); vBilling.hidden = false; focusView(vBilling);
     setCrumb([['ホーム', gotoDash], ['プランと請求']], gotoDash);
     if (window.loadBilling) window.loadBilling();
@@ -2823,15 +2875,23 @@
         .select('id,name,plan,credits,is_personal,owner_user_id').in('id', ids);
       if (oe || !orgs || !orgs.length) { currentOrg = null; return null; }
       const roleOf = Object.fromEntries(mems.map(m => [m.org_id, m.role]));
+      window.__orgs = orgs.map(o => ({ id: o.id, name: o.name, is_personal: o.is_personal, plan: o.plan, role: roleOf[o.id] }));
       let chosen = null;
       try { const pref = localStorage.getItem('spot-org'); if (pref) chosen = orgs.find(o => o.id === pref); } catch (_) {}
       chosen = chosen || orgs.find(o => o.is_personal) || orgs[0];
       currentOrg = { ...chosen, role: roleOf[chosen.id] };
       window.__orgId = currentOrg.id;
       return currentOrg;
-    } catch (_) { currentOrg = null; return null; }
+    } catch (_) { currentOrg = null; window.__orgs = []; return null; }
   }
   window.__getOrg = () => currentOrg;
+  window.__isOwner = () => currentOrg ? currentOrg.role === 'owner' : true;   // 個人利用(org未解決)は owner 扱い
+  window.__switchOrg = async function (id) {
+    try { localStorage.setItem('spot-org', id); } catch (_) {}
+    await loadOrg(); applyRoleUI();
+    loadProjects(); refreshCredits(); refreshUsage();
+    if (window.__renderWorkspaces) window.__renderWorkspaces();
+  };
 
   // viewer は読み取り専用。org 未解決（個人利用）は書き込み可。
   function canWrite() { return !currentOrg || currentOrg.role !== 'viewer'; }
@@ -3014,6 +3074,7 @@
       const nameEl = document.getElementById('setName'); if (nameEl) nameEl.value = (prof && prof.display_name) || '';
       setText('setPlanName', plan ? plan.name : '—');
       setText('setPlanSpots', plan ? `${plan.spots_per_month} spots/mo` : '');
+      const stb = document.getElementById('setToBilling'); if (stb) stb.hidden = !(window.__isOwner && window.__isOwner());   // 請求導線はオーナーのみ
       loadMembers(plan);
     } catch (e) { console.error('loadSettings:', e.message); }
   };
@@ -3180,6 +3241,7 @@
     const links = (window.SPOT_CONFIG && window.SPOT_CONFIG.stripeLinks) || {};
     const url = links[key];
     if (!url) { if (window.toast) window.toast('決済リンクが未設定です（config.js の stripeLinks を設定してください）。', false, 3000); return; }
+    if (currentOrg && currentOrg.role !== 'owner') { if (window.toast) window.toast(window.L('Only the owner can change billing.', '課金はオーナーのみ可能です。'), false, 2600); return; }
     const ref = (currentOrg && currentOrg.id) || currentUid || '';
     const sep = url.includes('?') ? '&' : '?';
     window.open(url + sep + 'client_reference_id=' + encodeURIComponent(ref), '_blank', 'noopener');
