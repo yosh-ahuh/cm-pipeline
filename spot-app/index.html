@@ -976,7 +976,13 @@
   body.readonly-role #exportBtn,
   body.readonly-role #dlAll,
   body.readonly-role #shareLink,
-  body.readonly-role .dfile .dl { display: none !important; }
+  body.readonly-role .dfile .dl,
+  /* viewer は「生成された動画の閲覧」だけ。制作系パネルは意味がないので隠す */
+  body.readonly-role #pipelinePanel,
+  body.readonly-role #qcPanel,
+  body.readonly-role #genCreditsPanel,
+  body.readonly-role #jobsPanel { display: none !important; }
+  @media (min-width: 1081px) { body.readonly-role .board { grid-template-columns: minmax(0,1fr) 300px; } }
   /* workspace switcher (account menu) */
   .menu-ws { padding: 4px 6px; }
   .menu-ws .ws-label { font-size: var(--t-label-sm); color: var(--muted); padding: 2px 10px 4px; letter-spacing: .04em; text-transform: uppercase; }
@@ -1436,7 +1442,7 @@
 
   <div class="board">
     <!-- ============ pipeline rail ============ -->
-    <aside class="panel rail">
+    <aside class="panel rail" id="pipelinePanel">
       <div class="panel-h">制作パイプライン</div>
       <ol class="stages">
         <li class="stage done"><div class="node"><svg class="ic"><use href="#i-check"/></svg></div><div><div class="s-name">ブリーフ</div><div class="s-desc">配信先×業種×伝え方を選択</div></div></li>
@@ -1535,7 +1541,7 @@
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="qcPanel">
         <div class="panel-h">品質チェック <span class="count">7/8 合格</span></div>
         <div class="qc">
           <div class="qc-row pass"><span class="qc-ic"><svg class="ic"><use href="#i-check"/></svg></span><span class="qc-name">手・指の破綻</span><span class="qc-tag">③修正済</span></div>
@@ -1549,7 +1555,7 @@
         <div class="qc-note">不合格のカットはあなたに見せません。合格した候補の中から、好みを選ぶだけ。</div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="genCreditsPanel">
         <div class="panel-h">この生成に使うクレジット</div>
         <div class="cost">
           <div class="cost-big"><b id="wsCredits">1</b><span class="yen">クレジット</span><span class="est">この案件・修正は無制限</span></div>
@@ -2217,34 +2223,12 @@
   });
 
   // ---------- dashboard ----------
-  const PROJ = [
-    { name:'ミライ工事写真 / 30秒CM', status:'done', st:'書き出し済み', cls:'ps-done', tag:'建設SaaS',
-      date:'今日', cost:'¥1,240', fmts:[[13,8],[8,13],[11,11]], copy:'現場で完結。', c1:'#D7000F', c2:'#8a0009', open:'work' },
-    { name:'夏の新規登録キャンペーン', status:'gen', st:'生成中 4/8', cls:'ps-gen', tag:'EC・D2C',
-      date:'2分前', cost:'¥680〜', fmts:[[8,13],[11,11]], copy:'', mini:true, c1:'#2E7D6B', c2:'#1a4c40' },
-    { name:'採用ブランディング / 15秒', status:'review', st:'チェック待ち', cls:'ps-review', tag:'採用',
-      date:'1時間前', cost:'¥920', fmts:[[13,8],[8,13]], copy:'ここで、働く。', c1:'#3A5BA0', c2:'#233a6b' },
-    { name:'機能アップデート告知', status:'draft', st:'下書き', cls:'ps-draft', tag:'SaaS',
-      date:'昨日', cost:'—', fmts:[[13,8]], copy:'', mini:true, c1:'#6B6A63', c2:'#43423c' },
-    { name:'店頭サイネージ / 秋メニュー', status:'done', st:'書き出し済み', cls:'ps-done', tag:'飲食',
-      date:'3日前', cost:'¥1,050', fmts:[[13,8]], copy:'できたて、あります。', c1:'#C4553D', c2:'#8a3826' },
-    { name:'導入事例インタビュー風', status:'done', st:'書き出し済み', cls:'ps-done', tag:'SaaS',
-      date:'先週', cost:'¥1,380', fmts:[[13,8],[8,13],[11,11]], copy:'', mini:true, c1:'#4a5560', c2:'#20272e' },
-  ];
   const projGrid = document.getElementById('projGrid');
-  function fmtGlyphs(fmts){ return `<span class="fmts">${fmts.map(([w,h])=>`<i style="width:${w}px;height:${h}px"></i>`).join('')}</span>`; }
-  projGrid.innerHTML = PROJ.map((p,i)=>`
-    <button class="proj" data-open="${p.open||''}" data-group="${p.status === 'done' ? 'done' : 'progress'}">
-      <div class="proj-thumb" style="background:linear-gradient(150deg, ${p.c1}, ${p.c2})">
-        <span class="proj-status ${p.cls}"><span class="sd"></span>${p.st}</span>
-        ${p.mini ? `<div class="pt-mini"><i></i><i></i></div>` : `<div class="pt-copy">${p.copy}</div>`}
-      </div>
-      <div class="proj-body">
-        <div class="proj-name">${p.name}</div>
-        <div class="proj-meta"><span>${p.tag}</span> ・ <span>${p.date}</span> ${fmtGlyphs(p.fmts)}</div>
-        <div class="proj-foot"><span>消費クレジット</span><span class="cost">${p.credits ?? '—'}</span></div>
-      </div>
-    </button>`).join('');
+  // 実データはデータ層 loadProjects() が現在のワークスペース(組織)で描画する。
+  // ここでは静的デモを出さない（以前は固定6件を即描画し、ロード中に「生成中 4/8」等の
+  // 身に覚えのないカードが見えていた）。データ到着までスケルトンのみ。
+  projGrid.innerHTML = Array.from({ length: 4 }, () =>
+    '<div class="skel"><i class="st"></i><div class="sb"><i style="height:14px;width:70%"></i><i style="height:11px;width:45%"></i></div></div>').join('');
   projGrid.addEventListener('click', e => {
     const p = e.target.closest('.proj'); if(!p) return;
     if (p.dataset.open === 'work') {
