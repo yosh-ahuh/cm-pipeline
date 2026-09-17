@@ -3361,8 +3361,9 @@
     if (!grid) return;
     grid.innerHTML = skeleton(4);   // M3 skeleton while fetching — no blank flash
     try {
-      const { data, error } = await sb.from('projects')
-        .select('id,name,product,status,spec,updated_at').order('updated_at', { ascending: false });
+      let q = sb.from('projects').select('id,name,product,status,spec,updated_at');
+      if (currentOrg && currentOrg.id) q = q.eq('org_id', currentOrg.id);   // 現在のワークスペース(組織)だけを表示
+      const { data, error } = await q.order('updated_at', { ascending: false });
       if (error) throw error;
       if (!data || !data.length) { grid.innerHTML = emptyState(); return; }
       grid.innerHTML = data.map(card).join('');
@@ -3481,6 +3482,7 @@
   window.onExportSettings = async function (c) {
     const id = window.__currentProjectId;
     if (!sb || !id) return;
+    if (!canWrite()) return;   // 閲覧のみは spec を書き換えない
     try {
       const { data: p } = await sb.from('projects').select('spec').eq('id', id).single();
       const spec = Object.assign({}, (p && p.spec) || {}, { compliance: c });
