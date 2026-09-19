@@ -65,10 +65,9 @@ def md_inline(s: str) -> str:
 
 # --------------------------------------------------------------------------- CSS
 CSS = """
-:root{color-scheme:light;--ground:#F2F3F6;--surface:#FFFFFF;--surface-2:#EFF1F4;--ink:#191A1F;--muted:#565A61;--faint:#757A82;--line:#E4E7EC;--line-strong:#C9CFD7;--blue:#2A46D6;--blue-ink:#1E37B0;--blue-soft:#E7EAFB;--good:#2E9E63;--warn:#B5820E;
---shadow:0 1px 2px rgba(20,21,25,.05),0 8px 24px rgba(20,21,25,.08);--shadow-lift:0 4px 14px rgba(20,21,25,.10),0 24px 50px rgba(20,21,25,.16);
+:root{color-scheme:dark;--ground:#0E0F14;--surface:#181A21;--surface-2:#1E2029;--ink:#F0EFEA;--muted:#9A9AA2;--faint:#605F66;--line:#262832;--line-strong:#343643;--blue:#6180F5;--blue-ink:#A9B8F8;--blue-soft:#181F45;--good:#5CC48C;--warn:#E0A05A;
+--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.5);--shadow-lift:0 4px 14px rgba(0,0,0,.45),0 30px 60px rgba(0,0,0,.65);
 --fd:"Bricolage Grotesque","Hanken Grotesk",system-ui,sans-serif;--fb:"Hanken Grotesk",system-ui,-apple-system,"Zen Kaku Gothic New",sans-serif;--fm:"DM Mono",ui-monospace,monospace;--r:14px}
-:root[data-theme=dark]{color-scheme:dark;--ground:#0E0F14;--surface:#181A21;--surface-2:#1E2029;--ink:#F0EFEA;--muted:#9A9AA2;--faint:#605F66;--line:#262832;--line-strong:#343643;--blue:#6180F5;--blue-ink:#A9B8F8;--blue-soft:#181F45;--good:#5CC48C;--warn:#E0A05A;--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.5);--shadow-lift:0 4px 14px rgba(0,0,0,.45),0 30px 60px rgba(0,0,0,.65)}
 html[lang=ja]{--fb:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",system-ui,sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fb);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
 h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.02em;text-wrap:balance}html[lang=ja] h1,html[lang=ja] h2,html[lang=ja] h3{letter-spacing:0}
@@ -141,7 +140,7 @@ html.js .reveal{opacity:.55;transform:translateY(16px)}html.js .reveal.in{opacit
 
 FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;700&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">'
 
-LOGO_SVG = '<svg width="30" height="30" viewBox="0 0 80 80" fill="none" aria-hidden="true"><rect width="80" height="80" rx="19" fill="var(--ink)"/><circle cx="40" cy="40" r="22" fill="none" stroke="var(--blue)" stroke-width="5"/><circle cx="40" cy="40" r="8" fill="#fff"/></svg>'
+LOGO_SVG = '<img src="/spot-mark.png" width="28" height="28" alt="" aria-hidden="true" style="display:block">'
 
 
 # --------------------------------------------------------------------------- page shell
@@ -177,6 +176,10 @@ def head(lang: str, page: dict) -> str:
 <meta name="description" content="{esc(desc)}">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <meta name="theme-color" content="#0E0F14">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="canonical" href="{here}">
 <link rel="alternate" hreflang="{'en' if lang=='en' else 'ja'}" href="{here}">
 <link rel="alternate" hreflang="{'ja' if lang=='en' else 'en'}" href="{other}">
@@ -198,7 +201,7 @@ def head(lang: str, page: dict) -> str:
 {FONTS}
 <style>{CSS}</style>
 {''.join(jsonld(x) for x in ld)}
-<script>var _d=document.documentElement;_d.classList.add('js');try{{var _t=localStorage.getItem('spot-theme');if(_t==='dark'||_t==='light')_d.setAttribute('data-theme',_t)}}catch(e){{}}addEventListener('DOMContentLoaded',function(){{var tb=document.getElementById('themeToggle');if(tb)tb.addEventListener('click',function(){{var n=_d.getAttribute('data-theme')==='dark'?'light':'dark';_d.setAttribute('data-theme',n);try{{localStorage.setItem('spot-theme',n)}}catch(e){{}}}});var e=document.querySelectorAll('.reveal'),r=function(x){{x.classList.add('in')}};if(!('IntersectionObserver'in window)){{e.forEach(r);return}}var io=new IntersectionObserver(function(es){{es.forEach(function(en){{if(en.isIntersecting){{r(en.target);io.unobserve(en.target)}}}})}},{{rootMargin:'0px 0px -8% 0px'}});e.forEach(function(x){{io.observe(x)}});setTimeout(function(){{e.forEach(r)}},1500);}});</script>
+<script>var _d=document.documentElement;_d.classList.add('js');addEventListener('DOMContentLoaded',function(){{var e=document.querySelectorAll('.reveal'),r=function(x){{x.classList.add('in')}};if(!('IntersectionObserver'in window)){{e.forEach(r);return}}var io=new IntersectionObserver(function(es){{es.forEach(function(en){{if(en.isIntersecting){{r(en.target);io.unobserve(en.target)}}}})}},{{rootMargin:'0px 0px -8% 0px'}});e.forEach(function(x){{io.observe(x)}});setTimeout(function(){{e.forEach(r)}},1500);}});</script>
 </head>
 <body>"""
 
@@ -215,7 +218,6 @@ def nav(lang: str, current: str) -> str:
   <div class="nav-links">{links}</div>
   <div class="nav-right">
     <div class="lang" role="group" aria-label="Language"><a href="{en_here}" hreflang="en"{' aria-current="true"' if lang=='en' else ''}>EN</a><a href="{ja_here}" hreflang="ja"{' aria-current="true"' if lang=='ja' else ''}>日本語</a></div>
-    <button id="themeToggle" class="theme-btn" type="button" aria-label="{'テーマ切替' if lang=='ja' else 'Toggle theme'}">◐</button>
     <a class="btn btn-primary" style="padding:10px 18px" href="{common.DEMO_URL}">{esc(t['demo'])}</a>
   </div>
 </div></nav>"""
@@ -400,26 +402,25 @@ def render_page(lang: str, page: dict) -> str:
 
 # --------------------------------------------------------------------------- assets
 def og_image(path: Path):
-    """1200×630 social card. Uses Pillow if available; otherwise skips."""
+    """1200×630 social card — dark, branded (star logo + tagline). Uses Pillow; skips if absent."""
     try:
-        from PIL import Image, ImageDraw, ImageFont
+        from PIL import Image, ImageDraw, ImageFont, ImageFilter
     except Exception:
         print("  (Pillow not available — skipping OG image)")
         return
     W, H = 1200, 630
-    im = Image.new("RGB", (W, H), "#0C0D12")
-    # diagonal depth + spotlight glow (right side, behind the frames)
-    glow = Image.new("RGB", (W, H), "#0C0D12")
-    gd = ImageDraw.Draw(glow)
-    for r in range(460, 0, -6):
-        a = int(24 * (1 - r / 460))
-        gd.ellipse((900 - r, 150 - r, 900 + r, 150 + r), fill=(20 + a, 27 + a * 2, 66 + a * 3))
-    im = Image.blend(im, glow, 0.9)
+    BG, INK, MUTED, FAINT, ACCENT = (14, 15, 20), (240, 239, 234), (183, 183, 190), (124, 124, 133), (97, 128, 245)
+    im = Image.new("RGB", (W, H), BG)
+    # accent glow top-right + cool glow bottom-left (blurred ellipses)
+    for cx, cy, rw, rh, col, a in [(W - 190, 60, 380, 320, ACCENT, 120), (120, H - 60, 360, 300, (76, 194, 176), 55)]:
+        g = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(g).ellipse([cx - rw, cy - rh, cx + rw, cy + rh], fill=col + (a,))
+        im = Image.alpha_composite(im.convert("RGBA"), g.filter(ImageFilter.GaussianBlur(155))).convert("RGB")
     d = ImageDraw.Draw(im)
 
     def font(size, bold=True):
-        for cand in ["/System/Library/Fonts/Supplemental/Arial Bold.ttf" if bold else "/System/Library/Fonts/Supplemental/Arial.ttf",
-                     "/System/Library/Fonts/Helvetica.ttc", "/Library/Fonts/Arial Bold.ttf"]:
+        for cand in (["/System/Library/Fonts/SF-Pro-Display-Black.otf", "/System/Library/Fonts/Supplemental/Arial Bold.ttf"]
+                     if bold else ["/System/Library/Fonts/SF-Pro-Display-Regular.otf", "/System/Library/Fonts/Supplemental/Arial.ttf"]):
             if os.path.exists(cand):
                 try:
                     return ImageFont.truetype(cand, size)
@@ -427,39 +428,18 @@ def og_image(path: Path):
                     pass
         return ImageFont.load_default()
 
-    def rounded(img, size, rad=16):
-        img = img.convert("RGB").resize(size)
-        mask = Image.new("L", size, 0)
-        ImageDraw.Draw(mask).rounded_rectangle((0, 0, size[0], size[1]), radius=rad, fill=255)
-        return img, mask
-
-    # right: real generated frames (proof the product makes real footage)
-    hero = ROOT / "static" / "hero"
-    frames = [("wide.jpg", (392, 220), (688, 150)), ("vert.jpg", (150, 266), (628, 292)),
-              ("square.jpg", (176, 176), (1006, 372))]
-    for name, size, pos in frames:
-        f = hero / name
-        if f.is_file():
-            try:
-                img, mask = rounded(Image.open(f), size)
-                # subtle dark border via a slightly larger backing plate
-                d.rounded_rectangle((pos[0] - 2, pos[1] - 2, pos[0] + size[0] + 2, pos[1] + size[1] + 2),
-                                    radius=18, fill="#2A2C36")
-                im.paste(img, pos, mask)
-            except Exception:
-                pass
+    PAD = 84
+    logo_p = ROOT / "static" / "spot-logo.png"
+    if logo_p.is_file():
+        logo = Image.open(logo_p).convert("RGBA")
+        lh = 96
+        logo = logo.resize((int(logo.width * lh / logo.height), lh), Image.LANCZOS)
+        im.paste(logo, (PAD, 116), logo)
     d = ImageDraw.Draw(im)
-
-    # logo ring + wordmark
-    d.rounded_rectangle((80, 76, 150, 146), radius=17, fill="#F0EFEA")
-    d.ellipse((92, 88, 138, 134), outline="#6180F5", width=5)
-    d.ellipse((108, 104, 122, 118), fill="#FFFFFF")
-    d.text((170, 84), "SPOT", font=font(44), fill="#F0EFEA")
-    # headline + supporting copy (left column)
-    d.text((80, 236), "Every spot,", font=font(88), fill="#F0EFEA")
-    d.text((80, 330), "in a day.", font=font(88), fill="#6180F5")
-    d.text((80, 466), "The AI commercial studio for marketing teams.", font=font(28, False), fill="#B7B7BE")
-    d.text((80, 512), "3 patterns × 3 formats  ·  same-day  ·  brand-safe", font=font(23, False), fill="#7C7C85")
+    d.text((PAD, 288), "Ad videos,", font=font(96), fill=INK)
+    d.text((PAD, 288 + 104), "just by choosing.", font=font(96), fill=ACCENT)
+    d.text((PAD + 3, 288 + 104 + 128), "AI writes the script and generates the footage, UI and voice —", font=font(30, False), fill=MUTED)
+    d.text((PAD + 3, 288 + 104 + 128 + 42), "a client-ready first cut, the same day.", font=font(30, False), fill=MUTED)
     path.parent.mkdir(parents=True, exist_ok=True)
     im.save(path, "PNG", optimize=True)
 
