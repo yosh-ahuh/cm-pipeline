@@ -4057,6 +4057,82 @@
           </li>`).join('')}
       </ul>
       <div class="qc-note" style="border:none">Est. cost $${usd.toFixed(2)}</div>`;
+    updatePipeline();
+    updateGenPanels();
+  }
+  // 品質チェック / この生成に使うクレジット を実ジョブに連動（未生成時はモックを出さず「準備中」表示）
+  const QC_STAGES = ['still', 'animate', 'audio', 'review'];
+  function updateGenPanels() {
+    const jobs = Object.values(jobsState);
+    const hasGen = jobs.length > 0;
+    // --- 品質チェック ---
+    const qc = document.getElementById('qcPanel');
+    if (qc) {
+      const head = qc.querySelector('.panel-h');
+      if (!hasGen) {
+        if (head) head.innerHTML = L('Quality check', '品質チェック');
+        const body = qc.querySelector('.qc'); if (body) body.innerHTML = '';
+        let ph = qc.querySelector('.qc-empty');
+        if (!ph) { ph = document.createElement('div'); ph.className = 'qc-note qc-empty'; qc.insertBefore(ph, qc.querySelector('.qc-note:not(.qc-empty)')); }
+        ph.textContent = L('Once you generate, AI quality-check results appear here.', '動画を生成すると、AIによる品質チェックの結果がここに表示されます。');
+        const note = qc.querySelector('.qc-note:not(.qc-empty)'); if (note) note.style.display = 'none';
+      } else {
+        const ph = qc.querySelector('.qc-empty'); if (ph) ph.remove();
+        const note = qc.querySelector('.qc-note'); if (note) note.style.display = '';
+        const checks = jobs.filter(j => QC_STAGES.includes(j.stage))
+          .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+        const src = checks.length ? checks : jobs;
+        const pass = src.filter(j => ['done', 'skipped'].includes(j.status)).length;
+        if (head) head.innerHTML = `${L('Quality check', '品質チェック')} <span class="count">${pass}/${src.length} ${L('passed', '合格')}</span>`;
+        const body = qc.querySelector('.qc');
+        if (body) body.innerHTML = src.map(j => {
+          const ok = ['done', 'skipped'].includes(j.status);
+          const run = ['running', 'pending'].includes(j.status);
+          const cls = ok ? 'pass' : (run ? 'run' : 'fail');
+          const ic = ok ? '<svg class="ic"><use href="#i-check"/></svg>'
+            : (run ? '<span class="spin" aria-label="' + L('checking', '検証中') + '"></span>'
+              : '<svg class="ic"><use href="#i-alert"/></svg>');
+          const name = (STAGE_LABEL[j.stage] || j.stage) + (j.cut ? ' · ' + j.cut : '');
+          return `<div class="qc-row ${cls}"><span class="qc-ic">${ic}</span><span class="qc-name">${esc(name)}</span><span class="qc-tag">${esc(j.status)}</span></div>`;
+        }).join('');
+      }
+    }
+    // --- この生成に使うクレジット ---
+    const wc = document.getElementById('wsCredits');
+    const est = document.querySelector('#genCreditsPanel .est');
+    if (wc) {
+      if (!hasGen) {
+        wc.textContent = '—';
+        if (est) est.textContent = L('Shown after you generate', '生成するとここに表示されます');
+      } else {
+        const used = jobs.filter(j => j.stage === 'animate').length || jobs.filter(j => j.stage === 'still').length || jobs.length;
+        wc.textContent = String(used);
+        if (est) est.textContent = L('Unlimited revisions on this project', 'この案件・修正は無制限');
+      }
+    }
+  }
+  // 制作パイプライン（左レール）を実ジョブ状況に連動
+  function updatePipeline() {
+    const lis = document.querySelectorAll('#pipelinePanel .stage');
+    if (!lis.length) return;
+    const jobs = Object.values(jobsState);
+    const has = s => jobs.some(j => j.stage === s);
+    const done = s => has(s) && jobs.filter(j => j.stage === s).every(j => ['done', 'skipped'].includes(j.status));
+    let active;                                 // アクティブな工程(1-6)。7=全完了
+    if (!jobs.length) active = 4;               // 下書き: ブリーフ/台本/撮影指示は済、生成が次
+    else if (done('build')) active = 7;
+    else {
+      const genDone = ['still', 'animate', 'audio'].every(s => !has(s) || done(s));
+      const reviewDone = !has('review') || done('review');
+      active = genDone ? (reviewDone ? 6 : 5) : 4;
+    }
+    lis.forEach((li, i) => {
+      const idx = i + 1, node = li.querySelector('.node');
+      li.classList.remove('done', 'active'); li.removeAttribute('aria-current');
+      if (idx < active) { li.classList.add('done'); if (node) node.innerHTML = '<svg class="ic"><use href="#i-check"/></svg>'; }
+      else if (idx === active) { li.classList.add('active'); li.setAttribute('aria-current', 'step'); if (node) node.textContent = idx; }
+      else if (node) node.textContent = idx;
+    });
   }
 
   // DEV runner — 本番は Python ワーカー（worker/worker.py）。これは service_role 不要で
