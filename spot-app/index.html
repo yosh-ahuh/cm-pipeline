@@ -1026,6 +1026,9 @@
   .menu-ws .ws-label { font-size: var(--t-label-sm); color: var(--muted); padding: 2px 10px 4px; letter-spacing: .04em; text-transform: uppercase; }
   .menu-ws .ws-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border: none; background: none; border-radius: 8px; cursor: pointer; color: var(--ink); font: inherit; text-align: left; }
   .menu-ws .ws-item:hover { background: var(--hover); }
+  .menu-ws .ws-item.ws-single { cursor: default; }
+  .menu-ws .ws-item.ws-single:hover { background: none; }
+  .menu-ws { margin-bottom: 8px; }
   .menu-ws .ws-item .ws-ic { width: 20px; height: 20px; border-radius: 6px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 11px; flex: none; }
   .menu-ws .ws-item .ws-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .menu-ws .ws-item .ws-role { font-size: var(--t-label-sm); color: var(--muted); }
@@ -1891,14 +1894,15 @@
     const box = document.getElementById('workspaceList'); if (!box) return;
     const orgs = (window.__orgs || []);
     const cur = window.__getOrg && window.__getOrg();
-    if (orgs.length < 2) { box.hidden = true; box.innerHTML = ''; return; }   // 参加先が1つなら切替不要
+    if (!orgs.length || !cur) { box.hidden = true; box.innerHTML = ''; return; }   // データ未解決時のみ非表示
     box.hidden = false;
+    const single = orgs.length < 2;   // 1つでも「現在地」として表示（切替は2つ以上）
     const roleL = { owner: L('Owner', 'オーナー'), member: L('Member', 'メンバー'), viewer: L('View-only', '閲覧のみ') };
     box.innerHTML = '<div class="ws-label">' + L('Workspace', 'ワークスペース') + '</div>' +
       orgs.map(o => {
         const nm = o.is_personal ? L('Personal', '個人') : o.name;
         const isCur = cur && o.id === cur.id;
-        return `<button type="button" class="ws-item" data-org="${o.id}" aria-current="${isCur ? 'true' : 'false'}">
+        return `<button type="button" class="ws-item${single ? ' ws-single' : ''}" data-org="${o.id}" aria-current="${isCur ? 'true' : 'false'}">
           <span class="ws-ic">${escHtml((nm || '?').slice(0, 1))}</span>
           <span class="ws-name">${escHtml(nm)}</span>
           <span class="ws-role">${roleL[o.role] || o.role}</span>
@@ -1931,7 +1935,13 @@
   // sidebar clicks: workspace switch + nav actions
   if (sidebar) sidebar.addEventListener('click', (e) => {
     const ws = e.target.closest('[data-org]');
-    if (ws) { closeDrawer(); if (window.__switchOrg) window.__switchOrg(ws.getAttribute('data-org')); return; }
+    if (ws) {
+      const id = ws.getAttribute('data-org'); const cur = window.__getOrg && window.__getOrg();
+      closeDrawer();
+      if (cur && cur.id === id) return;   // 現在のワークスペースは何もしない（無駄なリロード防止）
+      if (window.__switchOrg) window.__switchOrg(id);
+      return;
+    }
     const item = e.target.closest('[data-act]'); if (!item) return;
     const act = item.dataset.act;
     closeDrawer();
