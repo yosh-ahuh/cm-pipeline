@@ -216,7 +216,8 @@
     body.sb-collapsed .sb-brand .mark,
     body.sb-collapsed .sb-brand .wordmark,
     body.sb-collapsed .sb-item span,
-    body.sb-collapsed .ws-trigger .ws-cur,
+    body.sb-collapsed .ws-trigger .ws-name,
+    body.sb-collapsed .ws-trigger .ws-role-pill,
     body.sb-collapsed .ws-trigger .ws-chev,
     body.sb-collapsed .sb-credits,
     body.sb-collapsed .sb-foot .lang,
@@ -1053,7 +1054,8 @@
   .ws-trigger { display: flex; align-items: center; gap: 9px; width: 100%; padding: 9px 10px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; cursor: pointer; color: var(--ink); font: inherit; text-align: left; }
   .ws-trigger:hover:not(:disabled) { border-color: var(--line-strong); }
   .ws-trigger:disabled { cursor: default; }
-  .ws-trigger .ws-cur { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+  .ws-trigger .ws-name { flex: 1; }
+  .ws-role-pill { flex: none; font-size: var(--t-label-sm); color: var(--muted); border: 1px solid var(--line-strong); border-radius: var(--r-full); padding: 2px 9px; white-space: nowrap; }
   .ws-trigger .ws-chev { width: 15px; height: 15px; color: var(--muted); flex: none; transition: transform var(--dur-fast); }
   .menu-ws.open .ws-trigger .ws-chev { transform: rotate(180deg); }
   .ws-menu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-lift); padding: 5px; display: none; max-height: 300px; overflow-y: auto; }
@@ -1937,7 +1939,8 @@
     const curName = nameOf(cur), curRole = roleL[cur.role] || cur.role;
     const trigger = `<button type="button" class="ws-trigger"${single ? ' disabled' : ' aria-haspopup="listbox" aria-expanded="false"'} title="${escHtml(curName)}">
         <span class="ws-ic">${escHtml((curName || '?').slice(0, 1))}</span>
-        <span class="ws-cur"><span class="ws-name">${escHtml(curName)}</span><span class="ws-role">${curRole}</span></span>
+        <span class="ws-name">${escHtml(curName)}</span>
+        <span class="ws-role-pill">${curRole}</span>
         ${single ? '' : '<svg class="ic ws-chev" aria-hidden="true"><use href="#i-chevron-down"/></svg>'}
       </button>`;
     const menu = single ? '' : `<div class="ws-menu" role="listbox" aria-label="${L('Switch workspace', 'ワークスペースを切り替え')}">` +
