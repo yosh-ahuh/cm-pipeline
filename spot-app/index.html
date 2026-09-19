@@ -205,7 +205,9 @@
   .sb-credits .mc-row b { color: var(--ink); font-family: var(--font-mono); font-weight: 500; }
   .sb-credits .u-meter { height: 5px; margin-top: 8px; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; }
   .sb-credits .u-meter i { display: block; height: 100%; background: var(--accent); }
-  .sb-acct { display: flex; align-items: center; gap: 9px; padding: 4px 6px; }
+  .sb-acct { display: flex; align-items: center; gap: 9px; padding: 8px; width: 100%; border: none; background: none; border-radius: 10px; cursor: pointer; color: inherit; font: inherit; text-align: left; }
+  .sb-acct:hover { background: var(--hover); }
+  .sb-gear { width: 18px; height: 18px; color: var(--muted); flex: none; }
   .sb-acct .menu-id { min-width: 0; flex: 1; }
   .sb-acct .menu-email { font-size: var(--t-label); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .sb-acct .icon-btn { flex: none; }
@@ -226,7 +228,7 @@
     body.sb-collapsed .sb-credits,
     body.sb-collapsed .sb-foot .lang,
     body.sb-collapsed .sb-acct .menu-id,
-    body.sb-collapsed .sb-acct [data-act="logout"] { display: none; }
+    body.sb-collapsed .sb-acct .sb-gear { display: none; }
     body.sb-collapsed .sb-brand { justify-content: center; padding-bottom: 12px; }
     body.sb-collapsed .sb-collapse { margin: 0; }
     body.sb-collapsed .sb-item { justify-content: center; padding: 10px 0; gap: 0; }
@@ -1099,6 +1101,8 @@
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9.5V20h12V9.5"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
   <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9.5 4v16"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6"/><path d="M17.5 20a5.5 5.5 0 0 0-3-4.9"/></symbol>
   <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
   <symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5M15 8l4 4-4 4M19 12H9"/></symbol>
   <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
@@ -1146,24 +1150,23 @@
       <div class="u-meter" id="acctMeter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
     </div>
   </div>
+  <div class="sb-sep"></div>
   <nav class="sb-nav" id="sbNav" aria-label="ナビ">
-    <button type="button" class="sb-item sb-primary" data-act="new" data-owner-only title="新規CMをつくる"><svg class="ic"><use href="#i-plus"/></svg><span>新規CMをつくる</span></button>
+    <button type="button" class="sb-item sb-primary" data-act="new" data-write-only title="新規CMをつくる"><svg class="ic"><use href="#i-plus"/></svg><span>新規CMをつくる</span></button>
     <button type="button" class="sb-item" data-act="home" title="ホーム"><svg class="ic"><use href="#i-home"/></svg><span>ホーム</span></button>
+    <button type="button" class="sb-item" data-act="media" title="メディア"><svg class="ic"><use href="#i-film"/></svg><span>メディア</span></button>
+    <button type="button" class="sb-item" data-act="collections" title="コレクション"><svg class="ic"><use href="#i-folder"/></svg><span>コレクション</span></button>
     <div class="sb-sep"></div>
-    <button type="button" class="sb-item" data-act="profile" title="プロフィール・設定"><svg class="ic"><use href="#i-settings"/></svg><span>プロフィール・設定</span></button>
     <button type="button" class="sb-item" data-act="billing" data-owner-only title="プランと請求"><svg class="ic"><use href="#i-card"/></svg><span>プランと請求</span></button>
+    <button type="button" class="sb-item" data-act="team" data-owner-only title="チーム・メンバー"><svg class="ic"><use href="#i-users"/></svg><span>チーム・メンバー</span></button>
     <button type="button" class="sb-item" data-act="credits" data-owner-only title="クレジットを追加"><svg class="ic"><use href="#i-plus"/></svg><span>クレジットを追加</span></button>
   </nav>
   <div class="sb-foot">
-    <div class="lang seg" role="group" aria-label="Language">
-      <button data-lang="en" aria-pressed="true">EN</button>
-      <button data-lang="ja" aria-pressed="false" aria-label="日本語"><span class="full">日本語</span><span class="short" aria-hidden="true">JA</span></button>
-    </div>
-    <div class="sb-acct">
+    <button type="button" class="sb-acct" data-act="settings" title="プロフィール・設定">
       <span class="avatar" id="acctAvatar" aria-hidden="true">?</span>
       <div class="menu-id"><div class="menu-email" id="acctEmail"></div><span class="plan-badge" id="acctPlan">Free</span></div>
-      <button type="button" class="icon-btn" data-act="logout" aria-label="サインアウト" title="サインアウト"><svg class="ic"><use href="#i-logout"/></svg></button>
-    </div>
+      <svg class="ic sb-gear" aria-hidden="true"><use href="#i-settings"/></svg>
+    </button>
   </div>
 </aside>
 
@@ -1682,28 +1685,74 @@
     </div>
     <div class="panel">
       <div class="panel-h">表示言語</div>
-      <p class="muted" style="margin:0">左のサイドバー下部の <b>EN / 日本語</b> で切り替えられます。</p>
-    </div>
-    <div class="panel" id="teamPanel" style="grid-column:1/-1" hidden>
-      <div class="panel-h">チーム・メンバー</div>
-      <p class="muted" id="teamSeats" style="margin:0 0 12px"></p>
-      <div id="memberList" class="member-list"></div>
-      <div id="inviteBox" hidden>
-        <div class="cta-row" style="flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px">
-          <select id="inviteRole" class="sel" aria-label="役割">
-            <option value="member">メンバー（制作できる）</option>
-            <option value="viewer">閲覧のみ（無料・席を使わない）</option>
-          </select>
-          <button class="btn btn-primary" id="inviteCreate"><span>招待リンクを作成</span></button>
-        </div>
-        <div class="fld" id="inviteResult" hidden style="margin-top:10px">
-          <label>招待リンク（コピーして相手に共有）</label>
-          <input id="inviteLink" type="text" readonly onclick="this.select()">
-          <p class="muted" style="margin:6px 0 0;font-size:var(--t-label)">7日間有効。相手が開いてサインインすると参加します。</p>
-        </div>
+      <div class="lang seg" role="group" aria-label="Language" style="margin-top:4px">
+        <button data-lang="en" aria-pressed="true">EN</button>
+        <button data-lang="ja" aria-pressed="false" aria-label="日本語"><span class="full">日本語</span><span class="short" aria-hidden="true">JA</span></button>
       </div>
-      <p class="muted" id="teamViewerNote" hidden style="margin:12px 0 0;font-size:var(--t-label)">メンバーの招待・管理はオーナーのみ可能です。</p>
     </div>
+    <div class="panel">
+      <div class="panel-h">アカウント</div>
+      <div class="cta-row"><button class="btn btn-ghost" id="setSignOut"><svg class="ic"><use href="#i-logout"/></svg><span>サインアウト</span></button></div>
+    </div>
+  </div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ TEAM / MEMBERS VIEW ============================ -->
+<main class="wrap" id="view-team" hidden>
+  <section class="context"><div>
+    <h1 class="title-h1">チーム・メンバー</h1>
+    <div class="title-sub">メンバーを招待して、同じワークスペースで制作します。</div>
+  </div></section>
+  <div class="panel" id="teamPanel">
+    <p class="muted" id="teamSeats" style="margin:0 0 12px"></p>
+    <div id="memberList" class="member-list"></div>
+    <div id="inviteBox" hidden>
+      <div class="cta-row" style="flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px">
+        <select id="inviteRole" class="sel" aria-label="役割">
+          <option value="member">メンバー（制作できる）</option>
+          <option value="viewer">閲覧のみ（無料・席を使わない）</option>
+        </select>
+        <button class="btn btn-primary" id="inviteCreate"><span>招待リンクを作成</span></button>
+      </div>
+      <div class="fld" id="inviteResult" hidden style="margin-top:10px">
+        <label>招待リンク（コピーして相手に共有）</label>
+        <input id="inviteLink" type="text" readonly onclick="this.select()">
+        <p class="muted" style="margin:6px 0 0;font-size:var(--t-label)">7日間有効。相手が開いてサインインすると参加します。</p>
+      </div>
+    </div>
+    <p class="muted" id="teamViewerNote" hidden style="margin:12px 0 0;font-size:var(--t-label)">メンバーの招待・管理はオーナーのみ可能です。</p>
+  </div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ MEDIA VIEW (all videos) ============================ -->
+<main class="wrap" id="view-media" hidden>
+  <section class="context"><div>
+    <h1 class="title-h1">メディア</h1>
+    <div class="title-sub">生成した動画の一覧です。</div>
+  </div></section>
+  <div class="dash-h">
+    <div class="filters" role="group" aria-label="絞り込み">
+      <button class="filter" aria-pressed="true" data-filter="all">すべて</button>
+      <button class="filter" aria-pressed="false" data-filter="progress">制作中</button>
+      <button class="filter" aria-pressed="false" data-filter="done">完成</button>
+    </div>
+  </div>
+  <div class="proj-grid" id="mediaGrid"></div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ COLLECTIONS VIEW ============================ -->
+<main class="wrap" id="view-collections" hidden>
+  <section class="context"><div>
+    <h1 class="title-h1">コレクション</h1>
+    <div class="title-sub">動画をフォルダのように整理できます。</div>
+  </div></section>
+  <div class="panel" style="text-align:center;padding:48px 24px">
+    <svg class="ic" style="width:34px;height:34px;color:var(--muted);margin-bottom:12px"><use href="#i-folder"/></svg>
+    <p style="margin:0 0 6px;font-weight:600">コレクションは近日対応します</p>
+    <p class="muted" style="margin:0;font-size:var(--t-body-sm)">「2026年9月」のようなコレクションを作って、生成した動画を整理・移動できるようになります。</p>
   </div>
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
@@ -2020,9 +2069,12 @@
     const act = item.dataset.act;
     closeDrawer();
     if (act === 'logout') { if (window.sb) window.sb.auth.signOut(); else toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200); return; }
-    if (act === 'new')     { gotoWizard(); return; }
-    if (act === 'home')    { gotoDash(); return; }
-    if (act === 'profile') { gotoSettings(); return; }
+    if (act === 'new')      { gotoWizard(); return; }
+    if (act === 'home')     { gotoDash(); return; }
+    if (act === 'media')    { gotoMedia(); return; }
+    if (act === 'collections') { gotoCollections(); return; }
+    if (act === 'team')     { gotoTeam(); return; }
+    if (act === 'settings' || act === 'profile') { gotoSettings(); return; }
     if (act === 'billing' || act === 'credits') { gotoBilling(); return; }
   });
   // Auth layer calls this after sign-in; the sidebar shows the account info directly.
@@ -2303,8 +2355,8 @@
   // 身に覚えのないカードが見えていた）。データ到着までスケルトンのみ。
   projGrid.innerHTML = Array.from({ length: 4 }, () =>
     '<div class="skel"><i class="st"></i><div class="sb"><i style="height:14px;width:70%"></i><i style="height:11px;width:45%"></i></div></div>').join('');
-  projGrid.addEventListener('click', e => {
-    const p = e.target.closest('.proj'); if(!p) return;
+  document.addEventListener('click', e => {   // ダッシュボード/メディアのカードから開く
+    const p = e.target.closest('#projGrid .proj, #mediaGrid .proj'); if(!p) return;
     if (p.dataset.open === 'work') {
       if (window.openWorkspace && p.dataset.id) window.openWorkspace(p.dataset.id);
       else gotoWorkspace();
@@ -2312,24 +2364,25 @@
     else toast(L('Opening this project…','このプロジェクトを開いています…'), true, 1200);
   });
   let projFilter = 'all';
-  function applyProjFilter() {
-    let shown = 0;
-    projGrid.querySelectorAll('.proj').forEach(p => {
-      const on = projFilter === 'all' || p.dataset.group === projFilter;
-      p.hidden = !on; if (on) shown++;
+  function applyProjFilter() {   // ダッシュボード(#projGrid)とメディア(#mediaGrid)の両方に適用
+    document.querySelectorAll('#projGrid, #mediaGrid').forEach(grid => {
+      let shown = 0;
+      grid.querySelectorAll('.proj').forEach(p => {
+        const on = projFilter === 'all' || p.dataset.group === projFilter;
+        p.hidden = !on; if (on) shown++;
+      });
+      let none = grid.querySelector('.empty.filtered');
+      if (!shown && grid.querySelector('.proj')) {
+        if (!none) { none = document.createElement('div'); none.className = 'empty filtered'; grid.appendChild(none); }
+        none.innerHTML = '<h4>該当するCMはありません</h4><p>フィルタを「すべて」に戻すと全件が表示されます。</p>';
+      } else if (none) none.remove();
     });
-    let none = projGrid.querySelector('.empty.filtered');
-    if (!shown && projGrid.querySelector('.proj')) {
-      if (!none) { none = document.createElement('div'); none.className = 'empty filtered'; projGrid.appendChild(none); }
-      none.innerHTML = '<h4>該当するCMはありません</h4><p>フィルタを「すべて」に戻すと全件が表示されます。</p>';
-    } else if (none) none.remove();
   }
   window.applyProjFilter = applyProjFilter;
-  document.querySelector('.dash-h .filters').addEventListener('click', e => {
-    const f = e.target.closest('.filter'); if(!f) return;
-    document.querySelectorAll('.dash-h .filter').forEach(x=>x.setAttribute('aria-pressed','false'));
-    f.setAttribute('aria-pressed','true');
+  document.addEventListener('click', e => {
+    const f = e.target.closest('.dash-h .filters .filter'); if (!f) return;
     projFilter = f.dataset.filter || 'all';
+    document.querySelectorAll('.dash-h .filters .filter').forEach(x => x.setAttribute('aria-pressed', x.dataset.filter === projFilter ? 'true' : 'false'));
     applyProjFilter();
   });
 
@@ -2341,6 +2394,9 @@
   const vExport = document.getElementById('view-export');
   const vSettings = document.getElementById('view-settings');
   const vBilling = document.getElementById('view-billing');
+  const vTeam = document.getElementById('view-team');
+  const vMedia = document.getElementById('view-media');
+  const vCollections = document.getElementById('view-collections');
   const crumb = document.getElementById('crumb');
   const navBack = document.getElementById('navBack');
   let backFn = null;
@@ -2358,7 +2414,7 @@
   }
   navBack.addEventListener('click', () => { if (backFn) backFn(); });
   function hideAll(){
-    [vDash,vWiz,vScript,vWork,vExport,vSettings,vBilling].forEach(v=>v.hidden=true);
+    [vDash,vWiz,vScript,vWork,vExport,vSettings,vBilling,vTeam,vMedia,vCollections].forEach(v=>v.hidden=true);
     window.scrollTo(0,0);
   }
   function focusView(v) {   // move focus to the new view so keyboard/AT users land on it
@@ -2406,7 +2462,23 @@
     setCrumb([['ホーム', gotoDash], ['プランと請求']], gotoDash);
     if (window.loadBilling) window.loadBilling();
   }
+  function gotoMedia() {
+    hideAll(); vMedia.hidden = false; focusView(vMedia); _nav(false, 'media');
+    setCrumb([['ホーム', gotoDash], ['メディア']], gotoDash);
+    if (window.loadMedia) window.loadMedia();
+  }
+  function gotoCollections() {
+    hideAll(); vCollections.hidden = false; focusView(vCollections); _nav(false, 'collections');
+    setCrumb([['ホーム', gotoDash], ['コレクション']], gotoDash);
+  }
+  function gotoTeam() {
+    if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can manage the team.', 'チーム管理はオーナーのみ可能です。'), false, 2600); return; }
+    hideAll(); vTeam.hidden = false; focusView(vTeam); _nav(false, 'team');
+    setCrumb([['ホーム', gotoDash], ['チーム・メンバー']], gotoDash);
+    if (window.loadTeam) window.loadTeam();
+  }
   window.gotoSettings = gotoSettings; window.gotoBilling = gotoBilling;
+  window.gotoMedia = gotoMedia; window.gotoTeam = gotoTeam; window.gotoCollections = gotoCollections;
   document.getElementById('setToBilling').addEventListener('click', gotoBilling);
   setCrumb([['ホーム']]);
   const _brand = document.querySelector('.sb-brand');
@@ -3155,9 +3227,18 @@
       setText('setPlanName', plan ? plan.name : '—');
       setText('setPlanSpots', plan ? `${plan.spots_per_month} spots/mo` : '');
       const stb = document.getElementById('setToBilling'); if (stb) stb.hidden = !(window.__isOwner && window.__isOwner());   // 請求導線はオーナーのみ
-      loadMembers(plan);
     } catch (e) { console.error('loadSettings:', e.message); }
   };
+  // ---- team screen（メンバー管理を独立ビュー化）----
+  window.loadTeam = async function () {
+    try { const { plan } = await getProfileWithPlan(); loadMembers(plan); }
+    catch (e) { console.error('loadTeam:', e.message); }
+  };
+  // 設定のサインアウト
+  (function wireSignOut() {
+    const b = document.getElementById('setSignOut');
+    if (b) b.addEventListener('click', () => { if (window.sb) window.sb.auth.signOut(); });
+  })();
 
   // ---- team / members ----
   async function loadMembers(plan) {
@@ -3436,8 +3517,8 @@
     });
   };
 
-  async function loadProjects() {
-    const grid = document.getElementById('projGrid');
+  async function renderVideos(gridId) {   // 現在のワークスペースの動画をグリッドに描画（ホーム/メディア共通）
+    const grid = document.getElementById(gridId);
     if (!grid) return;
     grid.innerHTML = skeleton(4);   // M3 skeleton while fetching — no blank flash
     try {
@@ -3449,10 +3530,12 @@
       grid.innerHTML = data.map(card).join('');
       if (window.applyProjFilter) window.applyProjFilter();
     } catch (e) {
-      console.error('loadProjects failed:', e.message);
+      console.error('renderVideos failed:', e.message);
       grid.innerHTML = emptyState('接続に失敗しました', e.message);
     }
   }
+  async function loadProjects() { return renderVideos('projGrid'); }
+  window.loadMedia = () => renderVideos('mediaGrid');
   function skeleton(n) {
     return Array.from({ length: n }, () => `<div class="skel" aria-hidden="true"><i class="st"></i><div class="sb"><i style="height:14px;width:70%"></i><i style="height:11px;width:45%"></i><i style="height:11px;width:55%;margin-top:6px"></i></div></div>`).join('');
   }
