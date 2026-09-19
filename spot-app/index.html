@@ -1011,6 +1011,27 @@
   .plan-card .ps { font-size: var(--t-body-sm); margin-top: 2px; color: var(--muted); }
   .plan-card .badge-cur { align-self: flex-start; font-size: var(--t-label-sm); color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: 2px 8px; margin-top: 4px; }
   .plan-card .btn { margin-top: auto; }
+  /* credits: purchase packs + auto top-up */
+  .pack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--s-3); }
+  .pack-card { position: relative; border: 1px solid var(--line); border-radius: 12px; padding: var(--s-4); background: var(--surface-2);
+    display: flex; flex-direction: column; gap: 4px; cursor: pointer; text-align: left; color: inherit; font: inherit; }
+  .pack-card:hover { border-color: var(--accent); }
+  .pack-card.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .pack-card .pk-credits { font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+  .pack-card .pk-price { color: var(--ink); font-size: var(--t-body); font-weight: 600; }
+  .pack-card .pk-sub { color: var(--muted); font-size: var(--t-label-sm); }
+  .pack-card .pk-tag { position: absolute; top: 10px; right: 10px; font-size: var(--t-label-sm); color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--r-full); padding: 1px 8px; }
+  .switch-row { display: flex; align-items: center; gap: 10px; font-size: var(--t-body); cursor: pointer; }
+  .switch-row input { width: 18px; height: 18px; flex: none; accent-color: var(--accent); }
+  .topup-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s-3); margin-top: 12px; }
+  .topup-fields[hidden] { display: none; }
+  .inline-input { display: flex; align-items: center; gap: 8px; }
+  .inline-input input { width: 120px; }
+  .inline-input .unit { color: var(--muted); font-size: var(--t-label); }
+  .soft-sep { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
+  .bill-hist-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: var(--t-label); }
+  .bill-hist-row:last-child { border-bottom: none; }
+  .bill-hist-row .bh-amt { margin-left: auto; font-family: var(--font-mono); color: var(--ink); }
 
   /* ---- voice picker ---- */
   .voice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -1833,13 +1854,62 @@
     <p class="muted" id="billNote" style="margin-top:12px">アップグレードすると、毎月つくれる本数が増えます。</p>
   </div>
   <div class="panel">
-    <div class="panel-h">追加スポット</div>
-    <p class="muted" style="margin:0 0 12px">プランの上限を使い切っても、1本単位で追加購入できます。</p>
-    <div class="bill-cur">
-      <div class="bc-name"><b id="extraSpotPrice">—</b><span class="muted"> / 追加1本</span></div>
-      <button class="btn btn-primary" id="buyExtraSpot"><span>追加スポットを購入</span></button>
+    <div class="panel-h">お支払い履歴</div>
+    <p class="muted" style="margin:0 0 12px">これまでの請求・領収書を確認できます。</p>
+    <div id="billHistory"></div>
+    <div class="cta-row" style="margin-top:6px">
+      <button class="btn btn-ghost" id="openPortal"><svg class="ic"><use href="#i-card"/></svg><span>請求ポータルを開く（領収書・カード管理）</span></button>
     </div>
     <div id="creditCosts" class="muted" style="margin-top:14px;font-size:var(--t-label);line-height:1.8"></div>
+  </div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ CREDITS VIEW (add credits) ============================ -->
+<main class="wrap" id="view-credits" hidden>
+  <section class="context"><div>
+    <h1 class="title-h1">クレジットを追加</h1>
+    <div class="title-sub">動画をつくるためのクレジットを購入します。1クレジット＝CM1本の目安です。</div>
+  </div></section>
+  <div class="panel">
+    <div class="panel-h">いまの残高</div>
+    <div class="bill-cur">
+      <div class="bc-name"><b id="crBalance">—</b><span class="muted"> クレジット</span></div>
+      <div class="muted" id="crUsage" style="font-size:var(--t-label)"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-h">クレジットを購入（一回）</div>
+    <p class="muted" style="margin:0 0 14px">必要なぶんだけ、その都度購入できます。使い切らなくても翌月に繰り越せます。</p>
+    <div class="pack-grid" id="creditPacks"></div>
+    <div class="cta-row" style="margin-top:14px">
+      <button class="btn btn-primary" id="crBuy"><span>選んだクレジットを購入</span></button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-h">自動チャージ <span class="count" id="autoTopupState" style="color:var(--muted)">オフ</span></div>
+    <p class="muted" style="margin:0 0 14px">残高が少なくなったら、自動でクレジットを補充します。作業が途中で止まりません。</p>
+    <label class="switch-row"><input type="checkbox" id="topupEnabled"><span>自動チャージを有効にする</span></label>
+    <div class="topup-fields" id="topupFields" hidden>
+      <div class="fld"><label for="topupThreshold">残高がこの数を下回ったら</label>
+        <div class="inline-input"><input id="topupThreshold" type="number" min="1" step="1" value="10"><span class="unit">クレジット</span></div></div>
+      <div class="fld"><label for="topupAmount">このぶんを補充する</label>
+        <div class="inline-input"><input id="topupAmount" type="number" min="1" step="1" value="30"><span class="unit">クレジット</span></div></div>
+    </div>
+    <hr class="soft-sep">
+    <label class="switch-row"><input type="checkbox" id="notifyEnabled"><span>残高が少なくなったらメールで知らせる</span></label>
+    <div class="topup-fields" id="notifyFields" hidden>
+      <div class="fld"><label for="notifyThreshold">この数を下回ったら通知</label>
+        <div class="inline-input"><input id="notifyThreshold" type="number" min="1" step="1" value="5"><span class="unit">クレジット</span></div></div>
+    </div>
+    <div class="cta-row" style="margin-top:14px">
+      <button class="btn btn-primary" id="topupSave"><span>設定を保存</span></button>
+    </div>
+    <p class="muted" id="topupNote" style="margin:12px 0 0;font-size:var(--t-label)">※ 自動チャージの実行には、保存済みのお支払い方法が必要です。</p>
+  </div>
+  <div class="panel">
+    <div class="panel-h">クレジット利用明細</div>
+    <div id="crActivity" class="muted" style="font-size:var(--t-label)"></div>
   </div>
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
@@ -2129,7 +2199,8 @@
     if (act === 'collections') { gotoCollections(); return; }
     if (act === 'team')     { gotoTeam(); return; }
     if (act === 'settings' || act === 'profile') { gotoSettings(); return; }
-    if (act === 'billing' || act === 'credits') { gotoBilling(); return; }
+    if (act === 'billing')  { gotoBilling(); return; }
+    if (act === 'credits')  { gotoCredits(); return; }
   });
   // Auth layer calls this after sign-in; the sidebar shows the account info directly.
   window.mountUserChip = function (email) { window.onAccountInfo({ email }); return null; };
@@ -2464,6 +2535,7 @@
   const vTeam = document.getElementById('view-team');
   const vMedia = document.getElementById('view-media');
   const vCollections = document.getElementById('view-collections');
+  const vCredits = document.getElementById('view-credits');
   const crumb = document.getElementById('crumb');
   const navBack = document.getElementById('navBack');
   let backFn = null;
@@ -2481,7 +2553,7 @@
   }
   navBack.addEventListener('click', () => { if (backFn) backFn(); });
   function hideAll(){
-    [vDash,vWiz,vScript,vWork,vExport,vSettings,vBilling,vTeam,vMedia,vCollections].forEach(v=>v.hidden=true);
+    [vDash,vWiz,vScript,vWork,vExport,vSettings,vBilling,vTeam,vMedia,vCollections,vCredits].forEach(v=>v.hidden=true);
     window.scrollTo(0,0);
   }
   function focusView(v) {   // move focus to the new view so keyboard/AT users land on it
@@ -2529,6 +2601,15 @@
     setCrumb([['ホーム', gotoDash], ['プランと請求']], gotoDash);
     if (window.loadBilling) window.loadBilling();
   }
+  function gotoCredits() {
+    if (window.__isOwner && !window.__isOwner()) {   // 課金導線はオーナー限定
+      toast(L('Only the workspace owner can add credits.', 'クレジットの追加はワークスペースのオーナーのみ可能です。'), false, 2600);
+      return;
+    }
+    hideAll(); vCredits.hidden = false; focusView(vCredits); _nav(false, 'credits');
+    setCrumb([['ホーム', gotoDash], ['クレジットを追加']], gotoDash);
+    if (window.loadCredits) window.loadCredits();
+  }
   function gotoMedia() {
     hideAll(); vMedia.hidden = false; focusView(vMedia); _nav(false, 'media');
     setCrumb([['ホーム', gotoDash], ['メディア']], gotoDash);
@@ -2545,7 +2626,7 @@
     setCrumb([['ホーム', gotoDash], ['チーム・メンバー']], gotoDash);
     if (window.loadTeam) window.loadTeam();
   }
-  window.gotoSettings = gotoSettings; window.gotoBilling = gotoBilling;
+  window.gotoSettings = gotoSettings; window.gotoBilling = gotoBilling; window.gotoCredits = gotoCredits;
   window.gotoMedia = gotoMedia; window.gotoTeam = gotoTeam; window.gotoCollections = gotoCollections;
   document.getElementById('setToBilling').addEventListener('click', gotoBilling);
   setCrumb([['ホーム']]);
@@ -2798,6 +2879,26 @@
     '現在のプランと利用状況。アップグレードで毎月のスポット数が増えます。': 'Your current plan and usage. Upgrade for more spots each month.',
     '現在のプラン': 'Current plan', 'プラン一覧': 'Plans', 'アップグレード': 'Upgrade', '利用中': 'Current',
     'アップグレードの決済連携（Stripe / 請求書）は準備中です。ご希望のプランはお問い合わせください。': 'Payment (Stripe / invoice) is coming soon — contact us for the plan you want.',
+    'アップグレードすると、毎月つくれる本数が増えます。': 'Upgrade to create more videos each month.',
+    'お支払い履歴': 'Payment history', 'これまでの請求・領収書を確認できます。': 'View your past invoices and receipts.',
+    '請求ポータルを開く（領収書・カード管理）': 'Open billing portal (receipts, cards)',
+    '消費クレジットの目安': 'Credits per action',
+    // credits view
+    '動画をつくるためのクレジットを購入します。1クレジット＝CM1本の目安です。': 'Buy credits to make videos. 1 credit ≈ 1 finished ad.',
+    'いまの残高': 'Current balance', 'クレジット': 'credits',
+    'クレジットを購入（一回）': 'Buy credits (one-time)',
+    '必要なぶんだけ、その都度購入できます。使い切らなくても翌月に繰り越せます。': 'Buy just what you need. Unused credits roll over to next month.',
+    '選んだクレジットを購入': 'Buy selected credits',
+    '自動チャージ': 'Auto top-up',
+    '残高が少なくなったら、自動でクレジットを補充します。作業が途中で止まりません。': 'Automatically add credits when your balance runs low, so work never stops.',
+    '自動チャージを有効にする': 'Enable auto top-up',
+    '残高がこの数を下回ったら': 'When balance falls below',
+    'このぶんを補充する': 'Add this many credits',
+    '残高が少なくなったらメールで知らせる': 'Email me when my balance runs low',
+    'この数を下回ったら通知': 'Notify when below',
+    '設定を保存': 'Save settings',
+    '※ 自動チャージの実行には、保存済みのお支払い方法が必要です。': '* Auto top-up requires a saved payment method to run.',
+    'クレジット利用明細': 'Credit activity',
     '当日': 'Same day', '修正は分単位': 'revisions in minutes',
     'すべてダウンロード（ZIP）': 'Download all (ZIP)', '共有リンクを作成': 'Create share link',
     'ワークスペースに戻る': 'Back to workspace', 'サムネイル（静止画）': 'Thumbnails (stills)',
@@ -3444,10 +3545,26 @@
         grid.querySelectorAll('[data-upgrade]').forEach(b => b.addEventListener('click',
           () => openCheckout(b.getAttribute('data-upgrade'))));   // Stripe Payment Link（config）
       }
-      // 追加スポット価格
-      setText('extraSpotPrice', plan && plan.extra_spot_usd ? `$${plan.extra_spot_usd}` : '—');
-      const buy = document.getElementById('buyExtraSpot');
-      if (buy && !buy.dataset.wired) { buy.dataset.wired = '1'; buy.addEventListener('click', () => openCheckout('extraSpot')); }
+      // お支払い履歴（クレジット付与＝購入の台帳行から）。Stripe の領収書は請求ポータルで。
+      const hist = document.getElementById('billHistory');
+      if (hist) {
+        let rows = [];
+        try {
+          const { data } = await sb.from('credit_ledger')
+            .select('created_at, credits, usd').gt('credits', 0)
+            .order('created_at', { ascending: false }).limit(12);
+          rows = data || [];
+        } catch (_) { rows = []; }
+        if (rows.length) {
+          hist.innerHTML = rows.map(r => {
+            const d = new Date(r.created_at).toLocaleDateString(document.documentElement.lang === 'ja' ? 'ja-JP' : 'en-US');
+            const amt = r.usd ? `$${Number(r.usd).toFixed(2)}` : `+${Number(r.credits)} ${L('credits', 'クレジット')}`;
+            return `<div class="bill-hist-row"><span>${d}</span><span class="muted">${L('Credit purchase', 'クレジット購入')}</span><span class="bh-amt">${amt}</span></div>`;
+          }).join('');
+        } else {
+          hist.innerHTML = `<p class="muted" style="margin:0;font-size:var(--t-label)">${L('No payments yet.', 'まだお支払いはありません。')}</p>`;
+        }
+      }
       // 消費クレジットの目安（credit_costs）
       const { data: costs } = await sb.from('credit_costs').select('action, credits');
       const cc = document.getElementById('creditCosts');
@@ -3463,6 +3580,123 @@
       }
     } catch (e) { console.error('loadBilling:', e.message); }
   };
+  (function wirePortal() {
+    const b = document.getElementById('openPortal'); if (!b) return;
+    b.addEventListener('click', () => {
+      const url = (window.SPOT_CONFIG && window.SPOT_CONFIG.stripeLinks && window.SPOT_CONFIG.stripeLinks.portal) || '';
+      if (!url) { if (window.toast) window.toast(L('Billing portal not set up yet.', '請求ポータルは準備中です（config.js の stripeLinks.portal）。'), false, 3000); return; }
+      window.open(url, '_blank', 'noopener');
+    });
+  })();
+
+  // ---- credits screen（クレジットを追加） ----
+  // パックは価格・数量ともプレースホルダ。config.js の stripeLinks.<key> に Payment Link を貼ると有効化。
+  const CREDIT_PACKS = [
+    { key: 'credits10',  credits: 10,  jpy: 1500,  usd: 10 },
+    { key: 'credits30',  credits: 30,  jpy: 4200,  usd: 28, tagJa: '人気',  tagEn: 'Popular' },
+    { key: 'credits60',  credits: 60,  jpy: 7800,  usd: 52, tagJa: 'お得',  tagEn: 'Best value' },
+    { key: 'credits120', credits: 120, jpy: 14400, usd: 96 },
+  ];
+  let selectedPack = 'credits30';
+  function renderCreditPacks() {
+    const grid = document.getElementById('creditPacks'); if (!grid) return;
+    const isJa = document.documentElement.lang === 'ja';
+    grid.innerHTML = CREDIT_PACKS.map(p => {
+      const price = isJa ? `¥${p.jpy.toLocaleString()}` : `$${p.usd}`;
+      const tag = isJa ? p.tagJa : p.tagEn;
+      return `<button type="button" class="pack-card${p.key === selectedPack ? ' sel' : ''}" data-pack="${p.key}" aria-pressed="${p.key === selectedPack}">
+        ${tag ? `<span class="pk-tag">${tag}</span>` : ''}
+        <span class="pk-credits">${p.credits}</span>
+        <span class="pk-price">${price}</span>
+        <span class="pk-sub">${L(`about ${p.credits} videos`, `CM 約${p.credits}本`)}</span>
+      </button>`;
+    }).join('');
+    grid.querySelectorAll('[data-pack]').forEach(b => b.addEventListener('click', () => {
+      selectedPack = b.getAttribute('data-pack'); renderCreditPacks();
+    }));
+  }
+  window.loadCredits = async function () {
+    try {
+      renderCreditPacks();
+      const { prof } = await getProfileWithPlan();
+      const c = prof ? Number(prof.credits) : 0;
+      setText('crBalance', String(c));
+      // 今月の消費（credit_ledger の consumption 行＝credits>0 で project 紐付き）から概算
+      try {
+        const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+        const { data } = await sb.from('credit_ledger').select('credits, usd, created_at, project_id, stage')
+          .order('created_at', { ascending: false }).limit(200);
+        const rows = data || [];
+        const used = rows.filter(r => r.project_id && new Date(r.created_at) >= monthStart)
+          .reduce((s, r) => s + (Number(r.credits) || 0), 0);
+        setText('crUsage', L(`Used this month: ${used} credits`, `今月の消費: ${used} クレジット`));
+        const act = document.getElementById('crActivity');
+        if (act) {
+          const recent = rows.slice(0, 10);
+          act.innerHTML = recent.length ? recent.map(r => {
+            const d = new Date(r.created_at).toLocaleDateString(document.documentElement.lang === 'ja' ? 'ja-JP' : 'en-US');
+            const isBuy = !r.project_id;
+            const label = isBuy ? L('Purchase', '購入') : (STAGE_LABEL[r.stage] || L('Generation', '生成'));
+            const amt = isBuy ? `+${Number(r.credits)}` : `-${Number(r.credits)}`;
+            return `<div class="bill-hist-row"><span>${d}</span><span class="muted">${label}</span><span class="bh-amt">${amt}</span></div>`;
+          }).join('') : `<p class="muted" style="margin:0">${L('No activity yet.', 'まだ利用はありません。')}</p>`;
+        }
+      } catch (_) {}
+      await loadTopupPrefs();
+    } catch (e) { console.error('loadCredits:', e.message); }
+  };
+  async function loadTopupPrefs() {
+    const en=document.getElementById('topupEnabled'), th=document.getElementById('topupThreshold'),
+          am=document.getElementById('topupAmount'), ne=document.getElementById('notifyEnabled'),
+          nt=document.getElementById('notifyThreshold');
+    if (!en) return;
+    let pref = null;
+    try {
+      if (currentOrg) { const { data } = await sb.from('billing_prefs').select('*').eq('org_id', currentOrg.id).maybeSingle(); pref = data; }
+    } catch (_) { pref = null; }
+    if (pref) {
+      en.checked = !!pref.topup_enabled; th.value = pref.topup_threshold; am.value = pref.topup_amount;
+      ne.checked = !!pref.notify_enabled; nt.value = pref.notify_threshold;
+    }
+    syncTopupUI();
+  }
+  function syncTopupUI() {
+    const en=document.getElementById('topupEnabled'), ne=document.getElementById('notifyEnabled');
+    const tf=document.getElementById('topupFields'), nf=document.getElementById('notifyFields');
+    const st=document.getElementById('autoTopupState');
+    if (tf) tf.hidden = !(en && en.checked);
+    if (nf) nf.hidden = !(ne && ne.checked);
+    if (st) { st.textContent = (en && en.checked) ? L('On', 'オン') : L('Off', 'オフ');
+      st.style.color = (en && en.checked) ? 'var(--good)' : 'var(--muted)'; }
+  }
+  (function wireCredits() {
+    const buy = document.getElementById('crBuy');
+    if (buy) buy.addEventListener('click', () => openCheckout(selectedPack));
+    const en=document.getElementById('topupEnabled'), ne=document.getElementById('notifyEnabled');
+    if (en) en.addEventListener('change', syncTopupUI);
+    if (ne) ne.addEventListener('change', syncTopupUI);
+    const save = document.getElementById('topupSave');
+    if (save) save.addEventListener('click', async () => {
+      if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can change billing.', '課金設定はオーナーのみ可能です。'), false, 2600); return; }
+      if (!currentOrg) { toast(L('Workspace not ready.', 'ワークスペースが未準備です。'), false, 2600); return; }
+      save.disabled = true;
+      const row = {
+        org_id: currentOrg.id,
+        topup_enabled: document.getElementById('topupEnabled').checked,
+        topup_threshold: Number(document.getElementById('topupThreshold').value) || 0,
+        topup_amount: Number(document.getElementById('topupAmount').value) || 0,
+        notify_enabled: document.getElementById('notifyEnabled').checked,
+        notify_threshold: Number(document.getElementById('notifyThreshold').value) || 0,
+        updated_at: new Date().toISOString(),
+      };
+      try {
+        const { error } = await sb.from('billing_prefs').upsert(row, { onConflict: 'org_id' });
+        if (error) throw error;
+        toast(L('Settings saved', '設定を保存しました'), true, 2000);
+      } catch (e) { toast(L('Failed to save: ', '保存に失敗: ') + e.message, false, 2800); }
+      finally { save.disabled = false; }
+    });
+  })();
   // Stripe Payment Link（コード不要）。client_reference_id に「組織id」を付け（課金は組織単位）、
   // Webhook（worker/stripe_webhook.py）が set_plan / add_credits を組織に反映する。
   // 006 未適用など org 未解決時は user id にフォールバック。

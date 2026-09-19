@@ -17,6 +17,15 @@ window.SPOT_CONFIG = {
     team: '',
     business: '',
     enterprise: '',   // 通常は「お問い合わせ」。URL があればそれを開きます
-    extraSpot: '',    // 追加スポット購入のリンク
+    extraSpot: '',    // 追加スポット購入のリンク（旧・後方互換）
+
+    // クレジットの一回購入（「クレジットを追加」画面のパック）。各パックに Payment Link を作成して貼る。
+    credits10:  '',   // 10 クレジット
+    credits30:  '',   // 30 クレジット
+    credits60:  '',   // 60 クレジット
+    credits120: '',   // 120 クレジット
+    creditsCustom: '', // カスタム金額（金額可変の Payment Link があれば）
+
+    portal: '',       // Stripe カスタマーポータル（支払い履歴・領収書・カード管理）。「プランと請求」から開きます
   },
 };
