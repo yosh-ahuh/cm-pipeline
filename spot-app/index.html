@@ -1103,6 +1103,8 @@
   .modal-scrim { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.5); display: grid; place-items: center; padding: 24px; }
   .modal-card { width: 100%; max-width: 420px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-lift); }
   .modal-h { font-family: var(--font-display); font-weight: 800; font-size: 20px; margin: 0 0 16px; }
+  .frame-copy .fc-sub { margin-top: 8px; font-weight: 600; font-size: clamp(11px, 3.4cqw, 15px); color: rgba(255,255,255,.9); text-shadow: 0 1px 6px rgba(0,0,0,.35); }
+  .frame-copy .fc-note { margin-top: 14px; font-size: clamp(9px, 2.6cqw, 11px); font-weight: 500; letter-spacing: .04em; color: rgba(255,255,255,.62); }
 </style>
 </head>
 <body class="booting">
@@ -1607,8 +1609,8 @@
       <div class="preview-area">
         <div class="frame wide" id="frame">
           <div class="frame-badge"><span class="pulse"></span><span id="introChip">リング+マリンバ</span></div>
-          <div class="frame-logo"><span class="fl-mark"></span><span>ミライ工事</span></div>
-          <div class="frame-copy">
+          <div class="frame-logo"><span class="fl-mark"></span><span id="frameLogo">ミライ工事</span></div>
+          <div class="frame-copy" id="frameCopy">
             <div class="fc-line">現場で完結。</div>
             <div class="fc-line">作業時間を<span class="fc-hl">40時間</span>短縮!</div>
             <div class="frame-phones"><i></i><i></i></div>
@@ -3903,6 +3905,21 @@
   }
 
   // ダッシュボードのカード / 生成後にワークスペースを「対象プロジェクト」で開く。
+  function renderPreviewFrame(proj) {   // プレビューを対象プロジェクトのブランド/文脈で描画（ミライ工事モックの置換）
+    const spec = (proj && proj.spec) || {};
+    const brand = spec.brand || {}, sel = spec.selections || {};
+    const name = brand.name || proj.product || proj.name || 'プロジェクト';
+    setText('frameLogo', name);
+    const copy = document.getElementById('frameCopy');
+    if (copy) {
+      const ctx = [sel.industry, sel.target].filter(Boolean).join(' ・ ');
+      copy.innerHTML = `<div class="fc-line">${esc(name)}</div>` + (ctx ? `<div class="fc-sub">${esc(ctx)}</div>` : '')
+        + `<div class="fc-note">${L('AI-generated first cut preview', 'AIが生成する初稿プレビュー')}</div>`;
+    }
+    const frame = document.getElementById('frame');
+    const primary = brand.colors && brand.colors.primary;
+    if (frame) frame.style.background = primary ? `linear-gradient(150deg, ${primary}, color-mix(in srgb, ${primary} 52%, #000))` : '';
+  }
   window.openWorkspace = async function (projectId) {
     if (!sb || !projectId) { if (window.gotoWorkspaceFor) window.gotoWorkspaceFor(); return; }
     try {
@@ -3918,6 +3935,7 @@
       setText('wsMetaChannel', Array.isArray(sel.media) ? sel.media.join(' ・ ') : (sel.media || '—'));
       setText('wsMetaLength', Array.isArray(sel.media) && sel.media.includes('リール/ショート') ? '15秒〜' : '30秒');
       setText('wsMetaTone', sel.tone || '—');
+      renderPreviewFrame(proj);   // プレビューを対象プロジェクトのブランドで描画
       loadVoiceFromSpec(proj && proj.spec);   // 保存済みのナレーション声を反映
       subscribeJobs(projectId);
       await refreshJobs(projectId);
