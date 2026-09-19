@@ -3287,7 +3287,7 @@
       const { prof, plan } = await getProfileWithPlan();
       const nameEl = document.getElementById('setName'); if (nameEl) nameEl.value = (prof && prof.display_name) || '';
       setText('setPlanName', plan ? plan.name : '—');
-      setText('setPlanSpots', plan ? `${plan.spots_per_month} spots/mo` : '');
+      setText('setPlanSpots', plan ? (Number(plan.spots_per_month) === 0 ? L('Committed volume', 'コミット制') : L(`${plan.spots_per_month} spots/mo`, `月 ${plan.spots_per_month} 本`)) : '');
       const stb = document.getElementById('setToBilling'); if (stb) stb.hidden = !(window.__isOwner && window.__isOwner());   // 請求導線はオーナーのみ
     } catch (e) { console.error('loadSettings:', e.message); }
   };
@@ -3470,17 +3470,21 @@
     window.open(url + sep + 'client_reference_id=' + encodeURIComponent(ref), '_blank', 'noopener');
   }
   function planPrice(id, pl) {
-    if (id === 'free') return 'Free';
+    const ja = document.documentElement.lang === 'ja';
+    if (id === 'free') return ja ? '無料' : '$0/mo';
+    if (ja) return pl.price_jpy ? `¥${Number(pl.price_jpy).toLocaleString()}/月` : 'お問い合わせ';
     return pl.price_usd ? `$${pl.price_usd}/mo` : 'Contact us';
   }
   function planCard(p, currentId) {
     const cur = p.id === currentId;
+    const spotsTxt = Number(p.spots_per_month) === 0 ? L('Committed volume', 'コミット制') : L(`${p.spots_per_month} spots/mo`, `月 ${p.spots_per_month} 本`);
+    const seatsTxt = Number(p.seats) === 0 ? L('Unlimited seats', '席数 無制限') : L(`${p.seats} seats`, `${p.seats} 席`);
     return `<div class="plan-card${cur ? ' current' : ''}">
       <div class="pn">${esc(p.name)}</div>
       <div class="pp">${planPrice(p.id, p)}</div>
-      <div class="ps">${p.spots_per_month} spots/mo${p.seats ? ' · ' + p.seats + ' seats' : ''}</div>
-      ${cur ? '<span class="badge-cur">利用中</span>'
-            : `<button class="btn btn-ghost" data-upgrade="${p.id}"><span>アップグレード</span></button>`}
+      <div class="ps">${spotsTxt} · ${seatsTxt}</div>
+      ${cur ? `<span class="badge-cur">${L('Current', '利用中')}</span>`
+            : `<button class="btn btn-ghost" data-upgrade="${p.id}"><span>${L('Upgrade', 'アップグレード')}</span></button>`}
     </div>`;
   }
   function setText(id, txt) { const el = document.getElementById(id); if (el) el.textContent = txt; }
