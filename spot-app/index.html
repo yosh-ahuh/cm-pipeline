@@ -170,20 +170,63 @@
   /* ==========================================================================
      Top app bar
      ========================================================================== */
-  header {
+  .mark {
+    width: 28px; height: 28px; flex: none;
+    background: url("assets/spot-mark.png") center/contain no-repeat;
+  }
+  .wordmark { font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.01em; }
+
+  /* ---- app shell: fixed left sidebar + padded content ---- */
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 248px; z-index: 40;
+    background: var(--surface-low); border-right: 1px solid var(--line);
+    display: none; flex-direction: column; padding: 14px 12px; overflow-y: auto;
+  }
+  body.signed-in .sidebar { display: flex; }
+  body.signed-in { padding-left: 248px; }
+  .sb-brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 14px; }
+  .sb-nav { display: flex; flex-direction: column; gap: 3px; }
+  .sb-item { display: flex; align-items: center; gap: 11px; width: 100%; padding: 10px 12px;
+    border: none; border-radius: 10px; background: none; color: var(--muted); font: inherit; font-size: var(--t-body);
+    text-align: left; cursor: pointer; }
+  .sb-item .ic { width: 18px; height: 18px; flex: none; }
+  .sb-item:hover { background: var(--hover); color: var(--ink); }
+  .sb-item[aria-current="page"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+  .sb-item.sb-primary { background: var(--accent); color: var(--on-accent); font-weight: 600; margin-bottom: 6px; }
+  .sb-item.sb-primary:hover { background: var(--accent-hover); color: var(--on-accent); }
+  .sb-sep { height: 1px; background: var(--line); margin: 8px 6px; }
+  .sb-foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding-top: 14px; }
+  .sb-credits { padding: 10px 12px; background: var(--surface-2); border-radius: 10px; }
+  .sb-credits .mc-row { display: flex; justify-content: space-between; font-size: var(--t-label); color: var(--muted); }
+  .sb-credits .mc-row b { color: var(--ink); font-family: var(--font-mono); font-weight: 500; }
+  .sb-credits .u-meter { height: 5px; margin-top: 8px; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; }
+  .sb-credits .u-meter i { display: block; height: 100%; background: var(--accent); }
+  .sb-acct { display: flex; align-items: center; gap: 9px; padding: 4px 6px; }
+  .sb-acct .menu-id { min-width: 0; flex: 1; }
+  .sb-acct .menu-email { font-size: var(--t-label); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sb-acct .icon-btn { flex: none; }
+  .sb-scrim { position: fixed; inset: 0; z-index: 39; background: rgba(0,0,0,.45); }
+
+  /* ---- slim topbar (in-project only on desktop; always on mobile for the menu button) ---- */
+  header#topbar {
     border-bottom: 1px solid var(--line);
     background: color-mix(in srgb, var(--ground) 78%, transparent);
     -webkit-backdrop-filter: saturate(1.4) blur(12px); backdrop-filter: saturate(1.4) blur(12px);
     position: sticky; top: 0; z-index: 20;
   }
-  .topbar { display: flex; align-items: center; gap: var(--s-3); height: var(--topbar-h); }
-  .brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 4px; margin-left: -4px; border-radius: var(--r-sm); }
-  .brand:hover { background: var(--hover); }
-  .mark {
-    width: 30px; height: 30px; flex: none;
-    background: url("assets/spot-mark.png") center/contain no-repeat;
+  .topbar-in { display: flex; align-items: center; gap: var(--s-2); height: 52px; max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  body:not(.in-project) #topbar { display: none; }
+  #sbToggle { display: none; }
+  .icon-btn.nav-back:not(.on) { display: none; }
+  /* mobile: sidebar becomes an off-canvas drawer, topbar always shows the menu button */
+  @media (max-width: 1080px) {
+    body.signed-in { padding-left: 0; }
+    body.signed-in .sidebar { transform: translateX(-100%); transition: transform var(--dur) var(--ease-standard); box-shadow: var(--shadow-lift); }
+    body.signed-in.sb-open .sidebar { transform: none; }
+    body:not(.sb-open) .sb-scrim { display: none; }
+    body.signed-in #topbar { display: block; }
+    #sbToggle { display: inline-flex; }
   }
-  .wordmark { font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.01em; }
 
   .icon-btn.nav-back:not(.on) { display: none; }
   .breadcrumb { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: var(--t-body-sm); min-width: 0; }
@@ -1012,6 +1055,8 @@
   <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
   <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9.5V20h12V9.5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
   <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
   <symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5M15 8l4 4-4 4M19 12H9"/></symbol>
   <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
@@ -1045,44 +1090,43 @@
   </div>
 </div>
 
-<header>
-  <div class="wrap topbar">
-    <div class="brand">
-      <div class="mark"></div>
-      <div class="wordmark">Spot</div>
+<!-- ============================ LEFT SIDEBAR (global nav) ============================ -->
+<div class="sb-scrim" id="sbScrim" hidden></div>
+<aside class="sidebar" id="sidebar" aria-label="メインナビゲーション">
+  <div class="sb-brand"><div class="mark"></div><div class="wordmark">Spot</div></div>
+  <div class="menu-ws" id="workspaceList" hidden></div>
+  <nav class="sb-nav" id="sbNav" aria-label="ナビ">
+    <button type="button" class="sb-item sb-primary" data-act="new" data-owner-only><svg class="ic"><use href="#i-plus"/></svg><span>新規CMをつくる</span></button>
+    <button type="button" class="sb-item" data-act="home"><svg class="ic"><use href="#i-home"/></svg><span>ホーム</span></button>
+    <div class="sb-sep"></div>
+    <button type="button" class="sb-item" data-act="profile"><svg class="ic"><use href="#i-settings"/></svg><span>プロフィール・設定</span></button>
+    <button type="button" class="sb-item" data-act="billing" data-owner-only><svg class="ic"><use href="#i-card"/></svg><span>プランと請求</span></button>
+    <button type="button" class="sb-item" data-act="credits" data-owner-only><svg class="ic"><use href="#i-plus"/></svg><span>クレジットを追加</span></button>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-credits">
+      <div class="mc-row"><span>クレジット残</span><b><span id="acctCredits">—</span> / <span id="acctMax">—</span></b></div>
+      <div class="u-meter" id="acctMeter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
     </div>
-    <button class="icon-btn nav-back" id="navBack" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
-    <nav class="breadcrumb" id="crumb" aria-label="現在地"></nav>
-    <div class="spacer"></div>
-    <div class="credits" title="クレジット残"><span class="dot"></span> <span class="lbl">クレジット残</span> <b>—</b></div>
     <div class="lang seg" role="group" aria-label="Language">
       <button data-lang="en" aria-pressed="true">EN</button>
       <button data-lang="ja" aria-pressed="false" aria-label="日本語"><span class="full">日本語</span><span class="short" aria-hidden="true">JA</span></button>
     </div>
-  </div>
-</header>
-<!-- account menu: anchored to #userChip (mounted by the auth layer via window.mountUserChip) -->
-<div class="scrim" id="acctScrim" hidden></div>
-<div class="menu" id="acctMenu" role="menu" aria-label="アカウントメニュー" aria-hidden="true" hidden>
-  <div class="menu-head">
-    <span class="avatar" id="acctAvatar" aria-hidden="true">?</span>
-    <div class="menu-id">
-      <div class="menu-email" id="acctEmail"></div>
-      <span class="plan-badge" id="acctPlan">Free</span>
+    <div class="sb-acct">
+      <span class="avatar" id="acctAvatar" aria-hidden="true">?</span>
+      <div class="menu-id"><div class="menu-email" id="acctEmail"></div><span class="plan-badge" id="acctPlan">Free</span></div>
+      <button type="button" class="icon-btn" data-act="logout" aria-label="サインアウト" title="サインアウト"><svg class="ic"><use href="#i-logout"/></svg></button>
     </div>
   </div>
-  <div class="menu-credits">
-    <div class="mc-row"><span>クレジット残</span><b><span id="acctCredits">—</span> / <span id="acctMax">—</span></b></div>
-    <div class="u-meter" id="acctMeter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
+</aside>
+
+<header id="topbar">
+  <div class="topbar-in">
+    <button class="icon-btn" id="sbToggle" aria-label="メニューを開く" aria-controls="sidebar" aria-expanded="false"><svg class="ic"><use href="#i-menu"/></svg></button>
+    <button class="icon-btn nav-back" id="navBack" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
+    <nav class="breadcrumb" id="crumb" aria-label="現在地"></nav>
   </div>
-  <div class="menu-sep" role="separator"></div>
-  <div class="menu-ws" id="workspaceList" hidden></div>
-  <button type="button" class="menu-item" role="menuitem" data-act="profile"><svg class="ic"><use href="#i-user"/></svg><span>プロフィール・設定</span></button>
-  <button type="button" class="menu-item" role="menuitem" data-act="billing" data-owner-only><svg class="ic"><use href="#i-card"/></svg><span>プランと請求</span></button>
-  <button type="button" class="menu-item" role="menuitem" data-act="credits" data-owner-only><svg class="ic"><use href="#i-plus"/></svg><span>クレジットを追加</span></button>
-  <div class="menu-sep" role="separator"></div>
-  <button type="button" class="menu-item" role="menuitem" data-act="logout"><svg class="ic"><use href="#i-logout"/></svg><span>サインアウト</span></button>
-</div>
+</header>
 
 <!-- ============================ DASHBOARD VIEW ============================ -->
 <main class="wrap" id="view-dash" tabindex="-1">
@@ -1591,7 +1635,7 @@
     </div>
     <div class="panel">
       <div class="panel-h">表示言語</div>
-      <p class="muted" style="margin:0">画面右上の <b>EN / 日本語</b> で切り替えられます。</p>
+      <p class="muted" style="margin:0">左のサイドバー下部の <b>EN / 日本語</b> で切り替えられます。</p>
     </div>
     <div class="panel" id="teamPanel" style="grid-column:1/-1" hidden>
       <div class="panel-h">チーム・メンバー</div>
@@ -1838,20 +1882,10 @@
   roving(document.querySelector('.dash-h .filters'), '.filter');
   roving(track, '.cut');
 
-  // ---- account menu (M3 menu / HIG popover on desktop, bottom sheet ≤720px), anchored to the user chip ----
-  const acctMenu = document.getElementById('acctMenu');
-  const acctScrim = document.getElementById('acctScrim');
-  const acctMq = window.matchMedia('(max-width: 720px)');
-  const acctInfo = { email: '', plan: 'Free', credits: 18.5, max: 40 };   // demo values until the data layer reports
-  let userChip = null;
-  const acctItems = () => [...acctMenu.querySelectorAll('[role="menuitem"]')];
-  const acctOpen = () => acctMenu.getAttribute('aria-hidden') === 'false';
-  function placeAcct() {
-    if (acctMq.matches) { acctMenu.style.top = ''; acctMenu.style.right = ''; return; }   // bottom sheet: CSS positions it
-    const r = userChip.getBoundingClientRect();
-    acctMenu.style.top = Math.round(r.bottom + 8) + 'px';
-    acctMenu.style.right = Math.round(Math.max(8, window.innerWidth - r.right)) + 'px';
-  }
+  // ---- left sidebar (persistent global nav) ----
+  const acctInfo = { email: '', plan: 'Free', credits: 0, max: 1 };
+  const sidebar = document.getElementById('sidebar');
+  let userChip = null;   // legacy; sidebar shows account info directly
   function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
   function renderWorkspaces() {
     const box = document.getElementById('workspaceList'); if (!box) return;
@@ -1873,68 +1907,42 @@
       }).join('');
   }
   window.__renderWorkspaces = renderWorkspaces;
-  function refreshAcctMenu() {
+  function refreshSidebar() {
     renderWorkspaces();
     const owner = !window.__isOwner || window.__isOwner();   // 課金導線はオーナーのみ
-    acctMenu.querySelectorAll('[data-owner-only]').forEach(el => { el.hidden = !owner; });
+    const write = !window.__canWrite || window.__canWrite(); // 新規作成は owner/member
+    if (!sidebar) return;
+    sidebar.querySelectorAll('[data-owner-only]').forEach(el => { el.hidden = !owner; });
+    sidebar.querySelectorAll('[data-write-only]').forEach(el => { el.hidden = !write; });
   }
-  // ワークスペース切替
-  const wsList = document.getElementById('workspaceList');
-  if (wsList) wsList.addEventListener('click', (e) => {
-    const b = e.target.closest('[data-org]'); if (!b) return;
-    const id = b.getAttribute('data-org');
-    closeAcct(false);
-    if (window.__switchOrg) window.__switchOrg(id);
-    if (window.gotoDash) window.gotoDash();
-  });
-  function openAcct(focusLast) {
-    if (!userChip || acctOpen()) return;
-    refreshAcctMenu();
-    acctMenu.hidden = false; acctScrim.hidden = false;
-    acctMenu.setAttribute('aria-hidden', 'false'); userChip.setAttribute('aria-expanded', 'true');
-    placeAcct();
-    const items = acctItems(); (focusLast ? items[items.length - 1] : items[0]).focus();
+  window.__refreshSidebar = refreshSidebar;
+  function setSbActive(act) {
+    if (!sidebar) return;
+    sidebar.querySelectorAll('.sb-item').forEach(b => b.removeAttribute('aria-current'));
+    if (act) { const b = sidebar.querySelector('.sb-item[data-act="' + act + '"]'); if (b) b.setAttribute('aria-current', 'page'); }
   }
-  function closeAcct(refocus = true) {
-    if (!acctOpen()) return;
-    acctMenu.hidden = true; acctScrim.hidden = true;
-    acctMenu.setAttribute('aria-hidden', 'true'); userChip.setAttribute('aria-expanded', 'false');
-    if (refocus) userChip.focus();
-  }
-  acctScrim.addEventListener('click', () => closeAcct());
-  window.addEventListener('resize', () => { if (acctOpen()) placeAcct(); });
-  roving(acctMenu, '[role="menuitem"]', { activate: false });   // ↑↓ Home End between items
-  acctMenu.addEventListener('keydown', e => { if (e.key === 'Tab') closeAcct(); });   // APG: Tab leaves the menu (Esc is handled globally)
-  acctMenu.addEventListener('click', e => {
-    const item = e.target.closest('[role="menuitem"]'); if (!item) return;
+  window.__setNav = setSbActive;
+  // mobile drawer
+  const sbToggle = document.getElementById('sbToggle'), sbScrim = document.getElementById('sbScrim');
+  function closeDrawer() { document.body.classList.remove('sb-open'); if (sbToggle) sbToggle.setAttribute('aria-expanded', 'false'); }
+  window.__closeDrawer = closeDrawer;
+  if (sbToggle) sbToggle.addEventListener('click', () => { const open = document.body.classList.toggle('sb-open'); sbToggle.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+  if (sbScrim) sbScrim.addEventListener('click', closeDrawer);
+  // sidebar clicks: workspace switch + nav actions
+  if (sidebar) sidebar.addEventListener('click', (e) => {
+    const ws = e.target.closest('[data-org]');
+    if (ws) { closeDrawer(); if (window.__switchOrg) window.__switchOrg(ws.getAttribute('data-org')); return; }
+    const item = e.target.closest('[data-act]'); if (!item) return;
     const act = item.dataset.act;
-    closeAcct(act !== 'logout');
-    if (act === 'logout') {
-      if (window.sb) window.sb.auth.signOut();
-      else toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200);
-      return;
-    }
+    closeDrawer();
+    if (act === 'logout') { if (window.sb) window.sb.auth.signOut(); else toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200); return; }
+    if (act === 'new')     { gotoWizard(); return; }
+    if (act === 'home')    { gotoDash(); return; }
     if (act === 'profile') { gotoSettings(); return; }
     if (act === 'billing' || act === 'credits') { gotoBilling(); return; }
-    toast(L('Coming soon', '準備中'), false, 1800);
   });
-  // Auth layer mounts the chip after sign-in (also callable by hand for testing: window.mountUserChip('you@example.com'))
-  window.mountUserChip = function (email) {
-    const bar = document.querySelector('.topbar');
-    if (!bar) return null;
-    if (!userChip) {
-      userChip = document.createElement('button');
-      userChip.type = 'button'; userChip.id = 'userChip'; userChip.className = 'user-chip';
-      userChip.setAttribute('aria-haspopup', 'menu'); userChip.setAttribute('aria-expanded', 'false');
-      userChip.setAttribute('aria-controls', 'acctMenu'); userChip.setAttribute('aria-label', 'アカウントメニュー');
-      userChip.innerHTML = '<span class="avatar" aria-hidden="true"></span><span class="email"></span><svg class="ic chev" aria-hidden="true"><use href="#i-chevron-down"/></svg>';
-      userChip.addEventListener('click', () => acctOpen() ? closeAcct() : openAcct());   // Enter / Space fire click natively
-      userChip.addEventListener('keydown', e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); openAcct(e.key === 'ArrowUp'); } });
-      bar.appendChild(userChip);
-    }
-    window.onAccountInfo({ email });
-    return userChip;
-  };
+  // Auth layer calls this after sign-in; the sidebar shows the account info directly.
+  window.mountUserChip = function (email) { window.onAccountInfo({ email }); return null; };
   // Data layer reports { email?, plan?, credits?, max? } (partial objects merge) after refreshUsage() / refreshCredits()
   window.onAccountInfo = function (info) {
     Object.keys(info || {}).forEach(k => { if (info[k] !== undefined && info[k] !== null) acctInfo[k] = info[k]; });
@@ -1995,7 +2003,7 @@
   document.getElementById('backToWork').addEventListener('click', gotoWorkspace);
 
   function gotoExport() {
-    hideAll(); vExport.hidden = false;
+    hideAll(); vExport.hidden = false; _nav(true, null);
     renderSpecs();
     setCrumb([['ホーム', gotoDash], ['ミライ工事写真', gotoWorkspace], ['書き出し']], gotoWorkspace);
   }
@@ -2272,32 +2280,36 @@
   function focusView(v) {   // move focus to the new view so keyboard/AT users land on it
     v.setAttribute('tabindex', '-1'); v.focus({ preventScroll: true });
   }
+  function _nav(inProject, act) {   // 上部バーの出し分け（工程のみ）＋サイドバーのアクティブ状態
+    document.body.classList.toggle('in-project', !!inProject);
+    setSbActive(act || null);
+  }
   document.getElementById('newCM').addEventListener('click', gotoWizard);
   function gotoScript() {
-    hideAll(); vScript.hidden = false; focusView(vScript);
+    hideAll(); vScript.hidden = false; focusView(vScript); _nav(true, 'new');
     setCrumb([['ホーム', gotoDash], ['新規CM', gotoWizard], ['台本・絵コンテ']], gotoWizard);
     if (window.renderShotList) window.renderShotList();   // Supabase 接続時は実案件の素材リスト（アップロード可）に差し替え
   }
   function gotoWorkspace() {
-    hideAll(); vWork.hidden = false; focusView(vWork);
+    hideAll(); vWork.hidden = false; focusView(vWork); _nav(true, null);
     setCrumb([['ホーム', gotoDash], ['ミライ工事写真', null], ['30秒CM']], gotoDash);
   }
   // 対象プロジェクト名でワークスペースを開く（データ層 openWorkspace から呼ぶ）。
   window.gotoWorkspaceFor = function (name) {
-    hideAll(); vWork.hidden = false; focusView(vWork);
+    hideAll(); vWork.hidden = false; focusView(vWork); _nav(true, null);
     setCrumb([['ホーム', gotoDash], [name || 'プロジェクト', null], ['ワークスペース']], gotoDash);
   };
   function gotoWizard() {
-    hideAll(); vWiz.hidden = false; focusView(vWiz);
+    hideAll(); vWiz.hidden = false; focusView(vWiz); _nav(true, 'new');
     setCrumb([['ホーム', gotoDash], ['新規CM', null], ['制作をはじめる']], gotoDash);
   }
   function gotoDash() {
-    hideAll(); vDash.hidden = false; focusView(vDash);
+    hideAll(); vDash.hidden = false; focusView(vDash); _nav(false, 'home');
     setCrumb([['ホーム']]);
     if (window.applyProjFilter) window.applyProjFilter();
   }
   function gotoSettings() {
-    hideAll(); vSettings.hidden = false; focusView(vSettings);
+    hideAll(); vSettings.hidden = false; focusView(vSettings); _nav(false, 'profile');
     setCrumb([['ホーム', gotoDash], ['プロフィール・設定']], gotoDash);
     if (window.loadSettings) window.loadSettings();
   }
@@ -2306,23 +2318,26 @@
       toast(L('Only the workspace owner can view billing.', '請求情報はワークスペースのオーナーのみ閲覧できます。'), false, 2600);
       return;
     }
-    hideAll(); vBilling.hidden = false; focusView(vBilling);
+    hideAll(); vBilling.hidden = false; focusView(vBilling); _nav(false, 'billing');
     setCrumb([['ホーム', gotoDash], ['プランと請求']], gotoDash);
     if (window.loadBilling) window.loadBilling();
   }
   window.gotoSettings = gotoSettings; window.gotoBilling = gotoBilling;
   document.getElementById('setToBilling').addEventListener('click', gotoBilling);
   setCrumb([['ホーム']]);
-  document.querySelector('.brand').style.cursor = 'pointer';
-  document.querySelector('.brand').setAttribute('role', 'link');
-  document.querySelector('.brand').setAttribute('tabindex', '0');
-  document.querySelector('.brand').setAttribute('aria-label', 'Spot ホーム');
-  document.querySelector('.brand').addEventListener('click', gotoDash);
-  document.querySelector('.brand').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); gotoDash(); } });
+  const _brand = document.querySelector('.sb-brand');
+  if (_brand) {
+    _brand.style.cursor = 'pointer';
+    _brand.setAttribute('role', 'link');
+    _brand.setAttribute('tabindex', '0');
+    _brand.setAttribute('aria-label', 'Spot ホーム');
+    _brand.addEventListener('click', gotoDash);
+    _brand.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); gotoDash(); } });
+  }
   // Esc = back (HIG), only when focus is not inside a text field
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
-    if (document.querySelector('.menu[aria-hidden="false"]')) { closeAcct(); return; }   // an open menu owns Esc
+    if (document.body.classList.contains('sb-open')) { if (window.__closeDrawer) window.__closeDrawer(); return; }   // an open drawer owns Esc
     if (backFn && !e.target.closest('input, textarea, [contenteditable="true"]')) backFn();
   });
   document.getElementById('scriptBack').addEventListener('click', gotoWizard);
@@ -2540,7 +2555,7 @@
     'プロフィール・設定': 'Profile & settings', 'アカウント情報と表示設定。': 'Account info and display settings.',
     'プロフィール': 'Profile', '表示名': 'Display name', 'メールアドレス': 'Email',
     '保存': 'Save', '保存しました': 'Saved', 'プラン': 'Plan', 'プランと請求を見る': 'View plan & billing',
-    '表示言語': 'Language', '画面右上の': 'Use the', 'で切り替えられます。': 'toggle at the top-right to switch.',
+    '表示言語': 'Language', '左のサイドバー下部の': 'Use the', 'で切り替えられます。': 'toggle in the sidebar to switch.',
     'プランと請求': 'Plan & billing', 'クレジットを追加': 'Add credits', 'サインアウト': 'Sign out',
     // team / members
     'チーム・メンバー': 'Team members',
@@ -2738,8 +2753,8 @@
   const eyeEl = document.getElementById('authEye');
   let mode = 'signin';
 
-  const showAuth = () => { document.body.classList.add('booting'); authEl.hidden = false; };
-  const showApp = () => { authEl.hidden = true; document.body.classList.remove('booting'); };
+  const showAuth = () => { document.body.classList.add('booting'); document.body.classList.remove('signed-in'); authEl.hidden = false; };
+  const showApp = () => { authEl.hidden = true; document.body.classList.remove('booting'); document.body.classList.add('signed-in'); };
   const fail = (msg, info) => {
     errEl.classList.toggle('info', !!info);
     errEl.innerHTML = '<svg class="ic"><use href="#i-alert"/></svg><span></span>';
@@ -2881,13 +2896,15 @@
       banner.textContent = (window.L ? window.L('View-only access — you can browse this workspace but not create or edit.', '閲覧のみの権限です。閲覧はできますが、作成・編集はできません。') : '閲覧のみ');
       banner.hidden = false;
     } else if (banner) { banner.hidden = true; }
+    if (window.__refreshSidebar) window.__refreshSidebar();   // サイドバーの役割ガードを更新
   }
   window.__applyRoleUI = applyRoleUI;
 
   window.onAppReady = async function (session, client) {
     sb = client; currentUid = session.user.id;
     await loadOrg();
-    applyRoleUI();                         // viewer を読み取り専用に
+    applyRoleUI();                         // viewer を読み取り専用に＋サイドバー更新
+    if (window.__setNav) window.__setNav('home');   // 初期はホーム
     recordLogin();                         // 共有検知の記録（007 未適用なら無害にスキップ）
     enforceSessionCap();                   // 同時セッション上限=2（008 未適用ならスキップ）
     deviceGateCheck(session.user.email);   // 新デバイスOTP（config.deviceOtp が true のときだけ）
