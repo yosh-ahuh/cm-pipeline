@@ -1096,6 +1096,13 @@
   .mm-item .ic { width: 15px; height: 15px; }
   .mm-new { color: var(--accent-ink); }
   .mm-sep { height: 1px; background: var(--line); margin: 4px 6px; }
+  .col-badge { display: inline-flex; align-items: center; gap: 4px; font-size: var(--t-label-sm); color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--r-full); padding: 2px 8px; margin-left: auto; max-width: 46%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .col-badge .ic { width: 11px; height: 11px; flex: none; }
+  .sb-item .sb-badge { margin-left: auto; font-size: var(--t-label-sm); color: var(--muted); background: var(--surface-3); border-radius: var(--r-full); padding: 1px 8px; min-width: 20px; text-align: center; }
+  body.sb-collapsed .sb-item .sb-badge { display: none; }
+  .modal-scrim { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,.5); display: grid; place-items: center; padding: 24px; }
+  .modal-card { width: 100%; max-width: 420px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; box-shadow: var(--shadow-lift); }
+  .modal-h { font-family: var(--font-display); font-weight: 800; font-size: 20px; margin: 0 0 16px; }
 </style>
 </head>
 <body class="booting">
@@ -1781,6 +1788,7 @@
       <button class="btn btn-ghost" id="colBack"><svg class="ic"><use href="#i-back"/></svg><span>コレクション一覧</span></button>
       <h2 id="colDetailName"></h2>
       <span class="spacer" style="flex:1"></span>
+      <button class="btn btn-ghost" id="colRename" data-write-only><svg class="ic"><use href="#i-edit"/></svg><span>名前を変更</span></button>
       <button class="btn btn-ghost" id="colDelete" data-write-only><span>削除</span></button>
     </div>
     <div class="proj-grid" id="colVideos"></div>
@@ -1790,6 +1798,19 @@
 
 <!-- move-to-collection popover -->
 <div class="move-menu" id="moveMenu" role="menu" aria-label="コレクションに移動" hidden></div>
+
+<!-- name modal (create / rename collection) -->
+<div class="modal-scrim" id="nameModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
+    <h2 class="modal-h" id="nameModalTitle">新規コレクション</h2>
+    <div class="fld"><label for="nameModalInput">コレクション名</label>
+      <input id="nameModalInput" type="text" maxlength="60" placeholder="例）2026年9月" autocomplete="off"></div>
+    <div class="cta-row" style="justify-content:flex-end;gap:8px;margin-top:8px">
+      <button class="btn btn-ghost" id="nameModalCancel"><span>キャンセル</span></button>
+      <button class="btn btn-primary" id="nameModalOk"><span>作成</span></button>
+    </div>
+  </div>
+</div>
 
 <!-- ============================ BILLING VIEW ============================ -->
 <main class="wrap" id="view-billing" hidden>
@@ -3564,13 +3585,14 @@
     if (!grid) return;
     grid.innerHTML = skeleton(4);   // M3 skeleton while fetching — no blank flash
     try {
-      let q = sb.from('projects').select('id,name,product,status,spec,updated_at');   // collection_id は基本selectに含めない（011未適用でも動く）
+      await fetchCollections();   // バッジ名の解決用
+      let q = sb.from('projects').select('id,name,product,status,spec,updated_at,collection_id');
       if (currentOrg && currentOrg.id) q = q.eq('org_id', currentOrg.id);   // 現在のワークスペース(組織)だけ
-      if (opts && opts.collectionId) q = q.eq('collection_id', opts.collectionId);   // 絞り込みはコレクション詳細のみ（011適用後）
+      if (opts && opts.collectionId) q = q.eq('collection_id', opts.collectionId);   // 絞り込みはコレクション詳細
       else if (opts && opts.uncategorized) q = q.is('collection_id', null);
       const { data, error } = await q.order('updated_at', { ascending: false });
       if (error) throw error;
-      if (!data || !data.length) { grid.innerHTML = emptyState(); return; }
+      if (!data || !data.length) { grid.innerHTML = (opts && opts.emptyMsg) || emptyState(); return; }
       grid.innerHTML = data.map(card).join('');
       if (window.applyProjFilter) window.applyProjFilter();
     } catch (e) {
@@ -3589,7 +3611,36 @@
       const { data } = await sb.from('collections').select('id,name').eq('org_id', currentOrg.id).order('created_at', { ascending: false });
       _collections = data || [];
     } catch (_) { _collections = []; }
+    updateCollectionsBadge();
     return _collections;
+  }
+  function colName(id) { const c = _collections.find(x => x.id === id); return c ? c.name : ''; }
+  function updateCollectionsBadge() {
+    const el = document.querySelector('#sbNav [data-act="collections"]');
+    if (!el) return;
+    let b = el.querySelector('.sb-badge');
+    const n = _collections.length;
+    if (!n) { if (b) b.remove(); return; }
+    if (!b) { b = document.createElement('span'); b.className = 'sb-badge'; el.appendChild(b); }
+    b.textContent = n;
+  }
+  window.__updateCollectionsBadge = updateCollectionsBadge;
+  // 名前入力モーダル（作成/リネーム共用、prompt の置き換え）
+  function openNameModal(opts) {
+    return new Promise(resolve => {
+      const scrim = document.getElementById('nameModal');
+      const input = document.getElementById('nameModalInput');
+      const ok = document.getElementById('nameModalOk'), cancel = document.getElementById('nameModalCancel');
+      setText('nameModalTitle', opts.title);
+      ok.querySelector('span').textContent = opts.okLabel || L('Create', '作成');
+      input.value = opts.value || '';
+      scrim.hidden = false; setTimeout(() => { input.focus(); input.select(); }, 30);
+      const done = (val) => { scrim.hidden = true; ok.onclick = cancel.onclick = scrim.onclick = input.onkeydown = null; resolve(val); };
+      ok.onclick = () => { const v = input.value.trim(); if (v) done(v); else input.focus(); };
+      cancel.onclick = () => done(null);
+      scrim.onclick = (e) => { if (e.target === scrim) done(null); };
+      input.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); ok.onclick(); } else if (e.key === 'Escape') { e.preventDefault(); done(null); } };
+    });
   }
   function colTile(id, name, count) {
     return `<button class="col-card" data-col="${id}"><span class="col-ic"><svg class="ic"><use href="#i-folder"/></svg></span><span class="col-name">${name}</span><span class="col-count">${count}</span></button>`;
@@ -3615,12 +3666,18 @@
     document.getElementById('colList').hidden = true;
     const d = document.getElementById('colDetail'); d.hidden = false; d.dataset.col = id;
     setText('colDetailName', name);
-    const del = document.getElementById('colDelete'); if (del) del.hidden = (id === '__uncat__') || !(window.__canWrite && window.__canWrite());
-    renderVideos('colVideos', id === '__uncat__' ? { uncategorized: true } : { collectionId: id });
+    const write = (window.__canWrite && window.__canWrite());
+    const del = document.getElementById('colDelete'); if (del) del.hidden = (id === '__uncat__') || !write;
+    const ren = document.getElementById('colRename'); if (ren) ren.hidden = (id === '__uncat__') || !write;
+    const emptyMsg = id === '__uncat__'
+      ? `<div class="empty"><div class="e-ic"><svg class="ic"><use href="#i-folder"/></svg></div><h4>${L('No uncategorized videos', '未分類の動画はありません')}</h4><p>${L('All videos are organized into collections.', 'すべての動画がコレクションに整理されています。')}</p></div>`
+      : `<div class="empty"><div class="e-ic"><svg class="ic"><use href="#i-folder"/></svg></div><h4>${L('This collection is empty', 'このコレクションは空です')}</h4><p>${L('Open a video’s 📁 button in Media or Home to move it here.', 'メディアやホームで動画の📁ボタンから、ここに移動できます。')}</p></div>`;
+    renderVideos('colVideos', id === '__uncat__' ? { uncategorized: true, emptyMsg } : { collectionId: id, emptyMsg });
   }
   async function createCollection(thenMoveProject) {
     if (!currentOrg || !(window.__canWrite && window.__canWrite())) return null;
-    const name = (prompt(L('Collection name', 'コレクション名')) || '').trim(); if (!name) return null;
+    const name = await openNameModal({ title: L('New collection', '新規コレクション'), okLabel: L('Create', '作成') });
+    if (!name) return null;
     try {
       const { data, error } = await sb.from('collections').insert({ org_id: currentOrg.id, name }).select().single();
       if (error) throw error;
@@ -3628,6 +3685,16 @@
       await fetchCollections();
       return data.id;
     } catch (e) { if (window.toast) window.toast('作成に失敗: ' + e.message, false, 2600); return null; }
+  }
+  async function renameCollection(id, currentName) {
+    if (!id || id === '__uncat__' || !(window.__canWrite && window.__canWrite())) return;
+    const name = await openNameModal({ title: L('Rename collection', 'コレクション名を変更'), value: currentName, okLabel: L('Save', '保存') });
+    if (!name || name === currentName) return;
+    try {
+      const { error } = await sb.from('collections').update({ name }).eq('id', id); if (error) throw error;
+      await fetchCollections();
+      setText('colDetailName', name);   // 詳細表示中なら見出しも更新
+    } catch (e) { if (window.toast) window.toast('変更に失敗: ' + e.message, false, 2600); }
   }
   async function moveToCollection(projectId, collectionId) {
     try {
@@ -3642,6 +3709,7 @@
     if (grid) grid.addEventListener('click', e => { const c = e.target.closest('[data-col]'); if (c) openCollectionDetail(c.getAttribute('data-col'), c.querySelector('.col-name').textContent); });
     const nc = document.getElementById('newCollection'); if (nc) nc.addEventListener('click', () => createCollection().then(id => { if (id) window.loadCollections(); }));
     const back = document.getElementById('colBack'); if (back) back.addEventListener('click', () => window.loadCollections());
+    const ren = document.getElementById('colRename'); if (ren) ren.addEventListener('click', () => renameCollection(document.getElementById('colDetail').dataset.col, document.getElementById('colDetailName').textContent));
     const del = document.getElementById('colDelete'); if (del) del.addEventListener('click', async () => {
       const id = document.getElementById('colDetail').dataset.col;
       if (!id || id === '__uncat__') return;
@@ -3703,7 +3771,8 @@
       <div class="proj-body">
         <div class="proj-name">${esc(p.name)}</div>
         <div class="proj-meta"><span>${esc(tag)}</span> ・ <span>${rel(p.updated_at)}</span>
-          <span class="fmts">${fmts.map(([w, h]) => `<i style="width:${w}px;height:${h}px"></i>`).join('')}</span></div>
+          <span class="fmts">${fmts.map(([w, h]) => `<i style="width:${w}px;height:${h}px"></i>`).join('')}</span>
+          ${p.collection_id && colName(p.collection_id) ? `<span class="col-badge"><svg class="ic"><use href="#i-folder"/></svg>${esc(colName(p.collection_id))}</span>` : ''}</div>
         <div class="proj-foot"><span>消費クレジット</span><span class="cost">${p.status && p.status !== 'draft' ? '1' : '—'}</span></div>
       </div>
     </div>`;
