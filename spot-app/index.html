@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SPOT</title>
+<title>Spot</title>
 <meta name="theme-color" content="#131318">
-<meta name="description" content="SPOT — 選ぶだけで、広告動画。">
+<meta name="description" content="Spot — 選ぶだけで、広告動画。">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:type" content="website">
-<meta property="og:title" content="SPOT — 選ぶだけで、広告動画。">
+<meta property="og:title" content="Spot — 選ぶだけで、広告動画。">
 <meta property="og:description" content="配信先・業種・ターゲットを選ぶだけ。AIが台本・実写・UI・音声を生成し、その日のうちに初稿。">
 <meta property="og:image" content="assets/og-cover.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
@@ -23,7 +23,7 @@
 <script src="config.js"></script>
 <style>
   /* ==========================================================================
-     SPOT design tokens — Material Design 3 (tonal surfaces / state layers /
+     Spot design tokens — Material Design 3 (tonal surfaces / state layers /
      shape & type scale) × Apple HIG (44pt targets, clarity, deference).
      ダーク一択（単一テーマ）。ライト/システム連動・切替は廃止。
      ========================================================================== */
@@ -655,7 +655,7 @@
     box-shadow: var(--shadow-lift);
   }
   .hero-new::after { content:""; position:absolute; right:-40px; top:-40px; width:220px; height:220px; border-radius:50%; background: radial-gradient(circle, var(--accent), transparent 70%); opacity:.4; pointer-events: none; }
-  .hero-new .hn-eye { font-family: var(--font-mono); font-size: var(--t-label-sm); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); }
+  .hero-new .hn-eye { font-family: var(--font-mono); font-size: var(--t-label-sm); letter-spacing: .12em; color: var(--accent-ink); }
   .hero-new h2 { font-family: var(--font-display); font-size: var(--t-display); font-weight: 800; letter-spacing: -.02em; margin: 8px 0 8px; line-height: 1.15; }
   .hero-new p { font-size: var(--t-body); color: #B4BAD4; max-width: 44ch; line-height: 1.65; margin: 0 0 var(--s-6); }
   .hn-btn {
@@ -1019,8 +1019,8 @@
 
 <div id="auth" class="auth-screen" hidden>
   <div class="auth-card">
-    <div class="auth-brand"><div class="mark"></div><div class="wordmark">SP<span style="color:var(--accent)">O</span>T</div></div>
-    <h1 class="auth-h" id="authH">SPOT にサインイン</h1>
+    <div class="auth-brand"><div class="mark"></div><div class="wordmark">Spot</div></div>
+    <h1 class="auth-h" id="authH">Spot にサインイン</h1>
     <p class="auth-sub">選ぶだけで、広告動画。</p>
     <form id="authForm" class="auth-form" novalidate>
       <div>
@@ -1038,7 +1038,7 @@
     </form>
     <div class="auth-err" id="authErr" role="alert" hidden></div>
     <div class="auth-toggle">
-      <span id="authToggleText">SPOT は初めてですか?</span>
+      <span id="authToggleText">Spot は初めてですか?</span>
       <button type="button" id="authToggle" class="linkbtn">アカウントを作成</button>
     </div>
     <div class="auth-config" id="authConfig" hidden>⚠ Supabase 未設定です。<code>config.js</code> に Project URL と anon キーを設定してください。</div>
@@ -1049,7 +1049,7 @@
   <div class="wrap topbar">
     <div class="brand">
       <div class="mark"></div>
-      <div class="wordmark">SP<span style="color:var(--accent)">O</span>T</div>
+      <div class="wordmark">Spot</div>
     </div>
     <button class="icon-btn nav-back" id="navBack" aria-label="戻る"><svg class="ic"><use href="#i-back"/></svg></button>
     <nav class="breadcrumb" id="crumb" aria-label="現在地"></nav>
@@ -1088,7 +1088,7 @@
 <main class="wrap" id="view-dash" tabindex="-1">
   <section class="dash-hero">
     <div class="hero-new">
-      <div class="hn-eye">SPOT</div>
+      <div class="hn-eye">Spot</div>
       <h2>選ぶだけで、広告動画。</h2>
       <p>配信先・業種・ターゲットを選ぶだけ。AIがディレクターとして台本を組み、実写もUIも音声も生成。その日のうちに、クライアント確認できる初稿が出てきます。</p>
       <button class="hn-btn" id="newCM"><svg class="ic"><use href="#i-plus"/></svg><span>新規CMをつくる</span></button>
@@ -1117,7 +1117,7 @@
     </div>
   </div>
   <div class="proj-grid" id="projGrid"></div>
-  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
 
 <!-- ============================ WIZARD VIEW ============================ -->
@@ -1327,7 +1327,7 @@
       <div class="rx-foot" id="rxFoot">この処方は、実案件のA/Bテスト知見をもとに自動で組み立てられます。</div>
     </aside>
   </div>
-  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
 
 <!-- ============================ SCRIPT / STORYBOARD VIEW ============================ -->
@@ -1368,7 +1368,7 @@
     <div class="grow"></div>
     <button class="btn btn-primary auto" id="scriptNext"><span>この構成で生成する</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
   </div>
-  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
 
 <!-- ============================ EXPORT / DELIVERY VIEW ============================ -->
@@ -1389,7 +1389,7 @@
         <div class="panel-h">納期の目安</div>
         <div class="compare">
           <div class="cmp-row"><div class="cmp-k">従来の外注<b>納期</b></div><div class="cmp-v">3週間<small>修正2回まで</small></div></div>
-          <div class="cmp-row komadori"><div class="cmp-k">SPOT<b>納期</b></div><div class="cmp-v">当日<small>修正は分単位</small></div></div>
+          <div class="cmp-row komadori"><div class="cmp-k">Spot<b>納期</b></div><div class="cmp-v">当日<small>修正は分単位</small></div></div>
         </div>
       </div>
       <div class="panel" id="preflight">
@@ -1415,7 +1415,7 @@
       </div>
     </aside>
   </div>
-  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
 
 <!-- ============================ WORKSPACE VIEW ============================ -->
@@ -1563,7 +1563,7 @@
     </aside>
   </div>
 
-  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
 
 <!-- ============================ SETTINGS VIEW ============================ -->
@@ -1614,7 +1614,7 @@
       <p class="muted" id="teamViewerNote" hidden style="margin:12px 0 0;font-size:var(--t-label)">メンバーの招待・管理はオーナーのみ可能です。</p>
     </div>
   </div>
-  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
 
 <!-- ============================ BILLING VIEW ============================ -->
@@ -1647,13 +1647,13 @@
     </div>
     <div id="creditCosts" class="muted" style="margin-top:14px;font-size:var(--t-label);line-height:1.8"></div>
   </div>
-  <div class="foot">SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
 
 <!-- ============================ FIRST-RUN ONBOARDING ============================ -->
 <div id="onboard" class="onboard-screen" role="dialog" aria-modal="true" aria-labelledby="onboardH" hidden>
   <div class="onboard-card">
-    <div class="auth-brand"><div class="mark"></div><div class="wordmark">SP<span style="color:var(--accent)">O</span>T</div></div>
+    <div class="auth-brand"><div class="mark"></div><div class="wordmark">Spot</div></div>
     <h1 class="onboard-h" id="onboardH">ようこそ。広告動画を、選ぶだけ。</h1>
     <p class="onboard-sub">むずかしい操作はありません。次の3ステップで、最初の動画をつくれます。</p>
     <ol class="onboard-steps">
@@ -1669,7 +1669,7 @@
 <!-- 新デバイス確認（メールOTP）。config.js の deviceOtp:true で有効。既定は非表示。 -->
 <div id="deviceGate" class="onboard-screen" role="dialog" aria-modal="true" aria-labelledby="dgH" hidden>
   <div class="onboard-card">
-    <div class="auth-brand"><div class="mark"></div><div class="wordmark">SP<span style="color:var(--accent)">O</span>T</div></div>
+    <div class="auth-brand"><div class="mark"></div><div class="wordmark">Spot</div></div>
     <h1 class="onboard-h" id="dgH">この端末を確認します</h1>
     <p class="onboard-sub" id="dgSub">初めての端末からのログインです。メールに送った6桁のコードを入力してください。</p>
     <div class="fld"><label for="dgCode">確認コード</label>
@@ -2316,7 +2316,7 @@
   document.querySelector('.brand').style.cursor = 'pointer';
   document.querySelector('.brand').setAttribute('role', 'link');
   document.querySelector('.brand').setAttribute('tabindex', '0');
-  document.querySelector('.brand').setAttribute('aria-label', 'SPOT ホーム');
+  document.querySelector('.brand').setAttribute('aria-label', 'Spot ホーム');
   document.querySelector('.brand').addEventListener('click', gotoDash);
   document.querySelector('.brand').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); gotoDash(); } });
   // Esc = back (HIG), only when focus is not inside a text field
@@ -2349,12 +2349,12 @@
   var D = {
     // --- header / breadcrumb ---
     'ホーム': 'Home', 'クレジット残': 'Credits', '新規CM': 'New ad', '戻る': 'Back', '設定': 'Settings',
-    '本文へスキップ': 'Skip to content', '現在地': 'Breadcrumb', 'SPOT ホーム': 'SPOT home',
+    '本文へスキップ': 'Skip to content', '現在地': 'Breadcrumb', 'Spot ホーム': 'Spot home',
     // --- auth ---
-    'SPOT にサインイン': 'Sign in to SPOT', 'SPOT アカウントを作成': 'Create your SPOT account',
+    'Spot にサインイン': 'Sign in to Spot', 'Spot アカウントを作成': 'Create your Spot account',
     'メールアドレス': 'Email', 'パスワード': 'Password', '6文字以上': 'At least 6 characters',
     'サインイン': 'Sign in', 'アカウント作成': 'Create account', 'アカウントを作成': 'Create an account',
-    'SPOT は初めてですか?': 'New to SPOT?', 'すでにアカウントをお持ちですか?': 'Already have an account?',
+    'Spot は初めてですか?': 'New to Spot?', 'すでにアカウントをお持ちですか?': 'Already have an account?',
     'パスワードを表示': 'Show password', 'パスワードを隠す': 'Hide password', 'サインアウト': 'Sign out',
     '確認メールを送信しました。メール内のリンクで認証してからログインしてください。':
       'Confirmation email sent. Follow the link in the email, then sign in.',
@@ -2381,7 +2381,7 @@
     '1クレジット = 1スポット（CM1本・3パターン×3フォーマット = 9ファイル）': '1 credit = 1 spot (one finished ad, 3 patterns × 3 formats = 9 files)',
     '制作中・完成したCM': 'In progress & finished',
     'すべて': 'All', '制作中': 'In progress', '完成': 'Finished',
-    'SPOT ・ 選ぶだけで、広告動画。 — プロトタイプ': 'SPOT · Ad videos, just by choosing. — Prototype',
+    'Spot ・ 選ぶだけで、広告動画。 — プロトタイプ': 'Spot · Ad videos, just by choosing. — Prototype',
     // --- wizard shell ---
     '新規CM ・ ステップ': 'New ad · Step',
     'つくりたいCMを、選ぶだけ。': 'Just choose the ad you want.',
@@ -2770,9 +2770,9 @@
   document.getElementById('authToggle').addEventListener('click', () => {
     mode = mode === 'signin' ? 'signup' : 'signin';
     const signin = mode === 'signin';
-    hEl.textContent = signin ? 'SPOT にサインイン' : 'SPOT アカウントを作成';
+    hEl.textContent = signin ? 'Spot にサインイン' : 'Spot アカウントを作成';
     submitText.textContent = signin ? 'サインイン' : 'アカウント作成';
-    document.getElementById('authToggleText').textContent = signin ? 'SPOT は初めてですか?' : 'すでにアカウントをお持ちですか?';
+    document.getElementById('authToggleText').textContent = signin ? 'Spot は初めてですか?' : 'すでにアカウントをお持ちですか?';
     document.getElementById('authToggle').textContent = signin ? 'アカウントを作成' : 'サインイン';
     passEl.autocomplete = signin ? 'current-password' : 'new-password';
     errEl.hidden = true;

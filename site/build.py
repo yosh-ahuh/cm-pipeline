@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SPOT marketing site — static generator.
+"""Spot marketing site — static generator.
 
     python3 site/build.py            # → site/dist/
     python3 site/build.py --serve    # build, then serve dist/ on :5510
@@ -185,7 +185,7 @@ def head(lang: str, page: dict) -> str:
 <link rel="alternate" hreflang="{'ja' if lang=='en' else 'en'}" href="{other}">
 <link rel="alternate" hreflang="x-default" href="{url('en', path)}">
 <meta property="og:type" content="{page.get('og_type','website')}">
-<meta property="og:site_name" content="SPOT">
+<meta property="og:site_name" content="Spot">
 <meta property="og:url" content="{here}">
 <meta property="og:locale" content="{'en_US' if lang=='en' else 'ja_JP'}">
 <meta property="og:locale:alternate" content="{'ja_JP' if lang=='en' else 'en_US'}">
@@ -193,7 +193,7 @@ def head(lang: str, page: dict) -> str:
 <meta property="og:description" content="{esc(desc)}">
 <meta property="og:image" content="{SITE}/og/spot-cover.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="SPOT — the AI commercial studio for marketing teams.">
+<meta property="og:image:alt" content="Spot — the AI commercial studio for marketing teams.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{esc(og_title)}">
 <meta name="twitter:description" content="{esc(desc)}">
@@ -214,7 +214,7 @@ def nav(lang: str, current: str) -> str:
     )
     en_here, ja_here = url("en", current), url("ja", current)
     return f"""<nav class="top"><div class="wrap nav-in">
-  <a class="brand" href="{url(lang, '')}" aria-label="SPOT home">{LOGO_SVG}<span class="word">SP<span class="o">O</span>T</span></a>
+  <a class="brand" href="{url(lang, '')}" aria-label="Spot home">{LOGO_SVG}<span class="word">Spot</span></a>
   <div class="nav-links">{links}</div>
   <div class="nav-right">
     <div class="lang" role="group" aria-label="Language"><a href="{en_here}" hreflang="en"{' aria-current="true"' if lang=='en' else ''}>EN</a><a href="{ja_here}" hreflang="ja"{' aria-current="true"' if lang=='ja' else ''}>日本語</a></div>
@@ -240,10 +240,10 @@ def footer(lang: str) -> str:
         cols += f"<div><h4>{esc(title)}</h4><ul>{lis}</ul></div>"
     return f"""<footer><div class="wrap">
   <div class="foot-in">
-    <div><div class="brand"><span class="word">SP<span class="o">O</span>T</span></div><p style="margin-top:12px;max-width:30ch">{esc(t['tagline'])}</p></div>
+    <div><div class="brand"><span class="word">Spot</span></div><p style="margin-top:12px;max-width:30ch">{esc(t['tagline'])}</p></div>
     {cols}
   </div>
-  <div class="foot-bottom"><span>© 2026 SPOT</span><span>{esc(t['foot_note'])}</span></div>
+  <div class="foot-bottom"><span>© 2026 Spot</span><span>{esc(t['foot_note'])}</span></div>
 </div></footer>
 </body></html>"""
 
@@ -488,7 +488,7 @@ def build():
     write(DIST / "robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap-index.xml\n")
 
     # llms.txt — cheap to ship, low expected impact (see spot-marketing.html §03)
-    lines = [f"# SPOT", "", "> " + common.T["en"]["tagline"], "", "## Pages", ""]
+    lines = [f"# Spot", "", "> " + common.T["en"]["tagline"], "", "## Pages", ""]
     for lang, page in all_pages:
         if lang == "en":
             lines.append(f"- [{page['h1_plain']}]({url('en', page['path'])}): {page['desc']}")

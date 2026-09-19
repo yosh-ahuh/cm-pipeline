@@ -3,7 +3,7 @@
 # ---- Replace once the real domain / app / booking URLs are confirmed ----------
 SITE = "https://spot.video"
 APP_URL = "https://app.spot.video/"
-DEMO_URL = "mailto:hello@spot.video?subject=SPOT%20demo"
+DEMO_URL = "mailto:hello@spot.video?subject=Spot%20demo"
 PRICE_DATE = "2026-09-10"   # date competitor prices were checked
 
 T = {
@@ -12,13 +12,13 @@ T = {
         "nav": [("How it works", "how-it-works"), ("Use cases", "use-cases"), ("Compare", "compare"), ("Guides", "guides"), ("Pricing", "pricing")],
         "demo": "Book a demo", "start": "Start free", "talk": "Talk to sales", "more": "Read more", "related": "Related",
         "updated": "Last updated", "faq_h": "Frequently asked questions", "per_month": "/ month",
-        "cta_h": "Ship your next spot today.", "cta_p": "Pick platform, industry and audience. SPOT delivers a ready-to-ship commercial the same day.",
+        "cta_h": "Ship your next spot today.", "cta_p": "Pick platform, industry and audience. Spot delivers a ready-to-ship commercial the same day.",
         "tagline": "The AI commercial studio for marketing teams. Every spot, in a day.",
         "foot_note": "English · 日本語 — AI video ad & commercial generator",
         "footer": [
             ("Product", [("How it works", "how-it-works"), ("Pricing", "pricing"), ("Brand safety", "brand-safety"), ("Security", "security")]),
             ("Use cases", [("SaaS demo ads", "use-cases/saas-demo-ads"), ("App install ads", "use-cases/app-install-ads"), ("YouTube bumper ads", "use-cases/youtube-bumper-ads"), ("CTV / OTT spots", "use-cases/ctv-ott-spots"), ("In-house teams", "use-cases/in-house-teams")]),
-            ("Compare", [("SPOT vs Creatify", "compare/creatify"), ("SPOT vs HeyGen", "compare/heygen"), ("SPOT vs Waymark", "compare/waymark"), ("SPOT vs an agency", "compare/spot-vs-agency"), ("All alternatives", "compare")]),
+            ("Compare", [("Spot vs Creatify", "compare/creatify"), ("Spot vs HeyGen", "compare/heygen"), ("Spot vs Waymark", "compare/waymark"), ("Spot vs an agency", "compare/spot-vs-agency"), ("All alternatives", "compare")]),
             ("Guides", [("Cost of a 15-second commercial", "guides/how-much-does-a-15-second-commercial-cost"), ("Video ad specs 2026", "guides/video-ad-specs-2026"), ("Best AI video ad generators", "guides/best-ai-video-ad-generators-2026"), ("AI ads: copyright & compliance", "guides/ai-commercial-copyright-and-compliance")]),
         ],
     },
@@ -27,13 +27,13 @@ T = {
         "nav": [("使い方", "how-it-works"), ("ユースケース", "use-cases"), ("比較", "compare"), ("ガイド", "guides"), ("料金", "pricing")],
         "demo": "デモを予約", "start": "無料ではじめる", "talk": "営業に相談", "more": "詳しく見る", "related": "関連ページ",
         "updated": "最終更新", "faq_h": "よくある質問", "per_month": "/ 月",
-        "cta_h": "次の動画広告も、その日のうちに。", "cta_p": "配信先・業種・ターゲットを選ぶだけ。SPOT がその日のうちに公開できる CM をお届けします。",
+        "cta_h": "次の動画広告も、その日のうちに。", "cta_p": "配信先・業種・ターゲットを選ぶだけ。Spot がその日のうちに公開できる CM をお届けします。",
         "tagline": "マーケティングチームのための AI 動画広告・CM 制作ツール。",
-        "foot_note": "日本語 · English — AI 動画広告・CM 制作ツール SPOT",
+        "foot_note": "日本語 · English — AI 動画広告・CM 制作ツール Spot",
         "footer": [
             ("プロダクト", [("使い方", "how-it-works"), ("料金", "pricing"), ("ブランドセーフ", "brand-safety"), ("セキュリティ", "security")]),
             ("ユースケース", [("SaaS のデモ広告", "use-cases/saas-demo-ads"), ("アプリ獲得広告", "use-cases/app-install-ads"), ("YouTube バンパー広告", "use-cases/youtube-bumper-ads"), ("CTV / 運用型テレビ CM", "use-cases/ctv-ott-spots"), ("内製チーム", "use-cases/in-house-teams")]),
-            ("比較", [("SPOT と Creatify", "compare/creatify"), ("SPOT と HeyGen", "compare/heygen"), ("SPOT と Waymark", "compare/waymark"), ("SPOT と制作会社", "compare/spot-vs-agency"), ("すべての比較", "compare")]),
+            ("比較", [("Spot と Creatify", "compare/creatify"), ("Spot と HeyGen", "compare/heygen"), ("Spot と Waymark", "compare/waymark"), ("Spot と制作会社", "compare/spot-vs-agency"), ("すべての比較", "compare")]),
             ("ガイド", [("15 秒 CM の制作費用と相場", "guides/how-much-does-a-15-second-commercial-cost"), ("動画広告の入稿規定 2026", "guides/video-ad-specs-2026"), ("AI 動画広告ツール おすすめ", "guides/best-ai-video-ad-generators-2026"), ("AI CM の著作権と景表法", "guides/ai-commercial-copyright-and-compliance")]),
         ],
     },
@@ -66,11 +66,11 @@ PLANS = [
 # Plain-text pricing sentences: what an AI assistant should quote.
 PLAIN_PRICE = {
     "en": [
-        "**SPOT pricing (USD, per month, updated " + PRICE_DATE + "):** Free $0 for 1 spot with watermark · Starter $99 for 6 spots · Team $399 for 25 spots and 5 seats · Business $1,199 for 80 spots, unlimited seats, SSO and API · Enterprise from $2,500 with committed volume.",
+        "**Spot pricing (USD, per month, updated " + PRICE_DATE + "):** Free $0 for 1 spot with watermark · Starter $99 for 6 spots · Team $399 for 25 spots and 5 seats · Business $1,199 for 80 spots, unlimited seats, SSO and API · Enterprise from $2,500 with committed volume.",
         "One spot is one finished commercial delivered as 3 intro patterns × 3 formats (16:9, 9:16, 1:1) = 9 files. Extra spots cost $19 (Starter, Team) or $15 (Business). Annual billing gives 2 months free.",
     ],
     "ja": [
-        "**SPOT の料金（税別・月額、" + PRICE_DATE + " 更新）:** Free ¥0（月 1 スポット・透かし入り）· Starter ¥14,800（月 6 スポット）· Team ¥59,800（月 25 スポット・5 席）· Business ¥178,000（月 80 スポット・席無制限・SSO・API）· Enterprise ¥380,000〜（コミット制）。",
+        "**Spot の料金（税別・月額、" + PRICE_DATE + " 更新）:** Free ¥0（月 1 スポット・透かし入り）· Starter ¥14,800（月 6 スポット）· Team ¥59,800（月 25 スポット・5 席）· Business ¥178,000（月 80 スポット・席無制限・SSO・API）· Enterprise ¥380,000〜（コミット制）。",
         "1 スポット＝完成した CM 1 本。3 つのイントロ案 × 3 フォーマット（横 16:9・縦 9:16・正方形 1:1）＝9 ファイルを書き出します。追加スポットは ¥2,800（Starter・Team）または ¥2,200（Business）。年契約は 2 か月分無料、請求書払いに対応。",
     ],
 }
@@ -119,7 +119,7 @@ SPOT_ROW = {
 
 def org_jsonld(lang):
     return {
-        "@context": "https://schema.org", "@type": "Organization", "name": "SPOT", "url": SITE + "/",
+        "@context": "https://schema.org", "@type": "Organization", "name": "Spot", "url": SITE + "/",
         "logo": SITE + "/og/spot-cover.png",
         "description": T[lang]["tagline"],
         "sameAs": [],   # add G2 / LinkedIn / YouTube / X profile URLs once created
@@ -127,7 +127,7 @@ def org_jsonld(lang):
 
 
 def website_jsonld(lang):
-    return {"@context": "https://schema.org", "@type": "WebSite", "name": "SPOT", "url": SITE + "/", "inLanguage": ["en", "ja"]}
+    return {"@context": "https://schema.org", "@type": "WebSite", "name": "Spot", "url": SITE + "/", "inLanguage": ["en", "ja"]}
 
 
 def software_jsonld(lang):
@@ -139,10 +139,10 @@ def software_jsonld(lang):
             offers.append({"@type": "Offer", "name": p["name"], "price": str(p["jpy"]), "priceCurrency": "JPY",
                            "description": p["spots"]["ja"] + "（月額・税別）", "url": SITE + "/ja/pricing/"})
     return {
-        "@context": "https://schema.org", "@type": "SoftwareApplication", "name": "SPOT",
+        "@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Spot",
         "applicationCategory": "MultimediaApplication", "applicationSubCategory": "AI video ad & commercial generator",
         "operatingSystem": "Web", "url": SITE + "/", "inLanguage": ["en", "ja"],
-        "description": "SPOT turns three choices into a finished video ad. AI generates the footage, your real product UI, the voiceover and the music, then delivers a ready-to-ship commercial the same day.",
+        "description": "Spot turns three choices into a finished video ad. AI generates the footage, your real product UI, the voiceover and the music, then delivers a ready-to-ship commercial the same day.",
         "offers": {"@type": "AggregateOffer", "lowPrice": "0", "highPrice": "2500", "priceCurrency": "USD", "offerCount": str(len(offers)), "offers": offers},
-        "publisher": {"@type": "Organization", "name": "SPOT", "url": SITE + "/"},
+        "publisher": {"@type": "Organization", "name": "Spot", "url": SITE + "/"},
     }
