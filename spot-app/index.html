@@ -1546,7 +1546,7 @@
   <section class="context">
     <div>
       <h1 class="title-h1" id="wsTitle">工事台帳CM ・ 制作ワークスペース</h1>
-      <div class="title-sub" id="wsSub">サンプル案件を読み込み中 — 実データの代わりにミライ工事の制作データを表示しています</div>
+      <div class="title-sub" id="wsSub">このページで進捗と仕上がりを確認できます。</div>
     </div>
     <div class="meta-row">
       <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg>業種 <b id="wsMetaIndustry">建設SaaS</b></span>
@@ -1609,11 +1609,9 @@
       <div class="preview-area">
         <div class="frame wide" id="frame">
           <div class="frame-badge"><span class="pulse"></span><span id="introChip">リング+マリンバ</span></div>
-          <div class="frame-logo"><span class="fl-mark"></span><span id="frameLogo">ミライ工事</span></div>
+          <div class="frame-logo"><span class="fl-mark"></span><span id="frameLogo">Spot</span></div>
           <div class="frame-copy" id="frameCopy">
-            <div class="fc-line">現場で完結。</div>
-            <div class="fc-line">作業時間を<span class="fc-hl">40時間</span>短縮!</div>
-            <div class="frame-phones"><i></i><i></i></div>
+            <div class="fc-line">プレビュー</div>
           </div>
           <button class="play" id="playBtn" type="button"><span class="pbtn"><svg class="ic"><use href="#i-play"/></svg></span><span>プレビュー再生</span></button>
         </div>
@@ -2171,7 +2169,9 @@
     { k:'vertical', label:'縦 9:16', use:'リール・ショート', ff:[9,15] },
     { k:'square', label:'正方形 1:1', use:'タイムライン', ff:[13,13] },
   ];
-  document.getElementById('delivList').innerHTML = VAR.map(v => `
+  function renderDeliv(name) {
+    const label = (name && name.trim()) || 'プロジェクト';
+    document.getElementById('delivList').innerHTML = VAR.map(v => `
     <div class="deliv-row">
       <div class="deliv-rh"><span class="vbadge">${v.id}</span><b><span>パターン</span>${v.id}</b><small>${v.name}</small></div>
       <div class="deliv-files">
@@ -2179,13 +2179,16 @@
           <div class="dfile">
             <div class="dfile-thumb ${f.k}">
               <span class="ff"><i style="width:${f.ff[0]}px;height:${f.ff[1]}px"></i></span>
-              <span class="mini-copy">現場で完結。</span>
+              <span class="mini-copy">${label.replace(/[<>&]/g, '')}</span>
               <span class="dur">0:30</span>
             </div>
             <div class="dfile-meta"><span class="fmt">${f.label} <small>${f.use}</small></span><button class="dl" title="ダウンロード">↓</button></div>
           </div>`).join('')}
       </div>
     </div>`).join('');
+  }
+  window.__renderDeliv = renderDeliv;
+  renderDeliv();
   const dlGuard = () => (window.__canWrite && !window.__canWrite()) ? (toast(L('View-only access — download is disabled.', '閲覧のみの権限のため、ダウンロードはできません。'), false, 2400), true) : false;
   document.getElementById('delivList').addEventListener('click', e => {
     if (e.target.closest('.dl')) { if (dlGuard()) return; toast(L('Download started','ダウンロードを開始しました'), false, 1600); }
@@ -2196,8 +2199,9 @@
 
   function gotoExport() {
     hideAll(); vExport.hidden = false; _nav(true, null);
+    if (window.__renderDeliv) window.__renderDeliv(window.__currentProjectName);
     renderSpecs();
-    setCrumb([['ホーム', gotoDash], ['ミライ工事写真', gotoWorkspace], ['書き出し']], gotoWorkspace);
+    setCrumb([['ホーム', gotoDash], [window.__currentProjectName || 'プロジェクト', gotoWorkspace], ['書き出し']], gotoWorkspace);
   }
 
   // ---------- wizard ----------
@@ -2495,7 +2499,7 @@
   }
   function gotoWorkspace() {
     hideAll(); vWork.hidden = false; focusView(vWork); _nav(true, null);
-    setCrumb([['ホーム', gotoDash], ['ミライ工事写真', null], ['30秒CM']], gotoDash);
+    setCrumb([['ホーム', gotoDash], [window.__currentProjectName || 'プロジェクト', null], ['ワークスペース']], gotoDash);
   }
   // 対象プロジェクト名でワークスペースを開く（データ層 openWorkspace から呼ぶ）。
   window.gotoWorkspaceFor = function (name) {
@@ -3925,6 +3929,7 @@
     try {
       const { data: proj } = await sb.from('projects').select('name, spec, status').eq('id', projectId).single();
       window.__currentProjectId = projectId;
+      window.__currentProjectName = proj && proj.name;
       if (window.gotoWorkspaceFor) window.gotoWorkspaceFor(proj && proj.name);
       if (proj && proj.spec && Array.isArray(proj.spec.cuts) && window.renderCutTrack) window.renderCutTrack(proj.spec.cuts);
       // タイトル・メタ行を対象プロジェクトで更新（ミライ工事サンプルの置き換え）
