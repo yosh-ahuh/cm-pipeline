@@ -6,6 +6,16 @@
 <title>SPOT</title>
 <meta name="theme-color" content="#131318">
 <meta name="description" content="SPOT — 選ぶだけで、広告動画。">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SPOT — 選ぶだけで、広告動画。">
+<meta property="og:description" content="配信先・業種・ターゲットを選ぶだけ。AIが台本・実写・UI・音声を生成し、その日のうちに初稿。">
+<meta property="og:image" content="assets/og-cover.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
@@ -170,11 +180,9 @@
   .brand { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 4px; margin-left: -4px; border-radius: var(--r-sm); }
   .brand:hover { background: var(--hover); }
   .mark {
-    width: 30px; height: 30px; border-radius: var(--r-sm); flex: none;
-    background: var(--ink); display: grid; place-items: center; position: relative;
+    width: 30px; height: 30px; flex: none;
+    background: url("assets/spot-mark.png") center/contain no-repeat;
   }
-  .mark::before { content: ""; width: 17px; height: 17px; border-radius: 50%; border: 3px solid var(--accent); box-sizing: border-box; }
-  .mark::after { content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
   .wordmark { font-family: var(--font-display); font-weight: 800; font-size: 19px; letter-spacing: -.01em; }
 
   .icon-btn.nav-back:not(.on) { display: none; }
