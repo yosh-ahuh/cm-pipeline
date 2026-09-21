@@ -1471,7 +1471,7 @@
         <button type="button" class="linkbtn auth-back" id="authBack" hidden><svg class="ic"><use href="#i-arrow-left"/></svg><span>サインインに戻る</span></button>
       </form>
       <div class="auth-err" id="authErr" role="alert" hidden></div>
-      <div class="auth-alt" id="authAlt"><button type="button" class="linkbtn" id="authOtpLink">パスワードなしでログイン（認証番号）</button></div>
+      <div class="auth-alt" id="authAlt"><button type="button" class="linkbtn" id="authOtpLink">パスワードなしでサインイン（認証番号）</button></div>
       <div class="auth-or" id="authOAuthWrap"><span>または</span></div>
       <div class="auth-oauth" id="authOAuthBtns">
         <button type="button" class="btn-oauth" data-oauth="google">
@@ -1545,7 +1545,7 @@
   <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウント設定</span></button>
   <button type="button" class="menu-item" data-act="help"><svg class="ic"><use href="#i-alert"/></svg><span>ヘルプ＆フィードバック</span></button>
   <div class="menu-sep"></div>
-  <button type="button" class="menu-item" data-act="logout"><svg class="ic"><use href="#i-logout"/></svg><span>ログアウト</span></button>
+  <button type="button" class="menu-item" data-act="logout"><svg class="ic"><use href="#i-logout"/></svg><span>サインアウト</span></button>
 </div>
 
 <!-- アカウント切替サブメニュー（ヘッダの › から開く） -->
@@ -1553,7 +1553,7 @@
   <div class="menu-label">アカウントを切り替える</div>
   <div id="asList"></div>
   <div class="menu-sep"></div>
-  <button type="button" class="menu-item" data-act="login-other"><svg class="ic"><use href="#i-plus"/></svg><span>別のアカウントでログイン</span></button>
+  <button type="button" class="menu-item" data-act="login-other"><svg class="ic"><use href="#i-plus"/></svg><span>別のアカウントでサインイン</span></button>
   <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウントを管理する</span></button>
 </div>
 
@@ -1928,7 +1928,7 @@
     <button class="btn btn-ghost" id="scriptBack"><svg class="ic"><use href="#i-arrow-left"/></svg><span>選択に戻る</span></button>
     <button class="btn btn-tonal wauto" id="scriptSaveLater"><span>保存して後で続ける</span></button>
     <div class="grow"></div>
-    <button class="btn btn-primary auto" id="scriptNext"><span>この構成で生成する</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
+    <button class="btn btn-primary auto" id="scriptNext"><span>この構成でつくる</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
   </div>
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
@@ -2109,7 +2109,7 @@
       </div>
 
       <div class="panel" id="genCreditsPanel">
-        <div class="panel-h">この生成に使うクレジット</div>
+        <div class="panel-h">このCMに使うクレジット</div>
         <div class="cost">
           <div class="cost-big"><b id="wsCredits">1</b><span class="yen">クレジット</span><span class="est">この案件・修正は無制限</span></div>
           <div class="qc-note" style="border:none">残り <b id="wsBal">—</b> / <span id="wsPlan">—</span> クレジット</div>
@@ -2280,7 +2280,7 @@
 <main class="wrap" id="view-media" hidden>
   <section class="context"><div>
     <h1 class="title-h1">メディア</h1>
-    <div class="title-sub">生成した動画の一覧です。</div>
+    <div class="title-sub">つくった動画の一覧です。</div>
   </div></section>
   <div class="dash-h media-h">
     <div class="filters" role="group" aria-label="絞り込み">
@@ -2470,7 +2470,7 @@
   <div class="onboard-card">
     <div class="auth-brand"><div class="mark"></div><div class="wordmark">Spot</div></div>
     <h1 class="onboard-h" id="dgH">この端末を確認します</h1>
-    <p class="onboard-sub" id="dgSub">初めての端末からのログインです。メールに送った6桁のコードを入力してください。</p>
+    <p class="onboard-sub" id="dgSub">初めての端末からのサインインです。メールに送った6桁のコードを入力してください。</p>
     <div class="fld"><label for="dgCode">確認コード</label>
       <input id="dgCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456"></div>
     <button class="hn-btn" id="dgVerify">確認する</button>
@@ -3081,7 +3081,7 @@
     if (step < 3) showStep(step + 1);
     else {
       if (window.onWizardComplete) window.onWizardComplete(sel);   // Supabaseに project を作成（データ層）
-      toast(L('Generating script and shot list…','台本と撮影指示を生成中…'), true, 1400);
+      toast(L('Generating script and shot list…','台本と撮影指示をつくっています…'), true, 1400);
       setTimeout(gotoScript, 1400);
     }
   });
@@ -3409,7 +3409,7 @@
     if (!confirm(L(`This generation uses ${cost} credit (1 ad). ${bal} left. Continue?`,
                    `この生成で ${cost} クレジット（＝CM1本）を使います。残り ${bal} クレジット。よろしいですか？`))) return;
     if (window.onGenerate) window.onGenerate(window.__currentProjectId);   // jobs をDBに投入（データ層）
-    toast(L('Generating 8 cuts… live-action = AI / UI = code-drawn','8カットを生成中… 実写=AI / UI=コード描画'), true, 1600);
+    toast(L('Generating 8 cuts… live-action = AI / UI = code-drawn','8カットをつくっています… 実写=AI / UI=コード描画'), true, 1600);
     setTimeout(() => {
       if (window.openWorkspace && window.__currentProjectId) window.openWorkspace(window.__currentProjectId);
       else gotoWorkspace();
@@ -3441,13 +3441,13 @@
     'パスワードを表示': 'Show password', 'パスワードを隠す': 'Hide password', 'サインアウト': 'Sign out',
     // OAuth / マルチアカウント
     'または': 'or', 'Google で続ける': 'Continue with Google', 'Microsoft で続ける': 'Continue with Microsoft',
-    '現在のアカウントに戻る': 'Back to current account', 'そのアカウントに再度ログインしてください。': 'Please sign in to that account again.',
+    '現在のアカウントに戻る': 'Back to current account', 'そのアカウントに再度サインインしてください。': 'Please sign in to that account again.',
     // パスワードリセット / 認証番号ログイン
-    'パスワードを忘れた?': 'Forgot password?', 'パスワードなしでログイン（認証番号）': 'Log in without a password (code)',
+    'パスワードを忘れた?': 'Forgot password?', 'パスワードなしでサインイン（認証番号）': 'Sign in without a password (code)',
     'サインインに戻る': 'Back to sign in', '認証番号を再送する': 'Resend code',
     'パスワードをリセット': 'Reset password', '登録メールにリセット用リンクを送ります。': "We'll email a reset link to your address.",
-    'リセットリンクを送信': 'Send reset link', '認証番号でログイン': 'Log in with a code',
-    'メールに届く番号で、パスワードなしで安全にログインできます。': 'Sign in securely with the code sent to your email — no password.',
+    'リセットリンクを送信': 'Send reset link', '認証番号でサインイン': 'Sign in with a code',
+    'メールに届く番号で、パスワードなしで安全にサインインできます。': 'Sign in securely with the code sent to your email — no password.',
     '認証番号を送信': 'Send code', '新しいパスワードを設定': 'Set a new password', 'パスワードを更新': 'Update password',
     '新しいパスワードを入力してください。': 'Enter your new password.', '認証番号（メールに届いた番号）': 'Verification code (from email)',
     'メールに届いた認証番号を入力してください。': 'Enter the code from your email.',
@@ -3462,7 +3462,7 @@
     '認証番号が正しくないか、期限切れです。再送してください。': 'The code is wrong or expired. Please resend.',
     '新しいパスワードは6文字以上で入力してください。': 'New password must be at least 6 characters.',
     'パスワードを更新しました。': 'Password updated.',
-    '確認メールを送信しました。メール内のリンクで認証してからログインしてください。':
+    '確認メールを送信しました。メール内のリンクで認証してからサインインしてください。':
       'Confirmation email sent. Follow the link in the email, then sign in.',
     'メールアドレスとパスワードを入力してください。': 'Enter your email and password.',
     'メールアドレスまたはパスワードが正しくありません。': 'Incorrect email or password.',
@@ -3475,7 +3475,7 @@
     'メニュー': 'Menu', '管理': 'Manage', 'ワークスペース': 'Workspace', 'ワークスペースを追加する': 'Add a workspace',
     'アカウント・ワークスペース': 'Account & workspace',
     'ヘルプ＆フィードバック': 'Help & feedback', 'アカウントを切り替える': 'Switch account',
-    '別のアカウントでログイン': 'Log in with another account', 'アカウントを管理する': 'Manage account',
+    '別のアカウントでサインイン': 'Sign in with another account', 'アカウントを管理する': 'Manage account',
     'ヘルプ＆フィードバックは準備中です。': 'Help & feedback is coming soon.',
     '制作をはじめる': 'Start creating', '台本・絵コンテ': 'Script & storyboard',
     '書き出し': 'Export', 'ミライ工事写真': 'Mirai Koji', '30秒CM': '30-sec ad',
@@ -3486,7 +3486,7 @@
     '新規CMをつくる': 'New ad video', '最初のCMをつくる': 'Create your first ad',
     'まだCMがありません': 'No ad videos yet', '配信先・業種・ターゲットを選ぶだけで、その日のうちに初稿が届きます。': 'Pick a channel, industry and audience — a first cut lands the same day.',
     '該当するCMはありません': 'Nothing matches this filter', 'フィルタを「すべて」に戻すと全件が表示されます。': 'Switch the filter back to “All” to see everything.',
-    '接続に失敗しました': 'Connection failed', '生成中': 'Generating',
+    '接続に失敗しました': 'Connection failed', '作成中': 'Generating',
     '今月つくったCM': 'Ads made this month',
     '本 / 全形式込み': 'made / all formats',
     '先月比 +5本。制作会社見積り換算で約 ¥360万分。': '+5 vs. last month — about ¥3.6M at agency rates.',
@@ -3572,7 +3572,7 @@
     'AIがディレクター。': 'AI is the director.',
     '台本の各カットから「何を撮ればいいか」を自動でリスト化。あなたは指示どおりに素材を上げるだけ。実写の人物・背景はAIが生成します。':
       'It turns every cut into a clear shot list of what to capture. You just upload what’s asked — AI generates the live-action people and backgrounds.',
-    '選択に戻る': 'Back to choices', 'この構成で生成する': 'Generate from this', 'ナレーション': 'Narration',
+    '選択に戻る': 'Back to choices', 'この構成でつくる': 'Generate from this', 'ナレーション': 'Narration',
     // SCUT scenes
     '車内 / ため息': 'In the car / a sigh', '夜オフィス': 'Office at night', '月40時間': '40 hrs a month',
     '現場で撮影': 'Shooting on site', '台帳が自動作成': 'Ledger builds itself', 'PDF完成': 'PDF ready',
@@ -3626,7 +3626,7 @@
     '従来の外注': 'Outsourced', '制作費': 'Production cost', '納期': 'Turnaround',
     '1本・税別': 'per video, ex. tax', '3週間': '3 weeks', '修正2回まで': 'up to 2 revisions',
     '生成原価': 'Generation cost', '9本・修正無制限': '9 videos · unlimited revisions',
-    '消費クレジット': 'Credits used', 'この生成に使うクレジット': 'Credits for this generation',
+    '消費クレジット': 'Credits used', 'このCMに使うクレジット': 'Credits for this ad',
     'クレジット': 'credits', 'この案件・修正は無制限': 'this project · unlimited revisions',
     '残り': 'Left', '納期の目安': 'Turnaround',
     // first-run onboarding
@@ -3689,7 +3689,7 @@
     'メンバーの招待・管理はオーナーのみ可能です。': 'Only the owner can invite and manage members.',
     // device verification (new-device OTP)
     'この端末を確認します': 'Verify this device',
-    '初めての端末からのログインです。メールに送った6桁のコードを入力してください。': 'First sign-in from this device. Enter the 6-digit code we emailed you.',
+    '初めての端末からのサインインです。メールに送った6桁のコードを入力してください。': 'First sign-in from this device. Enter the 6-digit code we emailed you.',
     '確認コード': 'Verification code', '確認する': 'Verify', 'コードを再送する': 'Resend code',
     'いまのプランと残りクレジット。上位プランほど、毎月つくれるCMが増えます。': 'Your plan and remaining credits. Higher plans make more ads each month.',
     '現在のプラン': 'Current plan', 'プラン一覧': 'Plans', 'アップグレード': 'Upgrade', '利用中': 'Current',
@@ -3764,7 +3764,7 @@
     'この3形式を書き出す': 'Export these 3 formats',
     // --- dashboard project cards ---
     'ミライ工事写真 / 30秒CM': 'Mirai Koji / 30-sec ad', '書き出し済み': 'Exported',
-    '夏の新規登録キャンペーン': 'Summer sign-up campaign', '生成中 4/8': 'Generating 4/8',
+    '夏の新規登録キャンペーン': 'Summer sign-up campaign', '作成中 4/8': 'Generating 4/8',
     '採用ブランディング / 15秒': 'Employer branding / 15-sec', 'チェック待ち': 'Awaiting review',
     '機能アップデート告知': 'Feature-update announcement', '下書き': 'Draft',
     '店頭サイネージ / 秋メニュー': 'In-store signage / fall menu',
@@ -3929,7 +3929,7 @@
     if (/email not confirmed/.test(m))
       return t('Your email isn’t verified yet. Open the link in the confirmation email first.', 'メールアドレスが未確認です。確認メールのリンクを開いてからお試しください。');
     if (/already registered|already been registered|user already exists/.test(m))
-      return t('This email is already registered. Try signing in instead.', 'このメールアドレスは登録済みです。ログインをお試しください。');
+      return t('This email is already registered. Try signing in instead.', 'このメールアドレスは登録済みです。サインインをお試しください。');
     if (/password should be at least|password.*at least.*character/.test(m))
       return t('Password must be at least 6 characters.', 'パスワードは6文字以上で入力してください。');
     if (/for security purposes.*after\s+\d+\s*second/.test(m)) {
@@ -3986,7 +3986,7 @@
     signin:   ['おかえりなさい', 'メールアドレスとパスワードでサインイン。', 'サインイン'],
     signup:   ['アカウントを作成', '個人／組織を選んで登録します。', 'アカウント作成'],
     reset:    ['パスワードをリセット', '登録メールにリセット用リンクを送ります。', 'リセットリンクを送信'],
-    otp:      ['認証番号でログイン', 'メールに届く番号で、パスワードなしで安全にログインできます。', '認証番号を送信'],
+    otp:      ['認証番号でサインイン', 'メールに届く番号で、パスワードなしで安全にサインインできます。', '認証番号を送信'],
     recovery: ['新しいパスワードを設定', '新しいパスワードを入力してください。', 'パスワードを更新'],
   };
   function show(id, on) { const el = document.getElementById(id); if (el) el.hidden = !on; }
@@ -3998,7 +3998,7 @@
     const [h, sub, submit] = HEAD[m] || HEAD.signin;
     hEl.textContent = h;
     const subEl = document.getElementById('authSub'); if (subEl) subEl.textContent = sub;
-    submitText.textContent = (m === 'otp' && otpSent) ? 'ログイン' : submit;
+    submitText.textContent = (m === 'otp' && otpSent) ? 'サインイン' : submit;
     // 各フィールドの出し分け
     show('signupFields', m === 'signup');
     show('authTerms', m === 'signup');
@@ -4050,7 +4050,7 @@
       submitLabel = submitText.textContent;
       const busy = document.createElement('span'); busy.className = 'btn-busy';
       const sp = document.createElement('span'); sp.className = 'btn-spin';
-      const tx = document.createElement('span'); tx.textContent = label || (window.L ? window.L('Processing…', '処理中…') : '処理中…');
+      const tx = document.createElement('span'); tx.textContent = label || (window.L ? window.L('Please wait…', '少々お待ちください…') : '少々お待ちください…');
       busy.appendChild(sp); busy.appendChild(tx);
       submitText.innerHTML = ''; submitText.appendChild(busy);
     } else { submitEl.removeAttribute('aria-busy'); if (submitLabel) submitText.textContent = submitLabel; }
@@ -4192,7 +4192,7 @@
           } } });
       if (error) throw error;
       if (mode === 'signup' && !data.session) {
-        fail('確認メールを送信しました。メール内のリンクで認証してからログインしてください。', true);
+        fail('確認メールを送信しました。メール内のリンクで認証してからサインインしてください。', true);
       }
     } catch (err) {
       fail(authErrMsg(err));
@@ -4208,7 +4208,7 @@
         const { error } = await sb.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin + window.location.pathname } });
         if (error) throw error;   // 成功時はプロバイダへリダイレクト → 戻り時に onAuthStateChange がセッション処理
       } catch (e) {
-        fail(L('Could not start sign-in. The provider may not be enabled in Supabase.', 'ログインを開始できませんでした。Supabase 側でこのプロバイダの有効化が必要かもしれません。') + ' (' + (e.message || e) + ')');
+        fail(L('Could not start sign-in. The provider may not be enabled in Supabase.', 'サインインを開始できませんでした。Supabase 側でこのプロバイダの有効化が必要かもしれません。') + ' (' + (e.message || e) + ')');
       }
     });
   });
@@ -4234,7 +4234,7 @@
       catch (e) {   // トークン失効等：そのアカウントを消してログインへ誘導
         writeAccts(readAccts().filter(x => x.id !== id));
         window.__addingAccount = true; showAuth(); if (authCancel) authCancel.hidden = readAccts().length === 0;
-        if (window.toast) window.toast(L('Please sign in to that account again.', 'そのアカウントに再度ログインしてください。'), false, 2600);
+        if (window.toast) window.toast(L('Please sign in to that account again.', 'そのアカウントに再度サインインしてください。'), false, 2600);
       }
     },
     add: () => { window.__addingAccount = true; setMode('signin'); showAuth(); if (authCancel) authCancel.hidden = false; },
@@ -4283,7 +4283,7 @@
   const GLYPH = { wide: [13, 8], vertical: [8, 13], square: [11, 11] };
   const STATUS = {   // JA source strings → translated by the i18n walker
     draft:      { st: '下書き', cls: 'ps-draft', group: 'progress' },
-    generating: { st: '生成中', cls: 'ps-gen', group: 'progress' },
+    generating: { st: '作成中', cls: 'ps-gen', group: 'progress' },
     review:     { st: 'チェック待ち', cls: 'ps-review', group: 'progress' },
     done:       { st: '書き出し済み', cls: 'ps-done', group: 'done' },
   };
@@ -4404,7 +4404,7 @@
   }
   async function sendDeviceOtp(email) {
     try { const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } }); if (error) throw error; }
-    catch (e) { if (window.toast) window.toast(window.L('Failed to send code: ', '確認コードの送信に失敗しました: ') + e.message, false, 3200); }
+    catch (e) { console.warn('deviceGate OTP send failed:', e); if (window.toast) window.toast(window.L("Couldn't send the code. Please try again.", '確認コードを送信できませんでした。もう一度お試しください。'), false, 3200); }
   }
   function showDeviceGate(email, dev) {
     const gate = document.getElementById('deviceGate'); if (!gate) return;
@@ -4450,7 +4450,7 @@
       const { data: n } = await sb.rpc('login_device_count', { p_days: 30 });
       let dismissed = null; try { dismissed = localStorage.getItem('spot-nudge-dismissed'); } catch (_) {}
       if (Number(n) > Number(seats) && !dismissed && window.toast) {
-        window.toast(window.L('This account was used on ' + n + ' devices in the last 30 days. Invite members so everyone gets their own login (Settings → Team).', 'このアカウントが直近30日で ' + n + ' 台の端末で使われています。メンバーを招待すると各自のログインで安全に使えます（設定 → チーム）。'), true, 6000);
+        window.toast(window.L('This account was used on ' + n + ' devices in the last 30 days. Invite members so everyone gets their own login (Settings → Team).', 'このアカウントが直近30日で ' + n + ' 台の端末で使われています。メンバーを招待すると各自のサインインで安全に使えます（設定 → チーム）。'), true, 6000);
         try { localStorage.setItem('spot-nudge-dismissed', '1'); } catch (_) {}
       }
     } catch (_) { /* noop */ }
@@ -4723,7 +4723,7 @@
         } catch (_) {}
         if (window.renderWorkspaces) window.renderWorkspaces();   // サイドバーのワークスペース名を更新
         if (note) { note.hidden = false; setTimeout(() => note.hidden = true, 2000); }
-      } catch (e) { toast(L('Failed to save: ', '保存に失敗: ') + e.message, false, 2600); }
+      } catch (e) { console.warn('company profile save failed:', e); toast(L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2600); }
       finally { save.disabled = false; }
     });
     // 個人 → 組織への昇格
@@ -4745,7 +4745,7 @@
         if (window.renderWorkspaces) window.renderWorkspaces();
         toast(L('Switched to an organization', '組織に切り替えました'), true, 2200);
         await loadCompanyProfile();   // パネルを会社プロフィールに切替
-      } catch (e) { toast(L('Failed: ', '失敗: ') + e.message, false, 2800); }
+      } catch (e) { console.warn('org upgrade failed:', e); toast(L("Couldn't switch to an organization. Please try again.", '組織への切り替えができませんでした。もう一度お試しください。'), false, 2800); }
       finally { upBtn.disabled = false; }
     });
     if (logoBtn && logoInput) logoBtn.addEventListener('click', () => logoInput.click());
@@ -4762,7 +4762,7 @@
         else { await sb.rpc('create_brand', { p_org: currentOrg.id, p_name: currentOrg.name || 'Brand', p_assets: { logo: path } }); }
         await loadCompanyProfile();
         toast(L('Logo updated', 'ロゴを更新しました'), true, 1800);
-      } catch (e) { toast(L('Upload failed: ', 'アップロードに失敗: ') + e.message, false, 2800); }
+      } catch (e) { console.warn('upload failed:', e); toast(L("Upload didn't work. Please try again.", 'アップロードできませんでした。もう一度お試しください。'), false, 2800); }
       finally { logoInput.value = ''; }
     });
   })();
@@ -4780,7 +4780,7 @@
         const box = document.getElementById('inviteResult'); const inp = document.getElementById('inviteLink');
         if (inp) inp.value = url; if (box) box.hidden = false;
         try { await navigator.clipboard.writeText(url); if (window.toast) window.toast(window.L('Invite link copied', '招待リンクをコピーしました'), true, 2000); } catch (_) {}
-      } catch (e) { if (window.toast) window.toast(window.L('Failed to create invite: ', '招待の作成に失敗: ') + e.message, false, 2600); }
+      } catch (e) { console.warn('invite create failed:', e); if (window.toast) window.toast(window.L("Couldn't create the invite. Please try again.", '招待リンクをつくれませんでした。もう一度お試しください。'), false, 2600); }
       finally { create.disabled = false; }
     });
     panel.addEventListener('click', async (e) => {
@@ -4790,7 +4790,7 @@
         const { error } = await sb.rpc('remove_member', { p_org: currentOrg.id, p_user: rm.getAttribute('data-remove') });
         if (error) throw error;
         loadMembers(await currentPlan());
-      } catch (err) { if (window.toast) window.toast(window.L('Remove failed: ', '削除に失敗: ') + err.message, false, 2600); }
+      } catch (err) { console.warn('member remove failed:', err); if (window.toast) window.toast(window.L("Couldn't remove them. Please try again.", '削除できませんでした。もう一度お試しください。'), false, 2600); }
     });
   })();
   async function currentPlan() {
@@ -4822,7 +4822,7 @@
     } catch (e) {
       const m = /seat limit/i.test(e.message)
         ? window.L('This team has no free seats. Ask the owner to add seats.', 'このチームは席が満席です。オーナーに席の追加を依頼してください。')
-        : (window.L('Failed to join: ', '参加に失敗: ') + e.message);
+        : window.L("Couldn't join. Please try again.", '参加できませんでした。もう一度お試しください。');
       if (window.toast) window.toast(m, false, 3200); stripInvite();
     }
   }
@@ -4842,7 +4842,7 @@
         if (error) throw error;
         if (window.__refreshAccountChip) window.__refreshAccountChip();   // サイドバー下部/メニューの氏名も更新
         if (note) { note.hidden = false; setTimeout(() => { note.hidden = true; }, 2000); }
-      } catch (e) { if (window.toast) window.toast('保存に失敗しました: ' + e.message, false, 2600); }
+      } catch (e) { console.warn('password save failed:', e); if (window.toast) window.toast(window.L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2600); }
       finally { btn.disabled = false; }
     });
   })();
@@ -5092,7 +5092,7 @@
         const { error } = await sb.from('billing_prefs').upsert(row, { onConflict: 'org_id' });
         if (error) throw error;
         toast(L('Settings saved', '設定を保存しました'), true, 2000);
-      } catch (e) { toast(L('Failed to save: ', '保存に失敗: ') + e.message, false, 2800); }
+      } catch (e) { console.warn('save failed:', e); toast(L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2800); }
       finally { save.disabled = false; }
     });
   })();
@@ -5255,7 +5255,7 @@
         if (window.toast) window.toast(L(`Uploaded ${uploaded.length} file(s)`, `${uploaded.length}件をアップロードしました`), true, 1600);
       } catch (err) {
         console.error('upload failed:', err.message);
-        if (window.toast) window.toast(L('Upload failed: ' + err.message, 'アップロードに失敗: ' + err.message), false, 3000);
+        console.warn('upload failed:', err); if (window.toast) window.toast(L("Upload didn't work. Please try again.", 'アップロードできませんでした。もう一度お試しください。'), false, 3000);
       }
       await draw();
     });
@@ -5366,7 +5366,7 @@
     const ren = document.getElementById('colRename'); if (ren) ren.hidden = (id === '__uncat__') || !write;
     const emptyMsg = id === '__uncat__'
       ? `<div class="empty"><div class="e-ic"><svg class="ic"><use href="#i-folder"/></svg></div><h4>${L('No uncategorized videos', '未分類の動画はありません')}</h4><p>${L('All videos are organized into collections.', 'すべての動画がコレクションに整理されています。')}</p></div>`
-      : `<div class="empty"><div class="e-ic"><svg class="ic"><use href="#i-folder"/></svg></div><h4>${L('This collection is empty', 'このコレクションは空です')}</h4><p>${L('Open a video’s 📁 button in Media or Home to move it here.', 'メディアやホームで動画の📁ボタンから、ここに移動できます。')}</p></div>`;
+      : `<div class="empty"><div class="e-ic"><svg class="ic"><use href="#i-folder"/></svg></div><h4>${L('This collection is empty', 'このコレクションは空です')}</h4><p>${L('Use a video’s “Move” button in Media or Home to move it here.', 'メディアやホームで動画の「移動」ボタンから、ここに移動できます。')}</p></div>`;
     renderVideos('colVideos', id === '__uncat__' ? { uncategorized: true, emptyMsg } : { collectionId: id, emptyMsg });
   }
   async function createCollection(thenMoveProject) {
@@ -5379,7 +5379,7 @@
       if (thenMoveProject) await moveToCollection(thenMoveProject, data.id);
       await fetchCollections();
       return data.id;
-    } catch (e) { if (window.toast) window.toast('作成に失敗: ' + e.message, false, 2600); return null; }
+    } catch (e) { console.warn('collection create failed:', e); if (window.toast) window.toast(window.L("Couldn't create it. Please try again.", 'コレクションをつくれませんでした。もう一度お試しください。'), false, 2600); return null; }
   }
   async function renameCollection(id, currentName) {
     if (!id || id === '__uncat__' || !(window.__canWrite && window.__canWrite())) return;
@@ -5389,14 +5389,14 @@
       const { error } = await sb.from('collections').update({ name }).eq('id', id); if (error) throw error;
       await fetchCollections();
       setText('colDetailName', name);   // 詳細表示中なら見出しも更新
-    } catch (e) { if (window.toast) window.toast('変更に失敗: ' + e.message, false, 2600); }
+    } catch (e) { console.warn('collection rename failed:', e); if (window.toast) window.toast(window.L("Couldn't apply the change. Please try again.", '変更できませんでした。もう一度お試しください。'), false, 2600); }
   }
   async function moveToCollection(projectId, collectionId) {
     try {
       const { error } = await sb.from('projects').update({ collection_id: collectionId }).eq('id', projectId);
       if (error) throw error;
       if (window.toast) window.toast(L('Moved', '移動しました'), true, 1400);
-    } catch (e) { if (window.toast) window.toast('移動に失敗: ' + e.message, false, 2600); }
+    } catch (e) { console.warn('move failed:', e); if (window.toast) window.toast(window.L("Couldn't move it. Please try again.", '移動できませんでした。もう一度お試しください。'), false, 2600); }
   }
   // collections view wiring
   (function wireCollections() {
@@ -5409,7 +5409,7 @@
       const id = document.getElementById('colDetail').dataset.col;
       if (!id || id === '__uncat__') return;
       if (!confirm(L('Delete this collection? Videos are kept (moved to Uncategorized).', 'このコレクションを削除しますか? 動画は残り「未分類」に戻ります。'))) return;
-      try { await sb.from('collections').delete().eq('id', id); window.loadCollections(); } catch (er) { if (window.toast) window.toast('削除に失敗: ' + er.message, false, 2600); }
+      try { await sb.from('collections').delete().eq('id', id); window.loadCollections(); } catch (er) { console.warn('collection delete failed:', er); if (window.toast) window.toast(window.L("Couldn't delete it. Please try again.", '削除できませんでした。もう一度お試しください。'), false, 2600); }
     });
   })();
   // move-to-collection popover
@@ -5565,7 +5565,7 @@
 
   window.onGenerate = async function (projectId) {
     if (!sb || !projectId) return;
-    if (!canWrite()) { if (window.toast) window.toast(window.L('View-only access — you cannot generate.', '閲覧のみの権限のため、生成はできません。'), false, 2600); return; }
+    if (!canWrite()) { if (window.toast) window.toast(window.L('View-only access — you cannot create ads.', '閲覧のみの権限のため、動画をつくれません。'), false, 2600); return; }
     try {
       window.__currentProjectId = projectId;
       // 既に生成中/済みなら購読だけして戻る（二重課金・二重投入の防止）
@@ -5575,7 +5575,7 @@
       const { data: ok, error: se } = await sb.rpc('spend_credits',
         { p_project: projectId, p_amount: CREDITS_PER_GENERATION });
       if (se) console.error('spend_credits error:', se.message);
-      if (!ok) { if (window.toast) window.toast('クレジットが不足しています。', false, 2800); return; }
+      if (!ok) { if (window.toast) window.toast(window.L('You’re out of credits. Add more to keep creating.', 'クレジットが足りません。追加すると続けてつくれます。'), false, 2800); return; }
       // ジョブDAG投入
       const { data: proj } = await sb.from('projects').select('spec').eq('id', projectId).single();
       const specCuts = proj && proj.spec && Array.isArray(proj.spec.cuts) ? proj.spec.cuts : null;
@@ -5756,11 +5756,11 @@
     // 状況フィードバック（生成中=進捗＋目安、完了=次アクション、失敗=再試行）
     let statusHtml = '';
     if (total === 0) statusHtml = `<div class="gen-status">${L('Preparing…', '準備しています…')}</div>`;
-    else if (failed) statusHtml = `<div class="gen-status err"><svg class="ic"><use href="#i-alert"/></svg><span>${L('Some cuts failed. Please try again.', '一部の生成に失敗しました。もう一度お試しください。')}</span></div>`;
-    else if (allDone) statusHtml = `<div class="gen-status ok"><svg class="ic"><use href="#i-check"/></svg><span>${L('Generation complete', '生成が完了しました')}</span><button class="btn btn-ghost wauto" id="genToExport"><span>${L('Go to export', '書き出しへ')}</span></button></div>`;
+    else if (failed) statusHtml = `<div class="gen-status err"><svg class="ic"><use href="#i-alert"/></svg><span>${L('Some cuts failed. Please try again.', '一部のカットをつくれませんでした。もう一度お試しください。')}</span></div>`;
+    else if (allDone) statusHtml = `<div class="gen-status ok"><svg class="ic"><use href="#i-check"/></svg><span>${L('Your ad is ready', 'CMができあがりました')}</span><button class="btn btn-ghost wauto" id="genToExport"><span>${L('Go to export', '書き出しへ')}</span></button></div>`;
     else statusHtml = `<div class="gen-status run"><span class="ai-spark" aria-hidden="true"><svg class="ic"><use href="#i-sparkle"/></svg></span><span>${L(`AI is creating… ${done}/${total} done · a few minutes`, `AIが制作中です… ${done}/${total} 完了 ・ 数分お待ちください`)}</span></div>`;
     panel.innerHTML = `
-      <div class="panel-h">${L('Generation', '生成の進捗')} <span class="rt">Realtime</span><span class="count${allDone ? ' ok' : ''}">${done}/${total}</span></div>
+      <div class="panel-h">${L('Progress', '作成の進捗')} <span class="rt">${L('Live', 'リアルタイム')}</span><span class="count${allDone ? ' ok' : ''}">${done}/${total}</span></div>
       ${statusHtml}
       <div class="jobs-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="${L('Generation progress', '生成の進捗')}"><i style="width:${pct}%"></i></div>
       <ul class="jobs">
@@ -5790,7 +5790,7 @@
         const body = qc.querySelector('.qc'); if (body) body.innerHTML = '';
         let ph = qc.querySelector('.qc-empty');
         if (!ph) { ph = document.createElement('div'); ph.className = 'qc-note qc-empty'; qc.insertBefore(ph, qc.querySelector('.qc-note:not(.qc-empty)')); }
-        ph.textContent = L('Once you generate, AI quality-check results appear here.', '動画を生成すると、AIによる品質チェックの結果がここに表示されます。');
+        ph.textContent = L('Once you make one, AI quality-check results appear here.', '動画をつくると、AIの品質チェック結果がここに表示されます。');
         const note = qc.querySelector('.qc-note:not(.qc-empty)'); if (note) note.style.display = 'none';
       } else {
         const ph = qc.querySelector('.qc-empty'); if (ph) ph.remove();
