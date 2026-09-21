@@ -3406,8 +3406,8 @@
       else gotoWorkspace();
     } else toast(L('Opening this project…','このプロジェクトを開いています…'), true, 1200);
   }
-  document.addEventListener('click', e => {   // カードから開く（移動ボタンは除外）
-    if (e.target.closest('.proj-move')) return;
+  document.addEventListener('click', e => {   // カードから開く（移動・削除ボタンは除外）
+    if (e.target.closest('.proj-move') || e.target.closest('.proj-del')) return;
     const p = e.target.closest('#projGrid .proj, #mediaGrid .proj, #colVideos .proj'); if (p) openProjCard(p);
   });
   document.addEventListener('keydown', e => {   // カード（role=button）を Enter/Space で開く
