@@ -1274,6 +1274,8 @@
   .modal-h { font-family: var(--font-display); font-weight: 800; font-size: 20px; margin: 0 0 16px; }
   .frame-copy .fc-sub { margin-top: 8px; font-weight: 600; font-size: clamp(11px, 3.4cqw, 15px); color: rgba(255,255,255,.9); text-shadow: 0 1px 6px rgba(0,0,0,.35); }
   .frame-copy .fc-note { margin-top: 14px; font-size: clamp(9px, 2.6cqw, 11px); font-weight: 500; letter-spacing: .04em; color: rgba(255,255,255,.62); }
+  /* 実プレビュー（生成静止画）が入ったら、冗長な補助ノートは隠して写真を活かす */
+  .frame.has-real .fc-note { display: none; }
 </style>
 </head>
 <body class="booting">
@@ -2625,16 +2627,40 @@
               <span class="mini-copy">${label.replace(/[<>&]/g, '')}</span>
               <span class="dur">0:30</span>
             </div>
-            <div class="dfile-meta"><span class="fmt">${f.label} <small>${f.use}</small></span><button class="dl" title="ダウンロード">↓</button></div>
+            <div class="dfile-meta"><span class="fmt">${f.label} <small>${f.use}</small></span><button class="dl" data-variant="${v.id}" data-format="${f.k}" title="ダウンロード">↓</button></div>
           </div>`).join('')}
       </div>
     </div>`).join('');
+    wireRealRenders();   // 実レンダー(mp4)があれば本物のDLリンクを各ボタンへ（無ければデモのまま）
+  }
+  // 実 renders（variant×format の mp4）があれば、各DLボタンに storage_path を紐づけて本物のダウンロードにする。
+  async function wireRealRenders() {
+    try {
+      const pid = window.__currentProjectId;
+      if (!sb || !pid) return;
+      const { data: rends } = await sb.from('renders').select('variant,format,storage_path').eq('project_id', pid).not('storage_path', 'is', null);
+      if (!rends || !rends.length || window.__currentProjectId !== pid) return;
+      const map = {}; rends.forEach(r => { map[`${r.variant}/${r.format}`] = r.storage_path; });
+      document.querySelectorAll('#delivList .dl').forEach(btn => {
+        const path = map[`${btn.dataset.variant}/${btn.dataset.format}`];
+        if (path) { btn.dataset.path = path; btn.closest('.dfile').classList.add('is-real'); }
+      });
+    } catch (_) { /* 失敗時はデモのDL（トースト）にフォールバック */ }
   }
   window.__renderDeliv = renderDeliv;
   renderDeliv();
   const dlGuard = () => (window.__canWrite && !window.__canWrite()) ? (toast(L('View-only access — download is disabled.', '閲覧のみの権限のため、ダウンロードはできません。'), false, 2400), true) : false;
-  document.getElementById('delivList').addEventListener('click', e => {
-    if (e.target.closest('.dl')) { if (dlGuard()) return; toast(L('Download started','ダウンロードを開始しました'), false, 1600); }
+  document.getElementById('delivList').addEventListener('click', async e => {
+    const btn = e.target.closest('.dl'); if (!btn) return;
+    if (dlGuard()) return;
+    const path = btn.dataset.path;
+    if (path && sb) {   // 実レンダーあり → 署名URLで本物のmp4をダウンロード
+      try {
+        const { data } = await sb.storage.from('assets').createSignedUrl(path, 3600, { download: true });
+        if (data && data.signedUrl) { window.open(data.signedUrl, '_blank', 'noopener'); return; }
+      } catch (_) { /* 失敗時は下のデモ挙動へ */ }
+    }
+    toast(L('Download started','ダウンロードを開始しました'), false, 1600);
   });
   document.getElementById('dlAll').addEventListener('click', () => { if (dlGuard()) return; toast(L('Downloading 9 videos + thumbnails as ZIP…','9本 + サムネイルをZIPでダウンロード中…'), true, 1800); });
   document.getElementById('shareLink').addEventListener('click', () => { if (dlGuard()) return; toast(L('Share link copied','共有リンクをコピーしました'), false, 1600); });
@@ -4916,7 +4942,25 @@
     }
     const frame = document.getElementById('frame');
     const primary = brand.colors && brand.colors.primary;
-    if (frame) frame.style.background = primary ? `linear-gradient(150deg, ${primary}, color-mix(in srgb, ${primary} 52%, #000))` : '';
+    if (frame) { frame.classList.remove('has-real'); frame.style.background = primary ? `linear-gradient(150deg, ${primary}, color-mix(in srgb, ${primary} 52%, #000))` : ''; }
+    // 実プレビュー: 生成済みの静止画(generations.kind='still')があれば背景に差し込む。無ければ上のプレースホルダーのまま。
+    (async () => {
+      try {
+        const pid = window.__currentProjectId;
+        if (!sb || !pid || !frame) return;
+        const { data: gens } = await sb.from('generations')
+          .select('storage_path,cut').eq('project_id', pid).eq('kind', 'still').eq('status', 'done')
+          .not('storage_path', 'is', null).order('cut', { ascending: true }).limit(1);
+        const path = gens && gens[0] && gens[0].storage_path;
+        if (!path) return;
+        const { data: su } = await sb.storage.from('assets').createSignedUrl(path, 3600);
+        if (su && su.signedUrl && window.__currentProjectId === pid) {
+          // スクリムを同じ background に重ねて、上に乗るロゴ/タイトル/再生ボタンの可読性を確保
+          frame.style.background = `linear-gradient(180deg, rgba(0,0,0,.14), rgba(0,0,0,.44)), center/cover no-repeat url("${su.signedUrl}")`;
+          frame.classList.add('has-real');
+        }
+      } catch (_) { /* 署名URL失敗時はプレースホルダーのまま（安全に degrade） */ }
+    })();
   }
   window.openWorkspace = async function (projectId) {
     if (!sb || !projectId) { if (window.gotoWorkspaceFor) window.gotoWorkspaceFor(); return; }
