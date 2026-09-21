@@ -3750,7 +3750,8 @@
       const contact = spots === 0 && !p.price_jpy && !p.price_usd;
       const up = Number(p.sort) > (currentSort == null ? -1 : currentSort);
       const label = contact ? L('Contact us', 'お問い合わせ') : (up ? L('Upgrade', 'アップグレード') : L('Change plan', 'プランを変更'));
-      action = `<button class="btn ${up && !contact ? 'btn-primary' : 'btn-ghost'}" data-upgrade="${p.id}"><span>${label}</span></button>`;
+      // プラン一覧のボタンは副(ghost)に統一（画面の主役はヒーローの「クレジットを追加」1つ。Teamの強調は枠＋人気バッジ）
+      action = `<button class="btn btn-ghost" data-upgrade="${p.id}"><span>${label}</span></button>`;
     }
     return `<div class="plan-card${cur ? ' current' : ''}${popular ? ' popular' : ''}">
       ${popular ? `<span class="pk-tag pop">${L('Popular', '人気')}</span>` : ''}
