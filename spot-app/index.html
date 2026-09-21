@@ -2584,6 +2584,37 @@
   </div>
 </div>
 
+<!-- プロフィール補完（Googleサインイン等で不足している「利用形態・お名前」を尋ねる） -->
+<div id="completeProfile" class="onboard-screen" role="dialog" aria-modal="true" aria-labelledby="cpH" hidden>
+  <div class="onboard-card">
+    <div class="auth-brand"><div class="mark"></div><div class="wordmark">Spot</div></div>
+    <h1 class="onboard-h" id="cpH">もう少しで完了です</h1>
+    <p class="onboard-sub">はじめる前に、あと少しだけ教えてください。</p>
+    <div class="type-cards" id="cpType" role="radiogroup" aria-label="アカウント種別" style="margin-bottom:var(--s-4)">
+      <button type="button" class="type-card" data-type="personal" role="radio" aria-checked="true">
+        <span class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+        <span class="tc-body"><span class="tc-name">個人</span><span class="tc-desc">個人でCMをつくる。あとから組織に切り替えできます</span></span>
+        <span class="tc-check"><svg class="ic"><use href="#i-check"/></svg></span>
+      </button>
+      <button type="button" class="type-card" data-type="org" role="radio" aria-checked="false">
+        <span class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4v18M19 21V11l-7-4"/><path d="M9 9h0M9 13h0M9 17h0"/></svg></span>
+        <span class="tc-body"><span class="tc-name">組織・会社</span><span class="tc-desc">チームで共有・ブランド管理。会社名を登録します</span></span>
+        <span class="tc-check"><svg class="ic"><use href="#i-check"/></svg></span>
+      </button>
+    </div>
+    <div id="cpCompanyWrap" hidden style="text-align:left;margin-bottom:var(--s-3)">
+      <label class="f-label" for="cpCompany">会社・組織名</label>
+      <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-users"/></svg></span><input id="cpCompany" type="text" placeholder="株式会社スポット" autocomplete="organization"></div>
+    </div>
+    <div style="text-align:left;margin-bottom:var(--s-4)">
+      <label class="f-label" for="cpName">お名前</label>
+      <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-user"/></svg></span><input id="cpName" type="text" placeholder="山田 太郎" autocomplete="name"></div>
+    </div>
+    <p class="auth-err" id="cpErr" role="alert" hidden style="margin:0 0 12px"></p>
+    <button class="hn-btn" id="cpSubmit"><span id="cpSubmitText">はじめる</span></button>
+  </div>
+</div>
+
 <div class="toast-wrap" id="toasts" role="status" aria-live="polite"></div>
 
 <script>
@@ -4578,11 +4609,82 @@
     window.__acctCurrentId = session.user.id;
     window.__addingAccount = false; if (authCancel) authCancel.hidden = true;
     upsertAcct(session);   // 現在アカウントを保管（トークン更新も反映）
+    // Google 等の OAuth では「利用形態（個人/組織）」を取得できない。不足していれば補完フローへ。
+    if (needsProfileCompletion(session.user)) { showProfileCompletion(session); return; }
+    finishSignIn(session);
+  }
+  function finishSignIn(session) {
     showApp();
     const email = session.user.email;
     if (window.mountUserChip) window.mountUserChip(email);   // user chip + account menu (UI layer); sign-out lives in the menu
     // クレジット残の反映はデータ層 refreshCredits（org 残高が正）に一本化する。
     if (window.onAppReady) window.onAppReady(session, sb);   // データ層を起動
+  }
+
+  // ---- プロフィール補完（OAuth で不足する利用形態・お名前を尋ねる）----
+  //   メール登録は signUp 時に account_type を metadata に必ず入れる。OAuth 経由はこれが無い＝未補完。
+  function needsProfileCompletion(user) {
+    const md = (user && user.user_metadata) || {};
+    return !md.account_type;   // 利用形態が未設定なら補完が必要
+  }
+  function showProfileCompletion(session) {
+    const L = window.L;
+    const scr = document.getElementById('completeProfile');
+    authEl.hidden = true;                       // 認証フォームを隠す
+    document.body.classList.add('booting');     // 背後のアプリUIは伏せたまま、補完オーバーレイのみ表示
+    if (!scr) { finishSignIn(session); return; }   // 保険：UIが無ければ素通し
+    const md = session.user.user_metadata || {};
+    const nameEl = document.getElementById('cpName');
+    const companyEl = document.getElementById('cpCompany');
+    const companyWrap = document.getElementById('cpCompanyWrap');
+    const typeSeg = document.getElementById('cpType');
+    const errEl2 = document.getElementById('cpErr');
+    const submit = document.getElementById('cpSubmit');
+    const submitText2 = document.getElementById('cpSubmitText');
+    let cpType = 'personal';
+    // Google 提供の氏名を初期値に
+    if (nameEl) nameEl.value = md.full_name || md.name || md.display_name || '';
+    if (companyWrap) companyWrap.hidden = true;
+    if (errEl2) errEl2.hidden = true;
+    if (typeSeg) typeSeg.querySelectorAll('[data-type]').forEach(b => b.setAttribute('aria-checked', b.dataset.type === 'personal' ? 'true' : 'false'));
+    scr.hidden = false;
+    setTimeout(() => nameEl && nameEl.focus(), 60);
+    // 種別トグル（重複バインド防止）
+    if (typeSeg && !typeSeg.__bound) {
+      typeSeg.__bound = true;
+      typeSeg.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-type]'); if (!b) return;
+        cpType = b.getAttribute('data-type');
+        typeSeg.querySelectorAll('[data-type]').forEach(x => x.setAttribute('aria-checked', x === b ? 'true' : 'false'));
+        if (companyWrap) companyWrap.hidden = cpType !== 'org';
+        if (cpType === 'org') setTimeout(() => companyEl && companyEl.focus(), 30);
+      });
+    }
+    const failCp = (m) => { if (errEl2) { errEl2.textContent = m; errEl2.hidden = false; } };
+    async function submitCp() {
+      const name = (nameEl && nameEl.value.trim()) || '';
+      const company = (companyEl && companyEl.value.trim()) || '';
+      if (!name) { failCp(L('Please enter your name.', 'お名前を入力してください。')); nameEl && nameEl.focus(); return; }
+      if (cpType === 'org' && !company) { failCp(L('Please enter your company or team name.', '会社・組織名を入力してください。')); companyEl && companyEl.focus(); return; }
+      submit.disabled = true; if (submitText2) submitText2.textContent = L('Saving…', '保存中…');
+      try {
+        // サーバー側でプロフィール名の更新＋（組織選択時）個人WS→会社WS転換
+        await sb.rpc('complete_onboarding', { p_name: name, p_type: cpType, p_company: cpType === 'org' ? company : null });
+        // メタデータにも反映（再プロンプト防止・メール言語・請求UIが参照）
+        await sb.auth.updateUser({ data: {
+          display_name: name, account_type: cpType,
+          company_name: cpType === 'org' ? company : null, lang: window.L('en', 'ja'),
+        } });
+      } catch (err) {
+        submit.disabled = false; if (submitText2) submitText2.textContent = L('Get started', 'はじめる');
+        failCp(L('Could not save. Please try again.', '保存できませんでした。もう一度お試しください。') + ' (' + (err.message || err) + ')');
+        return;
+      }
+      scr.hidden = true;
+      const { data } = await sb.auth.getSession();
+      finishSignIn((data && data.session) || session);
+    }
+    if (submit && !submit.__bound) { submit.__bound = true; submit.addEventListener('click', submitCp); }
   }
 })();
 </script>
