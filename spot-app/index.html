@@ -3265,6 +3265,38 @@
   navs.forEach(nv => nv.addEventListener('click', () => showStep(+nv.dataset.s)));
   showStep(0);
 
+  // ウィザード離脱ガード（#4）：制作中に他画面へ移動しようとしたら「下書き保存 / 破棄 / キャンセル」
+  let __navBypass = false;
+  async function guardLeaveWizard(proceed) {
+    if (vWiz.hidden) { proceed(); return; }
+    const confirm = window.__confirm;
+    if (typeof confirm !== 'function') { proceed(); return; }  // 保険：確認UIが未初期化なら素通し
+    const r = await confirm({
+      title: L('Leave without finishing?', '作成を中断しますか？'),
+      message: L('Save your choices as a draft to continue later, or discard them?', '選んだ内容を下書きに保存して後で続けるか、破棄するか選べます。'),
+      actions: [
+        { id: 'save', label: L('Save draft', '下書き保存'), variant: 'primary' },
+        { id: 'discard', label: L('Discard', '破棄する'), variant: 'danger' },
+        { id: 'cancel', label: L('Keep editing', '編集を続ける'), variant: 'ghost' },
+      ],
+    });
+    if (r === 'save') {
+      try { if (window.onWizardComplete) await window.onWizardComplete(sel); if (window.toast) window.toast(L('Draft saved. Continue anytime from Media.', '下書きを保存しました。メディアからいつでも続けられます。'), true, 2200); } catch (_) {}
+      proceed();
+    } else if (r === 'discard') { proceed(); }
+    // cancel / null → 留まる
+  }
+  document.addEventListener('click', (e) => {
+    if (__navBypass || vWiz.hidden) return;
+    if (e.target.closest('#view-wizard')) return;   // ウィザード内の操作はスルー
+    const nav = e.target.closest('.sb-item, .sb-brand, #crumb button, #navBack, #acctMenu button[data-act]');
+    if (!nav) return;
+    e.preventDefault(); e.stopPropagation();
+    guardLeaveWizard(() => { __navBypass = true; try { nav.click(); } finally { __navBypass = false; } });
+  }, true);
+  // ページを閉じる/更新するときも警告（ブラウザ標準）
+  window.addEventListener('beforeunload', (e) => { if (!vWiz.hidden) { e.preventDefault(); e.returnValue = ''; } });
+
   // ホームのビジュアルカードから「配信先を選んだ状態で」ウィザードを開始（Canva風・見て選んで即開始）
   window.startWithChannel = function (val) {
     const grid = document.querySelector('.opt-grid[data-key="media"]');
