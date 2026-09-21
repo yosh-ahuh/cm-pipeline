@@ -1,10 +1,11 @@
 <!--
   Supabase → Authentication → Emails → Templates → "Magic Link" に貼り付ける。
   signInWithOtp（パスワードなしログイン／認証番号）で送られるメール。{{ .Token }} が認証番号。
-  ブランド版（ロゴ＋インディゴ）。user_metadata.lang で日本語/英語を出し分け（無ければ英語）。
+  ダークテーマ版。user_metadata.lang で日本語/英語を出し分け（無ければ英語）。
   ※ OTP 桁数は Authentication → Providers → Email → "Email OTP Length" で設定（例: 8）。
+  ※ 一部メールクライアントはダーク背景を自動反転/無視することがあるため bgcolor を二重指定。
 -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FAF9F6;margin:0;padding:0">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#131318" style="background:#131318;margin:0;padding:0">
   <tr>
     <td align="center" style="padding:32px 16px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%">
@@ -16,35 +17,35 @@
                 <td style="vertical-align:middle;padding-right:9px">
                   <img src="https://mmnpfxrodsurxpeyaaaf.supabase.co/storage/v1/object/public/brand/spot-mark.png" width="30" height="30" alt="Spot" style="display:block;border:0;width:30px;height:30px">
                 </td>
-                <td style="vertical-align:middle;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:21px;font-weight:800;letter-spacing:-.01em;color:#1A1A21">Spot</td>
+                <td style="vertical-align:middle;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:21px;font-weight:800;letter-spacing:-.01em;color:#F1EDE4">Spot</td>
               </tr>
             </table>
           </td>
         </tr>
         <!-- card -->
         <tr>
-          <td style="background:#FFFFFF;border:1px solid #ECE8DF;border-radius:16px;padding:32px 30px">
-            <h1 style="margin:0 0 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:20px;font-weight:700;color:#1A1A21">
+          <td bgcolor="#222230" style="background:#222230;border:1px solid #2C2C37;border-radius:16px;padding:32px 30px">
+            <h1 style="margin:0 0 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:20px;font-weight:700;color:#F1EDE4">
               {{ if eq .Data.lang "ja" }}認証番号{{ else }}Your verification code{{ end }}
             </h1>
-            <p style="margin:0 0 22px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#4A4A53">
+            <p style="margin:0 0 22px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#C7C3B7">
               {{ if eq .Data.lang "ja" }}ログイン画面に、以下の認証番号を入力してください。{{ else }}Enter the code below on the sign-in screen.{{ end }}
             </p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 22px">
               <tr>
-                <td align="center" style="background:#EEF1FD;border:1px solid #DCE1FB;border-radius:12px;padding:18px 12px;font-family:'DM Mono',Menlo,Consolas,monospace;font-size:30px;font-weight:700;letter-spacing:8px;color:#3A4FC0">
+                <td align="center" bgcolor="#1B2350" style="background:#1B2350;border:1px solid #313B72;border-radius:12px;padding:18px 12px;font-family:'DM Mono',Menlo,Consolas,monospace;font-size:30px;font-weight:700;letter-spacing:8px;color:#AEBCFA">
                   {{ .Token }}
                 </td>
               </tr>
             </table>
-            <p style="margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#8C8880">
+            <p style="margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#8C887E">
               {{ if eq .Data.lang "ja" }}この番号の有効期限は約1時間です。心当たりがない場合は、このメールを破棄してください。{{ else }}This code expires in about an hour. If you didn't request it, you can ignore this email.{{ end }}
             </p>
           </td>
         </tr>
         <!-- footer -->
         <tr>
-          <td align="center" style="padding:20px 0 0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:11px;color:#B0ACA3">
+          <td align="center" style="padding:20px 0 0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:11px;color:#6C6960">
             © Spot
           </td>
         </tr>

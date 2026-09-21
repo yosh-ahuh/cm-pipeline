@@ -1,9 +1,10 @@
 <!--
   Supabase → Authentication → Emails → Templates → "Confirm signup" に貼り付ける。
   新規登録の確認メール。signUp の options.data.lang（アプリが登録時に保存）で出し分け（無ければ英語）。
-  ブランド版（ロゴ＋インディゴ）。ロゴ: Supabase Storage 公開バケット brand/spot-mark.png。
+  ダークテーマ版。ロゴ: Supabase Storage 公開バケット brand/spot-mark.png。
+  ※ 一部メールクライアントはダーク背景を自動反転/無視することがあるため bgcolor を二重指定。
 -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#FAF9F6;margin:0;padding:0">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#131318" style="background:#131318;margin:0;padding:0">
   <tr>
     <td align="center" style="padding:32px 16px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%">
@@ -15,18 +16,18 @@
                 <td style="vertical-align:middle;padding-right:9px">
                   <img src="https://mmnpfxrodsurxpeyaaaf.supabase.co/storage/v1/object/public/brand/spot-mark.png" width="30" height="30" alt="Spot" style="display:block;border:0;width:30px;height:30px">
                 </td>
-                <td style="vertical-align:middle;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:21px;font-weight:800;letter-spacing:-.01em;color:#1A1A21">Spot</td>
+                <td style="vertical-align:middle;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:21px;font-weight:800;letter-spacing:-.01em;color:#F1EDE4">Spot</td>
               </tr>
             </table>
           </td>
         </tr>
         <!-- card -->
         <tr>
-          <td style="background:#FFFFFF;border:1px solid #ECE8DF;border-radius:16px;padding:32px 30px">
-            <h1 style="margin:0 0 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:20px;font-weight:700;color:#1A1A21">
+          <td bgcolor="#222230" style="background:#222230;border:1px solid #2C2C37;border-radius:16px;padding:32px 30px">
+            <h1 style="margin:0 0 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:20px;font-weight:700;color:#F1EDE4">
               {{ if eq .Data.lang "ja" }}メールアドレスの確認{{ else }}Confirm your email{{ end }}
             </h1>
-            <p style="margin:0 0 24px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#4A4A53">
+            <p style="margin:0 0 24px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#C7C3B7">
               {{ if eq .Data.lang "ja" }}Spot へのご登録ありがとうございます。下のボタンを押して、メールアドレスの確認を完了してください。{{ else }}Thanks for signing up for Spot. Click the button below to confirm your email address.{{ end }}
             </p>
             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 26px">
@@ -38,14 +39,14 @@
                 </td>
               </tr>
             </table>
-            <p style="margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#8C8880">
+            <p style="margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#8C887E">
               {{ if eq .Data.lang "ja" }}このメールに心当たりがない場合は、破棄してください。{{ else }}If you didn't create this account, you can ignore this email.{{ end }}
             </p>
           </td>
         </tr>
         <!-- footer -->
         <tr>
-          <td align="center" style="padding:20px 0 0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:11px;color:#B0ACA3">
+          <td align="center" style="padding:20px 0 0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:11px;color:#6C6960">
             © Spot
           </td>
         </tr>
