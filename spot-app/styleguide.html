@@ -54,9 +54,9 @@
   /* buttons (index.html 実値) */
   .btn { border-radius: var(--r-sm); min-height: var(--control-h-lg); padding: 0 18px; font-size: var(--t-body-sm); font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; font-family: inherit; }
   .btn-primary { background: var(--ink); color: var(--ground); }
-  .btn-accent { background: var(--accent); color: var(--on-accent); }
   .btn-ghost { background: transparent; border: 1px solid var(--line-strong); color: var(--ink); }
   .btn-tonal { background: var(--surface-2); color: var(--ink); }
+  .hn-btn { background: var(--accent); color: var(--on-accent); border-radius: var(--r-md); min-height: 48px; padding: 0 22px; font-size: var(--t-body); font-weight: 800; display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; font-family: inherit; }
   .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   /* badges (統一) */
   .badge { display: inline-flex; align-items: center; gap: 4px; font-size: var(--t-label-sm); line-height: 1.5; padding: 2px 8px; border-radius: var(--r-full); border: 1px solid transparent; font-family: var(--font-jp); }
@@ -117,10 +117,10 @@
   <h2>ボタン</h2>
   <p class="h2sub">白=アプリ内の主 / 青=ヒーロー・認証の主 / ghost=副 / tonal=中間。1画面に主は1つ。</p>
   <div class="row">
-    <button class="btn btn-primary">主（白）</button>
-    <button class="btn btn-accent">主（青）</button>
-    <button class="btn btn-ghost">副 ghost</button>
-    <button class="btn btn-tonal">中間 tonal</button>
+    <button class="btn btn-primary">主・アプリ内（.btn-primary）</button>
+    <button class="hn-btn">主・ヒーロー/認証（.hn-btn）</button>
+    <button class="btn btn-ghost">副（.btn-ghost）</button>
+    <button class="btn btn-tonal">中間（.btn-tonal）</button>
   </div>
 
   <h2>バッジ</h2>

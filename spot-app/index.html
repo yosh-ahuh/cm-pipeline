@@ -482,10 +482,10 @@
     transition: background var(--dur-fast), color var(--dur-fast), transform var(--dur-fast), box-shadow var(--dur-fast), border-color var(--dur-fast);
   }
   .btn:active { transform: scale(.98); }
+  /* 主ボタンは2系統のみ: .btn-primary(白=アプリ内) / .hn-btn(青=ヒーロー・認証)。
+     旧 .btn-accent は未使用のため撤去（青の主役は .hn-btn に一本化）。 */
   .btn-primary { background: var(--ink); color: var(--ground); }
   .btn-primary:hover { background: #fff; box-shadow: var(--shadow); }
-  .btn-accent { background: var(--accent); color: var(--on-accent); }
-  .btn-accent:hover { background: var(--accent-hover); box-shadow: 0 8px 24px rgba(74,103,227,.35); }
   .btn-ghost { background: transparent; border: 1px solid var(--line-strong); color: var(--ink); flex: 0 0 auto; }
   .btn-ghost:hover { border-color: var(--accent-ink); color: var(--accent-ink); background: var(--hover); }
   .btn-tonal { background: var(--surface-2); color: var(--ink); flex: 0 0 auto; }
