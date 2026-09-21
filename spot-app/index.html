@@ -971,10 +971,31 @@
   .auth-brand-m { display: none; margin-bottom: var(--s-5); }
   .auth-type { display: flex; width: 100%; }
   .auth-type button { flex: 1; justify-content: center; }
+  /* 利用形態カード（個人/組織）— タブではなく選択肢として */
+  .type-cards { display: flex; flex-direction: column; gap: var(--s-3); }
+  .type-card { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; padding: 16px; border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--surface-2); cursor: pointer; transition: border-color var(--dur-fast), background var(--dur-fast); }
+  .type-card:hover { border-color: var(--accent-ink); }
+  .type-card[aria-checked="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 45%, var(--surface)); }
+  .type-card .tc-ic { flex: none; width: 42px; height: 42px; border-radius: var(--r-md); background: var(--surface-3); border: 1px solid var(--line); display: grid; place-items: center; color: var(--accent-ink); }
+  .type-card[aria-checked="true"] .tc-ic { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .type-card .tc-ic svg { width: 21px; height: 21px; }
+  .type-card .tc-body { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .type-card .tc-name { font-size: var(--t-body-lg); font-weight: 700; color: var(--ink); }
+  .type-card .tc-desc { font-size: var(--t-label); color: var(--muted); line-height: 1.5; }
+  .type-card .tc-check { flex: none; margin-left: auto; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; color: transparent; }
+  .type-card[aria-checked="true"] .tc-check { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .type-card .tc-check .ic { width: 12px; height: 12px; stroke-width: 3.5; }
   /* 登録: ステップ進捗（3セグメント） */
   .auth-steps { display: flex; gap: 6px; margin: 0 0 var(--s-2); }
   .auth-step { flex: 1; height: 4px; border-radius: var(--r-full); background: var(--line-strong); transition: background var(--dur-fast); }
   .auth-step.on { background: var(--accent); }
+  /* 戻る / 次へ を横並びに */
+  .auth-cta { display: flex; gap: 10px; align-items: stretch; }
+  .auth-cta .hn-btn { flex: 1; margin: 0; }
+  .auth-back-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 54px; padding: 0 20px; border: 1px solid var(--line-strong); border-radius: var(--r-full); background: transparent; color: var(--muted); font: inherit; font-weight: 600; cursor: pointer; transition: border-color var(--dur-fast), color var(--dur-fast); }
+  .auth-back-btn:hover { border-color: var(--accent-ink); color: var(--ink); }
+  .auth-back-btn .ic { width: 16px; height: 16px; }
+  .auth-back-btn[hidden] { display: none; }
   .auth-terms { display: flex; align-items: flex-start; gap: 9px; font-size: var(--t-body-sm); color: var(--muted); cursor: pointer; margin-top: 2px; }
   .auth-terms input { width: 18px; height: 18px; flex: none; margin-top: 1px; accent-color: var(--accent); }
   .auth-terms a { color: var(--accent-ink); }
@@ -1468,16 +1489,24 @@
         </div>
         <!-- 登録 step2: 利用形態 -->
         <div class="auth-signup-only" id="authFieldType" hidden>
-          <div class="seg auth-type" id="authType" role="group" aria-label="アカウント種別">
-            <button type="button" data-type="personal" aria-pressed="true">個人</button>
-            <button type="button" data-type="org" aria-pressed="false">組織・会社</button>
+          <div class="type-cards" id="authType" role="radiogroup" aria-label="アカウント種別">
+            <button type="button" class="type-card" data-type="personal" role="radio" aria-checked="true">
+              <span class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+              <span class="tc-body"><span class="tc-name">個人</span><span class="tc-desc">個人でCMをつくる。あとから組織に切り替えできます</span></span>
+              <span class="tc-check"><svg class="ic"><use href="#i-check"/></svg></span>
+            </button>
+            <button type="button" class="type-card" data-type="org" role="radio" aria-checked="false">
+              <span class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4v18M19 21V11l-7-4"/><path d="M9 9h0M9 13h0M9 17h0"/></svg></span>
+              <span class="tc-body"><span class="tc-name">組織・会社</span><span class="tc-desc">チームで共有・ブランド管理。会社名を登録します</span></span>
+              <span class="tc-check"><svg class="ic"><use href="#i-check"/></svg></span>
+            </button>
           </div>
         </div>
         <!-- 登録 step3: プロフィール（組織は 会社名 → 氏名 の順） -->
         <div class="auth-signup-only" id="authFieldProfile" hidden>
           <div id="authCompanyWrap" hidden>
             <label class="f-label" for="authCompany">会社・組織名</label>
-            <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-users"/></svg></span><input id="authCompany" type="text" placeholder="株式会社ミライ" autocomplete="organization"></div>
+            <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-users"/></svg></span><input id="authCompany" type="text" placeholder="株式会社スポット" autocomplete="organization"></div>
             <p class="muted" style="margin:6px 0 0;font-size:var(--t-label-sm)">ロゴや請求情報は、登録後にプロフィールから追加できます。</p>
           </div>
           <div id="authNameWrap" style="margin-top:var(--s-3)">
@@ -1521,8 +1550,10 @@
           <input type="checkbox" id="authAgree">
           <span><a href="#" id="authTermsLink">利用規約</a>・<a href="#" id="authPrivacyLink">プライバシーポリシー</a>に同意します</span>
         </label>
-        <button class="hn-btn" type="submit" id="authSubmit"><span id="authSubmitText">サインイン</span></button>
-        <button type="button" class="linkbtn auth-back" id="authBack" hidden><svg class="ic"><use href="#i-arrow-left"/></svg><span>サインインに戻る</span></button>
+        <div class="auth-cta">
+          <button type="button" class="auth-back-btn" id="authBack" hidden><svg class="ic"><use href="#i-arrow-left"/></svg><span>サインインに戻る</span></button>
+          <button class="hn-btn" type="submit" id="authSubmit"><span id="authSubmitText">サインイン</span></button>
+        </div>
       </form>
       <div class="auth-err" id="authErr" role="alert" hidden></div>
       <div class="auth-alt" id="authAlt"><button type="button" class="linkbtn" id="authOtpLink">パスワードなしでサインイン（認証番号）</button></div>
@@ -4248,7 +4279,7 @@
   if (typeSeg) typeSeg.addEventListener('click', (e) => {
     const b = e.target.closest('[data-type]'); if (!b) return;
     acctType = b.getAttribute('data-type');
-    typeSeg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    typeSeg.querySelectorAll('[data-type]').forEach(x => x.setAttribute('aria-checked', x === b ? 'true' : 'false'));
     const cw = document.getElementById('authCompanyWrap'); if (cw) cw.hidden = acctType !== 'org';
   });
 
