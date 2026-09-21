@@ -825,6 +825,16 @@
   .skel .st { height: 132px; border-radius: 0; }
   .skel .sb { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
   @keyframes shimmer { to { background-position: -200% 0; } }
+  /* 汎用スケルトン：数値バー・リスト行（読み込み中プレースホルダ） */
+  .sk { display: inline-block; vertical-align: middle; border-radius: 6px;
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+  .sk-num { width: 46px; height: .58em; border-radius: 5px; }
+  .sk-row { display: flex; align-items: center; gap: 12px; padding: 12px 2px; border-bottom: 1px solid var(--line); }
+  .sk-row:last-child { border-bottom: none; }
+  .sk-row .sk-c { width: 34px; height: 34px; border-radius: 50%; flex: none; }
+  .sk-row .sk-b { height: 12px; }
+  @media (prefers-reduced-motion: reduce) { .sk, .skel i { animation: none; } }
 
   /* empty state */
   .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: var(--s-10) var(--s-4); display: flex; flex-direction: column; align-items: center; gap: var(--s-3); }
@@ -1577,12 +1587,12 @@
     <div class="usage">
       <div class="u-card">
         <div class="u-k">今月つくったCM</div>
-        <div class="u-v">—<small>本 / 全形式込み</small></div>
+        <div class="u-v"><span class="sk sk-num" aria-hidden="true"></span><small>本 / 全形式込み</small></div>
         <div class="u-note">先月比 +5本。制作会社見積り換算で約 ¥360万分。</div>
       </div>
       <div class="u-card">
         <div class="u-k">クレジット残</div>
-        <div class="u-v">—<small>本</small></div>
+        <div class="u-v"><span class="sk sk-num" aria-hidden="true"></span><small>本</small></div>
         <div class="u-meter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
         <div class="u-note" data-t="1クレジット ＝ CM1本（3パターン×3フォーマット = 9ファイル）">1クレジット ＝ CM1本（3パターン×3フォーマット = 9ファイル）</div>
       </div>
@@ -2112,7 +2122,7 @@
         <div class="panel-h">このCMに使うクレジット</div>
         <div class="cost">
           <div class="cost-big"><b id="wsCredits">1</b><span class="yen">クレジット</span><span class="est">この案件・修正は無制限</span></div>
-          <div class="qc-note" style="border:none">残り <b id="wsBal">—</b> / <span id="wsPlan">—</span> クレジット</div>
+          <div class="qc-note" style="border:none">残り <b id="wsBal"><span class="sk sk-num" aria-hidden="true"></span></b> / <span id="wsPlan">—</span> クレジット</div>
         </div>
       </div>
 
@@ -2409,7 +2419,7 @@
   <div class="panel pad">
     <div class="panel-h">いまの残高</div>
     <div class="bill-cur">
-      <div class="bc-name"><b id="crBalance">—</b><span class="muted"> クレジット</span></div>
+      <div class="bc-name"><b id="crBalance"><span class="sk sk-num" aria-hidden="true"></span></b><span class="muted"> クレジット</span></div>
       <div class="muted" id="crUsage" style="font-size:var(--t-label)"></div>
     </div>
   </div>
@@ -4569,6 +4579,8 @@
   // 「12<small>…</small>」の先頭テキストノード（数字）だけ差し替える。
   function setLeadNumber(vEl, text) {
     if (!vEl) return;
+    const lead = vEl.firstChild;   // 読み込み中スケルトンがあれば先に除去
+    if (lead && lead.nodeType === 1 && lead.classList && lead.classList.contains('sk')) vEl.removeChild(lead);
     const n = vEl.firstChild, fresh = document.createTextNode(text);   // new node: the i18n walker restores edited nodes to their original
     if (n && n.nodeType === 3) vEl.replaceChild(fresh, n); else vEl.insertBefore(fresh, vEl.firstChild);
   }
@@ -4683,6 +4695,7 @@
     if (!panel) return;
     if (!currentOrg) { panel.hidden = true; return; }   // 006 未適用
     panel.hidden = false;
+    { const el = document.getElementById('memberList'); if (el && !el.children.length) el.innerHTML = skelRows(3, { avatar: true }); }   // 読み込み中スケルトン
     const isOwner = currentOrg.role === 'owner';
     let members = [];
     try { const { data } = await sb.rpc('list_members', { p_org: currentOrg.id }); members = data || []; }
@@ -5042,6 +5055,7 @@
   window.loadCredits = async function () {
     try {
       renderCreditPacks();
+      { const el = document.getElementById('crActivity'); if (el) el.innerHTML = skelRows(4, { avatar: false }); }   // 利用明細の読み込み中スケルトン
       const { prof } = await getProfileWithPlan();
       const c = prof ? Number(prof.credits) : 0;
       setText('crBalance', String(c));
@@ -5471,6 +5485,13 @@
   });
   function skeleton(n) {
     return Array.from({ length: n }, () => `<div class="skel" aria-hidden="true"><i class="st"></i><div class="sb"><i style="height:14px;width:70%"></i><i style="height:11px;width:45%"></i><i style="height:11px;width:55%;margin-top:6px"></i></div></div>`).join('');
+  }
+  // リスト行のスケルトン（メンバー一覧・利用明細など）。avatar:false で丸アイコンを省く。
+  function skelRows(n, opts) {
+    opts = opts || {};
+    const av = opts.avatar !== false;
+    const w = [62, 46, 54, 40];
+    return Array.from({ length: n }, (_, i) => `<div class="sk-row" aria-hidden="true">${av ? '<span class="sk sk-c"></span>' : ''}<span class="sk sk-b" style="width:${w[i % w.length]}%"></span></div>`).join('');
   }
 
   // ---- render helpers ----
