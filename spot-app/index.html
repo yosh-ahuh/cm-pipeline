@@ -1414,6 +1414,9 @@
   .modal-msg[hidden] { display: none; }
   #confirmModal .modal-h { margin-bottom: 8px; }
   #confirmActions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  #confirmActions .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .confirm-input { display: block; margin: 14px 0 0; font-size: var(--t-label); color: var(--muted); }
+  .confirm-input input { display: block; width: 100%; margin-top: 6px; }
   .btn-danger { background: var(--crit); color: #fff; border: 1px solid transparent; }
   .btn-danger:hover { background: color-mix(in srgb, var(--crit) 86%, #000); }
   .danger-zone { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
@@ -2369,6 +2372,11 @@
         </select>
       </div>
       <p class="muted" style="margin:10px 0 0;font-size:var(--t-label-sm)">対応言語は順次追加予定です。</p>
+    </div>
+    <div class="panel pad">
+      <div class="panel-h">アカウントの削除</div>
+      <p class="muted" style="margin:0 0 12px;font-size:var(--t-label)">アカウントと、あなたのすべてのデータ（動画・ワークスペース・クレジット）を完全に削除します。元に戻せません。</p>
+      <button class="btn btn-danger wauto" id="accountDeleteBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg><span>アカウントを削除</span></button>
     </div>
   </div>
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
@@ -5175,6 +5183,31 @@
       try { if (typeof renderVoicePicker === 'function') renderVoicePicker(); } catch (_) {}
     });
   })();
+  // アカウントの削除 — type-to-confirm ＋ Edge Function（auth.users削除→全データcascade）
+  (function wireAccountDelete() {
+    const btn = document.getElementById('accountDeleteBtn'); if (!btn) return;
+    btn.addEventListener('click', async () => {
+      const word = L('DELETE', '削除');
+      const r = await openConfirm({
+        title: L('Delete your account?', 'アカウントを削除しますか？'),
+        message: L('Your account and all data (videos, workspaces, credits) will be permanently deleted. This cannot be undone.', 'アカウントと、あなたのすべてのデータ（動画・ワークスペース・クレジット）が完全に削除されます。元に戻せません。'),
+        requireText: { label: L(`Type “${word}” to confirm`, `確認のため「${word}」と入力してください`), value: word, placeholder: word },
+        actions: [{ id: 'ok', label: L('Delete account', 'アカウントを削除'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }],
+      });
+      if (r !== 'ok') return;
+      btn.disabled = true;
+      try {
+        const { data, error } = await sb.functions.invoke('delete-account');
+        if (error) throw error;
+        if (data && data.error) throw new Error(data.error);
+        if (window.toast) window.toast(L('Account deleted', 'アカウントを削除しました'), true, 2000);
+        try { if (window.__accounts && window.__acctCurrentId) window.__accounts.remove(window.__acctCurrentId); } catch (_) {}
+        try { localStorage.removeItem('spot-org'); } catch (_) {}
+        try { await sb.auth.signOut(); } catch (_) {}
+        setTimeout(() => location.reload(), 1200);
+      } catch (err) { console.warn('delete account failed:', err); btn.disabled = false; if (window.toast) window.toast(L("Couldn't delete the account. Please try again.", 'アカウントを削除できませんでした。もう一度お試しください。'), false, 3000); }
+    });
+  })();
   // 通知設定（端末ごとの表示設定・localStorage）
   (function wireNotifications() {
     const done = document.getElementById('notifDone'), news = document.getElementById('notifNews');
@@ -5625,26 +5658,41 @@
       const actEl = document.getElementById('confirmActions');
       titleEl.textContent = opts.title || '';
       msgEl.textContent = opts.message || ''; msgEl.hidden = !opts.message;
+      { const old = document.getElementById('confirmInputWrap'); if (old) old.remove(); }   // 前回の入力欄を掃除
       const actions = opts.actions || [
         { id: 'ok', label: L('OK', 'OK'), variant: 'primary' },
         { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' },
       ];
       const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); pick(null); } };
-      const cleanup = () => { scrim.hidden = true; document.removeEventListener('keydown', onKey); scrim.onclick = null; };
+      const cleanup = () => { scrim.hidden = true; document.removeEventListener('keydown', onKey); scrim.onclick = null; const w = document.getElementById('confirmInputWrap'); if (w) w.remove(); };
       const pick = (id) => { cleanup(); resolve(id); };
+      // type-to-confirm（重要な削除向け）：requireText.value と一致するまで危険/主ボタンを無効化
+      let inputEl = null;
+      if (opts.requireText) {
+        const wrap = document.createElement('label'); wrap.id = 'confirmInputWrap'; wrap.className = 'confirm-input';
+        wrap.textContent = opts.requireText.label || '';
+        inputEl = document.createElement('input'); inputEl.type = 'text'; inputEl.autocomplete = 'off'; inputEl.autocapitalize = 'off'; inputEl.spellcheck = false;
+        inputEl.placeholder = opts.requireText.placeholder || '';
+        wrap.appendChild(inputEl); msgEl.after(wrap);
+      }
       actEl.innerHTML = '';
       actions.forEach(a => {
         const b = document.createElement('button');
         b.className = 'btn ' + (a.variant === 'danger' ? 'btn-danger' : a.variant === 'ghost' ? 'btn-ghost' : 'btn-primary');
+        if (opts.requireText && (a.variant === 'danger' || a.variant === 'primary')) b.disabled = true;
         const s = document.createElement('span'); s.textContent = a.label; b.appendChild(s);
-        b.onclick = () => pick(a.id);
+        b.onclick = () => { if (!b.disabled) pick(a.id); };
         actEl.appendChild(b);
+      });
+      if (inputEl) inputEl.addEventListener('input', () => {
+        const match = inputEl.value.trim() === opts.requireText.value;
+        actEl.querySelectorAll('.btn-danger, .btn-primary').forEach(b => b.disabled = !match);
       });
       scrim.hidden = false;
       scrim.onclick = (e) => { if (e.target === scrim) pick(null); };
       document.addEventListener('keydown', onKey);
-      const focusBtn = actEl.querySelector('.btn-primary, .btn-danger') || actEl.querySelector('.btn');
-      if (focusBtn) setTimeout(() => focusBtn.focus(), 30);
+      if (inputEl) setTimeout(() => inputEl.focus(), 30);
+      else { const focusBtn = actEl.querySelector('.btn-primary, .btn-danger') || actEl.querySelector('.btn'); if (focusBtn) setTimeout(() => focusBtn.focus(), 30); }
     });
   }
   window.__confirm = openConfirm;
