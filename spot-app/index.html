@@ -3579,6 +3579,23 @@
       const { count } = await sb.from('projects')
         .select('id', { count: 'exact', head: true }).gte('created_at', monthStart.toISOString());
       if (cards[0]) setLeadNumber(cards[0].querySelector('.u-v'), String(count ?? 0));
+      // 先月比 ＋ 制作会社換算（1本=30万円の目安）を実データで
+      if (cards[0]) {
+        const note = cards[0].querySelector('.u-note');
+        if (note) {
+          try {
+            const lastStart = new Date(monthStart); lastStart.setMonth(lastStart.getMonth() - 1);
+            const { count: lastCount } = await sb.from('projects')
+              .select('id', { count: 'exact', head: true })
+              .gte('created_at', lastStart.toISOString()).lt('created_at', monthStart.toISOString());
+            const n = count || 0, diff = n - (lastCount || 0), man = n * 30;
+            note.textContent = n === 0
+              ? L('No videos this month yet.', '今月はまだありません。まず1本つくってみましょう。')
+              : L(`vs last month ${diff >= 0 ? '+' : ''}${diff} · ~¥${man}0,000 vs an agency`,
+                  `先月比 ${diff >= 0 ? '+' : ''}${diff}本 ・ 制作会社換算で約 ¥${man.toLocaleString()}万分`);
+          } catch (_) {}
+        }
+      }
       const { prof, plan } = await getProfileWithPlan();
       const c = prof ? Number(prof.credits) : 0;
       if (plan) { PLAN_CREDITS = Number(plan.spots_per_month) || 1; PLAN_NAME = plan.name || PLAN_NAME; }
