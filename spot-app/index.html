@@ -1036,6 +1036,9 @@
   .pack-card .pk-sub { color: var(--muted); font-size: var(--t-label-sm); }
   .pack-card .pk-unit { color: var(--faint); font-size: var(--t-label-sm); font-family: var(--font-mono); }
   .pack-card .pk-tag { position: absolute; top: 10px; right: 10px; font-size: var(--t-label-sm); color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--r-full); padding: 1px 8px; }
+  /* 列・行で並ぶ数字は等幅数字で桁を揃える（価格・メトリクス・ダッシュ統計。mono系は元々等幅） */
+  .plan-card .pc-price, .plan-card .pc-metrics, .pack-card .pk-credits, .pack-card .pk-price,
+  .u-card .u-v, .cost-big { font-variant-numeric: tabular-nums; }
   .switch-row { display: flex; align-items: center; gap: 10px; font-size: var(--t-body); cursor: pointer; }
   .switch-row input { width: 18px; height: 18px; flex: none; accent-color: var(--accent); }
   .topup-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s-3); margin-top: 12px; }
