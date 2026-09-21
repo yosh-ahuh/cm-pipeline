@@ -605,6 +605,17 @@
   .opt[aria-pressed="true"] .o-tick, .opt[aria-checked="true"] .o-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .multi-note { font-size: var(--t-label); color: var(--faint); margin-top: var(--s-3); font-family: var(--font-mono); }
   .multi-note.warn { color: var(--warn); }
+  /* カスタム設定（縦横比・解像度） */
+  .custom-cfg { margin-top: var(--s-4); padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface-2); }
+  .custom-cfg .cfg-title { font-size: var(--t-body-sm); font-weight: 700; margin-bottom: var(--s-3); }
+  .custom-cfg .cfg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3) var(--s-4); }
+  .custom-cfg .cfg-field { display: flex; flex-direction: column; gap: 6px; font-size: var(--t-label); color: var(--muted); }
+  .custom-cfg .cfg-field .sel { width: 100%; }
+  .custom-cfg .cfg-pair { display: flex; align-items: center; gap: 8px; }
+  .custom-cfg .cfg-pair input { width: 100%; min-width: 0; }
+  .custom-cfg .cfg-pair i { color: var(--muted); font-style: normal; }
+  .custom-cfg .cfg-preview { margin-top: var(--s-3); font-family: var(--font-mono); font-size: var(--t-label); color: var(--accent-ink); }
+  @media (max-width: 520px) { .custom-cfg .cfg-grid { grid-template-columns: 1fr; } }
 
   /* 作成フローの下部アクションバーは常時見える位置に固定（主CTAへ常にアクセス・Canva/モダンUI流） */
   .wiz-nav { display: flex; gap: var(--s-2); margin-top: var(--s-6); align-items: center;
@@ -1660,15 +1671,15 @@
         <span class="make-desc">正方形。音なしで流し見されても伝わる字幕重視。</span>
         <span class="make-fmt">1:1 ・ 15〜30秒</span>
       </button>
-      <button class="make-card" onclick="startWithChannel('店頭サイネージ')">
+      <button class="make-card" onclick="startWithChannel('カスタム')">
         <span class="make-go"><svg class="ic"><use href="#i-arrow-right"/></svg></span>
         <span class="make-preview"><span class="make-ratio r-169"></span></span>
         <span class="make-row">
-          <span class="make-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
-          <span class="make-name">店頭サイネージ</span>
+          <span class="make-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="17" cy="12" r="2"/><circle cx="14" cy="18" r="2"/></svg></span>
+          <span class="make-name">カスタム</span>
         </span>
-        <span class="make-desc">店頭のモニター向け。音なし・大きな字幕で目を引く。</span>
-        <span class="make-fmt">16:9 ・ 15秒</span>
+        <span class="make-desc">縦横比・解像度を自由に設定。特殊な配信先や独自サイズに。</span>
+        <span class="make-fmt">自由サイズ</span>
       </button>
     </div>
   </section>
@@ -1749,14 +1760,45 @@
             <span class="o-name">SNSタイムライン</span>
             <span class="o-desc">1:1・音なし前提・字幕重視</span>
           </button>
-          <button class="opt" data-val="店頭サイネージ" data-fmt="16:9" data-len="15秒">
+          <button class="opt" data-val="カスタム" data-fmt="custom" data-len="自由">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
-            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
-            <span class="o-name">店頭サイネージ</span>
-            <span class="o-desc">16:9・音なし・大字幕</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="17" cy="12" r="2"/><circle cx="14" cy="18" r="2"/></svg></span>
+            <span class="o-name">カスタム</span>
+            <span class="o-desc">縦横比・解像度を自由に設定</span>
           </button>
         </div>
         <div class="multi-note" id="mediaNote" aria-live="polite">選択中の配信先から、書き出す形式が決まります。</div>
+        <!-- カスタム選択時：縦横比・解像度を自由設定 -->
+        <div class="custom-cfg" id="customCfg" hidden>
+          <div class="cfg-title">カスタム設定</div>
+          <div class="cfg-grid">
+            <label class="cfg-field"><span>縦横比</span>
+              <select id="customRatio" class="sel">
+                <option value="16:9">16:9（横・ワイド）</option>
+                <option value="9:16">9:16（縦・スマホ全画面）</option>
+                <option value="1:1">1:1（正方形）</option>
+                <option value="4:5">4:5（縦長ポスト）</option>
+                <option value="21:9">21:9（シネマ）</option>
+                <option value="__free__">自由入力…</option>
+              </select>
+            </label>
+            <label class="cfg-field" id="customRatioFree" hidden><span>比率（幅 : 高さ）</span>
+              <span class="cfg-pair"><input id="customRatioW" type="number" min="1" max="100" placeholder="16" inputmode="numeric"><i>:</i><input id="customRatioH" type="number" min="1" max="100" placeholder="9" inputmode="numeric"></span>
+            </label>
+            <label class="cfg-field"><span>解像度</span>
+              <select id="customRes" class="sel">
+                <option value="1080">フルHD（1080p）</option>
+                <option value="720">HD（720p）</option>
+                <option value="2160">4K（2160p）</option>
+                <option value="__free__">自由入力…</option>
+              </select>
+            </label>
+            <label class="cfg-field" id="customResFree" hidden><span>サイズ（px・幅 × 高さ）</span>
+              <span class="cfg-pair"><input id="customResW" type="number" min="1" placeholder="1920" inputmode="numeric"><i>×</i><input id="customResH" type="number" min="1" placeholder="1080" inputmode="numeric"></span>
+            </label>
+          </div>
+          <div class="cfg-preview" id="customPreview" aria-live="polite"></div>
+        </div>
       </div>
 
       <!-- STEP 2: 業種 -->
@@ -3022,15 +3064,47 @@
   window.gotoExport = gotoExport;   // データ層（生成完了→書き出し導線）から呼べるように
 
   // ---------- wizard ----------
-  const sel = { media: [], industry: null, target: null, angle: null, tone: null };
+  const sel = { media: [], industry: null, target: null, angle: null, tone: null,
+    custom: { ratio: '16:9', res: '1080', ratioW: null, ratioH: null, resW: null, resH: null } };
   const RX_LABELS = { media:'配信先', industry:'業種', target:'ターゲット', angle:'伝え方', tone:'トーン' };
+
+  // カスタム設定：縦横比・解像度から表示文字列を組む（例「16:9 · 1920×1080」）
+  function customFmtLabel() {
+    const c = sel.custom || {};
+    let ratio = c.ratio === '__free__' ? ((c.ratioW && c.ratioH) ? `${c.ratioW}:${c.ratioH}` : '自由比率') : (c.ratio || '16:9');
+    let sizeStr = '';
+    if (c.res === '__free__') { if (c.resW && c.resH) sizeStr = `${c.resW}×${c.resH}`; }
+    else {
+      const rp = String(ratio).split(':').map(Number);
+      const h = Number(c.res) || 1080;
+      if (rp.length === 2 && rp[0] && rp[1]) { const w = Math.round(h * rp[0] / rp[1]); sizeStr = `${w}×${h}`; }
+    }
+    return sizeStr ? `${ratio} · ${sizeStr}` : ratio;
+  }
+  // カスタム設定パネルの表示/読み取り/プレビュー更新
+  function syncCustomCfg() {
+    const on = sel.media && sel.media.includes('カスタム');
+    const panel = document.getElementById('customCfg'); if (panel) panel.hidden = !on;
+    if (!on) return;
+    const g = id => document.getElementById(id);
+    const c = sel.custom;
+    if (g('customRatio')) c.ratio = g('customRatio').value;
+    if (g('customRes')) c.res = g('customRes').value;
+    c.ratioW = g('customRatioW') ? g('customRatioW').value.trim() : null;
+    c.ratioH = g('customRatioH') ? g('customRatioH').value.trim() : null;
+    c.resW = g('customResW') ? g('customResW').value.trim() : null;
+    c.resH = g('customResH') ? g('customResH').value.trim() : null;
+    { const el = g('customRatioFree'); if (el) el.hidden = c.ratio !== '__free__'; }
+    { const el = g('customResFree'); if (el) el.hidden = c.res !== '__free__'; }
+    const pv = g('customPreview'); if (pv) pv.textContent = '書き出しサイズ： ' + customFmtLabel();
+  }
 
   // 配信先ごとの入稿仕様（cm-pipeline/styles/platform-specs.yaml と同期）。書き出し時に配信前チェックへ表示。
   const PLATFORM_SPECS = {
     'YouTube':        { fmt: '16:9 · 1920×1080', spec: ['H.264 · 30fps · −14 LUFS', 'スキップ前5秒でフック、下部10%はUIと重なる', '30秒以内（バンパーは6秒）'] },
     'リール/ショート': { fmt: '9:16 · 1080×1920', spec: ['上14% / 下35% はUIと重なる → 字幕は中央帯', '冒頭2秒フック、15〜30秒', '字幕焼き込み推奨（音なし再生が多い）'] },
     'SNSタイムライン': { fmt: '1:1 · 1080×1080', spec: ['音なし前提 → 字幕必須', '15〜30秒、1フレーム目がサムネ', 'ロゴは最初の3秒以内に'] },
-    '店頭サイネージ':  { fmt: '16:9 · 1920×1080', spec: ['音なし · 大字幕（画面高の8%以上）', '15秒ループ · 終端でロゴ静止', 'H.264 · ループ継ぎ目に黒を入れない'] },
+    'カスタム':        { fmt: 'カスタム', spec: ['縦横比・解像度は「カスタム設定」で指定', 'H.264 推奨 · 特殊配信先や独自サイズに対応', '安全マージンは配信先の仕様に合わせて確認'] },
   };
   function renderSpecs() {
     const box = document.getElementById('ccSpecs'); if (!box) return;
@@ -3059,7 +3133,10 @@
       } else { el.textContent = '未選択'; el.classList.add('empty'); }
     }
     // derived: formats from media
-    const fmtSet = new Set(sel.media.map(m => ({'YouTube':'16:9','リール/ショート':'9:16','SNSタイムライン':'1:1','店頭サイネージ':'16:9'}[m])));
+    const fmtOf = { 'YouTube':'16:9', 'リール/ショート':'9:16', 'SNSタイムライン':'1:1' };
+    const fmtSet = new Set(sel.media.map(m => m === 'カスタム'
+      ? (sel.custom.ratio === '__free__' ? (sel.custom.ratioW && sel.custom.ratioH ? `${sel.custom.ratioW}:${sel.custom.ratioH}` : 'カスタム') : sel.custom.ratio)
+      : fmtOf[m]).filter(Boolean));
     const rxFmt = document.getElementById('rxFmt');
     rxFmt.innerHTML = [...fmtSet].map(f=>`<span class="rx-pill">${f}</span>`).join('') || '<span class="rx-pill" style="opacity:.5">配信先を選択</span>';
     // length: shortest wins if リール
@@ -3083,7 +3160,12 @@
     document.getElementById('rxFoot').textContent = NOTE[sel.target] || 'この構成は、実案件のA/Bテスト知見をもとに自動で組み立てられます。';
     const derived = document.getElementById('rxDerived');
     derived.classList.toggle('live', sel.media.length>0);
+    syncCustomCfg();   // カスタム設定パネルの表示/プレビュー同期
   }
+  // カスタム設定の入力変化を反映
+  { const cfg = document.getElementById('customCfg');
+    if (cfg) cfg.addEventListener('change', () => { syncCustomCfg(); renderRx(); });
+    if (cfg) cfg.addEventListener('input', () => { syncCustomCfg(); }); }
 
   document.querySelectorAll('.opt-grid').forEach(grid => {
     const multi = grid.dataset.multi === 'true';
@@ -3593,7 +3675,9 @@
     '16:9・課題提起型が効く': '16:9 · problem-led works best',
     'リール / ショート': 'Reels / Shorts', 'リール/ショート': 'Reels / Shorts', '9:16・冒頭2秒フック必須': '9:16 · 2-sec hook is a must',
     'SNSタイムライン': 'Social feed', '1:1・音なし前提・字幕重視': '1:1 · sound-off · caption-first',
-    '店頭サイネージ': 'In-store signage', '16:9・音なし・大字幕': '16:9 · sound-off · big captions',
+    'カスタム': 'Custom', '縦横比・解像度を自由に設定': 'Set aspect ratio and resolution freely', 'カスタム設定': 'Custom settings',
+    '縦横比': 'Aspect ratio', '解像度': 'Resolution', '自由入力…': 'Custom…',
+    '自由サイズ': 'Any size', '縦横比・解像度を自由に設定。特殊な配信先や独自サイズに。': 'Set aspect ratio and resolution freely — for special channels or custom sizes.',
     '選択中の配信先から、書き出す形式が決まります。': 'Your selected channels set the export formats.',
     // step 2
     'どんなプロダクトですか?': 'What kind of product is it?',
@@ -4412,7 +4496,7 @@
   const MEDIA_FMT = { 'YouTube': { id: 'wide', w: 1920, h: 1080 },
     'リール/ショート': { id: 'vertical', w: 1080, h: 1920 },
     'SNSタイムライン': { id: 'square', w: 1080, h: 1080 },
-    '店頭サイネージ': { id: 'wide', w: 1920, h: 1080 } };
+    'カスタム': { id: 'custom', w: 1920, h: 1080 } };
   const GLYPH = { wide: [13, 8], vertical: [8, 13], square: [11, 11] };
   const STATUS = {   // JA source strings → translated by the i18n walker
     draft:      { st: '下書き', cls: 'ps-draft', group: 'progress' },
