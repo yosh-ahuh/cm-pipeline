@@ -256,9 +256,11 @@
   .menu-head-btn:hover { background: var(--hover); }
   .menu-head .mh-chev { margin-left: auto; flex: none; width: 16px; height: 16px; color: var(--faint); transition: transform var(--dur-fast); }
   .menu-head-btn[aria-expanded="true"] .mh-chev { transform: rotate(-90deg); }
-  .as-current { align-items: center; }
-  .as-current .avatar { width: 34px; height: 34px; border-radius: 50%; flex: none; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-sm); text-transform: uppercase; }
-  .as-current .as-check { margin-left: auto; flex: none; color: var(--accent); }
+  .as-current, .as-acct { align-items: center; }
+  .as-acct { width: calc(100% - 8px); margin: 0 var(--s-1); border-radius: var(--r-sm); }
+  .as-current .avatar, .as-acct .avatar { width: 34px; height: 34px; border-radius: 50%; flex: none; overflow: hidden; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-sm); text-transform: uppercase; }
+  .as-check { margin-left: auto; flex: none; color: var(--accent); opacity: 0; }
+  .as-current .as-check, .as-acct[aria-checked="true"] .as-check { opacity: 1; }
   .menu-id { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
   .menu-email { max-width: 100%; font-size: var(--t-body-sm); font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .plan-badge { font-family: var(--font-mono); font-size: var(--t-label-sm); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; line-height: 1.6; padding: 1px 8px; border-radius: var(--r-full); color: var(--accent-ink); background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent-ink) 30%, transparent); }
@@ -928,6 +930,10 @@
   .auth-panel { padding: clamp(32px, 5vw, 72px); display: flex; flex-direction: column; justify-content: center; align-items: center; }
   /* 右フォームは快適な幅に収め、右半分の中で中央寄せ（参考デザインのゆとり） */
   .auth-panel > * { width: 100%; max-width: 440px; }
+  .auth-cancel { display: inline-flex; align-items: center; gap: 6px; align-self: center; width: 100%; max-width: 440px; margin-bottom: var(--s-4);
+    color: var(--muted); font-size: var(--t-body-sm); background: none; border: none; cursor: pointer; justify-content: flex-start; }
+  .auth-cancel:hover { color: var(--ink); }
+  .auth-cancel .ic { width: 16px; height: 16px; }
   .auth-brand { display: flex; align-items: center; gap: 11px; }
   .auth-brand .wordmark { font-size: 22px; letter-spacing: -.02em; }
   .auth-brand-m { display: none; margin-bottom: var(--s-5); }
@@ -951,6 +957,15 @@
   /* 参考デザインに寄せる：入力はふっくら丸く、送信はピル、全幅 */
   .auth-form .field input, .auth-form .sel, .auth-form select { border-radius: var(--r-lg); }
   .auth-form .hn-btn { align-self: stretch; width: 100%; justify-content: center; min-height: 54px; border-radius: var(--r-full); margin-top: var(--s-2); }
+  /* OAuth（Google / Microsoft） */
+  .auth-or { display: flex; align-items: center; gap: var(--s-3); margin: var(--s-4) 0; color: var(--faint); font-size: var(--t-label); }
+  .auth-or::before, .auth-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .auth-oauth { display: flex; flex-direction: column; gap: var(--s-2); }
+  .btn-oauth { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 50px; border-radius: var(--r-full);
+    background: var(--surface-2); border: 1px solid var(--line-strong); color: var(--ink); font-size: var(--t-body); font-weight: 600; cursor: pointer;
+    transition: border-color var(--dur-fast), background var(--dur-fast); }
+  .btn-oauth:hover { border-color: var(--faint); background: var(--surface-3); }
+  .btn-oauth .oa-ic { display: grid; place-items: center; flex: none; }
   .f-label { display: block; font-size: var(--t-label); font-weight: 700; color: var(--muted); margin-bottom: 6px; }
   .auth-form .field input { height: 48px; font-size: var(--t-body-lg); padding-right: 12px; }
   .auth-form .field.pw input { padding-right: 48px; }
@@ -1389,6 +1404,7 @@
     </aside>
     <!-- 右: フォーム -->
     <div class="auth-panel">
+      <button type="button" class="auth-cancel" id="authCancel" hidden><svg class="ic"><use href="#i-arrow-left"/></svg><span>現在のアカウントに戻る</span></button>
       <div class="auth-brand auth-brand-m"><div class="mark"></div><div class="wordmark">Spot</div></div>
       <h1 class="auth-h" id="authH">おかえりなさい</h1>
       <p class="auth-sub" id="authSub">メールアドレスとパスワードでサインイン。</p>
@@ -1426,6 +1442,17 @@
         <button class="hn-btn" type="submit" id="authSubmit"><span id="authSubmitText">サインイン</span></button>
       </form>
       <div class="auth-err" id="authErr" role="alert" hidden></div>
+      <div class="auth-or"><span>または</span></div>
+      <div class="auth-oauth">
+        <button type="button" class="btn-oauth" data-oauth="google">
+          <span class="oa-ic" aria-hidden="true"><svg viewBox="0 0 18 18" width="18" height="18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.46 3.44 1.35l2.58-2.58C13.47.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg></span>
+          <span>Google で続ける</span>
+        </button>
+        <button type="button" class="btn-oauth" data-oauth="azure">
+          <span class="oa-ic" aria-hidden="true"><svg viewBox="0 0 18 18" width="16" height="16"><path fill="#F25022" d="M0 0h8.5v8.5H0z"/><path fill="#7FBA00" d="M9.5 0H18v8.5H9.5z"/><path fill="#00A4EF" d="M0 9.5h8.5V18H0z"/><path fill="#FFB900" d="M9.5 9.5H18V18H9.5z"/></svg></span>
+          <span>Microsoft で続ける</span>
+        </button>
+      </div>
       <div class="auth-toggle">
         <span id="authToggleText">Spot は初めてですか?</span>
         <button type="button" id="authToggle" class="linkbtn">アカウントを作成</button>
@@ -1498,11 +1525,7 @@
 <!-- アカウント切替サブメニュー（ヘッダの › から開く） -->
 <div class="menu" id="acctSwitch" role="menu" aria-label="アカウントを切り替える" hidden>
   <div class="menu-label">アカウントを切り替える</div>
-  <div class="menu-item as-current" aria-current="true">
-    <span class="avatar" id="asAvatar" aria-hidden="true">?</span>
-    <div class="acct-id"><div class="acct-top"><span class="acct-name" id="asName">—</span><span class="plan-badge" id="asPlan">Free</span></div><div class="acct-email" id="asEmail"></div></div>
-    <svg class="ic as-check" aria-hidden="true"><use href="#i-check"/></svg>
-  </div>
+  <div id="asList"></div>
   <div class="menu-sep"></div>
   <button type="button" class="menu-item" data-act="login-other"><svg class="ic"><use href="#i-plus"/></svg><span>別のアカウントでログイン</span></button>
   <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウントを管理する</span></button>
@@ -2694,16 +2717,32 @@
     acctMenu.style.bottom = (window.innerHeight - r.top + 8) + 'px';
     acctMenu.style.width = Math.max(248, r.width) + 'px';
   }
+  function renderAcctList() {   // 保管済みの全アカウントを一覧（現在に✓）
+    const box = document.getElementById('asList'); if (!box) return;
+    const accts = (window.__accounts && window.__accounts.list()) || [];
+    const curId = (window.__accounts && window.__accounts.currentId()) || null;
+    if (!accts.length) {   // フォールバック：ヘッダの現在アカウントのみ
+      const nm = (document.getElementById('amName') || {}).textContent || '';
+      const em = (document.getElementById('amEmail') || {}).textContent || '';
+      const avHtml = (document.getElementById('amAvatar') || {}).innerHTML || '?';
+      box.innerHTML = `<div class="menu-item as-current" aria-current="true"><span class="avatar" aria-hidden="true">${avHtml}</span>`
+        + `<div class="acct-id"><div class="acct-top"><span class="acct-name">${escHtml(nm)}</span></div><div class="acct-email">${escHtml(em)}</div></div>`
+        + `<svg class="ic as-check" aria-hidden="true"><use href="#i-check"/></svg></div>`;
+      return;
+    }
+    box.innerHTML = accts.map(a => {
+      const cur = a.id === curId;
+      const initial = (a.name || a.email || '?').charAt(0);
+      const inner = a.avatar ? `<img src="${a.avatar}" alt="">` : escHtml(initial);
+      return `<button type="button" class="menu-item as-acct${cur ? ' as-current' : ''}" role="menuitemradio" aria-checked="${cur ? 'true' : 'false'}" data-acct="${a.id}">`
+        + `<span class="avatar" aria-hidden="true">${inner}</span>`
+        + `<div class="acct-id"><div class="acct-top"><span class="acct-name">${escHtml(a.name || a.email.split('@')[0])}</span></div><div class="acct-email">${escHtml(a.email)}</div></div>`
+        + `<svg class="ic as-check" aria-hidden="true"><use href="#i-check"/></svg></button>`;
+    }).join('');
+  }
   function openAcctSwitch() {   // ヘッダの › から：アカウント切替サブメニュー（横に出す）
     if (!acctSwitch || !acctMenu) return;
-    // 現在アカウントを同期
-    const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    const av = document.getElementById('amAvatar');
-    const asAv = document.getElementById('asAvatar');
-    if (asAv && av) asAv.innerHTML = av.innerHTML;   // 画像 or イニシャルをそのまま複製
-    setTxt('asName', (document.getElementById('amName') || {}).textContent || '');
-    setTxt('asEmail', (document.getElementById('amEmail') || {}).textContent || '');
-    setTxt('asPlan', (document.getElementById('amPlan') || {}).textContent || 'Free');
+    renderAcctList();
     acctSwitch.hidden = false;
     const h = document.querySelector('#acctMenu .menu-head-btn'); if (h) h.setAttribute('aria-expanded', 'true');
     const mr = acctMenu.getBoundingClientRect();
@@ -2725,8 +2764,21 @@
     if (a === 'settings') { gotoSettings(); return; }
     if (a === 'account') { if (window.gotoAccount) window.gotoAccount(); return; }
     if (a === 'help') { const to = (window.__cfg && window.__cfg.supportEmail) || ''; if (to) { location.href = 'mailto:' + to + '?subject=' + encodeURIComponent('Spot feedback'); } else toast(L('Help & feedback is coming soon.', 'ヘルプ＆フィードバックは準備中です。'), false, 2400); return; }
-    if (a === 'login-other') { if (window.sb) window.sb.auth.signOut(); else toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200); return; }
-    if (a === 'logout') { if (window.sb) window.sb.auth.signOut(); else toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200); return; }
+    if (a === 'login-other') { if (window.__accounts) window.__accounts.add(); else if (window.sb) window.sb.auth.signOut(); return; }
+    if (a === 'logout') {
+      if (!window.sb) { toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200); return; }
+      const accts = (window.__accounts && window.__accounts.list()) || [];
+      const curId = window.__accounts && window.__accounts.currentId();
+      const others = accts.filter(x => x.id !== curId);
+      if (others.length && window.__accounts) {   // 他アカウントがあれば、そちらへ切り替える（認証画面を挟まない）
+        window.__addingAccount = true;
+        window.sb.auth.signOut().then(() => { if (curId) window.__accounts.remove(curId); window.__accounts.switch(others[0].id); });
+      } else {
+        if (window.__accounts && curId) window.__accounts.remove(curId);
+        window.sb.auth.signOut();   // → onAuthStateChange(null) → 認証画面
+      }
+      return;
+    }
   }
   if (acctMenu) acctMenu.addEventListener('click', (e) => {
     const ws = e.target.closest('[data-org]');
@@ -2740,7 +2792,11 @@
     const it = e.target.closest('[data-act]'); if (!it) return;
     acctAction(it.dataset.act);
   });
-  if (acctSwitch) acctSwitch.addEventListener('click', (e) => { const it = e.target.closest('[data-act]'); if (it) acctAction(it.dataset.act); });
+  if (acctSwitch) acctSwitch.addEventListener('click', (e) => {
+    const acc = e.target.closest('[data-acct]');
+    if (acc) { const id = acc.getAttribute('data-acct'); closeAcctMenu(); closeDrawer(); if (window.__accounts) window.__accounts.switch(id); return; }
+    const it = e.target.closest('[data-act]'); if (it) acctAction(it.dataset.act);
+  });
   // --- サイドバー ナビ操作 ---
   if (sidebar) sidebar.addEventListener('click', (e) => {
     const item = e.target.closest('[data-act]'); if (!item) return;
@@ -3355,6 +3411,9 @@
     'サインイン': 'Sign in', 'アカウント作成': 'Create account', 'アカウントを作成': 'Create an account',
     'Spot は初めてですか?': 'New to Spot?', 'すでにアカウントをお持ちですか?': 'Already have an account?',
     'パスワードを表示': 'Show password', 'パスワードを隠す': 'Hide password', 'サインアウト': 'Sign out',
+    // OAuth / マルチアカウント
+    'または': 'or', 'Google で続ける': 'Continue with Google', 'Microsoft で続ける': 'Continue with Microsoft',
+    '現在のアカウントに戻る': 'Back to current account', 'そのアカウントに再度ログインしてください。': 'Please sign in to that account again.',
     '確認メールを送信しました。メール内のリンクで認証してからログインしてください。':
       'Confirmation email sent. Follow the link in the email, then sign in.',
     'メールアドレスとパスワードを入力してください。': 'Enter your email and password.',
@@ -3825,8 +3884,8 @@
   // セッション判定（getSession / onAuthStateChange）が終わるまでは body.booting のブランクを維持し、
   // 「セッションあり→アプリ」「セッションなし→認証」を確定させてから描画する。
 
-  document.getElementById('authToggle').addEventListener('click', () => {
-    mode = mode === 'signin' ? 'signup' : 'signin';
+  function setMode(m) {
+    mode = m;
     const signin = mode === 'signin';
     hEl.textContent = signin ? 'おかえりなさい' : 'アカウントを作成';
     const subEl = document.getElementById('authSub');
@@ -3838,7 +3897,8 @@
     passEl.autocomplete = signin ? 'current-password' : 'new-password';
     errEl.hidden = true;
     document.getElementById('authEmail').focus();
-  });
+  }
+  document.getElementById('authToggle').addEventListener('click', () => setMode(mode === 'signin' ? 'signup' : 'signin'));
 
   // アカウント種別（個人 / 組織）切替 — 組織のとき会社名を表示
   let acctType = 'personal';
@@ -3886,11 +3946,65 @@
     } finally { submitEl.disabled = false; submitEl.removeAttribute('aria-busy'); submitText.textContent = label; }
   });
 
-  sb.auth.onAuthStateChange((_evt, session) => { session ? onSignedIn(session) : showAuth(); });
+  // OAuth（Google / Microsoft）。プロバイダは Supabase ダッシュボードで有効化が必要。
+  document.querySelectorAll('[data-oauth]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const provider = btn.getAttribute('data-oauth');   // 'google' | 'azure'(=Microsoft)
+      errEl.hidden = true;
+      try {
+        const { error } = await sb.auth.signInWithOAuth({ provider, options: { redirectTo: window.location.origin + window.location.pathname } });
+        if (error) throw error;   // 成功時はプロバイダへリダイレクト → 戻り時に onAuthStateChange がセッション処理
+      } catch (e) {
+        fail(L('Could not start sign-in. The provider may not be enabled in Supabase.', 'ログインを開始できませんでした。Supabase 側でこのプロバイダの有効化が必要かもしれません。') + ' (' + (e.message || e) + ')');
+      }
+    });
+  });
+
+  // ========== マルチアカウント（複数セッション保管・切替） ==========
+  const ACCT_KEY = 'spot.accounts';
+  const readAccts = () => { try { return JSON.parse(localStorage.getItem(ACCT_KEY) || '[]'); } catch (_) { return []; } };
+  const writeAccts = (l) => { try { localStorage.setItem(ACCT_KEY, JSON.stringify(l)); } catch (_) {} };
+  function upsertAcct(session) {
+    if (!session || !session.user || !session.refresh_token) return;
+    const u = session.user, md = u.user_metadata || {};
+    const rest = readAccts().filter(a => a.id !== u.id);
+    writeAccts([{ id: u.id, email: u.email, name: md.display_name || md.full_name || md.name || '', avatar: md.avatar_url || md.picture || '',
+      access_token: session.access_token, refresh_token: session.refresh_token, expires_at: session.expires_at, ts: Date.now() }, ...rest]);
+  }
+  window.__accounts = {
+    list: () => readAccts(),
+    currentId: () => (window.__acctCurrentId || null),
+    switch: async (id) => {
+      const a = readAccts().find(x => x.id === id); if (!a || !sb) return;
+      if (a.id === window.__acctCurrentId) return;
+      try { const { error } = await sb.auth.setSession({ access_token: a.access_token, refresh_token: a.refresh_token }); if (error) throw error; }
+      catch (e) {   // トークン失効等：そのアカウントを消してログインへ誘導
+        writeAccts(readAccts().filter(x => x.id !== id));
+        window.__addingAccount = true; showAuth(); if (authCancel) authCancel.hidden = readAccts().length === 0;
+        if (window.toast) window.toast(L('Please sign in to that account again.', 'そのアカウントに再度ログインしてください。'), false, 2600);
+      }
+    },
+    add: () => { window.__addingAccount = true; setMode('signin'); showAuth(); if (authCancel) authCancel.hidden = false; },
+    remove: (id) => { writeAccts(readAccts().filter(x => x.id !== id)); },
+  };
+
+  const authCancel = document.getElementById('authCancel');
+  if (authCancel) authCancel.addEventListener('click', () => {   // アカウント追加をキャンセル＝現在のセッションに戻る
+    window.__addingAccount = false; authCancel.hidden = true;
+    sb.auth.getSession().then(({ data }) => { if (data.session) onSignedIn(data.session); });
+  });
+
+  sb.auth.onAuthStateChange((evt, session) => {
+    if (session) { upsertAcct(session); onSignedIn(session); }
+    else if (!window.__addingAccount) showAuth();   // 追加中の一時的な未認証では認証画面のまま
+  });
   sb.auth.getSession().then(({ data }) => { data.session ? onSignedIn(data.session) : showAuth(); })
     .catch(() => showAuth());   // 判定不能時は安全側で認証画面へ
 
   async function onSignedIn(session) {
+    window.__acctCurrentId = session.user.id;
+    window.__addingAccount = false; if (authCancel) authCancel.hidden = true;
+    upsertAcct(session);   // 現在アカウントを保管（トークン更新も反映）
     showApp();
     const email = session.user.email;
     if (window.mountUserChip) window.mountUserChip(email);   // user chip + account menu (UI layer); sign-out lives in the menu
