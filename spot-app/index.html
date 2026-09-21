@@ -982,6 +982,8 @@
   .auth-config code { font-family: var(--font-mono); background: var(--surface-2); padding: 1px 5px; border-radius: 5px; }
   /* 認証が済むまでアプリ本体を隠す（ちらつき防止） */
   body.booting header, body.booting main, body.booting .toast-wrap { visibility: hidden; }
+  /* ブート/認証中は裏の app 本体（visibility:hidden で領域は残る）がページを伸ばすため、スクロールを止める */
+  html:has(body.booting), body.booting { overflow: hidden; }
 
   /* jobs (Realtime generation) */
   .panel-h .rt { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--faint); }
