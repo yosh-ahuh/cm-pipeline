@@ -1447,9 +1447,9 @@
           </div>
         </div>
         <div id="authFieldOtp" hidden>
-          <label class="f-label" for="authOtp">認証番号（メールに届いた6桁）</label>
+          <label class="f-label" for="authOtp">認証番号（メールに届いた番号）</label>
           <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
-            <input id="authOtp" type="text" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"></div>
+            <input id="authOtp" type="text" inputmode="numeric" maxlength="10" placeholder="認証番号" autocomplete="one-time-code"></div>
           <button type="button" class="linkbtn" id="authOtpResend" style="margin-top:6px">認証番号を再送する</button>
         </div>
         <div id="authFieldRecovery" hidden>
@@ -3439,9 +3439,10 @@
     'サインインに戻る': 'Back to sign in', '認証番号を再送する': 'Resend code',
     'パスワードをリセット': 'Reset password', '登録メールにリセット用リンクを送ります。': "We'll email a reset link to your address.",
     'リセットリンクを送信': 'Send reset link', '認証番号でログイン': 'Log in with a code',
-    'メールに届く6桁の番号で、パスワードなしで安全にログインできます。': 'Sign in securely with the 6-digit code sent to your email — no password.',
+    'メールに届く番号で、パスワードなしで安全にログインできます。': 'Sign in securely with the code sent to your email — no password.',
     '認証番号を送信': 'Send code', '新しいパスワードを設定': 'Set a new password', 'パスワードを更新': 'Update password',
-    '新しいパスワードを入力してください。': 'Enter your new password.', '認証番号（メールに届いた6桁）': 'Verification code (6 digits from email)',
+    '新しいパスワードを入力してください。': 'Enter your new password.', '認証番号（メールに届いた番号）': 'Verification code (from email)',
+    'メールに届いた認証番号を入力してください。': 'Enter the code from your email.',
     '新しいパスワード': 'New password', 'ログイン': 'Log in',
     'メールアドレスを入力してください。': 'Please enter your email.',
     'パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。': 'Password reset email sent. Open the link in the email to set a new password.',
@@ -3925,7 +3926,7 @@
     signin:   ['おかえりなさい', 'メールアドレスとパスワードでサインイン。', 'サインイン'],
     signup:   ['アカウントを作成', '個人／組織を選んで登録します。', 'アカウント作成'],
     reset:    ['パスワードをリセット', '登録メールにリセット用リンクを送ります。', 'リセットリンクを送信'],
-    otp:      ['認証番号でログイン', 'メールに届く6桁の番号で、パスワードなしで安全にログインできます。', '認証番号を送信'],
+    otp:      ['認証番号でログイン', 'メールに届く番号で、パスワードなしで安全にログインできます。', '認証番号を送信'],
     recovery: ['新しいパスワードを設定', '新しいパスワードを入力してください。', 'パスワードを更新'],
   };
   function show(id, on) { const el = document.getElementById(id); if (el) el.hidden = !on; }
@@ -4015,8 +4016,8 @@
     // --- 認証番号（メールOTP）ログイン ---
     if (mode === 'otp') {
       if (!otpSent) { await sendOtp(email); return; }
-      const token = (document.getElementById('authOtp').value || '').trim();
-      if (!/^\d{6}$/.test(token)) { fail('6桁の認証番号を入力してください。'); document.getElementById('authOtp').focus(); return; }
+      const token = (document.getElementById('authOtp').value || '').replace(/\s/g, '');
+      if (!/^\d{4,10}$/.test(token)) { fail('メールに届いた認証番号を入力してください。'); document.getElementById('authOtp').focus(); return; }
       submitBusy(true);
       try {
         const { error } = await sb.auth.verifyOtp({ email, token, type: 'email' });
