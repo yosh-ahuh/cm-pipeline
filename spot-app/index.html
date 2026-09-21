@@ -686,6 +686,24 @@
   .u-meter i { display: block; height: 100%; background: var(--accent); border-radius: inherit; transition: width var(--dur-slow) var(--ease-emphasized); }
   .u-card .u-note { font-size: var(--t-label-sm); color: var(--muted); margin-top: 8px; line-height: 1.5; }
 
+  /* 常設「3ステップ」ガイド（低ITリテラシー向け・ホームに固定） */
+  .guide3 { margin: var(--s-2) 0 var(--s-5); }
+  .guide3-h { font-size: var(--t-label); color: var(--muted); font-weight: 700; letter-spacing: .04em; margin: 0 0 var(--s-3); }
+  .guide3-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); }
+  .g3-card { position: relative; display: flex; align-items: flex-start; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px; box-shadow: var(--shadow-1); }
+  .g3-num { flex: none; width: 26px; height: 26px; border-radius: var(--r-full); background: var(--accent-soft); color: var(--accent-ink);
+    display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 13px; }
+  .g3-ic { flex: none; width: 20px; height: 20px; color: var(--accent-ink); margin-top: 1px; }
+  .g3-txt b { display: block; font-size: var(--t-body); font-weight: 700; margin-bottom: 2px; }
+  .g3-txt small { color: var(--muted); font-size: var(--t-body-sm); line-height: 1.5; }
+  .g3-card::after { content: ""; position: absolute; right: -10px; top: 50%; width: 12px; height: 12px; transform: translateY(-50%) rotate(45deg);
+    border-top: 2px solid var(--line-strong); border-right: 2px solid var(--line-strong); z-index: 1; }
+  .g3-card:last-child::after { display: none; }
+  @media (max-width: 720px) {
+    .guide3-row { grid-template-columns: 1fr; }
+    .g3-card::after { right: 50%; top: auto; bottom: -10px; transform: translateX(50%) rotate(135deg); }
+  }
+
   .dash-h { display: flex; align-items: center; gap: var(--s-3); margin: var(--s-2) 0 var(--s-4); flex-wrap: wrap; }
   .dash-h h3 { font-size: var(--t-title); font-weight: 700; }
   .dash-h .filters { margin-left: auto; display: flex; gap: 6px; }
@@ -1335,6 +1353,27 @@
         <div class="u-v">—<small>本</small></div>
         <div class="u-meter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
         <div class="u-note" data-t="1クレジット ＝ CM1本（3パターン×3フォーマット = 9ファイル）">1クレジット ＝ CM1本（3パターン×3フォーマット = 9ファイル）</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide3" aria-labelledby="guide3H">
+    <h3 class="guide3-h" id="guide3H">つくり方は、かんたん3ステップ</h3>
+    <div class="guide3-row">
+      <div class="g3-card">
+        <span class="g3-num">1</span>
+        <svg class="ic g3-ic" aria-hidden="true"><use href="#i-check"/></svg>
+        <span class="g3-txt"><b>選ぶ</b><small>配信先・業種・ターゲットを選ぶだけ。文章は書きません。</small></span>
+      </div>
+      <div class="g3-card">
+        <span class="g3-num">2</span>
+        <svg class="ic g3-ic" aria-hidden="true"><use href="#i-film"/></svg>
+        <span class="g3-txt"><b>AIがつくる</b><small>台本・映像・音声をAIが自動で生成します。待つだけ。</small></span>
+      </div>
+      <div class="g3-card">
+        <span class="g3-num">3</span>
+        <svg class="ic g3-ic" aria-hidden="true"><use href="#i-download"/></svg>
+        <span class="g3-txt"><b>受け取る</b><small>できあがった動画を確認して、そのまま書き出せます。</small></span>
       </div>
     </div>
   </section>
@@ -3087,6 +3126,11 @@
     '台本も、映像も、声も、音楽も、AIが自動で用意します。': 'Script, footage, voice, and music — all prepared automatically.',
     'その日のうちに、そのまま使える動画ができあがります。': 'A ready-to-use video, finished the same day.',
     'はじめる（新しい動画をつくる）': 'Get started (make a new video)', 'あとで見る': 'Later',
+    // home 常設3ステップ
+    'つくり方は、かんたん3ステップ': 'How it works — three simple steps',
+    '配信先・業種・ターゲットを選ぶだけ。文章は書きません。': 'Just pick channel, industry, and audience. No writing.',
+    '台本・映像・音声をAIが自動で生成します。待つだけ。': 'AI generates the script, footage, and audio. Just wait.',
+    'できあがった動画を確認して、そのまま書き出せます。': 'Review the finished video and export it as-is.',
     // narration voice picker
     'ナレーションの声': 'Narration voice', '話し方（トーン）': 'Delivery (tone)',
     '聞いてから選べます。子供〜お年寄り、声のトーンも変えられます。': 'Listen, then choose — from kids to seniors, and change the tone too.',
