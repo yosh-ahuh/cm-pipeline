@@ -32,6 +32,22 @@ Authentication → **Emails** → **Templates** で、各テンプレートに�
 | Magic Link | [`magic-link.html`](./magic-link.html) | `signInWithOtp`（認証番号ログイン）。`{{ .Token }}` が番号 |
 | Confirm signup | [`confirm-signup.html`](./confirm-signup.html) | 新規登録の確認メール |
 
+### 件名（Subject）も言語切替
+各テンプレートの **Subject 欄**（本文HTMLとは別管理）にも同じ条件分岐を入れて、本文と言語を揃える（既定は英語のままなので要変更）:
+
+| テンプレート | Subject 欄に入れる値 |
+|---|---|
+| Magic Link | `{{ if eq (index .Data "lang") "ja" }}Spot 認証番号{{ else }}Your Spot verification code{{ end }}` |
+| Reset Password | `{{ if eq (index .Data "lang") "ja" }}Spot パスワードの再設定{{ else }}Reset your Spot password{{ end }}` |
+| Confirm signup | `{{ if eq (index .Data "lang") "ja" }}Spot メールアドレスの確認{{ else }}Confirm your Spot email{{ end }}` |
+
+### 配信（SMTP）
+- 組み込みメールはレート制限あり・本番不可。**カスタムSMTP＝Resend** を使用。
+  Supabase → Authentication → Emails → SMTP Settings: Host `smtp.resend.com` / Port `465` / Username `resend` / Password `ResendのAPIキー` / Sender `no-reply@creativepunx.com` / Name `Spot`。
+- 送信ドメイン `creativepunx.com` を Resend で認証済み（DKIM `resend._domainkey`、CNAME `rsend`/`send`、DMARC `_dmarc`）。SPF/DKIM/DMARC 全PASS。
+- ロゴは Storage 公開バケット `brand/spot-mark.png`。**迷惑メール内では Gmail が画像を読み込まない**ため、受信トレイ＋画像表示で確認する。
+- 新規ドメインは初期に迷惑メール判定されやすい（レピュテーション）。「迷惑メールではない」操作＋通常運用で改善。
+
 ### 補足
 - **認証番号の桁数**：Authentication → Providers → Email → **Email OTP Length** で設定（例: 8桁）。テンプレート側は `{{ .Token }}` のままでOK。
 - **リダイレクトURL**：Authentication → **URL Configuration** → Redirect URLs に、アプリのURL（dev の `http://localhost:5500/**` と本番オリジン）を許可登録。これが無いと再設定リンクが弾かれます。
