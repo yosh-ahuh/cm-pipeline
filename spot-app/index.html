@@ -1003,7 +1003,7 @@
   .bill-cur { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); flex-wrap: wrap; }
   .bill-cur .bc-name b { font-family: var(--font-display); font-size: 22px; }
   .bill-meter { min-width: 200px; }
-  .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--s-3); }
+  .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--s-3); }
   .plan-card { border: 1px solid var(--line); border-radius: 12px; padding: var(--s-4); background: var(--surface-2); display: flex; flex-direction: column; gap: 5px; }
   .plan-card.current { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
   .plan-card .pn { font-family: var(--font-display); font-weight: 800; font-size: 16px; }
@@ -1035,14 +1035,15 @@
   /* billing: hero current-plan */
   .bill-hero { border: 1px solid var(--line-strong); position: relative; overflow: hidden; }
   .bill-hero::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--accent); }
-  .bh-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-4); flex-wrap: wrap; }
+  .bh-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); flex-wrap: wrap; }
+  .bh-plan { flex: 1 1 auto; min-width: 0; }
   .bh-eyebrow { font-size: var(--t-label); color: var(--muted); letter-spacing: .04em; }
-  .bh-name { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  .bh-name { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
   .bh-name b { font-family: var(--font-display); font-weight: 800; font-size: 26px; letter-spacing: -.01em; }
   .bh-price { font-size: var(--t-body); }
-  .bh-renew { font-size: var(--t-label); margin-top: 4px; }
-  .bh-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-  .bh-meter { margin-top: 18px; }
+  .bh-renew { font-size: var(--t-label); margin-top: 6px; }
+  .bh-actions { display: flex; gap: 8px; flex: none; }
+  .bh-meter { margin-top: 20px; }
   .bh-meter-head { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--t-body); margin-bottom: 8px; }
   .bh-meter-head b { font-family: var(--font-mono); font-size: 18px; font-weight: 600; }
   .u-meter.big { height: 10px; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; }
@@ -1884,7 +1885,6 @@
       </div>
       <div class="bh-actions">
         <button class="btn btn-primary" id="billAddCredits"><svg class="ic"><use href="#i-plus"/></svg><span>クレジットを追加</span></button>
-        <button class="btn btn-ghost" id="billChangePlan"><span>プランを変更</span></button>
       </div>
     </div>
     <div class="bh-meter" id="billMeterWrap">
@@ -1897,9 +1897,9 @@
     <div class="bh-incl" id="billIncludes"></div>
   </div>
 
-  <!-- プラン一覧 -->
+  <!-- プランを変更（現行プランはヒーローに表示するため一覧からは除外） -->
   <div class="panel">
-    <div class="panel-h">プラン一覧</div>
+    <div class="panel-h">プランを変更</div>
     <div class="plan-grid" id="planGrid"></div>
     <p class="muted" id="billNote" style="margin-top:14px">上位プランほど、毎月つくれるCMの本数と席数が増えます。足りなくなったら「クレジットを追加」でその都度購入もできます。</p>
   </div>
@@ -3633,8 +3633,10 @@
       const { data: plans } = await sb.from('plans').select('*').order('sort', { ascending: true });
       const grid = document.getElementById('planGrid');
       if (grid && plans) {
+        const curId = prof && prof.plan;
         const curSort = plan ? Number(plan.sort) : -1;
-        grid.innerHTML = plans.map(p => planCard(p, prof && prof.plan, curSort)).join('');
+        const others = plans.filter(p => p.id !== curId);   // 現行はヒーローに表示済み → 一覧からは畳む
+        grid.innerHTML = others.map(p => planCard(p, curId, curSort)).join('');
         grid.querySelectorAll('[data-upgrade]').forEach(b => b.addEventListener('click',
           () => openCheckout(b.getAttribute('data-upgrade'))));   // Stripe Payment Link（config）
       }
@@ -3675,11 +3677,6 @@
   (function wireBillingActions() {
     const add = document.getElementById('billAddCredits');
     if (add) add.addEventListener('click', () => { if (window.gotoCredits) window.gotoCredits(); });
-    const chg = document.getElementById('billChangePlan');
-    if (chg) chg.addEventListener('click', () => {
-      const grid = document.getElementById('planGrid');
-      if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
     const b = document.getElementById('openPortal');
     if (b) b.addEventListener('click', () => {
       const url = (window.SPOT_CONFIG && window.SPOT_CONFIG.stripeLinks && window.SPOT_CONFIG.stripeLinks.portal) || '';
