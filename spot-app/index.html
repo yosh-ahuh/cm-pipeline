@@ -1508,7 +1508,7 @@
   <div class="sb-wscard" id="sbWsCard">
     <div class="sb-wsnow" id="sbWsNow" hidden></div>
     <div class="sb-credits">
-      <div class="mc-row"><span>クレジット残</span><b><span id="acctCredits">—</span> <span class="mc-unit">本</span></b></div>
+      <div class="mc-row"><span>クレジット残</span><b><span id="acctCredits"><span class="sk sk-num" aria-hidden="true"></span></span> <span class="mc-unit">本</span></b></div>
       <div class="u-meter sm" id="acctMeter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
     </div>
   </div>
@@ -1525,9 +1525,9 @@
   </nav>
   <div class="sb-foot">
     <button type="button" class="sb-acct" id="sbAcctBtn" aria-haspopup="menu" aria-expanded="false" title="アカウント・ワークスペース">
-      <span class="avatar has-dot" id="acctAvatar" aria-hidden="true">?</span>
+      <span class="avatar has-dot" id="acctAvatar" aria-hidden="true"><span class="sk" style="display:block;width:100%;height:100%;border-radius:50%"></span></span>
       <div class="acct-id">
-        <div class="acct-top"><span class="acct-name" id="acctName">—</span><span class="plan-badge" id="acctPlan">Free</span></div>
+        <div class="acct-top"><span class="acct-name" id="acctName"><span class="sk" style="display:inline-block;width:84px;height:12px;border-radius:5px;vertical-align:-1px"></span></span><span class="plan-badge" id="acctPlan">Free</span></div>
         <div class="acct-email" id="acctEmail"></div>
       </div>
       <svg class="ic sb-chev" aria-hidden="true"><use href="#i-chevron-down"/></svg>
@@ -1539,9 +1539,9 @@
 <div class="scrim" id="acctScrim" hidden></div>
 <div class="menu" id="acctMenu" role="menu" aria-label="アカウント・ワークスペース" hidden>
   <button type="button" class="menu-head menu-head-btn" data-act="switch-account" aria-haspopup="menu" aria-expanded="false">
-    <span class="avatar has-dot" id="amAvatar" aria-hidden="true">?</span>
+    <span class="avatar has-dot" id="amAvatar" aria-hidden="true"><span class="sk" style="display:block;width:100%;height:100%;border-radius:50%"></span></span>
     <div class="acct-id">
-      <div class="acct-top"><span class="acct-name" id="amName">—</span><span class="plan-badge" id="amPlan">Free</span></div>
+      <div class="acct-top"><span class="acct-name" id="amName"><span class="sk" style="display:inline-block;width:84px;height:12px;border-radius:5px;vertical-align:-1px"></span></span><span class="plan-badge" id="amPlan">Free</span></div>
       <div class="acct-email" id="amEmail"></div>
     </div>
     <svg class="ic mh-chev" aria-hidden="true"><use href="#i-chevron-down"/></svg>
@@ -2362,7 +2362,7 @@
     <div class="bh-top">
       <div class="bh-plan">
         <div class="bh-eyebrow">現在のプラン</div>
-        <div class="bh-name"><b id="billPlanName">—</b><span class="bh-price muted" id="billPlanPrice"></span></div>
+        <div class="bh-name"><b id="billPlanName"><span class="sk" aria-hidden="true" style="display:inline-block;width:64px;height:14px;border-radius:5px;vertical-align:-2px"></span></b><span class="bh-price muted" id="billPlanPrice"></span></div>
         <div class="bh-renew muted" id="billRenew"></div>
       </div>
       <div class="bh-actions">
@@ -2371,7 +2371,7 @@
     </div>
     <div class="bh-meter" id="billMeterWrap">
       <div class="bh-meter-head">
-        <span>残り <b id="billCredits">—</b> 本</span>
+        <span>残り <b id="billCredits"><span class="sk sk-num" aria-hidden="true"></span></b> 本</span>
         <span class="muted" id="billQuota"></span>
       </div>
       <div class="u-meter big" id="billBar"><i id="billMeter" style="width:0%"></i></div>
@@ -2648,7 +2648,7 @@
   roving(track, '.cut');
 
   // ---- left sidebar (persistent global nav) ----
-  const acctInfo = { email: '', plan: 'Free', credits: 0, max: 1 };
+  const acctInfo = { email: '', plan: 'Free', credits: null, max: null };   // credits/max は実値到着までスケルトン維持（0/1の暫定表示を避ける）
   const sidebar = document.getElementById('sidebar');
   let userChip = null;   // legacy; sidebar shows account info directly
   function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
@@ -2863,6 +2863,11 @@
       reader.readAsDataURL(blob);
     } catch (_) {}
   }
+  // 表示名も前回値をキャッシュ（確定前の“古い名前/フォールバック名”のちらつき防止）
+  const nmKey = (e) => 'spot.name.' + (e || '');
+  const readNameCache = (e) => { try { return e ? localStorage.getItem(nmKey(e)) : null; } catch (_) { return null; } };
+  const writeNameCache = (e, v) => { try { if (e && v) localStorage.setItem(nmKey(e), v); } catch (_) {} };
+  window.__writeNameCache = writeNameCache;
   // Data layer reports { email?, plan?, credits?, max? } (partial objects merge) after refreshUsage() / refreshCredits()
   window.onAccountInfo = function (info) {
     Object.keys(info || {}).forEach(k => { if (info[k] !== undefined && info[k] !== null) acctInfo[k] = info[k]; });
@@ -2874,20 +2879,26 @@
     }
     set('acctEmail', acctInfo.email); set('acctPlan', acctInfo.plan);
     set('amEmail', acctInfo.email); set('amPlan', acctInfo.plan);   // 下部メニューのヘッダも同期
-    // 氏名の暫定フォールバック（実表示名は __refreshAccountChip が上書き）
-    const nameFallback = acctInfo.email ? acctInfo.email.split('@')[0] : '—';
-    ['acctName', 'amName'].forEach(id => { const el = document.getElementById(id); if (el && (!el.textContent || el.textContent === '—')) el.textContent = nameFallback; });
-    // アバターは画像が入っていれば保持。無ければ前回のキャッシュ画像を即時表示（ちらつき防止）→ それも無ければイニシャル。
+    // 氏名：確定前（refreshAccountChip 未解決）はキャッシュの正しい名前 → 無ければスケルトン。
+    //   誤ったフォールバック名（メールの先頭など）や前アカウントの名前を出さない。解決状態は email 単位。
+    const cachedName = readNameCache(acctInfo.email);
+    ['acctName', 'amName'].forEach(id => {
+      const el = document.getElementById(id); if (!el || el.dataset.for === acctInfo.email) return;
+      if (cachedName) el.textContent = cachedName;
+      else el.innerHTML = '<span class="sk" aria-hidden="true" style="display:inline-block;width:84px;height:12px;border-radius:5px;vertical-align:-1px"></span>';
+    });
+    // アバター：確定前はキャッシュ画像 → 無ければスケルトン円。イニシャルは出さない（確定時に表示）。
     ['acctAvatar', 'amAvatar'].forEach(id => {
-      const el = document.getElementById(id); if (!el || el.querySelector('img')) return;
+      const el = document.getElementById(id); if (!el || el.dataset.for === acctInfo.email || el.querySelector('img')) return;
       const cached = readAvatarCache(acctInfo.email);
       if (cached) el.innerHTML = `<img src="${cached}" alt="">`;
-      else el.textContent = initial;
+      else el.innerHTML = '<span class="sk" aria-hidden="true" style="display:block;width:100%;height:100%;border-radius:50%"></span>';
     });
     const credits = Number(acctInfo.credits) || 0, max = Number(acctInfo.max) || 1;
-    set('acctCredits', credits); set('acctMax', max);
+    if (acctInfo.credits != null) set('acctCredits', credits);   // 実値が来るまではスケルトンのまま（暫定0を出さない）
+    if (acctInfo.max != null) set('acctMax', max);
     const meter = document.getElementById('acctMeter');
-    if (meter) {
+    if (meter && acctInfo.credits != null) {
       meter.querySelector('i').style.width = Math.max(0, Math.min(100, (credits / max) * 100)) + '%';
       meter.setAttribute('aria-valuemax', max); meter.setAttribute('aria-valuenow', credits);
     }
@@ -4402,8 +4413,9 @@
     }
     const email = acctInfo.email || '';
     const dispName = name || (email ? email.split('@')[0] : '—');
-    const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    setTxt('acctName', dispName); setTxt('amName', dispName);
+    // 氏名を確定（スケルトン/キャッシュを実値へ）。dataset.for=email で解決済みを記録し、以後 onAccountInfo に上書きされない。
+    ['acctName', 'amName'].forEach(id => { const el = document.getElementById(id); if (el) { el.textContent = dispName; el.dataset.for = email; } });
+    if (name) writeNameCache(email, dispName);   // 実表示名のみキャッシュ（メール先頭のフォールバックはキャッシュしない）
     let url = null;
     if (avatarPath) {
       try { url = /^https?:/.test(avatarPath) ? avatarPath : ((await sb.storage.from('assets').createSignedUrl(avatarPath, 3600)).data || {}).signedUrl; } catch (_) {}
@@ -4411,7 +4423,8 @@
     ['acctAvatar', 'amAvatar'].forEach(id => {
       const el = document.getElementById(id); if (!el) return;
       if (url) el.innerHTML = `<img src="${url}" alt="">`;
-      else el.textContent = (dispName || email || '?').charAt(0);
+      else el.textContent = (dispName || email || '?').charAt(0);   // アバター未設定はここで初めてイニシャル表示
+      el.dataset.for = email;   // 解決済み（onAccountInfo がスケルトンで上書きしない）
     });
     if (url) cacheAvatarImage(email, url);   // 次回ロードの即時表示用にキャッシュ
     else clearAvatarCache(email);            // アバター無し → 古いキャッシュを破棄
@@ -4600,6 +4613,7 @@
   // プロフィールアイコン（アバター）の表示：avatar_url があれば画像、無ければイニシャル
   async function renderProfAvatar(prof, session) {
     const box = document.getElementById('profAvatar'); if (!box) return;
+    if (!box.querySelector('img')) box.innerHTML = '<span class="sk" aria-hidden="true" style="display:block;width:100%;height:100%;border-radius:50%"></span>';   // 読み込み中スケルトン（? を出さない）
     const email = (session && session.user && session.user.email) || acctInfo.email || '';
     const initial = (prof && prof.display_name ? prof.display_name : email || '?').charAt(0);
     // avatar_url は個別取得（列が無い環境=015未適用でも安全に degrade）
@@ -4657,6 +4671,7 @@
     panel.hidden = false;
     const nameEl = document.getElementById('companyName'); if (nameEl) nameEl.value = org.name || '';
     // ブランドのロゴを表示
+    { const box = document.getElementById('companyLogo'); if (box && !box.querySelector('img')) box.innerHTML = '<span class="sk" aria-hidden="true" style="display:block;width:100%;height:100%;border-radius:inherit"></span>'; }   // 読み込み中スケルトン
     try {
       const { data: br } = await sb.from('brands').select('assets').eq('org_id', org.id).limit(1).maybeSingle();
       const logoPath = br && br.assets && br.assets.logo;
