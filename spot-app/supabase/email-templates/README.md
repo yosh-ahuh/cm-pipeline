@@ -11,9 +11,20 @@ Spot の認証メール（パスワード再設定・認証番号・登録確認
 - Supabase のメールテンプレートは Go テンプレートで、`{{ .Data.lang }}` を参照して本文を出し分けます。
   - `lang` が未設定の旧ユーザー等は **英語にフォールバック**します。
 
+## ロゴのホスティング（メールに画像を出すため・最初に1回）
+
+メールはローカルの `assets/` を参照できず、Gmail/Outlook 等は base64 埋め込み画像もブロックするため、ロゴは**公開URL**が必要です。Supabase Storage の公開バケットを使います。
+
+1. Supabase → **Storage** → **New bucket** → 名前 `brand`、**Public bucket を ON** → Create。
+2. その `brand` バケットに `spot-app/assets/spot-mark.png` をアップロード（ファイル名は `spot-mark.png` のまま）。
+3. 公開URLは次になります（テンプレートにこのURLを直書き済み）:
+   `https://mmnpfxrodsurxpeyaaaf.supabase.co/storage/v1/object/public/brand/spot-mark.png`
+   - バケット名やファイル名を変えた場合は、各テンプレートの `<img src="...">` を合わせて修正してください。
+   - ブラウザでこのURLを開いてロゴが表示されれば準備OKです。
+
 ## 設定手順（Supabase ダッシュボード）
 
-Authentication → **Emails** → **Templates** で、各テンプレートに以下を貼り付けます。
+Authentication → **Emails** → **Templates** で、各テンプレートに以下を貼り付けます（ブランド版：ロゴ＋インディゴ #4A67E3）。
 
 | テンプレート | 貼り付けるファイル | 使われる場面 |
 |---|---|---|

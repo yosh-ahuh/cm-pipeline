@@ -539,6 +539,9 @@
     animation: rise var(--dur-slow) var(--ease-emphasized); max-width: 100%; pointer-events: auto;
   }
   .toast .tsp { width: 14px; height: 14px; border: 2px solid var(--ground); border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; opacity: .8; flex: none; }
+  /* ボタン内の「送信中…」表示（スピナー＋ラベル）。色は currentColor 依存で白CTA・アクセントリンク両対応 */
+  .btn-busy { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-spin { display: inline-block; width: 15px; height: 15px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; opacity: .9; flex: none; }
   .toast .ic { width: 16px; height: 16px; color: var(--good); stroke-width: 3; }
   @keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.98); } }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -4026,7 +4029,7 @@
       if (mode === 'recovery') { setRecovering(false); try { sb.auth.signOut(); } catch (_) {} }   // 復旧を中断＝復旧セッションを破棄
       setMode('signin');
     }); }
-  { const r = document.getElementById('authOtpResend'); if (r) r.addEventListener('click', () => sendOtp(document.getElementById('authEmail').value.trim())); }
+  { const r = document.getElementById('authOtpResend'); if (r) r.addEventListener('click', () => sendOtp(document.getElementById('authEmail').value.trim(), true)); }
 
   // アカウント種別（個人 / 組織）切替 — 組織のとき会社名を表示
   let acctType = 'personal';
@@ -4040,10 +4043,30 @@
 
   const isEmail = (v) => /.+@.+\..+/.test(v || '');
   let submitLabel = '';
-  function submitBusy(on) {
+  function submitBusy(on, label) {
     submitEl.disabled = on;
-    if (on) { submitEl.setAttribute('aria-busy', 'true'); submitLabel = submitText.textContent; submitText.innerHTML = '<span class="tsp" style="border-color:#fff;border-right-color:transparent"></span>'; }
-    else { submitEl.removeAttribute('aria-busy'); if (submitLabel) submitText.textContent = submitLabel; }
+    if (on) {
+      submitEl.setAttribute('aria-busy', 'true');
+      submitLabel = submitText.textContent;
+      const busy = document.createElement('span'); busy.className = 'btn-busy';
+      const sp = document.createElement('span'); sp.className = 'btn-spin';
+      const tx = document.createElement('span'); tx.textContent = label || (window.L ? window.L('Processing…', '処理中…') : '処理中…');
+      busy.appendChild(sp); busy.appendChild(tx);
+      submitText.innerHTML = ''; submitText.appendChild(busy);
+    } else { submitEl.removeAttribute('aria-busy'); if (submitLabel) submitText.textContent = submitLabel; }
+  }
+  // 再送リンク自身の「送信中…」表示（送信ボタンとは別に、押したリンクにフィードバック）
+  function setResendBusy(on) {
+    if (!resendBtn) return;
+    resendBtn.disabled = on;
+    if (on) {
+      resendBtn.dataset.lbl = resendBtn.textContent;
+      const busy = document.createElement('span'); busy.className = 'btn-busy';
+      const sp = document.createElement('span'); sp.className = 'btn-spin';
+      const tx = document.createElement('span'); tx.textContent = window.L ? window.L('Sending…', '送信中…') : '送信中…';
+      busy.appendChild(sp); busy.appendChild(tx);
+      resendBtn.innerHTML = ''; resendBtn.appendChild(busy);
+    } else if (resendBtn.dataset.lbl) { resendBtn.textContent = resendBtn.dataset.lbl; }
   }
   // ---- 再送/再送信のクールダウン（残り秒数をカウントダウン表示）----
   //   タイマーはボタン要素(_cd)に保持し、setMode 側でも id 参照で確実に停止できるようにする。
@@ -4067,18 +4090,20 @@
   const setSubmit = (t) => { submitText.textContent = t; };
 
   // 認証番号（メールOTP）を送る。※Supabaseのメールテンプレートに {{ .Token }} が必要（コード）。
-  async function sendOtp(email) {
+  //   viaResend=true のときは、送信ボタンではなく再送リンク自身に「送信中…」を表示する。
+  async function sendOtp(email, viaResend) {
     if (!isEmail(email)) { fail('メールアドレスを入力してください。'); document.getElementById('authEmail').focus(); return; }
-    submitBusy(true);
+    const setBusy = (on) => viaResend ? setResendBusy(on) : submitBusy(on, window.L('Sending email…', 'メールを送信中…'));
+    setBusy(true);
     try {
       const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-      submitBusy(false);   // ラベルを戻してから setMode でモード用ラベルに切替
+      setBusy(false);   // ラベルを戻してから setMode でモード用ラベルに切替
       if (error) throw error;
       otpSent = true; setMode('otp');
       fail('認証番号をメールに送信しました。届いた番号を入力してください。', true);
       startCooldown(resendBtn, setResend, OTP_COOLDOWN, '認証番号を再送する');   // 再送は一定時間後
     } catch (e) {
-      submitBusy(false);
+      setBusy(false);
       const sec = parseRetrySec(e.message);
       if (sec != null) {   // レート制限：残り秒数をカウントダウン
         if (!otpSent) { otpSent = true; setMode('otp'); }
@@ -4095,7 +4120,7 @@
     // --- パスワードリセット（再設定リンクを送信） ---
     if (mode === 'reset') {
       if (!isEmail(email)) { fail('メールアドレスを入力してください。'); return; }
-      submitBusy(true);
+      submitBusy(true, window.L('Sending email…', 'メールを送信中…'));
       try {
         const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
         submitBusy(false);
@@ -4116,7 +4141,7 @@
       if (!otpSent) { await sendOtp(email); return; }
       const token = (document.getElementById('authOtp').value || '').replace(/\s/g, '');
       if (!/^\d{4,10}$/.test(token)) { fail('メールに届いた認証番号を入力してください。'); document.getElementById('authOtp').focus(); return; }
-      submitBusy(true);
+      submitBusy(true, window.L('Verifying…', '確認中…'));
       try {
         const { error } = await sb.auth.verifyOtp({ email, token, type: 'email' });
         if (error) throw error;   // 成功 → onAuthStateChange → onSignedIn
@@ -4131,7 +4156,7 @@
       const np2 = document.getElementById('authNewPass2').value;
       if (np.length < 6) { fail('新しいパスワードは6文字以上で入力してください。'); document.getElementById('authNewPass').focus(); return; }
       if (np !== np2) { fail('確認用のパスワードが一致しません。'); document.getElementById('authNewPass2').focus(); return; }
-      submitBusy(true);
+      submitBusy(true, window.L('Updating…', '更新中…'));
       try {
         const { error } = await sb.auth.updateUser({ password: np });
         submitBusy(false);
@@ -4155,7 +4180,7 @@
       const agree = document.getElementById('authAgree');
       if (agree && !agree.checked) { fail('利用規約・プライバシーポリシーに同意してください。'); agree.focus(); return; }
     }
-    submitBusy(true);
+    submitBusy(true, mode === 'signin' ? window.L('Signing in…', 'サインイン中…') : window.L('Creating account…', 'アカウントを作成中…'));
     try {
       const { data, error } = mode === 'signin'
         ? await sb.auth.signInWithPassword({ email, password })
