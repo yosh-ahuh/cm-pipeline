@@ -281,6 +281,12 @@
   .board { display: grid; grid-template-columns: 220px minmax(0,1fr) 300px; gap: var(--s-5); padding-bottom: 60px; align-items: start; }
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-1); }
   .panel-pad { padding: var(--s-4); }
+  /* 均一パディングのパネル（内部の .panel-h は自前パディングを解除して二重余白を防ぐ） */
+  .panel.pad { padding: var(--s-5); }
+  .panel.pad > .panel-h { padding: 0; margin-bottom: var(--s-4); }
+  /* セクション（パネル）間に一定の縦余白。ヘッダー(.context)の下余白は gap に一本化 */
+  #view-billing, #view-credits, #view-team { display: flex; flex-direction: column; gap: var(--s-6); }
+  #view-billing > .context, #view-credits > .context, #view-team > .context { padding-bottom: 0; }
   .panel-h {
     font-size: var(--t-label-sm); font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
     color: var(--muted); padding: var(--s-4) var(--s-4) 0; display: flex; align-items: center; gap: var(--s-2);
@@ -987,7 +993,7 @@
   .plan-card .pk-tag.pop { position: absolute; top: -1px; right: 12px; transform: translateY(-50%);
     font-size: var(--t-label-sm); color: var(--on-accent); background: var(--accent); border-radius: var(--r-full); padding: 2px 10px; }
   /* billing: pricing guide (collapsible) */
-  .bill-guide { padding-top: 14px; padding-bottom: 14px; }
+  .bill-guide { padding: var(--s-4) var(--s-5); }
   .bill-guide > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
     font-family: var(--font-display); font-weight: 700; font-size: var(--t-title); color: var(--ink); }
   .bill-guide > summary::-webkit-details-marker { display: none; }
@@ -1720,7 +1726,7 @@
     <h1 class="title-h1">チーム・メンバー</h1>
     <div class="title-sub">メンバーを招待して、同じワークスペースで制作します。</div>
   </div></section>
-  <div class="panel" id="teamPanel">
+  <div class="panel pad" id="teamPanel">
     <p class="muted" id="teamSeats" style="margin:0 0 12px"></p>
     <div id="memberList" class="member-list"></div>
     <div id="inviteBox" hidden>
@@ -1809,7 +1815,7 @@
   </div></section>
 
   <!-- 現在のプラン（ヒーロー） -->
-  <div class="panel bill-hero">
+  <div class="panel bill-hero pad">
     <div class="bh-top">
       <div class="bh-plan">
         <div class="bh-eyebrow">現在のプラン</div>
@@ -1831,14 +1837,14 @@
   </div>
 
   <!-- プランを変更（現行プランはヒーローに表示するため一覧からは除外） -->
-  <div class="panel">
+  <div class="panel pad">
     <div class="panel-h">プランを変更</div>
     <div class="plan-grid" id="planGrid"></div>
     <p class="muted" id="billNote" style="margin-top:14px">上位プランほど、毎月つくれるCMの本数と席数が増えます。足りなくなったら「クレジットを追加」でその都度購入もできます。</p>
   </div>
 
   <!-- お支払い履歴 -->
-  <div class="panel">
+  <div class="panel pad">
     <div class="panel-h">お支払い履歴</div>
     <div id="billHistory"></div>
     <div class="cta-row" style="margin-top:10px">
@@ -1862,14 +1868,14 @@
     <h1 class="title-h1">クレジットを追加</h1>
     <div class="title-sub">動画をつくるためのクレジットを購入します。1クレジット＝CM1本の目安です。</div>
   </div></section>
-  <div class="panel">
+  <div class="panel pad">
     <div class="panel-h">いまの残高</div>
     <div class="bill-cur">
       <div class="bc-name"><b id="crBalance">—</b><span class="muted"> クレジット</span></div>
       <div class="muted" id="crUsage" style="font-size:var(--t-label)"></div>
     </div>
   </div>
-  <div class="panel">
+  <div class="panel pad">
     <div class="panel-h">クレジットを購入（一回）</div>
     <p class="muted" style="margin:0 0 14px">必要なぶんだけ、その都度購入できます。使い切らなくても翌月に繰り越せます。</p>
     <div class="pack-grid" id="creditPacks"></div>
@@ -1877,7 +1883,7 @@
       <button class="btn btn-primary wauto" id="crBuy"><span>選んだクレジットを購入</span></button>
     </div>
   </div>
-  <div class="panel">
+  <div class="panel pad">
     <div class="panel-h">自動チャージ <span class="count" id="autoTopupState" style="color:var(--muted)">オフ</span></div>
     <p class="muted" style="margin:0 0 14px">残高が少なくなったら、自動でクレジットを補充します。作業が途中で止まりません。</p>
     <label class="switch-row"><input type="checkbox" id="topupEnabled"><span>自動チャージを有効にする</span></label>
@@ -1898,7 +1904,7 @@
     </div>
     <p class="muted" id="topupNote" style="margin:12px 0 0;font-size:var(--t-label)">※ 自動チャージの実行には、保存済みのお支払い方法が必要です。</p>
   </div>
-  <div class="panel">
+  <div class="panel pad">
     <div class="panel-h">クレジット利用明細</div>
     <div id="crActivity" class="muted" style="font-size:var(--t-label)"></div>
   </div>
