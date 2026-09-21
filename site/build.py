@@ -65,7 +65,7 @@ def md_inline(s: str) -> str:
 
 # --------------------------------------------------------------------------- CSS
 CSS = """
-:root{color-scheme:dark;--ground:#0E0F14;--surface:#181A21;--surface-2:#1E2029;--ink:#F0EFEA;--muted:#9A9AA2;--faint:#605F66;--line:#262832;--line-strong:#343643;--blue:#6180F5;--blue-ink:#A9B8F8;--blue-soft:#181F45;--good:#5CC48C;--warn:#E0A05A;
+:root{color-scheme:dark;--ground:#0E0F14;--surface:#181A21;--surface-2:#1E2029;--ink:#F0EFEA;--muted:#9A9AA2;--faint:#605F66;--line:#262832;--line-strong:#343643;--blue:#4A67E3;--blue-ink:#AEBCFA;--blue-soft:#1B2350;--good:#5CC48C;--warn:#E0A05A;
 --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 32px rgba(0,0,0,.5);--shadow-lift:0 4px 14px rgba(0,0,0,.45),0 30px 60px rgba(0,0,0,.65);
 --fd:"Bricolage Grotesque","Hanken Grotesk",system-ui,sans-serif;--fb:"Hanken Grotesk",system-ui,-apple-system,"Zen Kaku Gothic New",sans-serif;--fm:"DM Mono",ui-monospace,monospace;--r:14px}
 html[lang=ja]{--fb:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",system-ui,sans-serif}
@@ -409,7 +409,7 @@ def og_image(path: Path):
         print("  (Pillow not available — skipping OG image)")
         return
     W, H = 1200, 630
-    BG, INK, MUTED, FAINT, ACCENT = (14, 15, 20), (240, 239, 234), (183, 183, 190), (124, 124, 133), (97, 128, 245)
+    BG, INK, MUTED, FAINT, ACCENT = (14, 15, 20), (240, 239, 234), (183, 183, 190), (124, 124, 133), (74, 103, 227)
     im = Image.new("RGB", (W, H), BG)
     # accent glow top-right + cool glow bottom-left (blurred ellipses)
     for cx, cy, rw, rh, col, a in [(W - 190, 60, 380, 320, ACCENT, 120), (120, H - 60, 360, 300, (76, 194, 176), 55)]:
