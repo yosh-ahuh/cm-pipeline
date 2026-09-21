@@ -3456,15 +3456,15 @@
     '新しいパスワード（確認）': 'New password (confirm)', 'もう一度入力': 'Enter again',
     '確認用のパスワードが一致しません。': 'The confirmation password does not match.',
     'メールアドレスを入力してください。': 'Please enter your email.',
-    'パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。': 'Password reset email sent. Open the link in the email to set a new password.',
+    'パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。メールが届かない場合は、迷惑メールフォルダもご確認ください。': 'Password reset email sent. Open the link in the email to set a new password. If you don’t see it, check your spam folder.',
     '認証番号をメールに送信しました。届いた6桁を入力してください。': 'A verification code was emailed. Enter the 6 digits.',
-    '認証番号をメールに送信しました。届いた番号を入力してください。': 'A verification code was emailed. Enter the code you received.',
+    '認証番号をメールに送信しました。届いた番号を入力してください。メールが届かない場合は、迷惑メールフォルダもご確認ください。': 'A verification code was emailed. Enter the code you received. If you don’t see it, check your spam folder.',
     '6桁の認証番号を入力してください。': 'Enter the 6-digit code.',
     '認証番号が正しくないか、期限切れです。再送してください。': 'The code is wrong or expired. Please resend.',
     '新しいパスワードは6文字以上で入力してください。': 'New password must be at least 6 characters.',
     'パスワードを更新しました。': 'Password updated.',
-    '確認メールを送信しました。メール内のリンクで認証してからサインインしてください。':
-      'Confirmation email sent. Follow the link in the email, then sign in.',
+    '確認メールを送信しました。メール内のリンクで認証してからサインインしてください。メールが届かない場合は、迷惑メールフォルダもご確認ください。':
+      'Confirmation email sent. Follow the link in the email, then sign in. If you don’t see it, check your spam folder.',
     'メールアドレスとパスワードを入力してください。': 'Enter your email and password.',
     'メールアドレスまたはパスワードが正しくありません。': 'Incorrect email or password.',
     'プレビュー再生は次のビルドで有効になります': 'Preview playback is coming in the next build',
@@ -4102,7 +4102,7 @@
       setBusy(false);   // ラベルを戻してから setMode でモード用ラベルに切替
       if (error) throw error;
       otpSent = true; setMode('otp');
-      fail('認証番号をメールに送信しました。届いた番号を入力してください。', true);
+      fail('認証番号をメールに送信しました。届いた番号を入力してください。メールが届かない場合は、迷惑メールフォルダもご確認ください。', true);
       startCooldown(resendBtn, setResend, OTP_COOLDOWN, '認証番号を再送する');   // 再送は一定時間後
     } catch (e) {
       setBusy(false);
@@ -4127,7 +4127,7 @@
         const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
         submitBusy(false);
         if (error) throw error;
-        fail('パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。', true);
+        fail('パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。メールが届かない場合は、迷惑メールフォルダもご確認ください。', true);
         startCooldown(submitEl, setSubmit, OTP_COOLDOWN, '再設定リンクを送信');   // 連投防止のカウントダウン
       } catch (err) {
         submitBusy(false);
@@ -4194,7 +4194,7 @@
           } } });
       if (error) throw error;
       if (mode === 'signup' && !data.session) {
-        fail('確認メールを送信しました。メール内のリンクで認証してからサインインしてください。', true);
+        fail('確認メールを送信しました。メール内のリンクで認証してからサインインしてください。メールが届かない場合は、迷惑メールフォルダもご確認ください。', true);
       }
     } catch (err) {
       fail(authErrMsg(err));
