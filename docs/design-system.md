@@ -199,8 +199,12 @@ SVGスプライト（`<symbol id="i-*">`）を `<svg class="ic"><use href="#i-..
 
 ## 7. アクセシビリティ（現状と指針）
 
-- ✅ アイコンボタンに `aria-label`、パンくず `aria-current`、ビュー切替でフォーカス移動、`role=button/dialog/menu` の付与。
-- ⚠️ 追加すべき: `prefers-reduced-motion` 対応、フォーカスリングの一貫性、色だけに依存しない状態表現の徹底、コントラスト検証（muted/faint on surface）。
+- ✅ アイコンボタンに `aria-label`、パンくず `aria-current`、ビュー切替でフォーカス移動、`role=button/dialog/menu`。
+- ✅ **フォーカスリング**: グローバル `:focus-visible { outline: 2px solid var(--accent-ink); outline-offset:2px }`（`:focus{outline:none}` でマウス時は抑制）。
+- ✅ **`prefers-reduced-motion: reduce`**: 全 `animation/transition` を無効化。ただし**読み込みスピナー（`.spin`/`.toast .tsp`）は回転を維持**（必須フィードバック）。
+- ✅ **コントラスト検証（2026-09-21）**: 暗い面（ground〜surface-3）上で `ink/muted/accent-ink/good/warn/crit` はすべて WCAG AA(4.5+)。**`--faint` のみ surface-2/3 で 4.2/3.8（本文AA未満）** → 三次・装飾テキスト専用とし、**本文には使わない**（本文は `--muted` 以上）。
+- ✅ **アクセント塗りの上の文字は `--on-accent`（白, 4.8 AA）のみ**。`accent-ink`/`muted`/意味色を `--accent` 塗りに載せない（2.6以下で不合格）。バッジは `--accent-soft`(暗) 地なので `accent-ink` でAA。
+- ⏳ 今後: 色だけに依存しない状態表現の最終点検（メーター等はテキスト併記済み）。
 
 ---
 
@@ -247,11 +251,11 @@ E `--card`撤廃 ／ G mono 500統一 ／ I `.count`中立化＋`.ok`。
 
 ### P3 — スケール（一部完了）
 - ✅ **H ブランド統一**: サイトの brand blue をアプリ `--accent #4A67E3` に統一（`site/build.py` の `--blue/--blue-ink/--blue-soft` ＋ OG画像 ACCENT）。※ 面/文字/ground 等の値は依然別体系（完全統一は将来）。
-- ⏳ **A11y**: `prefers-reduced-motion`・フォーカスリング共通化・コントラスト検証（外観を大きく変えず着手可）。
+- ✅ **A11y**: `:focus-visible`・`prefers-reduced-motion` は既実装を確認、スピナー維持を追加。コントラスト検証済み（faintは本文不可・on-accentは白のみ、を§7/§11に明記）。
 - ⏳ **J フィールド2系統統合**（`.fld`/`.field`）: 認証を含むため慎重に。
 - ⏳ **ライブ・スタイルガイド**: 実スウォッチ/コンポーネントページ（別途ビルド）。
 
-> 残コード作業: A11y ・ J ・（Cの物理統合）・ 面/字トークンの完全共通化。
+> 残コード作業: J ・（Cの物理統合）・ 面/字トークンの完全共通化。
 
 ---
 
