@@ -960,6 +960,10 @@
   .auth-brand-m { display: none; margin-bottom: var(--s-5); }
   .auth-type { display: flex; width: 100%; }
   .auth-type button { flex: 1; justify-content: center; }
+  /* 登録: ステップ進捗（3セグメント） */
+  .auth-steps { display: flex; gap: 6px; margin: 0 0 var(--s-2); }
+  .auth-step { flex: 1; height: 4px; border-radius: var(--r-full); background: var(--line-strong); transition: background var(--dur-fast); }
+  .auth-step.on { background: var(--accent); }
   .auth-terms { display: flex; align-items: flex-start; gap: 9px; font-size: var(--t-body-sm); color: var(--muted); cursor: pointer; margin-top: 2px; }
   .auth-terms input { width: 18px; height: 18px; flex: none; margin-top: 1px; accent-color: var(--accent); }
   .auth-terms a { color: var(--accent-ink); }
@@ -1432,19 +1436,29 @@
       <h1 class="auth-h" id="authH">おかえりなさい</h1>
       <p class="auth-sub" id="authSub">メールアドレスとパスワードでサインイン。</p>
       <form id="authForm" class="auth-form" novalidate>
-        <div class="auth-signup-only" id="signupFields" hidden>
+        <!-- 登録: ステップ進捗（3ステップ） -->
+        <div class="auth-steps" id="authSteps" hidden aria-hidden="true">
+          <span class="auth-step" data-step="1"></span>
+          <span class="auth-step" data-step="2"></span>
+          <span class="auth-step" data-step="3"></span>
+        </div>
+        <!-- 登録 step2: 利用形態 -->
+        <div class="auth-signup-only" id="authFieldType" hidden>
           <div class="seg auth-type" id="authType" role="group" aria-label="アカウント種別">
             <button type="button" data-type="personal" aria-pressed="true">個人</button>
             <button type="button" data-type="org" aria-pressed="false">組織・会社</button>
           </div>
-          <div style="margin-top:var(--s-3)">
+        </div>
+        <!-- 登録 step3: プロフィール（組織は 会社名 → 氏名 の順） -->
+        <div class="auth-signup-only" id="authFieldProfile" hidden>
+          <div id="authCompanyWrap" hidden>
+            <label class="f-label" for="authCompany">会社・組織名</label>
+            <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-users"/></svg></span><input id="authCompany" type="text" placeholder="株式会社ミライ" autocomplete="organization"></div>
+            <p class="muted" style="margin:6px 0 0;font-size:var(--t-label-sm)">ロゴや請求情報は、登録後にプロフィールから追加できます。</p>
+          </div>
+          <div id="authNameWrap" style="margin-top:var(--s-3)">
             <label class="f-label" for="authName">お名前</label>
             <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-user"/></svg></span><input id="authName" type="text" placeholder="山田 太郎" autocomplete="name"></div>
-          </div>
-          <div id="authCompanyWrap" hidden style="margin-top:var(--s-3)">
-            <label class="f-label" for="authCompany">会社・組織名</label>
-            <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-users"/></svg></span><input id="authCompany" type="text" placeholder="株式会社スポット" autocomplete="organization"></div>
-            <p class="muted" style="margin:6px 0 0;font-size:var(--t-label-sm)">ロゴや請求情報は、登録後にプロフィールから追加できます。</p>
           </div>
         </div>
         <div id="authFieldEmail">
@@ -4032,8 +4046,10 @@
     recovery: ['新しいパスワードを設定', '新しいパスワードを入力してください。', 'パスワードを更新'],
   };
   function show(id, on) { const el = document.getElementById(id); if (el) el.hidden = !on; }
+  let signupStep = 1;   // 登録の3ステップ（1:メール+PW+規約 / 2:個人or組織 / 3:氏名(+会社名)）
   function setMode(m) {
     mode = m;
+    if (m === 'signup') signupStep = 1;
     if (m !== 'otp') otpSent = false;
     // モード変更でクールダウンをリセット（残ったカウントダウン/無効化を解除）
     ['authSubmit', 'authOtpResend'].forEach(id => { const el = document.getElementById(id); if (el && el._cd) { clearInterval(el._cd); el._cd = null; el.disabled = false; } });
@@ -4041,9 +4057,8 @@
     hEl.textContent = h;
     const subEl = document.getElementById('authSub'); if (subEl) subEl.textContent = sub;
     submitText.textContent = (m === 'otp' && otpSent) ? 'サインイン' : submit;
-    // 各フィールドの出し分け
-    show('signupFields', m === 'signup');
-    show('authTerms', m === 'signup');
+    // 各フィールドの出し分け（signup はステップ制御を applySignupStep に委譲）
+    show('authFieldType', false); show('authFieldProfile', false); show('authSteps', false); show('authTerms', false);
     show('authFieldEmail', m === 'signin' || m === 'signup' || m === 'reset' || m === 'otp');
     show('authFieldPass', m === 'signin' || m === 'signup');
     show('authFieldOtp', m === 'otp' && otpSent);
@@ -4053,21 +4068,54 @@
     show('authOAuthBtns', m === 'signin' || m === 'signup');
     const tog = document.querySelector('.auth-toggle'); if (tog) tog.hidden = !(m === 'signin' || m === 'signup');
     show('authBack', m === 'reset' || m === 'otp' || m === 'recovery');
+    { const bs = document.querySelector('#authBack span'); if (bs && m !== 'signup') bs.textContent = 'サインインに戻る'; }   // 登録以外は「サインインに戻る」
     const fb = document.getElementById('authForgot'); if (fb) fb.hidden = m !== 'signin';
     const em = document.getElementById('authEmail'); if (em) em.readOnly = (m === 'otp' && otpSent);   // 送信後はメール固定
     document.getElementById('authToggleText').textContent = m === 'signin' ? 'Spot は初めてですか?' : 'すでにアカウントをお持ちですか?';
     document.getElementById('authToggle').textContent = m === 'signin' ? 'アカウントを作成' : 'サインイン';
     passEl.autocomplete = m === 'signup' ? 'new-password' : 'current-password';
     errEl.hidden = true;
+    if (m === 'signup') { applySignupStep(); return; }   // 登録はステップ表示に委譲（見出し/送信/フォーカスも）
     const focusEl = (m === 'otp' && otpSent) ? document.getElementById('authOtp')
       : (m === 'recovery') ? document.getElementById('authNewPass')
       : document.getElementById('authEmail');
     if (focusEl) focusEl.focus();
   }
+  // 登録の各ステップの表示（見出し・サブ・送信ラベル・進捗・戻る・フォーカス）
+  function applySignupStep() {
+    const step = signupStep;
+    show('authSteps', true);
+    show('authFieldEmail', step === 1); show('authFieldPass', step === 1); show('authTerms', step === 1);
+    show('authFieldType', step === 2);
+    show('authFieldProfile', step === 3);
+    show('authOAuthWrap', step === 1); show('authOAuthBtns', step === 1);
+    const tog = document.querySelector('.auth-toggle'); if (tog) tog.hidden = step !== 1;   // トグルは step1 のみ
+    const isOrg = acctType === 'org';
+    const heads = {
+      1: ['アカウントを作成', 'メールアドレスとパスワードを入力してください。', '次へ'],
+      2: ['利用形態を選ぶ', '個人か、組織（会社）でのご利用かを選んでください。', '次へ'],
+      3: isOrg ? ['組織の情報', '会社・組織名とお名前を入力してください。', 'アカウントを作成']
+               : ['お名前', '表示に使うお名前を入力してください。', 'アカウントを作成'],
+    };
+    const [h, sub, submit] = heads[step] || heads[1];
+    hEl.textContent = h; const subEl = document.getElementById('authSub'); if (subEl) subEl.textContent = sub;
+    submitText.textContent = submit;
+    const cw = document.getElementById('authCompanyWrap'); if (cw) cw.hidden = !isOrg;   // 会社名は組織のみ
+    show('authBack', step > 1);   // step2/3 は戻る（step1 はトグルでサインインへ）
+    { const bs = document.querySelector('#authBack span'); if (bs) bs.textContent = '戻る'; }   // 登録中は「前のステップへ」
+    const steps = document.getElementById('authSteps');
+    if (steps) steps.querySelectorAll('.auth-step').forEach(d => d.classList.toggle('on', Number(d.dataset.step) <= step));
+    errEl.hidden = true;
+    const focusEl = step === 1 ? document.getElementById('authEmail')
+      : step === 3 ? (isOrg ? document.getElementById('authCompany') : document.getElementById('authName'))
+      : null;   // step2 はセグメントなのでフォーカスしない
+    if (focusEl) setTimeout(() => focusEl.focus(), 30);
+  }
   document.getElementById('authToggle').addEventListener('click', () => setMode(mode === 'signin' ? 'signup' : 'signin'));
   { const f = document.getElementById('authForgot'); if (f) f.addEventListener('click', () => setMode('reset')); }
   { const o = document.getElementById('authOtpLink'); if (o) o.addEventListener('click', () => setMode('otp')); }
   { const b = document.getElementById('authBack'); if (b) b.addEventListener('click', () => {
+      if (mode === 'signup' && signupStep > 1) { signupStep--; applySignupStep(); return; }   // 登録：前のステップへ
       if (mode === 'recovery') { setRecovering(false); try { sb.auth.signOut(); } catch (_) {} }   // 復旧を中断＝復旧セッションを破棄
       setMode('signin');
     }); }
@@ -4210,35 +4258,47 @@
       return;
     }
 
-    // --- signin / signup ---
+    // --- 新規登録（3ステップ）---
+    if (mode === 'signup') {
+      const password = passEl.value;
+      if (signupStep === 1) {   // メール + パスワード + 規約同意
+        if (!isEmail(email)) { fail('メールアドレスを入力してください。'); document.getElementById('authEmail').focus(); return; }
+        if (password.length < 6) { fail('パスワードは6文字以上で入力してください。'); passEl.focus(); return; }
+        const agree = document.getElementById('authAgree');
+        if (agree && !agree.checked) { fail('利用規約・プライバシーポリシーに同意してください。'); agree.focus(); return; }
+        signupStep = 2; applySignupStep(); return;
+      }
+      if (signupStep === 2) { signupStep = 3; applySignupStep(); return; }   // 個人 / 組織 の選択
+      // signupStep === 3：氏名（組織は会社名も）→ 実登録
+      const nameEl = document.getElementById('authName'), companyEl = document.getElementById('authCompany');
+      const displayName = nameEl ? nameEl.value.trim() : '';
+      const companyName = companyEl ? companyEl.value.trim() : '';
+      if (acctType === 'org' && !companyName) { fail('会社・組織名を入力してください。'); companyEl.focus(); return; }
+      if (!displayName) { fail('お名前を入力してください。'); nameEl.focus(); return; }
+      submitBusy(true, window.L('Creating account…', 'アカウントを作成中…'));
+      try {
+        const { data, error } = await sb.auth.signUp({ email, password, options: { data: {
+          display_name: displayName,
+          account_type: acctType,
+          company_name: acctType === 'org' ? companyName : null,
+          lang: window.L('en', 'ja'),   // メール言語切替用（Send Email テンプレートが {{ .Data.lang }} で参照）
+        } } });
+        if (error) throw error;
+        if (!data.session) fail('確認メールを送信しました。メール内のリンクで認証してからサインインしてください。メールが届かない場合は、迷惑メールフォルダもご確認ください。', true);
+      } catch (err) { fail(authErrMsg(err)); }
+      finally { submitBusy(false); }
+      return;
+    }
+
+    // --- サインイン ---
     const password = passEl.value;
     if (!email || password.length < 6) { fail('メールアドレスとパスワードを入力してください。'); (email ? passEl : document.getElementById('authEmail')).focus(); return; }
-    const nameEl = document.getElementById('authName'), companyEl = document.getElementById('authCompany');
-    const displayName = nameEl ? nameEl.value.trim() : '';
-    const companyName = companyEl ? companyEl.value.trim() : '';
-    if (mode === 'signup') {
-      if (!displayName) { fail('お名前を入力してください。'); nameEl.focus(); return; }
-      if (acctType === 'org' && !companyName) { fail('会社・組織名を入力してください。'); companyEl.focus(); return; }
-      const agree = document.getElementById('authAgree');
-      if (agree && !agree.checked) { fail('利用規約・プライバシーポリシーに同意してください。'); agree.focus(); return; }
-    }
-    submitBusy(true, mode === 'signin' ? window.L('Signing in…', 'サインイン中…') : window.L('Creating account…', 'アカウントを作成中…'));
+    submitBusy(true, window.L('Signing in…', 'サインイン中…'));
     try {
-      const { data, error } = mode === 'signin'
-        ? await sb.auth.signInWithPassword({ email, password })
-        : await sb.auth.signUp({ email, password, options: { data: {
-            display_name: displayName,
-            account_type: acctType,
-            company_name: acctType === 'org' ? companyName : null,
-            lang: window.L('en', 'ja'),   // メール言語切替用（Send Email テンプレートが {{ .Data.lang }} で参照）
-          } } });
+      const { error } = await sb.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      if (mode === 'signup' && !data.session) {
-        fail('確認メールを送信しました。メール内のリンクで認証してからサインインしてください。メールが届かない場合は、迷惑メールフォルダもご確認ください。', true);
-      }
-    } catch (err) {
-      fail(authErrMsg(err));
-    } finally { submitBusy(false); }
+    } catch (err) { fail(authErrMsg(err)); }
+    finally { submitBusy(false); }
   });
 
   // OAuth（Google / Microsoft）。プロバイダは Supabase ダッシュボードで有効化が必要。
