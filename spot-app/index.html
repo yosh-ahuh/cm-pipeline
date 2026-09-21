@@ -723,7 +723,8 @@
   .make-card:hover .make-go { opacity: 1; transform: translateX(0); color: var(--accent-ink); background: var(--accent-soft); }
   @media (prefers-reduced-motion: reduce) { .make-card, .make-go { transition: none; } .make-card:hover { transform: none; } }
 
-  /* 常設「3ステップ」ガイド（低ITリテラシー向け・ホームに固定） */
+  /* 常設「3ステップ」ガイド（低ITリテラシー向け）。制作物のあるリピーターでは畳む＝制作物を優先 */
+  #view-dash.has-work .guide3 { display: none; }
   .guide3 { margin: var(--s-2) 0 var(--s-5); }
   .guide3-h { font-size: var(--t-label); color: var(--muted); font-weight: 700; letter-spacing: .04em; margin: 0 0 var(--s-3); }
   .guide3-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-3); }
@@ -4568,6 +4569,8 @@
       else if (opts && opts.uncategorized) q = q.is('collection_id', null);
       const { data, error } = await q.order('updated_at', { ascending: false });
       if (error) throw error;
+      // ホーム：制作物があるリピーターは初回向けの「3ステップ」を畳んで制作物を優先（Canva風の情報順序）
+      if (gridId === 'projGrid') { const dash = document.getElementById('view-dash'); if (dash) dash.classList.toggle('has-work', !!(data && data.length)); }
       if (!data || !data.length) { grid.innerHTML = (opts && opts.emptyMsg) || emptyState(); return; }
       grid.innerHTML = data.map(card).join('');
       if (window.applyProjFilter) window.applyProjFilter();
