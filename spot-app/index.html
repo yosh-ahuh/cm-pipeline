@@ -252,6 +252,13 @@
   @keyframes menu-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
   .menu-head { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-3) var(--s-4) var(--s-2); }
   .menu-head .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-lg); text-transform: uppercase; flex: none; }
+  .menu-head-btn { width: 100%; border: none; background: none; cursor: pointer; color: inherit; font: inherit; text-align: left; border-radius: var(--r-sm); }
+  .menu-head-btn:hover { background: var(--hover); }
+  .menu-head .mh-chev { margin-left: auto; flex: none; width: 16px; height: 16px; color: var(--faint); transition: transform var(--dur-fast); }
+  .menu-head-btn[aria-expanded="true"] .mh-chev { transform: rotate(-90deg); }
+  .as-current { align-items: center; }
+  .as-current .avatar { width: 34px; height: 34px; border-radius: 50%; flex: none; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-sm); text-transform: uppercase; }
+  .as-current .as-check { margin-left: auto; flex: none; color: var(--accent); }
   .menu-id { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
   .menu-email { max-width: 100%; font-size: var(--t-body-sm); font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .plan-badge { font-family: var(--font-mono); font-size: var(--t-label-sm); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; line-height: 1.6; padding: 1px 8px; border-radius: var(--r-full); color: var(--accent-ink); background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent-ink) 30%, transparent); }
@@ -1259,9 +1266,15 @@
   .ws-ic { width: 22px; height: 22px; border-radius: 6px; background: var(--accent); color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 600; flex: none; text-transform: uppercase; }
   .ws-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--t-body-sm); }
   .ws-role { font-size: var(--t-label-sm); color: var(--muted); }
-  .ws-item .ws-check { color: var(--accent); opacity: 0; }
+  .ws-item .ws-check { color: var(--accent); opacity: 0; flex: none; }
   .ws-item[aria-selected="true"] .ws-check { opacity: 1; }
   .ws-item[aria-selected="true"] .ws-name { font-weight: 600; }
+  /* ワークスペース行：名前＋プランバッジ / 役割 の2段 */
+  .ws-item .ws-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  .ws-item .ws-line1 { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .ws-item .ws-line1 .ws-name { flex: 0 1 auto; }
+  .ws-item .ws-role { flex: none; font-size: var(--t-label-sm); color: var(--muted); }
+  .plan-badge.sm { font-size: 9px; letter-spacing: .04em; padding: 0 6px; line-height: 1.7; flex: none; }
   /* --- サイドバー刷新 --- */
   /* (1) 上部＝現在のワークスペースを読み取り専用で表示（ラベルは明瞭に） */
   .sb-wsnow { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border: 1px solid var(--line); background: var(--surface-2); border-radius: 10px; }
@@ -1462,13 +1475,14 @@
 <!-- アカウント/ワークスペース メニュー（下部プロフィールから開く） -->
 <div class="scrim" id="acctScrim" hidden></div>
 <div class="menu" id="acctMenu" role="menu" aria-label="アカウント・ワークスペース" hidden>
-  <div class="menu-head">
+  <button type="button" class="menu-head menu-head-btn" data-act="switch-account" aria-haspopup="menu" aria-expanded="false">
     <span class="avatar has-dot" id="amAvatar" aria-hidden="true">?</span>
     <div class="acct-id">
       <div class="acct-top"><span class="acct-name" id="amName">—</span><span class="plan-badge" id="amPlan">Free</span></div>
       <div class="acct-email" id="amEmail"></div>
     </div>
-  </div>
+    <svg class="ic mh-chev" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+  </button>
   <div class="menu-sep"></div>
   <div class="menu-label">ワークスペース</div>
   <div id="amWorkspaces"></div>
@@ -1476,8 +1490,22 @@
   <div class="menu-sep"></div>
   <button type="button" class="menu-item" data-act="settings"><svg class="ic"><use href="#i-user"/></svg><span>プロフィール設定</span></button>
   <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウント設定</span></button>
+  <button type="button" class="menu-item" data-act="help"><svg class="ic"><use href="#i-alert"/></svg><span>ヘルプ＆フィードバック</span></button>
   <div class="menu-sep"></div>
   <button type="button" class="menu-item" data-act="logout"><svg class="ic"><use href="#i-logout"/></svg><span>ログアウト</span></button>
+</div>
+
+<!-- アカウント切替サブメニュー（ヘッダの › から開く） -->
+<div class="menu" id="acctSwitch" role="menu" aria-label="アカウントを切り替える" hidden>
+  <div class="menu-label">アカウントを切り替える</div>
+  <div class="menu-item as-current" aria-current="true">
+    <span class="avatar" id="asAvatar" aria-hidden="true">?</span>
+    <div class="acct-id"><div class="acct-top"><span class="acct-name" id="asName">—</span><span class="plan-badge" id="asPlan">Free</span></div><div class="acct-email" id="asEmail"></div></div>
+    <svg class="ic as-check" aria-hidden="true"><use href="#i-check"/></svg>
+  </div>
+  <div class="menu-sep"></div>
+  <button type="button" class="menu-item" data-act="login-other"><svg class="ic"><use href="#i-plus"/></svg><span>別のアカウントでログイン</span></button>
+  <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウントを管理する</span></button>
 </div>
 
 <header id="topbar">
@@ -2583,15 +2611,19 @@
           + `<span class="ws-role-pill">${curRole}</span>`;
       }
     }
-    // (3) 下部メニュー：ワークスペース切替リスト
+    // (3) 下部メニュー：ワークスペース切替リスト（名前＋プランバッジ / 役割 の2段・参考デザイン）
+    const planL = { free: 'FREE', starter: 'STARTER', team: 'TEAM', business: 'BUSINESS', enterprise: 'ENTERPRISE' };
     if (amBox) {
       if (!orgs.length || !cur) { amBox.innerHTML = ''; }
       else amBox.innerHTML = orgs.map(o => {
         const nm = nameOf(o), isCur = o.id === cur.id;
+        const planTxt = planL[o.plan] || String(o.plan || '').toUpperCase();
         return `<button type="button" class="ws-item menu-item" role="menuitemradio" data-org="${o.id}" aria-selected="${isCur ? 'true' : 'false'}" aria-checked="${isCur ? 'true' : 'false'}">
           <span class="ws-ic">${escHtml((nm || '?').slice(0, 1))}</span>
-          <span class="ws-name">${escHtml(nm)}</span>
-          <span class="ws-role">${roleL[o.role] || o.role}</span>
+          <span class="ws-body">
+            <span class="ws-line1"><span class="ws-name">${escHtml(nm)}</span>${planTxt ? `<span class="plan-badge sm">${escHtml(planTxt)}</span>` : ''}</span>
+            <span class="ws-role">${roleL[o.role] || o.role}</span>
+          </span>
           <span class="ws-check" aria-hidden="true">✓</span>
         </button>`;
       }).join('');
@@ -2640,7 +2672,13 @@
   const acctMenu = document.getElementById('acctMenu');
   const acctScrim = document.getElementById('acctScrim');
   const sbAcctBtn = document.getElementById('sbAcctBtn');
+  const acctSwitch = document.getElementById('acctSwitch');
+  function closeAcctSwitch() {
+    if (acctSwitch) acctSwitch.hidden = true;
+    const h = document.querySelector('#acctMenu .menu-head-btn'); if (h) h.setAttribute('aria-expanded', 'false');
+  }
   function closeAcctMenu() {
+    closeAcctSwitch();
     if (acctMenu) acctMenu.hidden = true;
     if (acctScrim) acctScrim.hidden = true;
     if (sbAcctBtn) sbAcctBtn.setAttribute('aria-expanded', 'false');
@@ -2656,10 +2694,40 @@
     acctMenu.style.bottom = (window.innerHeight - r.top + 8) + 'px';
     acctMenu.style.width = Math.max(248, r.width) + 'px';
   }
+  function openAcctSwitch() {   // ヘッダの › から：アカウント切替サブメニュー（横に出す）
+    if (!acctSwitch || !acctMenu) return;
+    // 現在アカウントを同期
+    const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    const av = document.getElementById('amAvatar');
+    const asAv = document.getElementById('asAvatar');
+    if (asAv && av) asAv.innerHTML = av.innerHTML;   // 画像 or イニシャルをそのまま複製
+    setTxt('asName', (document.getElementById('amName') || {}).textContent || '');
+    setTxt('asEmail', (document.getElementById('amEmail') || {}).textContent || '');
+    setTxt('asPlan', (document.getElementById('amPlan') || {}).textContent || 'Free');
+    acctSwitch.hidden = false;
+    const h = document.querySelector('#acctMenu .menu-head-btn'); if (h) h.setAttribute('aria-expanded', 'true');
+    const mr = acctMenu.getBoundingClientRect();
+    acctSwitch.style.width = Math.max(248, mr.width) + 'px';
+    // 右に十分な幅があれば右横、無ければ左横に。縦はヘッダに合わせる。
+    const w = Math.max(248, mr.width);
+    const right = mr.right + 8 + w <= window.innerWidth;
+    acctSwitch.style.left = (right ? mr.right + 8 : Math.max(8, mr.left - w - 8)) + 'px';
+    acctSwitch.style.top = mr.top + 'px'; acctSwitch.style.bottom = 'auto';
+  }
   window.__closeAcctMenu = closeAcctMenu;
   if (sbAcctBtn) sbAcctBtn.addEventListener('click', () => { (acctMenu && acctMenu.hidden) ? openAcctMenu() : closeAcctMenu(); });
   if (acctScrim) acctScrim.addEventListener('click', closeAcctMenu);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAcctMenu(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (acctSwitch && !acctSwitch.hidden) closeAcctSwitch(); else closeAcctMenu(); } });
+  function acctAction(a) {   // 主メニュー/サブメニュー共通のアクション
+    if (a === 'switch-account') { (acctSwitch && acctSwitch.hidden) ? openAcctSwitch() : closeAcctSwitch(); return; }
+    closeAcctMenu(); closeDrawer();
+    if (a === 'add-workspace') { gotoSettings(); if (window.toast) toast(L('Add or upgrade your workspace here.', 'ここでワークスペースの追加・アップグレードができます。'), false, 2600); return; }
+    if (a === 'settings') { gotoSettings(); return; }
+    if (a === 'account') { if (window.gotoAccount) window.gotoAccount(); return; }
+    if (a === 'help') { const to = (window.__cfg && window.__cfg.supportEmail) || ''; if (to) { location.href = 'mailto:' + to + '?subject=' + encodeURIComponent('Spot feedback'); } else toast(L('Help & feedback is coming soon.', 'ヘルプ＆フィードバックは準備中です。'), false, 2400); return; }
+    if (a === 'login-other') { if (window.sb) window.sb.auth.signOut(); else toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200); return; }
+    if (a === 'logout') { if (window.sb) window.sb.auth.signOut(); else toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200); return; }
+  }
   if (acctMenu) acctMenu.addEventListener('click', (e) => {
     const ws = e.target.closest('[data-org]');
     if (ws) {
@@ -2670,12 +2738,9 @@
       return;
     }
     const it = e.target.closest('[data-act]'); if (!it) return;
-    const a = it.dataset.act; closeAcctMenu(); closeDrawer();
-    if (a === 'add-workspace') { gotoSettings(); if (window.toast) toast(L('Add or upgrade your workspace here.', 'ここでワークスペースの追加・アップグレードができます。'), false, 2600); return; }
-    if (a === 'settings') { gotoSettings(); return; }
-    if (a === 'account') { if (window.gotoAccount) window.gotoAccount(); return; }
-    if (a === 'logout') { if (window.sb) window.sb.auth.signOut(); else toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200); return; }
+    acctAction(it.dataset.act);
   });
+  if (acctSwitch) acctSwitch.addEventListener('click', (e) => { const it = e.target.closest('[data-act]'); if (it) acctAction(it.dataset.act); });
   // --- サイドバー ナビ操作 ---
   if (sidebar) sidebar.addEventListener('click', (e) => {
     const item = e.target.closest('[data-act]'); if (!item) return;
@@ -3302,6 +3367,9 @@
     // サイドバー刷新
     'メニュー': 'Menu', '管理': 'Manage', 'ワークスペース': 'Workspace', 'ワークスペースを追加する': 'Add a workspace',
     'アカウント・ワークスペース': 'Account & workspace',
+    'ヘルプ＆フィードバック': 'Help & feedback', 'アカウントを切り替える': 'Switch account',
+    '別のアカウントでログイン': 'Log in with another account', 'アカウントを管理する': 'Manage account',
+    'ヘルプ＆フィードバックは準備中です。': 'Help & feedback is coming soon.',
     '制作をはじめる': 'Start creating', '台本・絵コンテ': 'Script & storyboard',
     '書き出し': 'Export', 'ミライ工事写真': 'Mirai Koji', '30秒CM': '30-sec ad',
     // --- dashboard ---
