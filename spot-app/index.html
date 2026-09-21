@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Spot — 選ぶだけで、広告動画。">
-<meta property="og:description" content="配信先・業種・ターゲットを選ぶだけ。AIが台本・実写・UI・音声を生成し、その日のうちに初稿。">
+<meta property="og:description" content="配信先・業種・ターゲットを選ぶだけ。AIが台本・実写・UI・音声をつくり、その日のうちに初稿。">
 <meta property="og:image" content="assets/og-cover.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -1411,7 +1411,7 @@
       </div>
       <ul class="auth-hero-feats">
         <li><svg class="ic"><use href="#i-check"/></svg>プロンプト不要・その日のうちに初稿</li>
-        <li><svg class="ic"><use href="#i-check"/></svg>実写もアプリ画面もAIが生成</li>
+        <li><svg class="ic"><use href="#i-check"/></svg>実写もアプリ画面もAIがつくる</li>
         <li><svg class="ic"><use href="#i-check"/></svg>3パターン×3形式で納品</li>
       </ul>
     </aside>
@@ -1571,7 +1571,7 @@
     <div class="hero-new">
       <div class="hn-eye">Spot</div>
       <h1>選ぶだけで、広告動画。</h1>
-      <p>配信先・業種・ターゲットを選ぶだけ。AIがディレクターとして台本を組み、実写もUIも音声も生成。その日のうちに、クライアント確認できる初稿が出てきます。</p>
+      <p>配信先・業種・ターゲットを選ぶだけ。AIがディレクターとして台本を組み、実写もUIも音声もつくります。その日のうちに、クライアント確認できる初稿が出てきます。</p>
       <button class="hn-btn" id="newCM"><svg class="ic"><use href="#i-plus"/></svg><span>新規CMをつくる</span></button>
     </div>
     <div class="usage">
@@ -1647,7 +1647,7 @@
       <div class="g3-card">
         <span class="g3-num">2</span>
         <svg class="ic g3-ic" aria-hidden="true"><use href="#i-film"/></svg>
-        <span class="g3-txt"><b>AIがつくる</b><small>台本・映像・音声をAIが自動で生成します。待つだけ。</small></span>
+        <span class="g3-txt"><b>AIがつくる</b><small>台本・映像・音声をAIが自動でつくります。待つだけ。</small></span>
       </div>
       <div class="g3-card">
         <span class="g3-num">3</span>
@@ -1911,7 +1911,7 @@
 
     <aside class="shot-panel">
       <div class="panel-h">用意する素材 <span class="count" id="shotCount">4/4</span></div>
-      <p style="padding:10px 16px 0;margin:0;font-size:var(--t-label-sm);color:var(--muted);line-height:1.55">各項目をクリックして、お手元のファイル（画面録画・スクショ・ロゴ・写真）をアップロードします。すべて任意で、無い場合はAIが生成します。</p>
+      <p style="padding:10px 16px 0;margin:0;font-size:var(--t-label-sm);color:var(--muted);line-height:1.55">各項目をクリックして、お手元のファイル（画面録画・スクショ・ロゴ・写真）をアップロードします。すべて任意で、無い場合はAIがつくります。</p>
       <div class="shot-list" id="shotList">
         <div class="shot-item up"><span class="sck"><svg class="ic"><use href="#i-check"/></svg></span><div><div class="si-name">ダッシュボード画面</div><div class="si-desc">一覧・撮影・PDFの3画面</div></div><span class="si-tag">UP済</span></div>
         <div class="shot-item up"><span class="sck"><svg class="ic"><use href="#i-check"/></svg></span><div><div class="si-name">アプリアイコン・ロゴ</div><div class="si-desc">SVG / PNG</div></div><span class="si-tag">UP済</span></div>
@@ -1919,7 +1919,7 @@
         <div class="shot-item up"><span class="sck"><svg class="ic"><use href="#i-check"/></svg></span><div><div class="si-name">参考サウンドロゴ</div><div class="si-desc">構造のみ参照・本番は自社生成</div></div><span class="si-tag">UP済</span></div>
       </div>
       <div class="ai-shot">
-        <b>AIがディレクター。</b>台本の各カットから「何を撮ればいいか」を自動でリスト化。あなたは指示どおりに素材を上げるだけ。実写の人物・背景はAIが生成します。
+        <b>AIがディレクター。</b>台本の各カットから「何を撮ればいいか」を自動でリスト化。あなたは指示どおりに素材を上げるだけ。実写の人物・背景はAIがつくります。
       </div>
     </aside>
   </div>
@@ -3161,7 +3161,7 @@
       const pad = n => String(n).padStart(2, '0');
       return { n: '#' + (i + 1), kind, scene: label, secs: `0:${pad(s)}–0:${pad(e)}`, tl: label,
         dark: kind === 'アプリ画面', c1, c2, na: '—', telop: '—',
-        shot: L(`AI generates the script & footage for this cut. `, `このカットの台本・映像はAIが生成します。`) + `<b>${model}</b>` };
+        shot: L(`AI generates the script & footage for this cut. `, `このカットの台本・映像はAIがつくります。`) + `<b>${model}</b>` };
     });
   }
   function renderBoard() {
@@ -3406,8 +3406,8 @@
       if (confirm(L('Not enough credits. Add credits now?', 'クレジットが足りません。クレジットを追加しますか？')) && window.gotoCredits) window.gotoCredits();
       return;
     }
-    if (!confirm(L(`This generation uses ${cost} credit (1 ad). ${bal} left. Continue?`,
-                   `この生成で ${cost} クレジット（＝CM1本）を使います。残り ${bal} クレジット。よろしいですか？`))) return;
+    if (!confirm(L(`This ad uses ${cost} credit (1 ad). ${bal} left. Continue?`,
+                   `このCMづくりで ${cost} クレジット（＝CM1本）を使います。残り ${bal} クレジット。よろしいですか？`))) return;
     if (window.onGenerate) window.onGenerate(window.__currentProjectId);   // jobs をDBに投入（データ層）
     toast(L('Generating 8 cuts… live-action = AI / UI = code-drawn','8カットをつくっています… 実写=AI / UI=コード描画'), true, 1600);
     setTimeout(() => {
@@ -3433,6 +3433,7 @@
     '本文へスキップ': 'Skip to content', '現在地': 'Breadcrumb', 'Spot ホーム': 'Spot home',
     // --- auth ---
     'おかえりなさい': 'Welcome back', 'メールアドレスとパスワードでサインイン。': 'Sign in with your email and password.',
+    '実写もアプリ画面もAIがつくる': 'AI makes both live-action and app screens',
     '個人／組織を選んで登録します。': 'Choose personal or organization to sign up.',
     'Spot にサインイン': 'Sign in to Spot', 'Spot アカウントを作成': 'Create your Spot account',
     'メールアドレス': 'Email', 'パスワード': 'Password', '6文字以上': 'At least 6 characters',
@@ -3481,7 +3482,7 @@
     '書き出し': 'Export', 'ミライ工事写真': 'Mirai Koji', '30秒CM': '30-sec ad',
     // --- dashboard ---
     '選ぶだけで、広告動画。': 'Ad videos, just by choosing.',
-    '配信先・業種・ターゲットを選ぶだけ。AIがディレクターとして台本を組み、実写もUIも音声も生成。その日のうちに、クライアント確認できる初稿が出てきます。':
+    '配信先・業種・ターゲットを選ぶだけ。AIがディレクターとして台本を組み、実写もUIも音声もつくります。その日のうちに、クライアント確認できる初稿が出てきます。':
       'Pick your channel, industry, and audience. AI directs the script and generates the footage, UI, and voiceover — a client-ready first cut lands the same day.',
     '新規CMをつくる': 'New ad video', '最初のCMをつくる': 'Create your first ad',
     'まだCMがありません': 'No ad videos yet', '配信先・業種・ターゲットを選ぶだけで、その日のうちに初稿が届きます。': 'Pick a channel, industry and audience — a first cut lands the same day.',
@@ -3570,7 +3571,7 @@
     '工事写真サンプル': 'Sample site photos', '帳票に使う現場写真 3枚': '3 site photos for the report',
     '参考サウンドロゴ': 'Reference sound logo', '構造のみ参照・本番は自社生成': 'Structure only — final generated in-house',
     'AIがディレクター。': 'AI is the director.',
-    '台本の各カットから「何を撮ればいいか」を自動でリスト化。あなたは指示どおりに素材を上げるだけ。実写の人物・背景はAIが生成します。':
+    '台本の各カットから「何を撮ればいいか」を自動でリスト化。あなたは指示どおりに素材を上げるだけ。実写の人物・背景はAIがつくります。':
       'It turns every cut into a clear shot list of what to capture. You just upload what’s asked — AI generates the live-action people and backgrounds.',
     '選択に戻る': 'Back to choices', 'この構成でつくる': 'Generate from this', 'ナレーション': 'Narration',
     // SCUT scenes
@@ -3650,14 +3651,14 @@
     'つくり方は、かんたん3ステップ': 'How it works — three simple steps',
     '保存して後で続ける': 'Save & continue later',
     '配信先・業種・ターゲットを選ぶだけ。文章は書きません。': 'Just pick channel, industry, and audience. No writing.',
-    '台本・映像・音声をAIが自動で生成します。待つだけ。': 'AI generates the script, footage, and audio. Just wait.',
+    '台本・映像・音声をAIが自動でつくります。待つだけ。': 'AI generates the script, footage, and audio. Just wait.',
     'できあがった動画を確認して、そのまま書き出せます。': 'Review the finished video and export it as-is.',
     // narration voice picker
     'ナレーションの声': 'Narration voice', '話し方（トーン）': 'Delivery (tone)',
     '聞いてから選べます。子供〜お年寄り、声のトーンも変えられます。': 'Listen, then choose — from kids to seniors, and change the tone too.',
     // helper text (plain-language guidance for low-IT-literacy users)
     '用意する素材': 'Materials to prepare',
-    '各項目をクリックして、お手元のファイル（画面録画・スクショ・ロゴ・写真）をアップロードします。すべて任意で、無い場合はAIが生成します。':
+    '各項目をクリックして、お手元のファイル（画面録画・スクショ・ロゴ・写真）をアップロードします。すべて任意で、無い場合はAIがつくります。':
       'Click each item to upload your file (screen recording, screenshot, logo, photo). All optional — AI generates anything you don’t have.',
     // workspace cut track (project-driven storyboard)
     'アプリ画面': 'App screen', '締め': 'Closing', 'オープニング': 'Opening', 'お悩みを見せる': 'Show the problem',
