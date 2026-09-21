@@ -1534,7 +1534,7 @@
           </div>
         </div>
       </div>
-      <div class="rx-foot" id="rxFoot">この処方は、実案件のA/Bテスト知見をもとに自動で組み立てられます。</div>
+      <div class="rx-foot" id="rxFoot">この構成は、実案件のA/Bテスト知見をもとに自動で組み立てられます。</div>
     </aside>
   </div>
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
@@ -1595,14 +1595,14 @@
     <div class="deliv" id="delivList"></div>
 
     <aside class="exp-side">
-      <div class="panel">
+      <div class="panel pad">
         <div class="panel-h">納期の目安</div>
         <div class="compare">
           <div class="cmp-row"><div class="cmp-k">従来の外注<b>納期</b></div><div class="cmp-v">3週間<small>修正2回まで</small></div></div>
           <div class="cmp-row komadori"><div class="cmp-k">Spot<b>納期</b></div><div class="cmp-v">当日<small>修正は分単位</small></div></div>
         </div>
       </div>
-      <div class="panel" id="preflight">
+      <div class="panel pad" id="preflight">
         <div class="panel-h">配信前チェック</div>
         <label class="cchk"><span><b>AI利用の開示字幕</b><small>JIAA「広告クリエイティブにおけるAI利用の自主開示ガイドライン」（2026年4月）に沿った表記を、全ファイルの末尾に焼き込みます。</small></span><input type="checkbox" role="switch" class="switch" id="ccDisclosure" checked></label>
         <label class="cchk"><span><b>コンテンツ認証情報（C2PA）＋電子透かし</b><small>使用した生成モデルと編集履歴を書き出しファイルに記録。導入審査・配信先の開示要件に対応。</small></span><input type="checkbox" role="switch" class="switch" id="ccCredentials" checked></label>
@@ -1619,7 +1619,7 @@
         <button class="btn btn-ghost" id="shareLink"><svg class="ic"><use href="#i-share"/></svg><span>共有リンクを作成</span></button>
         <button class="btn btn-ghost" id="backToWork"><span>ワークスペースに戻る</span></button>
       </div>
-      <div class="panel">
+      <div class="panel pad">
         <div class="panel-h">サムネイル（静止画）</div>
         <div class="qc-note" style="border:none">各パターンのカバー画像も同梱。YouTube等のサムネイルにそのまま使えます。</div>
       </div>
@@ -2496,7 +2496,7 @@
       '一般消費者':'一般消費者向けはベネフィットを2秒で提示。感情の起伏を作ります。',
       'Z世代':'Z世代向けはテンポと世界観を最優先。冒頭0.5秒で世界に引き込みます。',
     };
-    document.getElementById('rxFoot').textContent = NOTE[sel.target] || 'この処方は、実案件のA/Bテスト知見をもとに自動で組み立てられます。';
+    document.getElementById('rxFoot').textContent = NOTE[sel.target] || 'この構成は、実案件のA/Bテスト知見をもとに自動で組み立てられます。';
     const derived = document.getElementById('rxDerived');
     derived.classList.toggle('live', sel.media.length>0);
   }
@@ -2936,7 +2936,7 @@
     '伝え方': 'Angle', '未選択': 'Not set',
     '推奨構成': 'Suggested structure', '冒頭フック': 'Opening hook', '課題提起': 'Problem',
     '書き出し形式': 'Export formats', '推奨長さ': 'Suggested length', '30秒': '30 sec',
-    'この処方は、実案件のA/Bテスト知見をもとに自動で組み立てられます。':
+    'この構成は、実案件のA/Bテスト知見をもとに自動で組み立てられます。':
       'This prescription is assembled automatically from A/B-test learnings on real campaigns.',
     // renderRx derived
     '実績・数字': 'Proof & numbers', '導入の様子': 'Adoption in action', '使い方': 'How to use',
