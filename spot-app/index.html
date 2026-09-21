@@ -1497,6 +1497,12 @@
             <button type="button" class="eye" id="authEye" aria-label="パスワードを表示" aria-pressed="false"><svg class="ic"><use href="#i-eye"/></svg></button>
           </div>
         </div>
+        <div id="authFieldPass2" hidden>
+          <label class="f-label" for="authPass2">パスワード（確認）</label>
+          <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
+            <input id="authPass2" type="password" placeholder="もう一度入力" autocomplete="new-password" minlength="6">
+          </div>
+        </div>
         <div id="authFieldOtp" hidden>
           <label class="f-label" for="authOtp">認証番号（メールに届いた番号）</label>
           <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
@@ -4173,7 +4179,7 @@
     const subEl = document.getElementById('authSub'); if (subEl) subEl.textContent = sub;
     submitText.textContent = (m === 'otp' && otpSent) ? 'サインイン' : submit;
     // 各フィールドの出し分け（signup はステップ制御を applySignupStep に委譲）
-    show('authFieldType', false); show('authFieldProfile', false); show('authSteps', false); show('authTerms', false);
+    show('authFieldType', false); show('authFieldProfile', false); show('authSteps', false); show('authTerms', false); show('authFieldPass2', false);
     show('authFieldEmail', m === 'signin' || m === 'signup' || m === 'reset' || m === 'otp');
     show('authFieldPass', m === 'signin' || m === 'signup');
     show('authFieldOtp', m === 'otp' && otpSent);
@@ -4200,7 +4206,7 @@
   function applySignupStep() {
     const step = signupStep;
     show('authSteps', true);
-    show('authFieldEmail', step === 1); show('authFieldPass', step === 1); show('authTerms', step === 1);
+    show('authFieldEmail', step === 1); show('authFieldPass', step === 1); show('authFieldPass2', step === 1); show('authTerms', step === 1);
     show('authFieldType', step === 2);
     show('authFieldProfile', step === 3);
     show('authOAuthWrap', step === 1); show('authOAuthBtns', step === 1);
@@ -4376,9 +4382,11 @@
     // --- 新規登録（3ステップ）---
     if (mode === 'signup') {
       const password = passEl.value;
-      if (signupStep === 1) {   // メール + パスワード + 規約同意
+      if (signupStep === 1) {   // メール + パスワード + パスワード（確認）+ 規約同意
         if (!isEmail(email)) { fail('メールアドレスを入力してください。'); document.getElementById('authEmail').focus(); return; }
         if (password.length < 6) { fail('パスワードは6文字以上で入力してください。'); passEl.focus(); return; }
+        const pass2El = document.getElementById('authPass2');
+        if (pass2El && pass2El.value !== password) { fail('確認用のパスワードが一致しません。'); pass2El.focus(); return; }
         const agree = document.getElementById('authAgree');
         if (agree && !agree.checked) { fail('利用規約・プライバシーポリシーに同意してください。'); agree.focus(); return; }
         signupStep = 2; applySignupStep(); return;
