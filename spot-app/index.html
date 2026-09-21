@@ -286,9 +286,15 @@
   .panel.pad > .panel-h { padding: 0; margin-bottom: var(--s-4); }
   /* セクション（パネル）間に一定の縦余白。ヘッダー(.context)の下余白は gap に一本化 */
   #view-billing, #view-credits, #view-team,
-  #view-media, #view-collections, #view-settings { display: flex; flex-direction: column; gap: var(--s-6); }
+  #view-media, #view-collections, #view-settings, #view-account { display: flex; flex-direction: column; gap: var(--s-6); }
   #view-billing > .context, #view-credits > .context, #view-team > .context,
-  #view-media > .context, #view-collections > .context, #view-settings > .context { padding-bottom: 0; }
+  #view-media > .context, #view-collections > .context, #view-settings > .context, #view-account > .context { padding-bottom: 0; }
+  /* プロフィールアイコン（アバター） */
+  .avatar-row { display: flex; align-items: center; gap: var(--s-4); }
+  .avatar-lg { width: 72px; height: 72px; border-radius: 50%; flex: none; display: grid; place-items: center; overflow: hidden;
+    background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; font-size: 28px; text-transform: uppercase; box-shadow: var(--shadow-1); }
+  .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-side { display: flex; flex-direction: column; gap: 2px; }
   .panel-h {
     font-size: var(--t-label-sm); font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
     color: var(--muted); padding: var(--s-4) var(--s-4) 0; display: flex; align-items: center; gap: var(--s-2);
@@ -1451,7 +1457,9 @@
   <div id="amWorkspaces"></div>
   <button type="button" class="menu-item" data-act="add-workspace"><svg class="ic"><use href="#i-plus"/></svg><span>ワークスペースを追加する</span></button>
   <div class="menu-sep"></div>
-  <button type="button" class="menu-item" data-act="settings"><svg class="ic"><use href="#i-settings"/></svg><span>プロフィール・設定</span></button>
+  <button type="button" class="menu-item" data-act="settings"><svg class="ic"><use href="#i-user"/></svg><span>プロフィール設定</span></button>
+  <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウント設定</span></button>
+  <div class="menu-sep"></div>
   <button type="button" class="menu-item" data-act="logout"><svg class="ic"><use href="#i-logout"/></svg><span>ログアウト</span></button>
 </div>
 
@@ -2027,9 +2035,31 @@
 <!-- ============================ SETTINGS VIEW ============================ -->
 <main class="wrap" id="view-settings" hidden>
   <section class="context"><div>
-    <h1 class="title-h1">プロフィール・設定</h1>
-    <div class="title-sub">アカウント情報と表示設定。</div>
+    <h1 class="title-h1">プロフィール設定</h1>
+    <div class="title-sub">あなたのアイコン・表示名・メールアドレス。</div>
   </div></section>
+
+  <!-- プロフィール（アイコン・表示名・メール） -->
+  <div class="panel pad">
+    <div class="panel-h">プロフィール</div>
+    <div class="avatar-row">
+      <span class="avatar-lg" id="profAvatar" aria-hidden="true">?</span>
+      <div class="avatar-side">
+        <button type="button" class="btn btn-ghost wauto" id="profAvatarBtn"><svg class="ic"><use href="#i-plus"/></svg><span>アイコンをアップロード</span></button>
+        <input type="file" id="profAvatarInput" accept="image/png,image/jpeg,image/webp" hidden>
+        <p class="muted" style="margin:6px 0 0;font-size:var(--t-label-sm)">PNG / JPG / WebP（正方形を推奨・2MBまで）</p>
+      </div>
+    </div>
+    <hr class="soft-sep">
+    <div class="fld"><label for="setName">表示名</label>
+      <input id="setName" type="text" maxlength="60" placeholder="山田 太郎" autocomplete="name"></div>
+    <div class="fld"><label for="setEmail">メールアドレス</label>
+      <input id="setEmail" type="email" readonly></div>
+    <div class="cta-row">
+      <button class="btn btn-primary wauto" id="setSave"><span>保存</span></button>
+      <span class="save-note" id="setSaveNote" hidden>保存しました</span>
+    </div>
+  </div>
 
   <!-- 会社プロフィール（組織アカウントのみ表示） -->
   <div class="panel pad" id="companyPanel" hidden>
@@ -2080,20 +2110,18 @@
     <div class="cta-row"><button class="btn btn-primary wauto" id="upgradeBtn"><svg class="ic"><use href="#i-users"/></svg><span>組織にアップグレード</span></button></div>
   </div>
 
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ ACCOUNT SETTINGS VIEW ============================ -->
+<main class="wrap" id="view-account" hidden>
+  <section class="context"><div>
+    <h1 class="title-h1">アカウント設定</h1>
+    <div class="title-sub">パスワード・通知・表示言語。</div>
+  </div></section>
   <div class="settings-grid">
     <div class="panel pad">
-      <div class="panel-h">プロフィール</div>
-      <div class="fld"><label for="setName">表示名</label>
-        <input id="setName" type="text" maxlength="60" placeholder="山田 太郎" autocomplete="name"></div>
-      <div class="fld"><label for="setEmail">メールアドレス</label>
-        <input id="setEmail" type="email" readonly></div>
-      <div class="cta-row">
-        <button class="btn btn-primary wauto" id="setSave"><span>保存</span></button>
-        <span class="save-note" id="setSaveNote" hidden>保存しました</span>
-      </div>
-    </div>
-    <div class="panel pad">
-      <div class="panel-h">パスワード</div>
+      <div class="panel-h">パスワード設定</div>
       <div class="fld"><label for="setNewPass">新しいパスワード</label>
         <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
           <input id="setNewPass" type="password" minlength="6" placeholder="6文字以上" autocomplete="new-password"></div></div>
@@ -2104,27 +2132,22 @@
         <span class="save-note" id="setPassNote" hidden>更新しました</span></div>
     </div>
     <div class="panel pad">
-      <div class="panel-h">通知</div>
+      <div class="panel-h">通知設定</div>
       <label class="switch-row"><input type="checkbox" id="notifDone"><span>制作が完了したらメールで知らせる</span></label>
       <hr class="soft-sep">
       <label class="switch-row"><input type="checkbox" id="notifNews"><span>Spot からのお知らせ・新機能を受け取る</span></label>
       <p class="muted" id="notifNote" style="margin:12px 0 0;font-size:var(--t-label-sm)">クレジットの低残高メールは「クレジットを追加」で設定できます。</p>
     </div>
     <div class="panel pad">
-      <div class="panel-h">プラン</div>
-      <div class="set-plan"><b id="setPlanName">—</b><span class="muted" id="setPlanSpots"></span></div>
-      <div class="cta-row"><button class="btn btn-ghost" id="setToBilling"><span>プランと請求を見る</span></button></div>
-    </div>
-    <div class="panel pad">
       <div class="panel-h">表示言語</div>
-      <div class="lang seg" role="group" aria-label="Language" style="margin-top:4px">
-        <button data-lang="en" aria-pressed="true">EN</button>
-        <button data-lang="ja" aria-pressed="false" aria-label="日本語"><span class="full">日本語</span><span class="short" aria-hidden="true">JA</span></button>
+      <div class="fld" style="margin-top:8px">
+        <label for="langSelect">言語</label>
+        <select id="langSelect" class="sel" aria-label="表示言語">
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+        </select>
       </div>
-    </div>
-    <div class="panel pad">
-      <div class="panel-h">アカウント</div>
-      <div class="cta-row"><button class="btn btn-ghost" id="setSignOut"><svg class="ic"><use href="#i-logout"/></svg><span>サインアウト</span></button></div>
+      <p class="muted" style="margin:10px 0 0;font-size:var(--t-label-sm)">対応言語は順次追加予定です。</p>
     </div>
   </div>
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
@@ -2633,6 +2656,7 @@
     const a = it.dataset.act; closeAcctMenu(); closeDrawer();
     if (a === 'add-workspace') { gotoSettings(); if (window.toast) toast(L('Add or upgrade your workspace here.', 'ここでワークスペースの追加・アップグレードができます。'), false, 2600); return; }
     if (a === 'settings') { gotoSettings(); return; }
+    if (a === 'account') { if (window.gotoAccount) window.gotoAccount(); return; }
     if (a === 'logout') { if (window.sb) window.sb.auth.signOut(); else toast(L('Sign-out needs Supabase (config.js)', 'サインアウトには Supabase 設定（config.js）が必要です'), false, 2200); return; }
   });
   // --- サイドバー ナビ操作 ---
@@ -3081,6 +3105,7 @@
   const vMedia = document.getElementById('view-media');
   const vCollections = document.getElementById('view-collections');
   const vCredits = document.getElementById('view-credits');
+  const vAccount = document.getElementById('view-account');
   const crumb = document.getElementById('crumb');
   const navBack = document.getElementById('navBack');
   let backFn = null;
@@ -3098,7 +3123,7 @@
   }
   navBack.addEventListener('click', () => { if (backFn) backFn(); });
   function hideAll(){
-    [vDash,vWiz,vScript,vWork,vExport,vSettings,vBilling,vTeam,vMedia,vCollections,vCredits].forEach(v=>v.hidden=true);
+    [vDash,vWiz,vScript,vWork,vExport,vSettings,vAccount,vBilling,vTeam,vMedia,vCollections,vCredits].forEach(v=>v.hidden=true);
     window.scrollTo(0,0);
   }
   function focusView(v) {   // move focus to the new view so keyboard/AT users land on it
@@ -3133,11 +3158,17 @@
     setCrumb([['ホーム']]);
     if (window.applyProjFilter) window.applyProjFilter();
   }
-  function gotoSettings() {
+  function gotoSettings() {   // = プロフィール設定
     hideAll(); vSettings.hidden = false; focusView(vSettings); _nav(false, 'profile');
-    setCrumb([['ホーム', gotoDash], ['プロフィール・設定']], gotoDash);
+    setCrumb([['ホーム', gotoDash], ['プロフィール設定']], gotoDash);
     if (window.loadSettings) window.loadSettings();
   }
+  function gotoAccount() {
+    hideAll(); vAccount.hidden = false; focusView(vAccount); _nav(false, null);
+    setCrumb([['ホーム', gotoDash], ['アカウント設定']], gotoDash);
+    if (window.loadAccount) window.loadAccount();
+  }
+  window.gotoAccount = gotoAccount;
   function gotoBilling() {
     if (window.__isOwner && !window.__isOwner()) {   // 請求はオーナー限定
       toast(L('Only the workspace owner can view billing.', '請求情報はワークスペースのオーナーのみ閲覧できます。'), false, 2600);
@@ -3174,7 +3205,7 @@
   }
   window.gotoSettings = gotoSettings; window.gotoBilling = gotoBilling; window.gotoCredits = gotoCredits;
   window.gotoMedia = gotoMedia; window.gotoTeam = gotoTeam; window.gotoCollections = gotoCollections;
-  document.getElementById('setToBilling').addEventListener('click', gotoBilling);
+  { const _stb = document.getElementById('setToBilling'); if (_stb) _stb.addEventListener('click', gotoBilling); }
   setCrumb([['ホーム']]);
   const _brand = document.querySelector('.sb-brand');
   if (_brand) {
@@ -3440,6 +3471,16 @@
     'プロフィール': 'Profile', '表示名': 'Display name', 'メールアドレス': 'Email',
     '保存': 'Save', '保存しました': 'Saved', 'プラン': 'Plan', 'プランと請求を見る': 'View plan & billing',
     '表示言語': 'Language', '左のサイドバー下部の': 'Use the', 'で切り替えられます。': 'toggle in the sidebar to switch.',
+    // プロフィール設定 / アカウント設定（分割）
+    'プロフィール設定': 'Profile settings', 'アカウント設定': 'Account settings',
+    'あなたのアイコン・表示名・メールアドレス。': 'Your icon, display name and email.',
+    'パスワード・通知・表示言語。': 'Password, notifications and language.',
+    'アイコンをアップロード': 'Upload icon', 'PNG / JPG / WebP（正方形を推奨・2MBまで）': 'PNG / JPG / WebP (square recommended, up to 2MB)',
+    'パスワード設定': 'Password', '通知設定': 'Notifications', '言語': 'Language',
+    '対応言語は順次追加予定です。': 'More languages coming soon.',
+    'プロフィールアイコンを更新しました。': 'Profile icon updated.',
+    '画像が大きすぎます（2MBまで）。': 'Image is too large (max 2MB).',
+    'アイコンを保存できませんでした（DB更新 015 が必要な場合があります）。': 'Could not save the icon (may need DB update 015).',
     'プランと請求': 'Plan & billing', 'クレジットを追加': 'Add credits', 'サインアウト': 'Sign out',
     // team / members
     'チーム・メンバー': 'Team members',
@@ -3629,19 +3670,19 @@
     connect();
   }
 
-  // toggle wiring
-  var btns = document.querySelectorAll('.lang [data-lang]');
+  // 表示言語＝ドロップダウン（将来の言語追加を想定）
+  var langSel = document.getElementById('langSelect');
   function setLang(lang) {
     LANG = lang;
-    btns.forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false'); });
+    if (langSel) langSel.value = lang;
     try { localStorage.setItem('spot.lang', lang); } catch (_) {}
     apply();
   }
-  btns.forEach(function (b) { b.addEventListener('click', function () { setLang(b.dataset.lang); }); });
+  if (langSel) langSel.addEventListener('change', function () { setLang(langSel.value); });
 
-  // English by default; remember the last choice per browser
+  // remember the last choice per browser
   try { var saved = localStorage.getItem('spot.lang'); if (saved === 'ja' || saved === 'en') LANG = saved; } catch (_) {}
-  btns.forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.lang === LANG ? 'true' : 'false'); });
+  if (langSel) langSel.value = LANG;
   apply();
 })();
 </script>
@@ -4017,18 +4058,61 @@
   }
 
   // ---- settings screen ----
-  window.loadSettings = async function () {
+  window.loadSettings = async function () {   // プロフィール設定：アイコン・表示名・メール（＋会社プロフィール）
     try {
       const { data: { session } } = await sb.auth.getSession();
       const emailEl = document.getElementById('setEmail'); if (emailEl) emailEl.value = session?.user?.email || '';
-      const { prof, plan } = await getProfileWithPlan();
+      const { prof } = await getProfileWithPlan();
       const nameEl = document.getElementById('setName'); if (nameEl) nameEl.value = (prof && prof.display_name) || '';
-      setText('setPlanName', plan ? plan.name : '—');
-      setText('setPlanSpots', plan ? (Number(plan.spots_per_month) === 0 ? L('Committed volume', 'コミット制') : L(`${plan.spots_per_month} spots/mo`, `月 ${plan.spots_per_month} 本`)) : '');
-      const stb = document.getElementById('setToBilling'); if (stb) stb.hidden = !(window.__isOwner && window.__isOwner());   // 請求導線はオーナーのみ
+      await renderProfAvatar(prof, session);
       await loadCompanyProfile();
     } catch (e) { console.error('loadSettings:', e.message); }
   };
+  window.loadAccount = function () { /* パスワード/通知/言語は各自で自己初期化済み。将来の読込フックはここへ。 */ };
+  // プロフィールアイコン（アバター）の表示：avatar_url があれば画像、無ければイニシャル
+  async function renderProfAvatar(prof, session) {
+    const box = document.getElementById('profAvatar'); if (!box) return;
+    const email = (session && session.user && session.user.email) || acctInfo.email || '';
+    const initial = (prof && prof.display_name ? prof.display_name : email || '?').charAt(0);
+    // avatar_url は個別取得（列が無い環境=015未適用でも安全に degrade）
+    let path = null;
+    try { const { data } = await sb.from('profiles').select('avatar_url').eq('id', currentUid).single(); path = data && data.avatar_url; } catch (_) {}
+    if (path) {
+      try {
+        let url = path;
+        if (!/^https?:/.test(path)) { const { data } = await sb.storage.from('assets').createSignedUrl(path, 3600); url = data && data.signedUrl; }
+        if (url) { box.innerHTML = `<img src="${url}" alt="">`; return; }
+      } catch (_) {}
+    }
+    box.textContent = initial;
+  }
+  // アイコンのアップロード → Storage 保存 → set_avatar_url RPC（015_profile_avatar.sql）
+  (function wireProfAvatar() {
+    const btn = document.getElementById('profAvatarBtn'), input = document.getElementById('profAvatarInput'), box = document.getElementById('profAvatar');
+    if (!btn || !input) return;
+    btn.addEventListener('click', () => input.click());
+    input.addEventListener('change', async () => {
+      const f = input.files && input.files[0]; if (!f) return;
+      if (f.size > 2 * 1024 * 1024) { toast(L('Image is too large (max 2MB).', '画像が大きすぎます（2MBまで）。'), false, 2600); input.value = ''; return; }
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        const uid = session && session.user && session.user.id; if (!uid) return;
+        const ext = (f.name.split('.').pop() || 'png').toLowerCase();
+        const path = `${uid}/avatar.${ext}`;
+        const up = await sb.storage.from('assets').upload(path, f, { upsert: true, contentType: f.type });
+        if (up.error) throw up.error;
+        const { error: rpcErr } = await sb.rpc('set_avatar_url', { p_url: path });
+        if (rpcErr) throw rpcErr;
+        // 表示を即更新（サイドバー/メニューのイニシャルは次回同期）
+        const { data } = await sb.storage.from('assets').createSignedUrl(path, 3600);
+        if (box && data && data.signedUrl) box.innerHTML = `<img src="${data.signedUrl}" alt="">`;
+        toast(L('Profile icon updated.', 'プロフィールアイコンを更新しました。'), false, 2000);
+      } catch (e) {
+        toast(L('Could not save the icon. It may need a DB update (015).', 'アイコンを保存できませんでした（DB更新 015 が必要な場合があります）。'), false, 3200);
+        console.error('avatar upload:', e.message);
+      } finally { input.value = ''; }
+    });
+  })();
   // 会社プロフィール（組織アカウントのみ）: 会社名 + ロゴ
   async function loadCompanyProfile() {
     const panel = document.getElementById('companyPanel'); if (!panel) return;
