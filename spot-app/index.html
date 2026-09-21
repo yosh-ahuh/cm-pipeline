@@ -934,6 +934,14 @@
     color: var(--muted); font-size: var(--t-body-sm); background: none; border: none; cursor: pointer; justify-content: flex-start; }
   .auth-cancel:hover { color: var(--ink); }
   .auth-cancel .ic { width: 16px; height: 16px; }
+  /* パスワードリセット / 認証番号ログインの動線 */
+  .f-labelrow { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-2); }
+  .auth-forgot { font-size: var(--t-body-sm); }
+  .auth-alt { text-align: center; margin-top: var(--s-3); }
+  .auth-alt .linkbtn { font-size: var(--t-body-sm); }
+  .auth-back { align-self: center; display: inline-flex; align-items: center; gap: 6px; margin-top: var(--s-1); color: var(--muted); font-size: var(--t-body-sm); }
+  .auth-back:hover { color: var(--ink); }
+  .auth-back .ic { width: 16px; height: 16px; }
   .auth-brand { display: flex; align-items: center; gap: 11px; }
   .auth-brand .wordmark { font-size: 22px; letter-spacing: -.02em; }
   .auth-brand-m { display: none; margin-bottom: var(--s-5); }
@@ -1426,26 +1434,40 @@
             <p class="muted" style="margin:6px 0 0;font-size:var(--t-label-sm)">ロゴや請求情報は、登録後にプロフィールから追加できます。</p>
           </div>
         </div>
-        <div>
+        <div id="authFieldEmail">
           <label class="f-label" for="authEmail">メールアドレス</label>
           <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-mail"/></svg></span><input id="authEmail" type="email" placeholder="you@company.com" autocomplete="email" autocapitalize="off" spellcheck="false" inputmode="email" required></div>
         </div>
-        <div>
-          <label class="f-label" for="authPass">パスワード</label>
+        <div id="authFieldPass">
+          <div class="f-labelrow"><label class="f-label" for="authPass">パスワード</label>
+            <button type="button" class="linkbtn auth-forgot" id="authForgot">パスワードを忘れた?</button></div>
           <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
             <input id="authPass" type="password" placeholder="6文字以上" autocomplete="current-password" required minlength="6">
             <button type="button" class="eye" id="authEye" aria-label="パスワードを表示" aria-pressed="false"><svg class="ic"><use href="#i-eye"/></svg></button>
           </div>
+        </div>
+        <div id="authFieldOtp" hidden>
+          <label class="f-label" for="authOtp">認証番号（メールに届いた6桁）</label>
+          <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
+            <input id="authOtp" type="text" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code"></div>
+          <button type="button" class="linkbtn" id="authOtpResend" style="margin-top:6px">認証番号を再送する</button>
+        </div>
+        <div id="authFieldRecovery" hidden>
+          <label class="f-label" for="authNewPass">新しいパスワード</label>
+          <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
+            <input id="authNewPass" type="password" minlength="6" placeholder="6文字以上" autocomplete="new-password"></div>
         </div>
         <label class="auth-terms auth-signup-only" id="authTerms" hidden>
           <input type="checkbox" id="authAgree">
           <span><a href="#" id="authTermsLink">利用規約</a>・<a href="#" id="authPrivacyLink">プライバシーポリシー</a>に同意します</span>
         </label>
         <button class="hn-btn" type="submit" id="authSubmit"><span id="authSubmitText">サインイン</span></button>
+        <button type="button" class="linkbtn auth-back" id="authBack" hidden><svg class="ic"><use href="#i-arrow-left"/></svg><span>サインインに戻る</span></button>
       </form>
       <div class="auth-err" id="authErr" role="alert" hidden></div>
-      <div class="auth-or"><span>または</span></div>
-      <div class="auth-oauth">
+      <div class="auth-alt" id="authAlt"><button type="button" class="linkbtn" id="authOtpLink">パスワードなしでログイン（認証番号）</button></div>
+      <div class="auth-or" id="authOAuthWrap"><span>または</span></div>
+      <div class="auth-oauth" id="authOAuthBtns">
         <button type="button" class="btn-oauth" data-oauth="google">
           <span class="oa-ic" aria-hidden="true"><svg viewBox="0 0 18 18" width="18" height="18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.46 3.44 1.35l2.58-2.58C13.47.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg></span>
           <span>Google で続ける</span>
@@ -3412,6 +3434,22 @@
     // OAuth / マルチアカウント
     'または': 'or', 'Google で続ける': 'Continue with Google', 'Microsoft で続ける': 'Continue with Microsoft',
     '現在のアカウントに戻る': 'Back to current account', 'そのアカウントに再度ログインしてください。': 'Please sign in to that account again.',
+    // パスワードリセット / 認証番号ログイン
+    'パスワードを忘れた?': 'Forgot password?', 'パスワードなしでログイン（認証番号）': 'Log in without a password (code)',
+    'サインインに戻る': 'Back to sign in', '認証番号を再送する': 'Resend code',
+    'パスワードをリセット': 'Reset password', '登録メールにリセット用リンクを送ります。': "We'll email a reset link to your address.",
+    'リセットリンクを送信': 'Send reset link', '認証番号でログイン': 'Log in with a code',
+    'メールに届く6桁の番号で、パスワードなしで安全にログインできます。': 'Sign in securely with the 6-digit code sent to your email — no password.',
+    '認証番号を送信': 'Send code', '新しいパスワードを設定': 'Set a new password', 'パスワードを更新': 'Update password',
+    '新しいパスワードを入力してください。': 'Enter your new password.', '認証番号（メールに届いた6桁）': 'Verification code (6 digits from email)',
+    '新しいパスワード': 'New password', 'ログイン': 'Log in',
+    'メールアドレスを入力してください。': 'Please enter your email.',
+    'パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。': 'Password reset email sent. Open the link in the email to set a new password.',
+    '認証番号をメールに送信しました。届いた6桁を入力してください。': 'A verification code was emailed. Enter the 6 digits.',
+    '6桁の認証番号を入力してください。': 'Enter the 6-digit code.',
+    '認証番号が正しくないか、期限切れです。再送してください。': 'The code is wrong or expired. Please resend.',
+    '新しいパスワードは6文字以上で入力してください。': 'New password must be at least 6 characters.',
+    'パスワードを更新しました。': 'Password updated.',
     '確認メールを送信しました。メール内のリンクで認証してからログインしてください。':
       'Confirmation email sent. Follow the link in the email, then sign in.',
     'メールアドレスとパスワードを入力してください。': 'Enter your email and password.',
@@ -3882,21 +3920,50 @@
   // セッション判定（getSession / onAuthStateChange）が終わるまでは body.booting のブランクを維持し、
   // 「セッションあり→アプリ」「セッションなし→認証」を確定させてから描画する。
 
+  let otpSent = false;
+  const HEAD = {
+    signin:   ['おかえりなさい', 'メールアドレスとパスワードでサインイン。', 'サインイン'],
+    signup:   ['アカウントを作成', '個人／組織を選んで登録します。', 'アカウント作成'],
+    reset:    ['パスワードをリセット', '登録メールにリセット用リンクを送ります。', 'リセットリンクを送信'],
+    otp:      ['認証番号でログイン', 'メールに届く6桁の番号で、パスワードなしで安全にログインできます。', '認証番号を送信'],
+    recovery: ['新しいパスワードを設定', '新しいパスワードを入力してください。', 'パスワードを更新'],
+  };
+  function show(id, on) { const el = document.getElementById(id); if (el) el.hidden = !on; }
   function setMode(m) {
     mode = m;
-    const signin = mode === 'signin';
-    hEl.textContent = signin ? 'おかえりなさい' : 'アカウントを作成';
-    const subEl = document.getElementById('authSub');
-    if (subEl) subEl.textContent = signin ? 'メールアドレスとパスワードでサインイン。' : '個人／組織を選んで登録します。';
-    submitText.textContent = signin ? 'サインイン' : 'アカウント作成';
-    document.querySelectorAll('.auth-signup-only').forEach(el => el.hidden = signin);   // 種別・お名前・会社名・規約同意は登録時のみ
-    document.getElementById('authToggleText').textContent = signin ? 'Spot は初めてですか?' : 'すでにアカウントをお持ちですか?';
-    document.getElementById('authToggle').textContent = signin ? 'アカウントを作成' : 'サインイン';
-    passEl.autocomplete = signin ? 'current-password' : 'new-password';
+    if (m !== 'otp') otpSent = false;
+    const [h, sub, submit] = HEAD[m] || HEAD.signin;
+    hEl.textContent = h;
+    const subEl = document.getElementById('authSub'); if (subEl) subEl.textContent = sub;
+    submitText.textContent = (m === 'otp' && otpSent) ? 'ログイン' : submit;
+    // 各フィールドの出し分け
+    show('signupFields', m === 'signup');
+    show('authTerms', m === 'signup');
+    show('authFieldEmail', m === 'signin' || m === 'signup' || m === 'reset' || m === 'otp');
+    show('authFieldPass', m === 'signin' || m === 'signup');
+    show('authFieldOtp', m === 'otp' && otpSent);
+    show('authFieldRecovery', m === 'recovery');
+    show('authAlt', m === 'signin');
+    show('authOAuthWrap', m === 'signin' || m === 'signup');
+    show('authOAuthBtns', m === 'signin' || m === 'signup');
+    const tog = document.querySelector('.auth-toggle'); if (tog) tog.hidden = !(m === 'signin' || m === 'signup');
+    show('authBack', m === 'reset' || m === 'otp' || m === 'recovery');
+    const fb = document.getElementById('authForgot'); if (fb) fb.hidden = m !== 'signin';
+    const em = document.getElementById('authEmail'); if (em) em.readOnly = (m === 'otp' && otpSent);   // 送信後はメール固定
+    document.getElementById('authToggleText').textContent = m === 'signin' ? 'Spot は初めてですか?' : 'すでにアカウントをお持ちですか?';
+    document.getElementById('authToggle').textContent = m === 'signin' ? 'アカウントを作成' : 'サインイン';
+    passEl.autocomplete = m === 'signup' ? 'new-password' : 'current-password';
     errEl.hidden = true;
-    document.getElementById('authEmail').focus();
+    const focusEl = (m === 'otp' && otpSent) ? document.getElementById('authOtp')
+      : (m === 'recovery') ? document.getElementById('authNewPass')
+      : document.getElementById('authEmail');
+    if (focusEl) focusEl.focus();
   }
   document.getElementById('authToggle').addEventListener('click', () => setMode(mode === 'signin' ? 'signup' : 'signin'));
+  { const f = document.getElementById('authForgot'); if (f) f.addEventListener('click', () => setMode('reset')); }
+  { const o = document.getElementById('authOtpLink'); if (o) o.addEventListener('click', () => setMode('otp')); }
+  { const b = document.getElementById('authBack'); if (b) b.addEventListener('click', () => setMode('signin')); }
+  { const r = document.getElementById('authOtpResend'); if (r) r.addEventListener('click', () => sendOtp(document.getElementById('authEmail').value.trim())); }
 
   // アカウント種別（個人 / 組織）切替 — 組織のとき会社名を表示
   let acctType = 'personal';
@@ -3908,12 +3975,75 @@
     const cw = document.getElementById('authCompanyWrap'); if (cw) cw.hidden = acctType !== 'org';
   });
 
+  const isEmail = (v) => /.+@.+\..+/.test(v || '');
+  let submitLabel = '';
+  function submitBusy(on) {
+    submitEl.disabled = on;
+    if (on) { submitEl.setAttribute('aria-busy', 'true'); submitLabel = submitText.textContent; submitText.innerHTML = '<span class="tsp" style="border-color:#fff;border-right-color:transparent"></span>'; }
+    else { submitEl.removeAttribute('aria-busy'); if (submitLabel) submitText.textContent = submitLabel; }
+  }
+  // 認証番号（メールOTP）を送る。※Supabaseのメールテンプレートに {{ .Token }} が必要（6桁コード）。
+  async function sendOtp(email) {
+    if (!isEmail(email)) { fail('メールアドレスを入力してください。'); document.getElementById('authEmail').focus(); return; }
+    submitBusy(true);
+    try {
+      const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+      if (error) throw error;
+      otpSent = true; setMode('otp');
+      fail('認証番号をメールに送信しました。届いた6桁を入力してください。', true);
+    } catch (e) { fail(String(e.message || e)); }
+    finally { submitBusy(false); }
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault(); errEl.hidden = true;
     const email = document.getElementById('authEmail').value.trim();
+
+    // --- パスワードリセット（再設定リンクを送信） ---
+    if (mode === 'reset') {
+      if (!isEmail(email)) { fail('メールアドレスを入力してください。'); return; }
+      submitBusy(true);
+      try {
+        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
+        if (error) throw error;
+        fail('パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。', true);
+      } catch (err) { fail(String(err.message || err)); }
+      finally { submitBusy(false); }
+      return;
+    }
+
+    // --- 認証番号（メールOTP）ログイン ---
+    if (mode === 'otp') {
+      if (!otpSent) { await sendOtp(email); return; }
+      const token = (document.getElementById('authOtp').value || '').trim();
+      if (!/^\d{6}$/.test(token)) { fail('6桁の認証番号を入力してください。'); document.getElementById('authOtp').focus(); return; }
+      submitBusy(true);
+      try {
+        const { error } = await sb.auth.verifyOtp({ email, token, type: 'email' });
+        if (error) throw error;   // 成功 → onAuthStateChange → onSignedIn
+      } catch (err) { fail(/expired|invalid/i.test(String(err.message)) ? '認証番号が正しくないか、期限切れです。再送してください。' : String(err.message || err)); }
+      finally { submitBusy(false); }
+      return;
+    }
+
+    // --- 新しいパスワードを設定（再設定リンクから戻った状態） ---
+    if (mode === 'recovery') {
+      const np = document.getElementById('authNewPass').value;
+      if (np.length < 6) { fail('新しいパスワードは6文字以上で入力してください。'); return; }
+      submitBusy(true);
+      try {
+        const { error } = await sb.auth.updateUser({ password: np });
+        if (error) throw error;
+        if (window.toast) window.toast('パスワードを更新しました。', false, 2000);
+        const { data } = await sb.auth.getSession(); if (data.session) onSignedIn(data.session);
+      } catch (err) { fail(String(err.message || err)); }
+      finally { submitBusy(false); }
+      return;
+    }
+
+    // --- signin / signup ---
     const password = passEl.value;
     if (!email || password.length < 6) { fail('メールアドレスとパスワードを入力してください。'); (email ? passEl : document.getElementById('authEmail')).focus(); return; }
-    // 登録時の追加入力（お名前・組織名）
     const nameEl = document.getElementById('authName'), companyEl = document.getElementById('authCompany');
     const displayName = nameEl ? nameEl.value.trim() : '';
     const companyName = companyEl ? companyEl.value.trim() : '';
@@ -3923,8 +4053,7 @@
       const agree = document.getElementById('authAgree');
       if (agree && !agree.checked) { fail('利用規約・プライバシーポリシーに同意してください。'); agree.focus(); return; }
     }
-    submitEl.disabled = true; submitEl.setAttribute('aria-busy', 'true');
-    const label = submitText.textContent; submitText.innerHTML = '<span class="tsp" style="border-color:#fff;border-right-color:transparent"></span>';
+    submitBusy(true);
     try {
       const { data, error } = mode === 'signin'
         ? await sb.auth.signInWithPassword({ email, password })
@@ -3937,11 +4066,10 @@
       if (mode === 'signup' && !data.session) {
         fail('確認メールを送信しました。メール内のリンクで認証してからログインしてください。', true);
       }
-      // セッションが張られれば onAuthStateChange → onSignedIn が呼ばれる
     } catch (err) {
       const m = String(err.message || err);
       fail(/invalid login credentials/i.test(m) ? 'メールアドレスまたはパスワードが正しくありません。' : m);
-    } finally { submitEl.disabled = false; submitEl.removeAttribute('aria-busy'); submitText.textContent = label; }
+    } finally { submitBusy(false); }
   });
 
   // OAuth（Google / Microsoft）。プロバイダは Supabase ダッシュボードで有効化が必要。
@@ -3993,6 +4121,7 @@
   });
 
   sb.auth.onAuthStateChange((evt, session) => {
+    if (evt === 'PASSWORD_RECOVERY') { showAuth(); setMode('recovery'); return; }   // 再設定リンクから戻った → 新パスワード設定
     if (session) { upsertAcct(session); onSignedIn(session); }
     else if (!window.__addingAccount) showAuth();   // 追加中の一時的な未認証では認証画面のまま
   });
