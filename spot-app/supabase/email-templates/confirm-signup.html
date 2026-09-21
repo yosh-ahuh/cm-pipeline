@@ -25,22 +25,22 @@
         <tr>
           <td bgcolor="#222230" style="background:#222230;border:1px solid #2C2C37;border-radius:16px;padding:32px 30px">
             <h1 style="margin:0 0 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:20px;font-weight:700;color:#F1EDE4">
-              {{ if eq .Data.lang "ja" }}メールアドレスの確認{{ else }}Confirm your email{{ end }}
+              {{ if eq (index .Data "lang") "ja" }}メールアドレスの確認{{ else }}Confirm your email{{ end }}
             </h1>
             <p style="margin:0 0 24px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#C7C3B7">
-              {{ if eq .Data.lang "ja" }}Spot へのご登録ありがとうございます。下のボタンを押して、メールアドレスの確認を完了してください。{{ else }}Thanks for signing up for Spot. Click the button below to confirm your email address.{{ end }}
+              {{ if eq (index .Data "lang") "ja" }}Spot へのご登録ありがとうございます。下のボタンを押して、メールアドレスの確認を完了してください。{{ else }}Thanks for signing up for Spot. Click the button below to confirm your email address.{{ end }}
             </p>
             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 26px">
               <tr>
                 <td align="center" bgcolor="#4A67E3" style="border-radius:999px;background:#4A67E3;background-image:linear-gradient(135deg,#4A67E3,#6C5CE0)">
                   <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:13px 28px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:999px">
-                    {{ if eq .Data.lang "ja" }}メールアドレスを確認する{{ else }}Confirm email{{ end }}
+                    {{ if eq (index .Data "lang") "ja" }}メールアドレスを確認する{{ else }}Confirm email{{ end }}
                   </a>
                 </td>
               </tr>
             </table>
             <p style="margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#8C887E">
-              {{ if eq .Data.lang "ja" }}このメールに心当たりがない場合は、破棄してください。{{ else }}If you didn't create this account, you can ignore this email.{{ end }}
+              {{ if eq (index .Data "lang") "ja" }}このメールに心当たりがない場合は、破棄してください。{{ else }}If you didn't create this account, you can ignore this email.{{ end }}
             </p>
           </td>
         </tr>

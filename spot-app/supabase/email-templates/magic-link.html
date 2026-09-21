@@ -26,10 +26,10 @@
         <tr>
           <td bgcolor="#222230" style="background:#222230;border:1px solid #2C2C37;border-radius:16px;padding:32px 30px">
             <h1 style="margin:0 0 12px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:20px;font-weight:700;color:#F1EDE4">
-              {{ if eq .Data.lang "ja" }}認証番号{{ else }}Your verification code{{ end }}
+              {{ if eq (index .Data "lang") "ja" }}認証番号{{ else }}Your verification code{{ end }}
             </h1>
             <p style="margin:0 0 22px;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#C7C3B7">
-              {{ if eq .Data.lang "ja" }}サインイン画面に、以下の認証番号を入力してください。{{ else }}Enter the code below on the sign-in screen.{{ end }}
+              {{ if eq (index .Data "lang") "ja" }}サインイン画面に、以下の認証番号を入力してください。{{ else }}Enter the code below on the sign-in screen.{{ end }}
             </p>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 22px">
               <tr>
@@ -39,7 +39,7 @@
               </tr>
             </table>
             <p style="margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#8C887E">
-              {{ if eq .Data.lang "ja" }}この番号の有効期限は約1時間です。心当たりがない場合は、このメールを破棄してください。{{ else }}This code expires in about an hour. If you didn't request it, you can ignore this email.{{ end }}
+              {{ if eq (index .Data "lang") "ja" }}この番号の有効期限は約1時間です。心当たりがない場合は、このメールを破棄してください。{{ else }}This code expires in about an hour. If you didn't request it, you can ignore this email.{{ end }}
             </p>
           </td>
         </tr>

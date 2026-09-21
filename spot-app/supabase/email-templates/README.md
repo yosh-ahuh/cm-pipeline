@@ -8,7 +8,7 @@ Spot の認証メール（パスワード再設定・認証番号・登録確認
   - 新規登録時：`signUp` の `options.data.lang`
   - ログイン中：`onAppReady` と表示言語ドロップダウンの変更時に `updateUser({ data: { lang } })`
   - 表示言語の既定は**デバイスの言語設定**（日本語なら `ja`、それ以外は `en`）。
-- Supabase のメールテンプレートは Go テンプレートで、`{{ .Data.lang }}` を参照して本文を出し分けます。
+- Supabase のメールテンプレートは Go テンプレートで、`{{ index .Data "lang" }}` を参照して本文を出し分けます（メタデータが空のユーザーでも描画で落ちない安全な書き方）。
   - `lang` が未設定の旧ユーザー等は **英語にフォールバック**します。
 
 ## ロゴのホスティング（メールに画像を出すため・最初に1回）
@@ -35,5 +35,5 @@ Authentication → **Emails** → **Templates** で、各テンプレートに�
 ### 補足
 - **認証番号の桁数**：Authentication → Providers → Email → **Email OTP Length** で設定（例: 8桁）。テンプレート側は `{{ .Token }}` のままでOK。
 - **リダイレクトURL**：Authentication → **URL Configuration** → Redirect URLs に、アプリのURL（dev の `http://localhost:5500/**` と本番オリジン）を許可登録。これが無いと再設定リンクが弾かれます。
-- テンプレートは最小限のインラインCSSのみ。ブランドに合わせてロゴや色を足す場合も、`{{ if eq .Data.lang "ja" }} … {{ else }} … {{ end }}` の分岐は残してください。
+- テンプレートは最小限のインラインCSSのみ。ブランドに合わせてロゴや色を足す場合も、`{{ if eq (index .Data "lang") "ja" }} … {{ else }} … {{ end }}` の分岐は残してください。
 - 既存ユーザーは一度ログイン（または言語を切替）すると `lang` が保存され、以後のメールが言語に追従します。
