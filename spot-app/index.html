@@ -483,6 +483,7 @@
     transition: background var(--dur-fast), color var(--dur-fast), transform var(--dur-fast), box-shadow var(--dur-fast), border-color var(--dur-fast);
   }
   .btn:active { transform: scale(.98); }
+  .btn.wauto { flex: 0 0 auto; }   /* 単独ボタンが全幅に伸びるのを防ぐ（内容幅） */
   /* 主ボタンは2系統のみ: .btn-primary(白=アプリ内) / .hn-btn(青=ヒーロー・認証)。
      旧 .btn-accent は未使用のため撤去（青の主役は .hn-btn に一本化）。 */
   .btn-primary { background: var(--ink); color: var(--ground); }
@@ -1728,8 +1729,9 @@
           <option value="member">メンバー（制作できる）</option>
           <option value="viewer">閲覧のみ（無料・席を使わない）</option>
         </select>
-        <button class="btn btn-primary" id="inviteCreate"><span>招待リンクを作成</span></button>
+        <button class="btn btn-primary wauto" id="inviteCreate"><span>招待リンクを作成</span></button>
       </div>
+      <p class="muted" id="seatFullNote" hidden style="margin:8px 0 0;font-size:var(--t-label)">席が満席です。メンバーを増やすにはプランを変更してください（閲覧のみは無料・無制限）。</p>
       <div class="fld" id="inviteResult" hidden style="margin-top:10px">
         <label>招待リンク（コピーして相手に共有）</label>
         <input id="inviteLink" type="text" readonly onclick="this.select()">
@@ -1872,7 +1874,7 @@
     <p class="muted" style="margin:0 0 14px">必要なぶんだけ、その都度購入できます。使い切らなくても翌月に繰り越せます。</p>
     <div class="pack-grid" id="creditPacks"></div>
     <div class="cta-row" style="margin-top:14px">
-      <button class="btn btn-primary" id="crBuy"><span>選んだクレジットを購入</span></button>
+      <button class="btn btn-primary wauto" id="crBuy"><span>選んだクレジットを購入</span></button>
     </div>
   </div>
   <div class="panel">
@@ -1892,7 +1894,7 @@
         <div class="inline-input"><input id="notifyThreshold" type="number" min="1" step="1" value="5"><span class="unit">クレジット</span></div></div>
     </div>
     <div class="cta-row" style="margin-top:14px">
-      <button class="btn btn-primary" id="topupSave"><span>設定を保存</span></button>
+      <button class="btn btn-ghost wauto" id="topupSave"><span>設定を保存</span></button>
     </div>
     <p class="muted" id="topupNote" style="margin:12px 0 0;font-size:var(--t-label)">※ 自動チャージの実行には、保存済みのお支払い方法が必要です。</p>
   </div>
@@ -3439,6 +3441,7 @@
     const full = seats !== 0 && used >= seats;
     const roleSel = document.getElementById('inviteRole');
     if (roleSel) { const mo = roleSel.querySelector('option[value="member"]'); if (mo) mo.disabled = full; if (full) roleSel.value = 'viewer'; }
+    const sfn = document.getElementById('seatFullNote'); if (sfn) sfn.hidden = !full;
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
   (function wireTeam() {
