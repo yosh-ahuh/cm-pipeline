@@ -935,6 +935,18 @@
   .gen-status.ok { color: var(--good); } .gen-status.ok .ic { color: var(--good); }
   .gen-status.err { color: var(--crit); } .gen-status.err .ic { color: var(--crit); }
   .gen-status .btn { margin-left: auto; }
+  /* フレンドリーAI：制作中のきらめき＋AIマークの光沢（Canva風“魔法感”） */
+  @keyframes ai-twinkle { 0%,100% { opacity:.5; transform: scale(.82) rotate(0); } 50% { opacity:1; transform: scale(1.1) rotate(10deg); } }
+  @keyframes ai-sheen { 0% { transform: translateX(-130%) rotate(12deg); } 60%,100% { transform: translateX(240%) rotate(12deg); } }
+  .ai-spark { display: inline-grid; place-items: center; color: var(--accent-ink); }
+  .ai-spark .ic { width: 16px; height: 16px; fill: currentColor; stroke: none;
+    animation: ai-twinkle 1.6s var(--ease-standard) infinite;
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent-ink) 55%, transparent)); }
+  .gen-status.run { color: var(--accent-ink); }
+  .rx-h .rx-mark { position: relative; overflow: hidden; }
+  .rx-h .rx-mark::after { content: ""; position: absolute; top: 0; left: 0; width: 42%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); animation: ai-sheen 3.6s var(--ease-standard) infinite; }
+  @media (prefers-reduced-motion: reduce) { .ai-spark .ic { animation: none; } .rx-h .rx-mark::after { display: none; } }
   .job { display: flex; align-items: center; gap: 8px; font-size: var(--t-body-sm); min-height: 28px; }
   .job .jd { flex: none; width: 8px; height: 8px; border-radius: 50%; }
   .job.running .jd { animation: pulse2 1.2s infinite; }
@@ -1276,6 +1288,7 @@
   <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
   <symbol id="i-logout" viewBox="0 0 24 24"><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5M15 8l4 4-4 4M19 12H9"/></symbol>
   <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3c.5 3.8 1.7 5 5.5 5.5C13.7 9 12.5 10.2 12 14c-.5-3.8-1.7-5-5.5-5.5C10.3 8 11.5 6.8 12 3z"/><path d="M18.5 14c.3 1.9.9 2.5 2.5 2.8-1.6.3-2.2.9-2.5 2.7-.3-1.8-.9-2.4-2.5-2.7 1.6-.3 2.2-.9 2.5-2.8z"/></symbol>
 </svg>
 
 <div id="auth" class="auth-screen" hidden>
@@ -4984,7 +4997,7 @@
     if (total === 0) statusHtml = `<div class="gen-status">${L('Preparing…', '準備しています…')}</div>`;
     else if (failed) statusHtml = `<div class="gen-status err"><svg class="ic"><use href="#i-alert"/></svg><span>${L('Some cuts failed. Please try again.', '一部の生成に失敗しました。もう一度お試しください。')}</span></div>`;
     else if (allDone) statusHtml = `<div class="gen-status ok"><svg class="ic"><use href="#i-check"/></svg><span>${L('Generation complete', '生成が完了しました')}</span><button class="btn btn-ghost wauto" id="genToExport"><span>${L('Go to export', '書き出しへ')}</span></button></div>`;
-    else statusHtml = `<div class="gen-status run"><span class="spin"></span><span>${L(`Generating… ${done}/${total} done · a few minutes`, `生成中… ${done}/${total} 完了 ・ 数分お待ちください`)}</span></div>`;
+    else statusHtml = `<div class="gen-status run"><span class="ai-spark" aria-hidden="true"><svg class="ic"><use href="#i-sparkle"/></svg></span><span>${L(`AI is creating… ${done}/${total} done · a few minutes`, `AIが制作中です… ${done}/${total} 完了 ・ 数分お待ちください`)}</span></div>`;
     panel.innerHTML = `
       <div class="panel-h">${L('Generation', '生成の進捗')} <span class="rt">Realtime</span><span class="count${allDone ? ' ok' : ''}">${done}/${total}</span></div>
       ${statusHtml}
