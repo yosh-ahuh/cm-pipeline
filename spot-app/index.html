@@ -1247,6 +1247,9 @@
   .voice .vinfo { min-width: 0; display: flex; flex-direction: column; }
   .voice .vn { font-size: var(--t-body-sm); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .voice .vt { font-size: var(--t-label-sm); color: var(--muted); }
+  .voice .v-check { margin-left: auto; flex: none; color: var(--accent); opacity: 0; transition: opacity var(--dur-fast); }
+  .voice .v-check .ic { width: 16px; height: 16px; }
+  .voice[aria-checked="true"] .v-check { opacity: 1; }
   .tone-row { display: flex; flex-wrap: wrap; gap: 6px; }
   .tone { border: 1px solid var(--line-strong); border-radius: 999px; padding: 5px 11px; font-size: var(--t-label); cursor: pointer; background: var(--surface-2); color: var(--muted); }
   .tone[aria-checked="true"] { border-color: var(--accent); color: var(--accent-ink); background: var(--accent-soft); }
@@ -5868,9 +5871,10 @@
     const grid = document.getElementById('voiceGrid'); if (!grid) return;
     const isJa = document.documentElement.lang === 'ja';
     grid.innerHTML = VOICES.map(v => `
-      <div class="voice" role="radio" tabindex="0" aria-checked="${v.id === voiceSel.voice_id}" data-vid="${v.id}">
-        <button class="vp" type="button" data-preview="${v.id}" aria-label="${isJa ? '試聴' : 'Preview'}">▶</button>
+      <div class="voice" role="radio" tabindex="0" aria-checked="${v.id === voiceSel.voice_id}" data-vid="${v.id}" title="${isJa ? 'クリックでこの声を選択' : 'Click to choose this voice'}">
+        <button class="vp" type="button" data-preview="${v.id}" aria-label="${isJa ? '試聴' : 'Preview'}" title="${isJa ? '試聴（聞いて選ぶ）' : 'Preview'}">▶</button>
         <span class="vinfo"><span class="vn">${isJa ? v.ja : v.en}</span><span class="vt">${isJa ? v.tagJa : v.tagEn}</span></span>
+        <span class="v-check" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></span>
       </div>`).join('');
     const tr = document.getElementById('toneRow'); if (tr)
       tr.innerHTML = TONES.map(t => `<button class="tone" role="radio" type="button" aria-checked="${t.id === voiceSel.tone}" data-tone="${t.id}">${isJa ? t.ja : t.en}</button>`).join('');
@@ -5901,9 +5905,9 @@
     const panel = document.getElementById('voicePanel'); if (!panel) return;
     panel.addEventListener('click', (e) => {
       const pv = e.target.closest('[data-preview]');
-      if (pv) { e.stopPropagation(); playVoice(pv.getAttribute('data-preview')); return; }
+      if (pv) { e.stopPropagation(); const id = pv.getAttribute('data-preview'); voiceSel.voice_id = id; renderVoicePicker(); saveVoice(); playVoice(id); return; }   // 試聴ボタン＝聞く＋その声を選択
       const v = e.target.closest('[data-vid]');
-      if (v) { voiceSel.voice_id = v.getAttribute('data-vid'); renderVoicePicker(); saveVoice(); return; }
+      if (v) { voiceSel.voice_id = v.getAttribute('data-vid'); renderVoicePicker(); saveVoice(); return; }   // カードのどこでも選択
       const t = e.target.closest('[data-tone]');
       if (t) { voiceSel.tone = t.getAttribute('data-tone'); renderVoicePicker(); saveVoice(); }
     });
