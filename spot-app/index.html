@@ -4200,8 +4200,12 @@
   function show(id, on) { const el = document.getElementById(id); if (el) el.hidden = !on; }
   let signupStep = 1;   // 登録の3ステップ（1:メール+PW+規約 / 2:個人or組織 / 3:氏名(+会社名)）
   function setMode(m) {
+    const enteringSignup = m === 'signup' && mode !== 'signup';   // サインイン→登録の切替時のみ
     mode = m;
     if (m === 'signup') signupStep = 1;
+    if (enteringSignup) {   // 登録は新規入力から始める（保存パスワード等の自動入力を持ち込まない）
+      ['authEmail', 'authPass', 'authPass2'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    }
     if (m !== 'otp') otpSent = false;
     // モード変更でクールダウンをリセット（残ったカウントダウン/無効化を解除）
     ['authSubmit', 'authOtpResend'].forEach(id => { const el = document.getElementById(id); if (el && el._cd) { clearInterval(el._cd); el._cd = null; el.disabled = false; } });
@@ -5750,9 +5754,14 @@
       try {
         const { error } = await sb.from('projects').delete().eq('id', id); if (error) throw error;
         if (window.toast) window.toast(L('Video deleted', '動画を削除しました'), true, 1600);
-        if (!document.getElementById('view-media').hidden) window.loadMedia();
-        else if (!document.getElementById('view-collections').hidden) window.loadCollections();
-        else loadProjects();
+        // 全体を再描画するとスケルトンで高さが一瞬変わりスクロールが飛ぶため、該当カードだけ除去。
+        const cardEl = del.closest('.proj'); const grid = cardEl ? cardEl.parentElement : null;
+        if (cardEl) cardEl.remove();
+        if (!grid || !grid.querySelector('.proj')) {   // 空になった時だけ再読込して空状態を表示
+          if (!document.getElementById('view-media').hidden) window.loadMedia();
+          else if (!document.getElementById('view-collections').hidden) window.loadCollections();
+          else loadProjects();
+        }
       } catch (err) { console.warn('delete project failed:', err); if (window.toast) window.toast(L("Couldn't delete it. Please try again.", '削除できませんでした。もう一度お試しください。'), false, 2600); }
       return;
     }
