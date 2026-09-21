@@ -4,6 +4,9 @@ spot-app/config.js
 **/.env
 *.env
 *.key
+# Google OAuth のクライアントシークレット（ダウンロードした JSON）
+client_secret_*.json
+**/client_secret_*.json
 
 # --- dependencies ---
 **/node_modules/
