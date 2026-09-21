@@ -564,6 +564,13 @@
   .opt .o-ic svg { width: 18px; height: 18px; }
   .opt .o-name { font-size: var(--t-body); font-weight: 700; }
   .opt .o-desc { font-size: var(--t-label); color: var(--muted); line-height: 1.45; }
+  /* トーンのムード・プレビュー（雰囲気を“見て”選ぶ・Canva風） */
+  .opt .o-mood { height: 40px; border-radius: var(--r-sm); border: 1px solid rgba(255,255,255,.06); position: relative; overflow: hidden; }
+  .opt .o-mood::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,.28)); }
+  .o-mood.m-doc  { background: linear-gradient(120deg, #6b6256, #38332b); }
+  .o-mood.m-pop  { background: linear-gradient(120deg, #ffc24d, #ff7a59); }
+  .o-mood.m-emo  { background: linear-gradient(120deg, #4a5db8, #7b4bb0); }
+  .o-mood.m-styl { background: linear-gradient(120deg, #96a0ad, #2b3138); }
   .opt .o-tick { position: absolute; top: 12px; right: 12px; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; color: transparent; transition: all var(--dur-fast); }
   .opt .o-tick .ic { width: 11px; height: 11px; stroke-width: 3.5; }
   .opt[aria-pressed="true"] .o-tick, .opt[aria-checked="true"] .o-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
@@ -1627,19 +1634,23 @@
         <div class="step-q sub">トーン</div>
         <div class="opt-grid" data-multi="false" data-key="tone" role="radiogroup" aria-label="トーン">
           <button class="opt" aria-pressed="true" data-val="ドキュメンタリー">
-            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span><span class="o-name">ドキュメンタリー</span>
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-mood m-doc" aria-hidden="true"></span><span class="o-name">ドキュメンタリー</span>
             <span class="o-desc">自然光・等身大。AI感が出にくい</span>
           </button>
           <button class="opt" data-val="明るいCM">
-            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span><span class="o-name">明るいCM</span>
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-mood m-pop" aria-hidden="true"></span><span class="o-name">明るいCM</span>
             <span class="o-desc">ポップ・軽快・前向き</span>
           </button>
           <button class="opt" data-val="エモーショナル">
-            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span><span class="o-name">エモーショナル</span>
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-mood m-emo" aria-hidden="true"></span><span class="o-name">エモーショナル</span>
             <span class="o-desc">映画的・情感・余韻</span>
           </button>
           <button class="opt" data-val="スタイリッシュ">
-            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span><span class="o-name">スタイリッシュ</span>
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-mood m-styl" aria-hidden="true"></span><span class="o-name">スタイリッシュ</span>
             <span class="o-desc">洗練・ミニマル・都会的</span>
           </button>
         </div>
