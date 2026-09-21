@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spot スタイルガイド</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="styles/tokens.css">
+<style>
+  /* スタイルガイド。トークンは styles/tokens.css（アプリと共有）。
+     コンポーネントは index.html の実値を再現（スナップショット）。source of truth = index.html / docs/design-system.md */
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--font-jp); -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 96px; }
+  header.sg { display: flex; align-items: center; gap: 12px; padding-bottom: 8px; }
+  .mark { width: 30px; height: 30px; background: url("assets/spot-mark.png") center/contain no-repeat; flex: none; }
+  h1 { font-family: var(--font-display); font-weight: 800; font-size: 28px; letter-spacing: -.02em; margin: 0; }
+  .lede { color: var(--muted); font-size: 14px; margin: 6px 0 0; }
+  .lede code { font-family: var(--font-mono); font-size: 12px; color: var(--accent-ink); }
+  h2 { font-family: var(--font-display); font-weight: 800; font-size: 18px; margin: 44px 0 4px; }
+  .h2sub { color: var(--faint); font-size: 12px; margin: 0 0 16px; }
+  .grid { display: grid; gap: 12px; }
+  .cols-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  /* color swatches */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .sw { border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
+  .sw .chip { height: 56px; }
+  .sw .meta { padding: 8px 10px; }
+  .sw .nm { font-size: 12px; font-weight: 500; }
+  .sw .hx { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .sw .cr { font-family: var(--font-mono); font-size: 10px; margin-top: 2px; }
+  .cr.aa { color: var(--good); } .cr.mid { color: var(--warn); } .cr.low { color: var(--crit); }
+  /* type scale */
+  .type-row { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .type-row .tk { font-family: var(--font-mono); font-size: 11px; color: var(--faint); width: 130px; flex: none; }
+  .type-row .sample { font-family: var(--font-display); font-weight: 800; letter-spacing: -.01em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  /* spacing / radius */
+  .scale-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+  .scale-row .tk { font-family: var(--font-mono); font-size: 11px; color: var(--faint); width: 130px; flex: none; }
+  .scale-row .bar { height: 16px; background: var(--accent); border-radius: 3px; }
+  .radii { display: flex; flex-wrap: wrap; gap: 14px; }
+  .radii .r { width: 84px; height: 60px; background: var(--surface-2); border: 1px solid var(--line-strong); display: grid; place-items: end center; padding-bottom: 6px; font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+  /* elevation */
+  .elevs { display: flex; flex-wrap: wrap; gap: 18px; }
+  .elevs .e { width: 150px; height: 84px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); display: grid; place-items: center; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  /* panel */
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-1); padding: 18px; }
+  .panel-h { font-family: var(--font-display); font-weight: 800; font-size: var(--t-title); display: flex; align-items: center; margin-bottom: 12px; }
+  .panel-h .count { margin-left: auto; color: var(--muted); font-weight: 500; font-family: var(--font-mono); }
+  .panel-h .count.ok { color: var(--good); }
+  /* buttons (index.html 実値) */
+  .btn { border-radius: var(--r-sm); min-height: var(--control-h-lg); padding: 0 18px; font-size: var(--t-body-sm); font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; font-family: inherit; }
+  .btn-primary { background: var(--ink); color: var(--ground); }
+  .btn-accent { background: var(--accent); color: var(--on-accent); }
+  .btn-ghost { background: transparent; border: 1px solid var(--line-strong); color: var(--ink); }
+  .btn-tonal { background: var(--surface-2); color: var(--ink); }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  /* badges (統一) */
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: var(--t-label-sm); line-height: 1.5; padding: 2px 8px; border-radius: var(--r-full); border: 1px solid transparent; font-family: var(--font-jp); }
+  .badge--accent { color: var(--accent-ink); background: var(--accent-soft); }
+  .badge--neutral { color: var(--muted); background: var(--surface-3); }
+  .badge--success { color: var(--good); background: var(--good-soft); }
+  .badge--warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 16%, transparent); }
+  .badge--danger { color: var(--crit); background: var(--crit-soft); }
+  /* meter (統一) */
+  .u-meter { height: 6px; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; margin: 8px 0; }
+  .u-meter.sm { height: 5px; } .u-meter.big { height: 10px; }
+  .u-meter i { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+  .mlabel { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  /* controls */
+  .fld { display: flex; flex-direction: column; gap: 6px; }
+  .fld label { font-size: var(--t-label); color: var(--muted); }
+  .fld input, .sel { height: var(--control-h); border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink); padding: 0 12px; font-size: var(--t-body-sm); font-family: var(--font-jp); }
+  .fld input:focus, .sel:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+  /* note */
+  .note { margin-top: 10px; font-size: 12px; color: var(--faint); line-height: 1.7; }
+  a { color: var(--accent-ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="sg"><div class="mark"></div><h1>Spot スタイルガイド</h1></header>
+  <p class="lede">トークンは <code>styles/tokens.css</code>（アプリと共有）。実装の正は <code>index.html</code> と <code>docs/design-system.md</code>。ダーク一本化。</p>
+
+  <h2>カラー</h2>
+  <p class="h2sub">面 / 文字 / ブランド・意味色。cr=surface上のWCAGコントラスト比（本文AA=4.5+）。</p>
+  <div class="swatches" id="swatches"></div>
+
+  <h2>タイポグラフィ</h2>
+  <p class="h2sub">Bricolage Grotesque（見出し）/ Zen Kaku Gothic New（本文）/ DM Mono（数値）。</p>
+  <div id="typescale"></div>
+
+  <div class="grid cols-2" style="margin-top:8px">
+    <div>
+      <h2>スペーシング</h2>
+      <p class="h2sub">4pt グリッド。</p>
+      <div id="spacing"></div>
+    </div>
+    <div>
+      <h2>角丸</h2>
+      <p class="h2sub">controls=sm / cards=md〜lg / pill=full。</p>
+      <div class="radii" id="radii"></div>
+    </div>
+  </div>
+
+  <h2>エレベーション</h2>
+  <p class="h2sub">影の3段階。</p>
+  <div class="elevs">
+    <div class="e" style="box-shadow:var(--shadow-1)">--shadow-1</div>
+    <div class="e" style="box-shadow:var(--shadow)">--shadow</div>
+    <div class="e" style="box-shadow:var(--shadow-lift)">--shadow-lift</div>
+  </div>
+
+  <h2>ボタン</h2>
+  <p class="h2sub">白=アプリ内の主 / 青=ヒーロー・認証の主 / ghost=副 / tonal=中間。1画面に主は1つ。</p>
+  <div class="row">
+    <button class="btn btn-primary">主（白）</button>
+    <button class="btn btn-accent">主（青）</button>
+    <button class="btn btn-ghost">副 ghost</button>
+    <button class="btn btn-tonal">中間 tonal</button>
+  </div>
+
+  <h2>バッジ</h2>
+  <p class="h2sub">正準 <code>.badge</code> ＋ バリアント。面soft＋同系ink文字。</p>
+  <div class="row">
+    <span class="badge badge--accent">利用中</span>
+    <span class="badge badge--neutral">メンバー</span>
+    <span class="badge badge--success">合格</span>
+    <span class="badge badge--warn">残少</span>
+    <span class="badge badge--danger">失敗</span>
+  </div>
+
+  <h2>メーター</h2>
+  <p class="h2sub">単一 <code>.u-meter</code>（sm/既定/big）。残量色は塗りを good/warn/crit で上書き。</p>
+  <div style="max-width:420px">
+    <div class="mlabel">.sm</div><div class="u-meter sm"><i style="width:70%"></i></div>
+    <div class="mlabel">既定 / good</div><div class="u-meter"><i style="width:70%;background:var(--good)"></i></div>
+    <div class="mlabel">.big / warn</div><div class="u-meter big"><i style="width:32%;background:var(--warn)"></i></div>
+    <div class="mlabel">.big / crit</div><div class="u-meter big"><i style="width:12%;background:var(--crit)"></i></div>
+  </div>
+
+  <h2>コントロール</h2>
+  <p class="h2sub">高さ <code>--control-h</code>=40。focusで accent リング。</p>
+  <div class="grid cols-2" style="max-width:680px">
+    <div class="fld"><label>テキスト入力</label><input placeholder="you@company.com"></div>
+    <div class="fld"><label>セレクト</label><select class="sel"><option>メンバー（制作できる）</option><option>閲覧のみ</option></select></div>
+  </div>
+
+  <h2>パネル</h2>
+  <div class="panel" style="max-width:520px">
+    <div class="panel-h">品質チェック <span class="count ok">7/8 合格</span></div>
+    <div class="note" style="margin:0">パネルは <code>--surface</code> ＋ <code>--line</code> ＋ <code>--radius</code> ＋ <code>--shadow-1</code>。見出しの <code>.count</code> は中立、成功時のみ <code>.ok</code>。</div>
+  </div>
+
+  <p class="note">このページはトークンを <code>styles/tokens.css</code> から読み込み、コンポーネントは <code>index.html</code> の実値を再現したスナップショットです。値を変えるときは <code>tokens.css</code>／<code>index.html</code>／<code>docs/design-system.md</code> を更新してください。</p>
+</div>
+
+<script>
+  const cs = getComputedStyle(document.documentElement);
+  const tok = n => cs.getPropertyValue(n).trim();
+  // contrast
+  function lin(c){c/=255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4);}
+  function Lum(hex){const h=hex.replace('#','');if(h.length<6)return null;const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);return .2126*lin(r)+.7152*lin(g)+.0722*lin(b);}
+  function ratio(a,b){const la=Lum(a),lb=Lum(b);if(la==null||lb==null)return null;const hi=Math.max(la,lb),lo=Math.min(la,lb);return (hi+.05)/(lo+.05);}
+  const surfaces=[['--ground','面/page'],['--surface-low','面/rail'],['--surface','面/card'],['--surface-2','面/input'],['--surface-3','面/hover']];
+  const texts=[['--ink','文字/主'],['--muted','文字/補助'],['--faint','文字/三次'],['--outline','装飾線']];
+  const brand=[['--accent','accent'],['--accent-ink','accent-ink'],['--accent-soft','accent-soft'],['--cool','cool'],['--good','good'],['--warn','warn'],['--crit','crit'],['--brand-red','brand-red']];
+  const surfBg = tok('--surface');
+  function swatch([name,label],withCr){
+    const hx=tok(name);
+    let cr='';
+    if(withCr){const r=ratio(hx,surfBg);if(r){const cls=r>=4.5?'aa':(r>=3?'mid':'low');cr=`<div class="cr ${cls}">${r.toFixed(1)} :1 on surface</div>`;}}
+    return `<div class="sw"><div class="chip" style="background:${hx}"></div><div class="meta"><div class="nm">${label}</div><div class="hx">${name} · ${hx}</div>${cr}</div></div>`;
+  }
+  document.getElementById('swatches').innerHTML =
+    surfaces.map(s=>swatch(s,false)).join('') +
+    texts.map(s=>swatch(s,true)).join('') +
+    brand.map(s=>swatch(s,true)).join('');
+
+  // type scale
+  const types=[['--t-display','Display 32'],['--t-headline','Headline 26'],['--t-title-lg','Title lg 20'],['--t-title','Title 16'],['--t-body-lg','Body lg 15'],['--t-body','Body 14'],['--t-body-sm','Body sm 13'],['--t-label','Label 12'],['--t-label-sm','Label sm 11']];
+  document.getElementById('typescale').innerHTML = types.map(([v,l])=>
+    `<div class="type-row"><span class="tk">${v}</span><span class="sample" style="font-size:${tok(v)}">選ぶだけで、広告動画。 Spot</span><span class="tk" style="margin-left:auto;width:auto">${l}</span></div>`).join('');
+
+  // spacing
+  const sp=[['--s-1',4],['--s-2',8],['--s-3',12],['--s-4',16],['--s-5',20],['--s-6',24],['--s-8',32],['--s-10',40]];
+  document.getElementById('spacing').innerHTML = sp.map(([v,px])=>
+    `<div class="scale-row"><span class="tk">${v} · ${px}</span><div class="bar" style="width:${px*2}px"></div></div>`).join('');
+
+  // radii
+  const rd=[['--r-xs',6],['--r-sm',8],['--r-md',12],['--r-lg',16],['--r-xl',24]];
+  document.getElementById('radii').innerHTML = rd.map(([v,px])=>
+    `<div class="r" style="border-radius:${px}px">${v}</div>`).join('') + `<div class="r" style="border-radius:999px">--r-full</div>`;
+</script>
+</body>
+</html>
