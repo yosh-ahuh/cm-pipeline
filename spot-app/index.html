@@ -654,7 +654,20 @@
   .mode-switch button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); }
   .script-board { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 56px; align-items: start; }
 
+  .board-main { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
   .board-list { display: flex; flex-direction: column; gap: var(--s-3); }
+  /* 台本を持ち込む（貼付/アップロード） */
+  .own-script { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); padding: var(--s-4); }
+  .own-script .os-head { font-size: var(--t-title); font-weight: 700; }
+  .own-script .os-sub { margin: 6px 0 12px; font-size: var(--t-label); color: var(--muted); line-height: 1.6; }
+  .own-script .os-text { width: 100%; min-height: 128px; resize: vertical; font: inherit; font-size: var(--t-body-sm); line-height: 1.7; }
+  .own-script .os-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  /* 各カットへの指示入力 */
+  .scut-note-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; padding-top: 8px; border-top: 1px dashed var(--line); }
+  .scut-note-ic { width: 14px; height: 14px; flex: none; color: var(--accent-ink); }
+  .scut-note { flex: 1; min-width: 0; font: inherit; font-size: var(--t-label); background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-md); padding: 7px 10px; color: var(--ink); }
+  .scut-note:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .scut-note::placeholder { color: var(--faint); }
   .scut {
     background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-1);
     display: grid; grid-template-columns: 132px minmax(0,1fr); overflow: hidden;
@@ -1968,7 +1981,20 @@
   </section>
 
   <div class="script-board">
-    <div class="board-list" id="boardList"></div>
+    <div class="board-main">
+      <!-- 台本を持ち込む：貼り付け or アップロード -->
+      <div class="own-script" id="ownScript" hidden>
+        <div class="os-head">台本を持ち込む</div>
+        <p class="os-sub">お持ちの台本を貼り付けるか、テキストファイルをアップロードしてください。各カットのナレーションと指示は下のカードで編集できます。</p>
+        <textarea id="ownScriptText" class="os-text" placeholder="例）&#10;#1 冒頭フック：「現場写真の整理、まだ手作業ですか？」&#10;#2 課題：毎日の集計に時間がかかる…&#10;#3 解決：スマホで撮るだけ、台帳が自動でできる"></textarea>
+        <div class="os-actions">
+          <input type="file" id="ownScriptFile" accept=".txt,.md,.rtf,text/plain" hidden>
+          <button type="button" class="btn btn-ghost wauto" id="ownScriptUpload"><svg class="ic"><use href="#i-plus"/></svg><span>ファイルをアップロード</span></button>
+          <button type="button" class="btn btn-tonal wauto" id="ownScriptApply"><span>この台本を反映</span></button>
+        </div>
+      </div>
+      <div class="board-list" id="boardList"></div>
+    </div>
 
     <aside class="shot-panel">
       <div class="panel-h">用意する素材 <span class="count" id="shotCount">4/4</span></div>
@@ -3310,14 +3336,14 @@
       const s = Math.round(30 / total * i), e = Math.round(30 / total * (i + 1));
       const pad = n => String(n).padStart(2, '0');
       return { n: '#' + (i + 1), kind, scene: label, secs: `0:${pad(s)}–0:${pad(e)}`, tl: label,
-        dark: kind === 'アプリ画面', c1, c2, na: '—', telop: '—',
+        dark: kind === 'アプリ画面', c1, c2, na: '—', telop: '—', note: (c.note || ''),
         shot: L(`AI generates the script & footage for this cut. `, `このカットの台本・映像はAIがつくります。`) + `<b>${model}</b>` };
     });
   }
   function renderBoard() {
     const rc = Array.isArray(window.__scriptCuts) && window.__scriptCuts.length ? window.__scriptCuts : null;
     const data = rc ? boardFromCuts(rc) : SCUT;   // 実プロジェクトがあれば実 cuts、無ければデモ(SCUT)
-    boardList.innerHTML = data.map(c => `
+    boardList.innerHTML = data.map((c, i) => `
       <article class="scut">
         <div class="scut-frame" style="background:linear-gradient(155deg, ${c.c1}, ${c.c2})">
           <span class="n">${c.n}</span>
@@ -3329,6 +3355,10 @@
           ${c.na!=='—' ? `<div class="scut-na${scriptEditable?' editable':''}" ${scriptEditable?'contenteditable="true" role="textbox" aria-label="ナレーション" spellcheck="false"':''}><span class="lab" contenteditable="false">NA</span>${c.na}</div>` : ''}
           ${c.telop!=='—' ? `<div class="scut-telop"><span class="lab">字幕</span>${c.telop}</div>` : ''}
           <div class="scut-shot"><span class="cam"><svg class="ic"><use href="#i-camera"/></svg></span><span class="txt"><b>撮影指示:</b> ${c.shot}</span></div>
+          <div class="scut-note-row">
+            <svg class="ic scut-note-ic" aria-hidden="true"><use href="#i-sparkle"/></svg>
+            <input class="scut-note" data-cut="${i}" placeholder="このカットへの指示（任意）例）もっと明るく・この画面を大きく" value="${String(c.note || '').replace(/"/g, '&quot;')}" aria-label="このカットへの指示">
+          </div>
         </div>
       </article>`).join('');
   }
@@ -3340,9 +3370,52 @@
     document.querySelectorAll('#scriptMode button').forEach(x=>x.setAttribute('aria-selected','false'));
     b.setAttribute('aria-selected','true');
     scriptEditable = b.dataset.m === 'own';
+    const os = document.getElementById('ownScript'); if (os) os.hidden = !scriptEditable;   // 台本貼付/アップロードのパネル
     renderBoard();
-    toast(scriptEditable ? L('Edit mode: narration is directly editable','編集モード: ナレーションを直接編集できます') : L('AI-handled mode','AIにおまかせモード'), false, 1800);
+    toast(scriptEditable ? L('Bring your own script: paste/upload above, edit narration and per-cut notes below','台本を持ち込む: 上で貼付/アップロード、下でナレーションと各カット指示を編集') : L('AI-handled mode','AIにおまかせモード'), false, 2400);
   });
+
+  // 現在のプロジェクト spec を部分更新（best-effort・デバウンス）
+  let _specSaveT = null;
+  function saveSpecPatch(mutate) {
+    if (typeof mutate === 'function' && Array.isArray(window.__scriptCuts)) { try { mutate(); } catch (_) {} }   // メモリ側も更新
+    if (!window.sb || !window.__currentProjectId) return;
+    clearTimeout(_specSaveT);
+    _specSaveT = setTimeout(async () => {
+      try {
+        const { data } = await window.sb.from('projects').select('spec').eq('id', window.__currentProjectId).single();
+        const spec = (data && data.spec) || {}; mutate && mutate(spec);
+        await window.sb.from('projects').update({ spec }).eq('id', window.__currentProjectId);
+      } catch (_) {}
+    }, 600);
+  }
+  // 各カットへの指示（#3）
+  boardList.addEventListener('input', e => {
+    const inp = e.target.closest('.scut-note'); if (!inp) return;
+    const i = Number(inp.dataset.cut); const val = inp.value;
+    saveSpecPatch((spec) => {
+      if (Array.isArray(window.__scriptCuts) && window.__scriptCuts[i]) window.__scriptCuts[i].note = val;
+      if (spec) { spec.cuts = spec.cuts || []; spec.cuts[i] = spec.cuts[i] || {}; spec.cuts[i].note = val; }
+    });
+  });
+  // 台本の持ち込み（#2）：アップロード → テキスト欄へ、反映 → spec.script.userScript に保存
+  { const up = document.getElementById('ownScriptUpload'), file = document.getElementById('ownScriptFile'),
+        apply = document.getElementById('ownScriptApply'), ta = document.getElementById('ownScriptText');
+    if (up && file) up.addEventListener('click', () => file.click());
+    if (file && ta) file.addEventListener('change', async () => {
+      const f = file.files && file.files[0]; if (!f) return;
+      if (f.size > 1024 * 1024) { toast(L('File is too large (max 1 MB).', 'ファイルが大きすぎます（最大1MB）。'), false, 2600); return; }
+      try { ta.value = await f.text(); toast(L('Script loaded. Review and apply.', '台本を読み込みました。確認して反映してください。'), true, 2000); }
+      catch (_) { toast(L("Couldn't read the file.", 'ファイルを読み込めませんでした。'), false, 2600); }
+      file.value = '';
+    });
+    if (apply && ta) apply.addEventListener('click', () => {
+      const text = (ta.value || '').trim();
+      if (!text) { toast(L('Paste or upload a script first.', '台本を貼り付けるかアップロードしてください。'), false, 2400); ta.focus(); return; }
+      saveSpecPatch((spec) => { if (spec) { spec.script = spec.script || {}; spec.script.userScript = text; spec.script.source = 'user'; } });
+      toast(L('Your script will be used for this ad.', 'この台本を反映しました。CMづくりに使われます。'), true, 2200);
+    });
+  }
 
   // ---------- dashboard ----------
   const projGrid = document.getElementById('projGrid');
