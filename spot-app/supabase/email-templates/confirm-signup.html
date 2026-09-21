@@ -1,0 +1,33 @@
+<!--
+  Supabase → Authentication → Emails → Templates → "Confirm signup" に貼り付ける。
+  新規登録の確認メール。signUp の options.data.lang（アプリが登録時に保存）で出し分け（無ければ英語）。
+-->
+{{ if eq .Data.lang "ja" }}
+<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;color:#111">
+  <h2 style="font-size:20px;margin:0 0 12px">メールアドレスの確認</h2>
+  <p style="font-size:14px;line-height:1.7;color:#333">
+    Spot へのご登録ありがとうございます。<br>
+    下のボタンを押して、メールアドレスの確認を完了してください。
+  </p>
+  <p style="margin:24px 0">
+    <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:600;font-size:14px">メールアドレスを確認する</a>
+  </p>
+  <p style="font-size:12px;line-height:1.7;color:#888">
+    このメールに心当たりがない場合は、破棄してください。
+  </p>
+</div>
+{{ else }}
+<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:0 auto;color:#111">
+  <h2 style="font-size:20px;margin:0 0 12px">Confirm your email</h2>
+  <p style="font-size:14px;line-height:1.7;color:#333">
+    Thanks for signing up for Spot.<br>
+    Click the button below to confirm your email address.
+  </p>
+  <p style="margin:24px 0">
+    <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:600;font-size:14px">Confirm email</a>
+  </p>
+  <p style="font-size:12px;line-height:1.7;color:#888">
+    If you didn't create this account, you can ignore this email.
+  </p>
+</div>
+{{ end }}

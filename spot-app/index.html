@@ -3429,6 +3429,8 @@
     'ホーム': 'Home', 'クレジット残': 'Credits', '新規CM': 'New ad', '戻る': 'Back', '設定': 'Settings',
     '本文へスキップ': 'Skip to content', '現在地': 'Breadcrumb', 'Spot ホーム': 'Spot home',
     // --- auth ---
+    'おかえりなさい': 'Welcome back', 'メールアドレスとパスワードでサインイン。': 'Sign in with your email and password.',
+    '個人／組織を選んで登録します。': 'Choose personal or organization to sign up.',
     'Spot にサインイン': 'Sign in to Spot', 'Spot アカウントを作成': 'Create your Spot account',
     'メールアドレス': 'Email', 'パスワード': 'Password', '6文字以上': 'At least 6 characters',
     'サインイン': 'Sign in', 'アカウント作成': 'Create account', 'アカウントを作成': 'Create an account',
@@ -3452,6 +3454,7 @@
     'メールアドレスを入力してください。': 'Please enter your email.',
     'パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。': 'Password reset email sent. Open the link in the email to set a new password.',
     '認証番号をメールに送信しました。届いた6桁を入力してください。': 'A verification code was emailed. Enter the 6 digits.',
+    '認証番号をメールに送信しました。届いた番号を入力してください。': 'A verification code was emailed. Enter the code you received.',
     '6桁の認証番号を入力してください。': 'Enter the 6-digit code.',
     '認証番号が正しくないか、期限切れです。再送してください。': 'The code is wrong or expired. Please resend.',
     '新しいパスワードは6文字以上で入力してください。': 'New password must be at least 6 characters.',
@@ -3871,8 +3874,16 @@
   }
   if (langSel) langSel.addEventListener('change', function () { setLang(langSel.value); });
 
-  // remember the last choice per browser
+  // 既定はデバイスの言語設定：ブラウザ/OS が日本語(ja*)なら日本語、それ以外の言語なら英語。
+  // ユーザーが表示言語を選び直したら、その選択(localStorage)を優先する。
+  (function () {
+    var langs;
+    try { langs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en']; }
+    catch (_) { langs = ['en']; }
+    LANG = String(langs[0] || 'en').toLowerCase().indexOf('ja') === 0 ? 'ja' : 'en';
+  })();
   try { var saved = localStorage.getItem('spot.lang'); if (saved === 'ja' || saved === 'en') LANG = saved; } catch (_) {}
+  window.__spotLang = function () { return LANG; };   // 認証エラー訳・メール言語で参照
   if (langSel) langSel.value = LANG;
   apply();
 })();
@@ -3902,6 +3913,38 @@
     errEl.innerHTML = '<svg class="ic"><use href="#i-alert"/></svg><span></span>';
     errEl.lastChild.textContent = msg; errEl.hidden = false;
   };
+  // Supabase(GoTrue) が返す英語エラーを、表示言語に合わせて訳す。
+  //   日本語UI → 日本語、英語UI → 英語。未知のエラーは汎用文にフォールバック（原文は console に残す）。
+  function authErrMsg(err) {
+    const raw = String((err && err.message) || err || '').trim();
+    const m = raw.toLowerCase();
+    const t = (en, ja) => (window.L ? window.L(en, ja) : ja);
+    if (/new password should be different/.test(m))
+      return t('Your new password must be different from your current password.', '新しいパスワードは、現在のパスワードと異なるものにしてください。');
+    if (/invalid login credentials/.test(m))
+      return t('Email or password is incorrect.', 'メールアドレスまたはパスワードが正しくありません。');
+    if (/email not confirmed/.test(m))
+      return t('Your email isn’t verified yet. Open the link in the confirmation email first.', 'メールアドレスが未確認です。確認メールのリンクを開いてからお試しください。');
+    if (/already registered|already been registered|user already exists/.test(m))
+      return t('This email is already registered. Try signing in instead.', 'このメールアドレスは登録済みです。ログインをお試しください。');
+    if (/password should be at least|password.*at least.*character/.test(m))
+      return t('Password must be at least 6 characters.', 'パスワードは6文字以上で入力してください。');
+    if (/for security purposes.*after\s+\d+\s*second/.test(m)) {
+      const s = (raw.match(/after\s+(\d+)\s*seconds?/i) || [])[1] || '';
+      return t(`For security, please wait ${s} seconds.`, `セキュリティのため、あと ${s} 秒お待ちください。`);
+    }
+    if (/token has expired|expired|invalid.*(otp|token|code)|(otp|token|code).*invalid/.test(m))
+      return t('The code is incorrect or has expired. Please resend it.', '認証番号が正しくないか、期限切れです。再送してください。');
+    if (/rate limit|too many requests|over_email_send_rate_limit/.test(m))
+      return t('Too many attempts. Please wait a moment and try again.', 'リクエストが多すぎます。しばらく待ってから再度お試しください。');
+    if (/user not found/.test(m))
+      return t('No account found for this email.', 'このメールアドレスのアカウントが見つかりません。');
+    if (/failed to fetch|networkerror|network request failed/.test(m))
+      return t('Network error. Check your connection and try again.', '通信エラーが発生しました。接続を確認して再度お試しください。');
+    if (raw) console.warn('[auth] unmapped error:', raw);
+    return t('Something went wrong. Please try again.', '問題が発生しました。もう一度お試しください。');
+  }
+  window.__authErrMsg = authErrMsg;   // 設定画面（別スコープ）のパスワード変更でも使う
   // show / hide password (HIG: never trap users in a masked field)
   eyeEl.addEventListener('click', () => {
     const show = passEl.type === 'password';
@@ -4040,8 +4083,8 @@
       if (sec != null) {   // レート制限：残り秒数をカウントダウン
         if (!otpSent) { otpSent = true; setMode('otp'); }
         startCooldown(resendBtn, setResend, sec, '認証番号を再送する');
-        fail(`セキュリティのため、あと ${sec} 秒お待ちください。`, true);
-      } else { fail(String(e.message || e)); }
+        fail(window.L(`For security, please wait ${sec} seconds.`, `セキュリティのため、あと ${sec} 秒お待ちください。`), true);
+      } else { fail(authErrMsg(e)); }
     }
   }
 
@@ -4062,8 +4105,8 @@
       } catch (err) {
         submitBusy(false);
         const sec = parseRetrySec(err.message);
-        if (sec != null) { fail(`セキュリティのため、あと ${sec} 秒お待ちください。`, true); startCooldown(submitEl, setSubmit, sec, 'リセットリンクを送信'); }
-        else fail(String(err.message || err));
+        if (sec != null) { fail(window.L(`For security, please wait ${sec} seconds.`, `セキュリティのため、あと ${sec} 秒お待ちください。`), true); startCooldown(submitEl, setSubmit, sec, 'リセットリンクを送信'); }
+        else fail(authErrMsg(err));
       }
       return;
     }
@@ -4077,7 +4120,7 @@
       try {
         const { error } = await sb.auth.verifyOtp({ email, token, type: 'email' });
         if (error) throw error;   // 成功 → onAuthStateChange → onSignedIn
-      } catch (err) { fail(/expired|invalid/i.test(String(err.message)) ? '認証番号が正しくないか、期限切れです。再送してください。' : String(err.message || err)); }
+      } catch (err) { fail(authErrMsg(err)); }
       finally { submitBusy(false); }
       return;
     }
@@ -4096,7 +4139,7 @@
         setRecovering(false);   // 復旧完了 → 通常のアプリ利用へ
         if (window.toast) window.toast('パスワードを更新しました。', false, 2000);
         const { data } = await sb.auth.getSession(); if (data.session) onSignedIn(data.session);
-      } catch (err) { submitBusy(false); fail(String(err.message || err)); }
+      } catch (err) { submitBusy(false); fail(authErrMsg(err)); }
       return;
     }
 
@@ -4120,14 +4163,14 @@
             display_name: displayName,
             account_type: acctType,
             company_name: acctType === 'org' ? companyName : null,
+            lang: window.L('en', 'ja'),   // メール言語切替用（Send Email テンプレートが {{ .Data.lang }} で参照）
           } } });
       if (error) throw error;
       if (mode === 'signup' && !data.session) {
         fail('確認メールを送信しました。メール内のリンクで認証してからログインしてください。', true);
       }
     } catch (err) {
-      const m = String(err.message || err);
-      fail(/invalid login credentials/i.test(m) ? 'メールアドレスまたはパスワードが正しくありません。' : m);
+      fail(authErrMsg(err));
     } finally { submitBusy(false); }
   });
 
@@ -4276,6 +4319,12 @@
 
   window.onAppReady = async function (session, client) {
     sb = client; currentUid = session.user.id;
+    // メール言語をユーザーに追従：現在のUI言語を user_metadata.lang に保つ。
+    //   → reset/OTP/確認メールのテンプレートが {{ .Data.lang }} で日本語/英語を出し分けできる。
+    try {
+      const want = window.L ? window.L('en', 'ja') : 'ja';
+      if (((session.user || {}).user_metadata || {}).lang !== want) sb.auth.updateUser({ data: { lang: want } });
+    } catch (_) {}
     await loadOrg();
     applyRoleUI();                         // viewer を読み取り専用に＋サイドバー更新
     if (window.__setNav) window.__setNav('home');   // 初期はホーム
@@ -4786,8 +4835,15 @@
         if (error) throw error;
         p1.value = ''; p2.value = '';
         const note = document.getElementById('setPassNote'); if (note) { note.hidden = false; setTimeout(() => note.hidden = true, 2000); }
-      } catch (e) { toast(L('Failed to update: ', 'パスワード更新に失敗: ') + e.message, false, 2800); }
+      } catch (e) { toast(window.__authErrMsg ? window.__authErrMsg(e) : (L('Failed to update: ', 'パスワード更新に失敗: ') + e.message), false, 2800); }
       finally { btn.disabled = false; }
+    });
+  })();
+  // 表示言語を切り替えたら、ログイン中は user_metadata.lang も更新（メール言語をUIに追従）
+  (function wireLangPersist() {
+    const sel = document.getElementById('langSelect'); if (!sel) return;
+    sel.addEventListener('change', () => {
+      try { if (sb) sb.auth.updateUser({ data: { lang: sel.value === 'ja' ? 'ja' : 'en' } }); } catch (_) {}
     });
   })();
   // 通知設定（端末ごとの表示設定・localStorage）
