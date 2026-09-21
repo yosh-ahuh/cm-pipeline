@@ -2839,6 +2839,20 @@
   });
   // Auth layer calls this after sign-in; the sidebar shows the account info directly.
   window.mountUserChip = function (email) { window.onAccountInfo({ email }); return null; };
+  // アバター画像をローカルにキャッシュ（次回ロードで即時表示＝イニシャルのちらつき防止）
+  const avKey = (e) => 'spot.avatar.' + (e || '');
+  const readAvatarCache = (e) => { try { return e ? localStorage.getItem(avKey(e)) : null; } catch (_) { return null; } };
+  const clearAvatarCache = (e) => { try { if (e) localStorage.removeItem(avKey(e)); } catch (_) {} };
+  async function cacheAvatarImage(e, url) {
+    if (!e || !url) return;
+    try {
+      const res = await fetch(url); const blob = await res.blob();
+      if (blob.size > 400 * 1024) return;   // 大きすぎる画像はキャッシュしない
+      const reader = new FileReader();
+      reader.onload = () => { try { localStorage.setItem(avKey(e), reader.result); } catch (_) {} };
+      reader.readAsDataURL(blob);
+    } catch (_) {}
+  }
   // Data layer reports { email?, plan?, credits?, max? } (partial objects merge) after refreshUsage() / refreshCredits()
   window.onAccountInfo = function (info) {
     Object.keys(info || {}).forEach(k => { if (info[k] !== undefined && info[k] !== null) acctInfo[k] = info[k]; });
@@ -2853,8 +2867,13 @@
     // 氏名の暫定フォールバック（実表示名は __refreshAccountChip が上書き）
     const nameFallback = acctInfo.email ? acctInfo.email.split('@')[0] : '—';
     ['acctName', 'amName'].forEach(id => { const el = document.getElementById(id); if (el && (!el.textContent || el.textContent === '—')) el.textContent = nameFallback; });
-    // アバターは画像が入っていれば保持、無ければイニシャル（ちらつき防止）
-    ['acctAvatar', 'amAvatar'].forEach(id => { const el = document.getElementById(id); if (el && !el.querySelector('img')) el.textContent = initial; });
+    // アバターは画像が入っていれば保持。無ければ前回のキャッシュ画像を即時表示（ちらつき防止）→ それも無ければイニシャル。
+    ['acctAvatar', 'amAvatar'].forEach(id => {
+      const el = document.getElementById(id); if (!el || el.querySelector('img')) return;
+      const cached = readAvatarCache(acctInfo.email);
+      if (cached) el.innerHTML = `<img src="${cached}" alt="">`;
+      else el.textContent = initial;
+    });
     const credits = Number(acctInfo.credits) || 0, max = Number(acctInfo.max) || 1;
     set('acctCredits', credits); set('acctMax', max);
     const meter = document.getElementById('acctMeter');
@@ -4384,6 +4403,8 @@
       if (url) el.innerHTML = `<img src="${url}" alt="">`;
       else el.textContent = (dispName || email || '?').charAt(0);
     });
+    if (url) cacheAvatarImage(email, url);   // 次回ロードの即時表示用にキャッシュ
+    else clearAvatarCache(email);            // アバター無し → 古いキャッシュを破棄
   }
   window.__refreshAccountChip = refreshAccountChip;
 
