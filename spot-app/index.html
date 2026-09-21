@@ -937,13 +937,13 @@
   .bill-cur .bc-name b { font-family: var(--font-display); font-size: 22px; }
   .bill-meter { min-width: 200px; }
   .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--s-3); }
-  .plan-card { border: 1px solid var(--line); border-radius: 12px; padding: var(--s-4); background: var(--surface-2); display: flex; flex-direction: column; gap: 5px; }
-  .plan-card.current { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
-  .plan-card .pn { font-family: var(--font-display); font-weight: 800; font-size: 16px; }
-  .plan-card .pp { color: var(--muted); font-size: var(--t-label); }
-  .plan-card .ps { font-size: var(--t-body-sm); margin-top: 2px; color: var(--muted); }
-  .plan-card .badge-cur { align-self: flex-start; font-size: var(--t-label-sm); color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: 2px 8px; margin-top: 4px; }
-  .plan-card .btn { margin-top: auto; }
+  .plan-card { border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-5); background: var(--surface-2); display: flex; flex-direction: column; }
+  .plan-card .pc-tier { font-size: var(--t-label); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .plan-card .pc-price { font-family: var(--font-display); font-weight: 800; font-size: 24px; letter-spacing: -.02em; margin-top: var(--s-1); }
+  .plan-card .pc-sub { font-size: var(--t-label); color: var(--faint); margin-top: 2px; }
+  .plan-card .pc-metrics { display: flex; gap: var(--s-2); align-items: baseline; font-size: var(--t-body-sm); padding: var(--s-3) 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: var(--s-4) 0; }
+  .plan-card .pc-metrics b { font-weight: 700; } .plan-card .pc-metrics span { color: var(--muted); }
+  .plan-card .badge-cur { align-self: flex-start; margin-top: var(--s-3); }
   /* credits: purchase packs + auto top-up */
   .pack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--s-3); }
   .pack-card { position: relative; border: 1px solid var(--line); border-radius: 12px; padding: var(--s-4); background: var(--surface-2);
@@ -985,9 +985,12 @@
   .bh-incl .chip .ic { width: 14px; height: 14px; color: var(--good); }
   /* billing: plan cards — feature list + popular */
   .plan-card { position: relative; }
-  .plan-card .feat { list-style: none; margin: 8px 0 12px; padding: 0; display: flex; flex-direction: column; gap: 5px; }
-  .plan-card .feat li { display: flex; align-items: center; gap: 7px; font-size: var(--t-body-sm); color: var(--muted); }
-  .plan-card .feat li .ic { width: 14px; height: 14px; flex: none; color: var(--good); }
+  .plan-card .feat { list-style: none; margin: 0 0 var(--s-4); padding: 0; display: flex; flex-direction: column; gap: var(--s-2); }
+  .plan-card .feat li { display: flex; align-items: center; gap: var(--s-2); font-size: var(--t-body-sm); }
+  .plan-card .feat li .ic { width: 15px; height: 15px; flex: none; }
+  .plan-card .feat li.on { color: var(--ink); } .plan-card .feat li.on .ic { color: var(--good); }
+  .plan-card .feat li.off { color: var(--faint); } .plan-card .feat li.off .ic { color: var(--faint); stroke-width: 2.4; }
+  .plan-card .btn { margin-top: auto; }
   .plan-card.current { border-color: var(--line); box-shadow: none; background: var(--surface); opacity: .82; }
   .plan-card.popular { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
   .plan-card .pk-tag.pop { position: absolute; top: -1px; right: 12px; transform: translateY(-50%);
@@ -1106,6 +1109,7 @@
 <a class="skip" href="#main">本文へスキップ</a>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
   <symbol id="i-forward" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
   <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
@@ -3741,29 +3745,44 @@
     return pl.price_usd ? `$${pl.price_usd}/mo` : 'Contact us';
   }
   const POPULAR_PLAN = 'team';   // おすすめバッジを付けるプラン
+  const PLAN_SUB = {
+    free:       ['Try it free', 'まずは無料でお試し'],
+    starter:    ['For solo & small teams', '個人・小規模の定番'],
+    team:       ['For team production', 'チーム制作に最適'],
+    business:   ['High volume & multi-brand', '大量制作・複数ブランド'],
+    enterprise: ['Custom & dedicated support', '大規模・専用サポート'],
+  };
   function planCard(p, currentId, currentSort) {
     const cur = p.id === currentId;
     const popular = !cur && p.id === POPULAR_PLAN;
-    const spots = Number(p.spots_per_month), seats = Number(p.seats), brands = Number(p.brands);
-    const feats = [];
-    feats.push(spots === 0 ? L('Committed volume', 'コミット制') : L(`${spots} videos / mo`, `月 ${spots} 本`));
-    feats.push(seats === 0 ? L('Unlimited seats', '席数 無制限') : L(`${seats} seats`, `${seats} 席`));
-    feats.push(brands === 0 ? L('Unlimited brands', 'ブランド 無制限') : L(`${brands} brand(s)`, `ブランド ${brands}`));
-    if (p.premium_models) feats.push(L('Premium models', 'プレミアムモデル'));
+    const spots = Number(p.spots_per_month), seats = Number(p.seats), brands = Number(p.brands), sort = Number(p.sort);
+    const sub = PLAN_SUB[p.id] ? L(PLAN_SUB[p.id][0], PLAN_SUB[p.id][1]) : '';
+    const spotsTxt = spots === 0 ? L('Committed volume', 'コミット制') : L(`${spots} videos/mo`, `月 ${spots} 本`);
+    const seatsTxt = seats === 0 ? L('Unlimited seats', '席 無制限') : L(`${seats} seats`, `${seats} 席`);
+    // 共通の機能比較（✓=含む / ✕=含まない）。実データ(brands/premium/sort)から導出。
+    const feats = [
+      { on: true,               label: L('Real-time progress & QC', 'リアルタイム進捗・品質チェック') },
+      { on: brands > 1 || brands === 0, label: brands === 0 ? L('Unlimited brands', 'ブランド無制限') : L('Multiple brands', '複数ブランド管理') },
+      { on: !!p.premium_models, label: L('Premium AI models', 'プレミアムAIモデル') },
+      { on: sort >= 3,          label: L('Priority render queue', '優先生成キュー') },
+      { on: sort >= 2,          label: L('Priority support', '優先サポート') },
+      { on: true,               label: L('Buy extra credits anytime', '追加クレジット購入') },
+    ];
     let action;
-    if (cur) { action = `<span class="badge-cur">${L('Current', '利用中')}</span>`; }
+    if (cur) { action = `<span class="badge-cur badge badge--accent">${L('Current', '利用中')}</span>`; }
     else {
       const contact = spots === 0 && !p.price_jpy && !p.price_usd;
-      const up = Number(p.sort) > (currentSort == null ? -1 : currentSort);
+      const up = sort > (currentSort == null ? -1 : currentSort);
       const label = contact ? L('Contact us', 'お問い合わせ') : (up ? L('Upgrade', 'アップグレード') : L('Change plan', 'プランを変更'));
-      // プラン一覧のボタンは副(ghost)に統一（画面の主役はヒーローの「クレジットを追加」1つ。Teamの強調は枠＋人気バッジ）
       action = `<button class="btn btn-ghost" data-upgrade="${p.id}"><span>${label}</span></button>`;
     }
     return `<div class="plan-card${cur ? ' current' : ''}${popular ? ' popular' : ''}">
       ${popular ? `<span class="pk-tag pop">${L('Popular', '人気')}</span>` : ''}
-      <div class="pn">${esc(p.name)}</div>
-      <div class="pp">${planPrice(p.id, p)}</div>
-      <ul class="feat">${feats.map(f => `<li><svg class="ic sm"><use href="#i-check"/></svg>${f}</li>`).join('')}</ul>
+      <div class="pc-tier">${esc(p.name)}</div>
+      <div class="pc-price">${planPrice(p.id, p)}</div>
+      <div class="pc-sub">${sub}</div>
+      <div class="pc-metrics"><b>${spotsTxt}</b><span>${seatsTxt}</span></div>
+      <ul class="feat">${feats.map(f => `<li class="${f.on ? 'on' : 'off'}"><svg class="ic sm"><use href="#i-${f.on ? 'check' : 'x'}"/></svg>${f.label}</li>`).join('')}</ul>
       ${action}
     </div>`;
   }
