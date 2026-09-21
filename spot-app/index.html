@@ -124,6 +124,7 @@
   .sb-credits { padding: 8px 10px 6px; }
   .sb-credits .mc-row { display: flex; justify-content: space-between; font-size: var(--t-label); color: var(--muted); }
   .sb-credits .mc-row b { color: var(--ink); font-family: var(--font-mono); font-weight: 500; }
+  .sb-credits .mc-unit { color: var(--muted); font-family: var(--font-jp); font-size: var(--t-label); font-weight: 400; }
   .sb-credits .u-meter { margin-top: 8px; }
   .sb-acct { display: flex; align-items: center; gap: 9px; padding: 8px; width: 100%; border: none; background: none; border-radius: 10px; cursor: pointer; color: inherit; font: inherit; text-align: left; }
   .sb-acct:hover { background: var(--hover); }
@@ -1163,7 +1164,7 @@
   <div class="sb-wscard" id="sbWsCard">
     <div class="menu-ws" id="workspaceList" hidden></div>
     <div class="sb-credits">
-      <div class="mc-row"><span>クレジット残</span><b><span id="acctCredits">—</span> / <span id="acctMax">—</span></b></div>
+      <div class="mc-row"><span>クレジット残</span><b><span id="acctCredits">—</span> <span class="mc-unit">本</span></b></div>
       <div class="u-meter sm" id="acctMeter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
     </div>
   </div>
@@ -1819,10 +1820,10 @@
     </div>
     <div class="bh-meter" id="billMeterWrap">
       <div class="bh-meter-head">
-        <span>今月あと <b id="billCredits">—</b> / <span id="billMax">—</span> 本</span>
-        <span class="muted" id="billPct"></span>
+        <span>残り <b id="billCredits">—</b> 本</span>
+        <span class="muted" id="billQuota"></span>
       </div>
-      <div class="u-meter big"><i id="billMeter" style="width:0%"></i></div>
+      <div class="u-meter big" id="billBar"><i id="billMeter" style="width:0%"></i></div>
     </div>
     <div class="bh-incl" id="billIncludes"></div>
   </div>
@@ -3344,7 +3345,7 @@
     const credits = currentOrg ? Number(currentOrg.credits) : (prof ? Number(prof.credits) : 0);
     let plan = null;
     if (planId) {
-      const r = await sb.from('plans').select('id,name,price_usd,price_jpy,spots_per_month,seats,extra_spot_usd').eq('id', planId).single();
+      const r = await sb.from('plans').select('id,name,price_usd,price_jpy,spots_per_month,seats,extra_spot_usd,sort').eq('id', planId).single();
       plan = r.data || null;
     }
     return { prof: { display_name: prof ? prof.display_name : '', plan: planId, credits }, plan, org: currentOrg };
@@ -3538,20 +3539,25 @@
           renew.textContent = L(`Renews ${ds}`, `次回更新 ${ds}`); renew.hidden = false;
         } else { renew.textContent = ''; renew.hidden = true; }
       }
-      // メーター（今月あと N/M 本）。コミット制は非表示。
-      const mWrap = document.getElementById('billMeterWrap');
-      if (max > 0) {
-        if (mWrap) mWrap.hidden = false;
-        setText('billCredits', String(c)); setText('billMax', String(max));
-        const pct = Math.max(0, Math.min(100, (c / max) * 100));
-        const meter = document.getElementById('billMeter');
-        if (meter) {
-          meter.style.width = pct + '%';
+      // 残高は総量で表示（購入・繰越で月次付与 max を超えるため「/max」は使わない）。
+      // バーは月次付与 max に対する目安（超過時は満タン）。コミット制(max=0)はバー非表示。
+      setText('billCredits', String(c));
+      const bq = document.getElementById('billQuota');
+      const bar = document.getElementById('billBar');
+      if (bq) bq.textContent = plan
+        ? (max > 0 ? L(`${plan.name} · ${max}/mo`, `${plan.name}は毎月 ${max} 本`) : L('Committed volume', 'コミット制'))
+        : '';
+      if (bar) {
+        if (max > 0) {
+          bar.hidden = false;
           const ratio = c / max;
-          meter.style.background = ratio <= 0.15 ? 'var(--crit)' : ratio <= 0.4 ? 'var(--warn)' : 'var(--good)';
-        }
-        setText('billPct', L(`${Math.round(pct)}% left`, `残り ${Math.round(pct)}%`));
-      } else if (mWrap) { mWrap.hidden = true; }
+          const meter = document.getElementById('billMeter');
+          if (meter) {
+            meter.style.width = Math.max(0, Math.min(100, ratio * 100)) + '%';
+            meter.style.background = ratio <= 0.15 ? 'var(--crit)' : ratio <= 0.4 ? 'var(--warn)' : 'var(--good)';
+          }
+        } else { bar.hidden = true; }
+      }
       // 含まれる内容チップ（月◯本 / ◯席）
       const incl = document.getElementById('billIncludes');
       if (incl && plan) {
