@@ -1072,6 +1072,10 @@
   .plan-card .feat li .ic { width: 15px; height: 15px; flex: none; }
   .plan-card .feat li.on { color: var(--ink); } .plan-card .feat li.on .ic { color: var(--good); }
   .plan-card .feat li.off { color: var(--faint); } .plan-card .feat li.off .ic { color: var(--faint); stroke-width: 2.4; }
+  .plan-card .feat li > span:first-of-type { min-width: 0; }
+  /* 「近日」= プラン特典表示だが製品未提供。控えめに区別（正直さ） */
+  .feat-soon { flex: none; margin-left: auto; font-size: var(--t-label-sm); font-weight: 700; letter-spacing: .02em;
+    color: var(--warn); background: color-mix(in srgb, var(--warn) 16%, transparent); border-radius: var(--r-full); padding: 1px 7px; }
   .plan-card .btn { margin-top: auto; }
   .plan-card.current { border-color: var(--line); box-shadow: none; background: var(--surface); opacity: .82; }
   .plan-card.popular { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
@@ -4265,11 +4269,12 @@
     const spotsTxt = spots === 0 ? L('Committed volume', 'コミット制') : L(`${spots} videos/mo`, `月 ${spots} 本`);
     const seatsTxt = seats === 0 ? L('Unlimited seats', '席 無制限') : L(`${seats} seats`, `${seats} 席`);
     // 共通の機能比較（✓=含む / ✕=含まない）。実データ(brands/premium/sort)から導出。
+    // soon=true はプラン特典として表示するが製品未提供の機能（正直さ: 今使えると誤認させない）。
     const feats = [
       { on: true,               label: L('Real-time progress & QC', 'リアルタイム進捗・品質チェック') },
-      { on: brands > 1 || brands === 0, label: brands === 0 ? L('Unlimited brands', 'ブランド無制限') : L('Multiple brands', '複数ブランド管理') },
-      { on: !!p.premium_models, label: L('Premium AI models', 'プレミアムAIモデル') },
-      { on: sort >= 3,          label: L('Priority render queue', '優先生成キュー') },
+      { on: brands > 1 || brands === 0, soon: true, label: brands === 0 ? L('Unlimited brands', 'ブランド無制限') : L('Multiple brands', '複数ブランド管理') },
+      { on: !!p.premium_models, soon: true, label: L('Premium AI models', 'プレミアムAIモデル') },
+      { on: sort >= 3,          soon: true, label: L('Priority render queue', '優先生成キュー') },
       { on: sort >= 2,          label: L('Priority support', '優先サポート') },
       { on: true,               label: L('Buy extra credits anytime', '追加クレジット購入') },
     ];
@@ -4287,7 +4292,7 @@
       <div class="pc-price">${planPrice(p.id, p, billCycle)}</div>
       <div class="pc-sub">${sub}</div>
       <div class="pc-metrics"><b>${spotsTxt}</b><span>${seatsTxt}</span></div>
-      <ul class="feat">${feats.map(f => `<li class="${f.on ? 'on' : 'off'}"><svg class="ic sm"><use href="#i-${f.on ? 'check' : 'x'}"/></svg>${f.label}</li>`).join('')}</ul>
+      <ul class="feat">${feats.map(f => `<li class="${f.on ? 'on' : 'off'}"><svg class="ic sm"><use href="#i-${f.on ? 'check' : 'x'}"/></svg><span>${f.label}</span>${f.on && f.soon ? `<span class="feat-soon">${L('Soon', '近日')}</span>` : ''}</li>`).join('')}</ul>
       ${action}
     </div>`;
   }
