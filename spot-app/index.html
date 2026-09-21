@@ -3690,7 +3690,9 @@
 
   const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
   window.sb = sb;   // データ配線スライスで再利用
-  showAuth();       // まず認証画面を出し、既存セッションがあれば隠す
+  // ここで認証画面を出すと、ログイン済みでも getSession 解決までの一瞬ログイン画面がチラつく。
+  // セッション判定（getSession / onAuthStateChange）が終わるまでは body.booting のブランクを維持し、
+  // 「セッションあり→アプリ」「セッションなし→認証」を確定させてから描画する。
 
   document.getElementById('authToggle').addEventListener('click', () => {
     mode = mode === 'signin' ? 'signup' : 'signin';
@@ -3754,7 +3756,8 @@
   });
 
   sb.auth.onAuthStateChange((_evt, session) => { session ? onSignedIn(session) : showAuth(); });
-  sb.auth.getSession().then(({ data }) => { if (data.session) onSignedIn(data.session); });
+  sb.auth.getSession().then(({ data }) => { data.session ? onSignedIn(data.session) : showAuth(); })
+    .catch(() => showAuth());   // 判定不能時は安全側で認証画面へ
 
   async function onSignedIn(session) {
     showApp();
