@@ -27,6 +27,10 @@
   --on-accent: #FFFFFF;
   --accent-grad: linear-gradient(135deg, #4A67E3, #6C5CE0);        /* 主CTA・Canva風のやさしいグラデ */
   --accent-grad-hover: linear-gradient(135deg, #5A76EC, #7C6BEC);
+  /* --- glow（indigoを「塗り」でなく「光源」として使う・LINE反映の要）--- */
+  --glow: radial-gradient(circle, var(--accent), transparent 70%); /* 光彩の塗り（ヒーロー/FAB/結果リビール等の疑似要素に） */
+  --glow-shadow: 0 10px 30px -6px color-mix(in srgb, var(--accent) 42%, transparent); /* 選択面・FABの色付き影＝“光っている”手触り */
+  --scrim: color-mix(in srgb, var(--ground) 55%, rgba(0,0,0,.35));  /* モーダル/ボトムシートの暗幕（onboard-screenの式を正準化） */
   --cool: #4CC2B0;
   --cool-soft: #12332E;
   --good: #6DB98C;
