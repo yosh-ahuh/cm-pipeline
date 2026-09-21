@@ -285,8 +285,10 @@
   .panel.pad { padding: var(--s-5); }
   .panel.pad > .panel-h { padding: 0; margin-bottom: var(--s-4); }
   /* セクション（パネル）間に一定の縦余白。ヘッダー(.context)の下余白は gap に一本化 */
-  #view-billing, #view-credits, #view-team { display: flex; flex-direction: column; gap: var(--s-6); }
-  #view-billing > .context, #view-credits > .context, #view-team > .context { padding-bottom: 0; }
+  #view-billing, #view-credits, #view-team,
+  #view-media, #view-collections, #view-settings { display: flex; flex-direction: column; gap: var(--s-6); }
+  #view-billing > .context, #view-credits > .context, #view-team > .context,
+  #view-media > .context, #view-collections > .context, #view-settings > .context { padding-bottom: 0; }
   .panel-h {
     font-size: var(--t-label-sm); font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
     color: var(--muted); padding: var(--s-4) var(--s-4) 0; display: flex; align-items: center; gap: var(--s-2);
@@ -1223,7 +1225,7 @@
       </div>
       <div class="u-card">
         <div class="u-k">クレジット残</div>
-        <div class="u-v">—<small>/ —</small></div>
+        <div class="u-v">—<small>本</small></div>
         <div class="u-meter" role="progressbar" aria-label="クレジット残" aria-valuemin="0" aria-valuemax="40" aria-valuenow="0"><i style="width:0%"></i></div>
         <div class="u-note" data-t="1クレジット ＝ CM1本（3パターン×3フォーマット = 9ファイル）">1クレジット ＝ CM1本（3パターン×3フォーマット = 9ファイル）</div>
       </div>
@@ -1693,30 +1695,30 @@
     <div class="title-sub">アカウント情報と表示設定。</div>
   </div></section>
   <div class="settings-grid">
-    <div class="panel">
+    <div class="panel pad">
       <div class="panel-h">プロフィール</div>
       <div class="fld"><label for="setName">表示名</label>
         <input id="setName" type="text" maxlength="60" placeholder="山田 太郎" autocomplete="name"></div>
       <div class="fld"><label for="setEmail">メールアドレス</label>
         <input id="setEmail" type="email" readonly></div>
       <div class="cta-row">
-        <button class="btn btn-primary" id="setSave"><span>保存</span></button>
+        <button class="btn btn-primary wauto" id="setSave"><span>保存</span></button>
         <span class="save-note" id="setSaveNote" hidden>保存しました</span>
       </div>
     </div>
-    <div class="panel">
+    <div class="panel pad">
       <div class="panel-h">プラン</div>
       <div class="set-plan"><b id="setPlanName">—</b><span class="muted" id="setPlanSpots"></span></div>
       <div class="cta-row"><button class="btn btn-ghost" id="setToBilling"><span>プランと請求を見る</span></button></div>
     </div>
-    <div class="panel">
+    <div class="panel pad">
       <div class="panel-h">表示言語</div>
       <div class="lang seg" role="group" aria-label="Language" style="margin-top:4px">
         <button data-lang="en" aria-pressed="true">EN</button>
         <button data-lang="ja" aria-pressed="false" aria-label="日本語"><span class="full">日本語</span><span class="short" aria-hidden="true">JA</span></button>
       </div>
     </div>
-    <div class="panel">
+    <div class="panel pad">
       <div class="panel-h">アカウント</div>
       <div class="cta-row"><button class="btn btn-ghost" id="setSignOut"><svg class="ic"><use href="#i-logout"/></svg><span>サインアウト</span></button></div>
     </div>
@@ -3378,9 +3380,9 @@
       if (prof && cards[1]) {   // profile query failed → keep what is shown (header chip still gets refreshCredits)
         setLeadNumber(cards[1].querySelector('.u-v'), String(c));
         const small = cards[1].querySelector('.u-v small');
-        if (small) small.textContent = '/ ' + PLAN_CREDITS;   // 分母をプラン付与量に
+        if (small) small.textContent = L(' credits', ' 本');   // 総残高で表示（購入/繰越で月次付与を超えるため /max は使わない）
         const meter = cards[1].querySelector('.u-meter i');
-        if (meter) meter.style.width = Math.max(0, Math.min(100, (c / PLAN_CREDITS) * 100)) + '%';
+        if (meter) meter.style.width = Math.max(0, Math.min(100, (c / (PLAN_CREDITS || 1)) * 100)) + '%';
       }
       if (prof && window.onAccountInfo) window.onAccountInfo({ plan: PLAN_NAME, credits: c, max: PLAN_CREDITS });   // account menu (keeps last values if the query fails)
     } catch (_) { /* noop */ }
