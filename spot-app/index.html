@@ -1775,7 +1775,7 @@
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
             <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18M6 20V9l6-4 6 4v11M9 20v-5h6v5"/></svg></span>
             <span class="o-name">経営層</span>
-            <span class="o-desc">実績・ROI。数字と信頼で入る</span>
+            <span class="o-desc">実績・費用対効果。数字と信頼で入る</span>
           </button>
           <button class="opt" data-val="一般消費者">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
@@ -2150,7 +2150,7 @@
     <div class="fld"><label for="setEmail">メールアドレス</label>
       <input id="setEmail" type="email" readonly></div>
     <div class="cta-row">
-      <button class="btn btn-primary wauto" id="setSave"><span>保存</span></button>
+      <button class="btn btn-primary wauto" id="setSave"><span>プロフィールを保存</span></button>
       <span class="save-note" id="setSaveNote" hidden>保存しました</span>
     </div>
   </div>
@@ -2230,7 +2230,7 @@
       <label class="switch-row"><input type="checkbox" id="notifDone"><span>制作が完了したらメールで知らせる</span></label>
       <hr class="soft-sep">
       <label class="switch-row"><input type="checkbox" id="notifNews"><span>Spot からのお知らせ・新機能を受け取る</span></label>
-      <p class="muted" id="notifNote" style="margin:12px 0 0;font-size:var(--t-label-sm)">クレジットの低残高メールは「クレジットを追加」で設定できます。</p>
+      <p class="muted" id="notifNote" style="margin:12px 0 0;font-size:var(--t-label-sm)">クレジットが少なくなったときのお知らせメールは「クレジットを追加」で設定できます。</p>
     </div>
     <div class="panel pad">
       <div class="panel-h">表示言語</div>
@@ -3523,7 +3523,7 @@
     '見る人によって、伝え方の入口とテンポが変わります。ひとつ選んでください。':
       'The entry point and pacing change with the viewer. Pick one.',
     '現場担当': 'Field staff', '手軽さ・時短。悩み共感から入る': 'Ease and time saved. Opens on the pain',
-    '経営層': 'Executives', '実績・ROI。数字と信頼で入る': 'Results and ROI. Opens on numbers',
+    '経営層': 'Executives', '実績・費用対効果。数字と信頼で入る': 'Results and ROI. Opens on numbers',
     '一般消費者': 'Consumers', 'ベネフィット・感情で入る': 'Opens on benefit and emotion',
     'Z世代': 'Gen Z', 'テンポ・世界観・共感で入る': 'Tempo, aesthetic, resonance',
     // step 4
@@ -3666,7 +3666,7 @@
     // settings / billing
     'プロフィール・設定': 'Profile & settings', 'アカウント情報と表示設定。': 'Account info and display settings.',
     'プロフィール': 'Profile', '表示名': 'Display name', 'メールアドレス': 'Email',
-    '保存': 'Save', '保存しました': 'Saved', 'プラン': 'Plan', 'プランと請求を見る': 'View plan & billing',
+    '保存': 'Save', '保存しました': 'Saved', 'プロフィールを保存': 'Save profile', 'プラン': 'Plan', 'プランと請求を見る': 'View plan & billing',
     '表示言語': 'Language', '左のサイドバー下部の': 'Use the', 'で切り替えられます。': 'toggle in the sidebar to switch.',
     // プロフィール設定 / アカウント設定（分割）
     'プロフィール設定': 'Profile settings', 'アカウント設定': 'Account settings',
@@ -3716,6 +3716,7 @@
     '残高がこの数を下回ったら': 'When balance falls below',
     'このぶんを補充する': 'Add this many credits',
     '残高が少なくなったらメールで知らせる': 'Email me when my balance runs low',
+    'クレジットが少なくなったときのお知らせメールは「クレジットを追加」で設定できます。': 'You can set up low-balance email alerts under “Add credits”.',
     'この数を下回ったら通知': 'Notify when below',
     '設定を保存': 'Save settings',
     '※ 自動チャージの実行には、保存済みのお支払い方法が必要です。': '* Auto top-up requires a saved payment method to run.',
@@ -5371,7 +5372,7 @@
   }
   async function createCollection(thenMoveProject) {
     if (!currentOrg || !(window.__canWrite && window.__canWrite())) return null;
-    const name = await openNameModal({ title: L('New collection', '新規コレクション'), okLabel: L('Create', '作成') });
+    const name = await openNameModal({ title: L('New collection', '新規コレクション'), okLabel: L('Create collection', 'コレクションを作成') });
     if (!name) return null;
     try {
       const { data, error } = await sb.from('collections').insert({ org_id: currentOrg.id, name }).select().single();
