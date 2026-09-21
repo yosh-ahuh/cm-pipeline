@@ -1456,6 +1456,9 @@
           <label class="f-label" for="authNewPass">新しいパスワード</label>
           <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
             <input id="authNewPass" type="password" minlength="6" placeholder="6文字以上" autocomplete="new-password"></div>
+          <label class="f-label" for="authNewPass2" style="margin-top:var(--s-3)">新しいパスワード（確認）</label>
+          <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
+            <input id="authNewPass2" type="password" minlength="6" placeholder="もう一度入力" autocomplete="new-password"></div>
         </div>
         <label class="auth-terms auth-signup-only" id="authTerms" hidden>
           <input type="checkbox" id="authAgree">
@@ -3444,6 +3447,8 @@
     '新しいパスワードを入力してください。': 'Enter your new password.', '認証番号（メールに届いた番号）': 'Verification code (from email)',
     'メールに届いた認証番号を入力してください。': 'Enter the code from your email.',
     '新しいパスワード': 'New password', 'ログイン': 'Log in',
+    '新しいパスワード（確認）': 'New password (confirm)', 'もう一度入力': 'Enter again',
+    '確認用のパスワードが一致しません。': 'The confirmation password does not match.',
     'メールアドレスを入力してください。': 'Please enter your email.',
     'パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。': 'Password reset email sent. Open the link in the email to set a new password.',
     '認証番号をメールに送信しました。届いた6桁を入力してください。': 'A verification code was emailed. Enter the 6 digits.',
@@ -3915,6 +3920,15 @@
     return;
   }
 
+  // ⚠ セキュリティ: パスワード再設定リンクは「新パスワード設定」専用。アプリにログインさせない。
+  //   Supabase の recovery リンクは #...&type=recovery で戻る。createClient がハッシュを消費する前に判定する。
+  //   さらに sessionStorage にも保持し、復旧中のリロードでもアプリに入れないようにする（完了/離脱で解除）。
+  const RECOVERY_KEY = 'spot.recovering';
+  const urlRecovery = /[#&?]type=recovery(&|$)/.test((location.hash || '') + (location.search || ''));
+  let recovering = urlRecovery;
+  try { if (urlRecovery) sessionStorage.setItem(RECOVERY_KEY, '1'); else if (sessionStorage.getItem(RECOVERY_KEY) === '1') recovering = true; } catch (_) {}
+  const setRecovering = (on) => { recovering = on; try { on ? sessionStorage.setItem(RECOVERY_KEY, '1') : sessionStorage.removeItem(RECOVERY_KEY); } catch (_) {} };
+
   const sb = window.supabase.createClient(cfg.url, cfg.anonKey);
   window.sb = sb;   // データ配線スライスで再利用
   // ここで認証画面を出すと、ログイン済みでも getSession 解決までの一瞬ログイン画面がチラつく。
@@ -3933,6 +3947,8 @@
   function setMode(m) {
     mode = m;
     if (m !== 'otp') otpSent = false;
+    // モード変更でクールダウンをリセット（残ったカウントダウン/無効化を解除）
+    ['authSubmit', 'authOtpResend'].forEach(id => { const el = document.getElementById(id); if (el && el._cd) { clearInterval(el._cd); el._cd = null; el.disabled = false; } });
     const [h, sub, submit] = HEAD[m] || HEAD.signin;
     hEl.textContent = h;
     const subEl = document.getElementById('authSub'); if (subEl) subEl.textContent = sub;
@@ -3963,7 +3979,10 @@
   document.getElementById('authToggle').addEventListener('click', () => setMode(mode === 'signin' ? 'signup' : 'signin'));
   { const f = document.getElementById('authForgot'); if (f) f.addEventListener('click', () => setMode('reset')); }
   { const o = document.getElementById('authOtpLink'); if (o) o.addEventListener('click', () => setMode('otp')); }
-  { const b = document.getElementById('authBack'); if (b) b.addEventListener('click', () => setMode('signin')); }
+  { const b = document.getElementById('authBack'); if (b) b.addEventListener('click', () => {
+      if (mode === 'recovery') { setRecovering(false); try { sb.auth.signOut(); } catch (_) {} }   // 復旧を中断＝復旧セッションを破棄
+      setMode('signin');
+    }); }
   { const r = document.getElementById('authOtpResend'); if (r) r.addEventListener('click', () => sendOtp(document.getElementById('authEmail').value.trim())); }
 
   // アカウント種別（個人 / 組織）切替 — 組織のとき会社名を表示
@@ -3983,17 +4002,47 @@
     if (on) { submitEl.setAttribute('aria-busy', 'true'); submitLabel = submitText.textContent; submitText.innerHTML = '<span class="tsp" style="border-color:#fff;border-right-color:transparent"></span>'; }
     else { submitEl.removeAttribute('aria-busy'); if (submitLabel) submitText.textContent = submitLabel; }
   }
-  // 認証番号（メールOTP）を送る。※Supabaseのメールテンプレートに {{ .Token }} が必要（6桁コード）。
+  // ---- 再送/再送信のクールダウン（残り秒数をカウントダウン表示）----
+  //   タイマーはボタン要素(_cd)に保持し、setMode 側でも id 参照で確実に停止できるようにする。
+  const OTP_COOLDOWN = 60;   // 送信直後の既定クールダウン（Supabaseのレート制限に合わせて自動補正）
+  const parseRetrySec = (msg) => { const m = String(msg || '').match(/after\s+(\d+)\s*seconds?/i); return m ? parseInt(m[1], 10) : null; };
+  function startCooldown(btn, setLabel, sec, restore) {
+    if (!btn) return;
+    if (btn._cd) clearInterval(btn._cd);
+    const lbl = window.L || ((en, ja) => ja);
+    let left = Math.max(1, Math.ceil(sec));
+    btn.disabled = true; btn.setAttribute('aria-live', 'polite');
+    const tick = () => {
+      if (left <= 0) { clearInterval(btn._cd); btn._cd = null; btn.disabled = false; setLabel(restore); return; }
+      setLabel(lbl(`Available in ${left}s`, `再送まで ${left}秒`));
+      left--;
+    };
+    tick(); btn._cd = setInterval(tick, 1000);
+  }
+  const resendBtn = document.getElementById('authOtpResend');
+  const setResend = (t) => { if (resendBtn) resendBtn.textContent = t; };
+  const setSubmit = (t) => { submitText.textContent = t; };
+
+  // 認証番号（メールOTP）を送る。※Supabaseのメールテンプレートに {{ .Token }} が必要（コード）。
   async function sendOtp(email) {
     if (!isEmail(email)) { fail('メールアドレスを入力してください。'); document.getElementById('authEmail').focus(); return; }
     submitBusy(true);
     try {
       const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+      submitBusy(false);   // ラベルを戻してから setMode でモード用ラベルに切替
       if (error) throw error;
       otpSent = true; setMode('otp');
-      fail('認証番号をメールに送信しました。届いた6桁を入力してください。', true);
-    } catch (e) { fail(String(e.message || e)); }
-    finally { submitBusy(false); }
+      fail('認証番号をメールに送信しました。届いた番号を入力してください。', true);
+      startCooldown(resendBtn, setResend, OTP_COOLDOWN, '認証番号を再送する');   // 再送は一定時間後
+    } catch (e) {
+      submitBusy(false);
+      const sec = parseRetrySec(e.message);
+      if (sec != null) {   // レート制限：残り秒数をカウントダウン
+        if (!otpSent) { otpSent = true; setMode('otp'); }
+        startCooldown(resendBtn, setResend, sec, '認証番号を再送する');
+        fail(`セキュリティのため、あと ${sec} 秒お待ちください。`, true);
+      } else { fail(String(e.message || e)); }
+    }
   }
 
   form.addEventListener('submit', async (e) => {
@@ -4006,10 +4055,16 @@
       submitBusy(true);
       try {
         const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + window.location.pathname });
+        submitBusy(false);
         if (error) throw error;
         fail('パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。', true);
-      } catch (err) { fail(String(err.message || err)); }
-      finally { submitBusy(false); }
+        startCooldown(submitEl, setSubmit, OTP_COOLDOWN, 'リセットリンクを送信');   // 連投防止のカウントダウン
+      } catch (err) {
+        submitBusy(false);
+        const sec = parseRetrySec(err.message);
+        if (sec != null) { fail(`セキュリティのため、あと ${sec} 秒お待ちください。`, true); startCooldown(submitEl, setSubmit, sec, 'リセットリンクを送信'); }
+        else fail(String(err.message || err));
+      }
       return;
     }
 
@@ -4030,15 +4085,18 @@
     // --- 新しいパスワードを設定（再設定リンクから戻った状態） ---
     if (mode === 'recovery') {
       const np = document.getElementById('authNewPass').value;
-      if (np.length < 6) { fail('新しいパスワードは6文字以上で入力してください。'); return; }
+      const np2 = document.getElementById('authNewPass2').value;
+      if (np.length < 6) { fail('新しいパスワードは6文字以上で入力してください。'); document.getElementById('authNewPass').focus(); return; }
+      if (np !== np2) { fail('確認用のパスワードが一致しません。'); document.getElementById('authNewPass2').focus(); return; }
       submitBusy(true);
       try {
         const { error } = await sb.auth.updateUser({ password: np });
+        submitBusy(false);
         if (error) throw error;
+        setRecovering(false);   // 復旧完了 → 通常のアプリ利用へ
         if (window.toast) window.toast('パスワードを更新しました。', false, 2000);
         const { data } = await sb.auth.getSession(); if (data.session) onSignedIn(data.session);
-      } catch (err) { fail(String(err.message || err)); }
-      finally { submitBusy(false); }
+      } catch (err) { submitBusy(false); fail(String(err.message || err)); }
       return;
     }
 
@@ -4122,12 +4180,15 @@
   });
 
   sb.auth.onAuthStateChange((evt, session) => {
-    if (evt === 'PASSWORD_RECOVERY') { showAuth(); setMode('recovery'); return; }   // 再設定リンクから戻った → 新パスワード設定
+    if (evt === 'PASSWORD_RECOVERY') { setRecovering(true); showAuth(); setMode('recovery'); return; }   // 再設定リンク → 新パスワード設定
+    if (recovering) { showAuth(); setMode('recovery'); return; }   // ⚠ 復旧中はセッションが張られてもアプリに入れない
     if (session) { upsertAcct(session); onSignedIn(session); }
-    else if (!window.__addingAccount) showAuth();   // 追加中の一時的な未認証では認証画面のまま
+    else if (!window.__addingAccount) { showAuth(); if (mode === 'recovery' || mode === 'reset' || mode === 'otp') setMode('signin'); }   // 通常のサインアウト → サインインへ
   });
-  sb.auth.getSession().then(({ data }) => { data.session ? onSignedIn(data.session) : showAuth(); })
-    .catch(() => showAuth());   // 判定不能時は安全側で認証画面へ
+  sb.auth.getSession().then(({ data }) => {
+    if (recovering) { showAuth(); setMode('recovery'); return; }   // 復旧中はアプリに入れない
+    data.session ? onSignedIn(data.session) : showAuth();
+  }).catch(() => showAuth());   // 判定不能時は安全側で認証画面へ
 
   async function onSignedIn(session) {
     window.__acctCurrentId = session.user.id;
