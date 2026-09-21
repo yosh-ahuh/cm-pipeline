@@ -1844,9 +1844,14 @@
 
   <!-- プランを変更（現行プランはヒーローに表示するため一覧からは除外） -->
   <div class="panel pad">
-    <div class="panel-h">プランを変更</div>
+    <div class="panel-h">プランを変更
+      <div class="seg" id="billCycleSeg" role="group" aria-label="請求サイクル" style="margin-left:auto">
+        <button type="button" data-cycle="monthly" aria-pressed="true">月払い</button>
+        <button type="button" data-cycle="yearly" aria-pressed="false">年払い</button>
+      </div>
+    </div>
     <div class="plan-grid" id="planGrid"></div>
-    <p class="muted" id="billNote" style="margin-top:14px">上位プランほど、毎月つくれるCMの本数と席数が増えます。足りなくなったら「クレジットを追加」でその都度購入もできます。</p>
+    <p class="muted" id="billNote" style="margin-top:var(--s-4)">上位プランほど、毎月つくれるCMの本数と席数が増えます。足りなくなったら「クレジットを追加」でその都度購入もできます。年払いは月額×12を年1回でお支払いいただきます（割引なし）。</p>
   </div>
 
   <!-- お支払い履歴 -->
@@ -2884,8 +2889,9 @@
     'プランを変更': 'Change plan', 'プランを変更する': 'Change plan', 'お問い合わせ': 'Contact us', '人気': 'Popular',
     'プレミアムモデル': 'Premium models',
     'アップグレードの決済連携（Stripe / 請求書）は準備中です。ご希望のプランはお問い合わせください。': 'Payment (Stripe / invoice) is coming soon — contact us for the plan you want.',
-    '上位プランほど、毎月つくれるCMの本数と席数が増えます。足りなくなったら「クレジットを追加」でその都度購入もできます。':
-      'Higher plans give more videos and seats each month. Run out? Buy more anytime with Add credits.',
+    '上位プランほど、毎月つくれるCMの本数と席数が増えます。足りなくなったら「クレジットを追加」でその都度購入もできます。年払いは月額×12を年1回でお支払いいただきます（割引なし）。':
+      'Higher plans give more videos and seats each month. Run out? Buy more anytime with Add credits. Yearly is monthly × 12, billed once a year (no discount).',
+    '月払い': 'Monthly', '年払い': 'Yearly',
     'お支払い履歴': 'Payment history', 'これまでの請求・領収書を確認できます。': 'View your past invoices and receipts.',
     '請求ポータルを開く（領収書・カード管理）': 'Open billing portal (receipts, cards)',
     '料金の目安（クレジットとは？）': 'Pricing guide (what are credits?)',
@@ -3582,15 +3588,8 @@
         incl.innerHTML = chips.map(t => `<span class="chip"><svg class="ic"><use href="#i-check"/></svg>${t}</span>`).join('');
       } else if (incl) { incl.innerHTML = ''; }
       const { data: plans } = await sb.from('plans').select('*').order('sort', { ascending: true });
-      const grid = document.getElementById('planGrid');
-      if (grid && plans) {
-        const curId = prof && prof.plan;
-        const curSort = plan ? Number(plan.sort) : -1;
-        const others = plans.filter(p => p.id !== curId);   // 現行はヒーローに表示済み → 一覧からは畳む
-        grid.innerHTML = others.map(p => planCard(p, curId, curSort)).join('');
-        grid.querySelectorAll('[data-upgrade]').forEach(b => b.addEventListener('click',
-          () => openCheckout(b.getAttribute('data-upgrade'))));   // Stripe Payment Link（config）
-      }
+      _billCtx = { plans: plans || [], curId: (prof && prof.plan) || null, curSort: plan ? Number(plan.sort) : -1 };
+      renderPlans();   // 請求サイクルトグルからも再描画する
       // お支払い履歴：実際の決済(Stripe)は Supabase に記録がない（add_credits は台帳に残さない）。
       // credit_ledger は「消費」記録なので購入履歴として出すと誤り → 領収書は請求ポータルへ誘導。
       const hist = document.getElementById('billHistory');
@@ -3609,6 +3608,23 @@
       }
     } catch (e) { console.error('loadBilling:', e.message); }
   };
+  let _billCtx = null;   // { plans, curId, curSort } — サイクル切替の再描画用
+  function renderPlans() {
+    const grid = document.getElementById('planGrid'); if (!grid || !_billCtx) return;
+    const { plans, curId, curSort } = _billCtx;
+    grid.innerHTML = plans.filter(p => p.id !== curId).map(p => planCard(p, curId, curSort)).join('');   // 現行はヒーロー表示のため除外
+    grid.querySelectorAll('[data-upgrade]').forEach(b => b.addEventListener('click',
+      () => openCheckout(b.getAttribute('data-upgrade'))));
+  }
+  (function wireBillCycle() {
+    const seg = document.getElementById('billCycleSeg'); if (!seg) return;
+    seg.addEventListener('click', e => {
+      const b = e.target.closest('[data-cycle]'); if (!b) return;
+      billCycle = b.getAttribute('data-cycle');
+      seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+      renderPlans();
+    });
+  })();
   (function wireBillingActions() {
     const add = document.getElementById('billAddCredits');
     if (add) add.addEventListener('click', () => { if (window.gotoCredits) window.gotoCredits(); });
@@ -3740,13 +3756,19 @@
     const sep = url.includes('?') ? '&' : '?';
     window.open(url + sep + 'client_reference_id=' + encodeURIComponent(ref), '_blank', 'noopener');
   }
-  function planPrice(id, pl) {
+  function planPrice(id, pl, cycle) {
     const ja = document.documentElement.lang === 'ja';
     if (id === 'free') return ja ? '無料' : '$0/mo';
-    if (ja) return pl.price_jpy ? `¥${Number(pl.price_jpy).toLocaleString()}/月` : 'お問い合わせ';
-    return pl.price_usd ? `$${pl.price_usd}/mo` : 'Contact us';
+    const yearly = cycle === 'yearly';
+    const mult = yearly ? 12 : 1;
+    const jpy = pl.price_jpy ? Number(pl.price_jpy) * mult : 0;
+    const usd = pl.price_usd ? Number(pl.price_usd) * mult : 0;
+    const per = yearly ? (ja ? '/年' : '/yr') : (ja ? '/月' : '/mo');
+    if (ja) return jpy ? `¥${jpy.toLocaleString()}${per}` : 'お問い合わせ';
+    return usd ? `$${usd.toLocaleString()}${per}` : 'Contact us';
   }
   const POPULAR_PLAN = 'team';   // おすすめバッジを付けるプラン
+  let billCycle = 'monthly';     // プラン一覧の請求サイクル表示（monthly/yearly、割引なし＝×12）
   const PLAN_SUB = {
     free:       ['Try it free', 'まずは無料でお試し'],
     starter:    ['For solo & small teams', '個人・小規模の定番'],
@@ -3781,7 +3803,7 @@
     return `<div class="plan-card${cur ? ' current' : ''}${popular ? ' popular' : ''}">
       ${popular ? `<span class="pk-tag pop">${L('Popular', '人気')}</span>` : ''}
       <div class="pc-tier">${esc(p.name)}</div>
-      <div class="pc-price">${planPrice(p.id, p)}</div>
+      <div class="pc-price">${planPrice(p.id, p, billCycle)}</div>
       <div class="pc-sub">${sub}</div>
       <div class="pc-metrics"><b>${spotsTxt}</b><span>${seatsTxt}</span></div>
       <ul class="feat">${feats.map(f => `<li class="${f.on ? 'on' : 'off'}"><svg class="ic sm"><use href="#i-${f.on ? 'check' : 'x'}"/></svg>${f.label}</li>`).join('')}</ul>
