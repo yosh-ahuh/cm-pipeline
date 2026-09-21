@@ -35,6 +35,7 @@
   --cool-soft: #12332E;
   --good: #6DB98C;
   --good-soft: #17281E;
+  --on-good: #0F1A14;       /* 緑塗り面の上の文字（--on-accent と同じ役割・従来の直書きを正準化） */
   --warn: #E4B14C;
   --crit: #E07A64;
   --crit-soft: #3A1F1A;

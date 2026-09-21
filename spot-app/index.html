@@ -337,7 +337,7 @@
     color: var(--faint); background: var(--surface); font-family: var(--font-mono);
   }
   .stage .node .ic { width: 13px; height: 13px; stroke-width: 3; }
-  .stage.done .node { background: var(--good); border-color: var(--good); color: #0F1A14; }
+  .stage.done .node { background: var(--good); border-color: var(--good); color: var(--on-good); }
   .stage.active .node { border-color: var(--accent-ink); color: var(--accent-ink); box-shadow: 0 0 0 4px var(--accent-soft); }
   .stage .s-name { font-size: var(--t-body-sm); font-weight: 700; line-height: 1.35; }
   .stage .s-desc { font-size: var(--t-label-sm); color: var(--muted); margin-top: 2px; }
@@ -483,7 +483,7 @@
   .field input:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
   .field .send { position: absolute; right: 4px; width: 34px; height: 34px; border-radius: var(--r-xs); display: grid; place-items: center; color: var(--muted); }
   .field .send:hover { background: var(--hover); color: var(--ink); }
-  .field-hint { font-size: var(--t-label-sm); color: var(--faint); margin-top: 6px; }
+  .field-hint { font-size: var(--t-label-sm); color: var(--muted); margin-top: 6px; }
   /* R1（LINE準拠）: 送信前のライブ検証 — error=赤枠+赤ヘルプ、正=かすかな緑、必須=赤* */
   .field.err input { border-color: var(--crit); background: color-mix(in srgb, var(--crit) 6%, var(--surface-2)); }
   .field.err input:focus { border-color: var(--crit); box-shadow: 0 0 0 3px var(--crit-soft); }
@@ -617,7 +617,7 @@
   .opt .o-tick .ic { width: 11px; height: 11px; stroke-width: 3.5; }
   .opt[aria-pressed="true"] .o-tick, .opt[aria-checked="true"] .o-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); animation: tickPop var(--dur) var(--ease-spring); }
   @keyframes tickPop { 0% { transform: scale(.4); } 60% { transform: scale(1.14); } 100% { transform: scale(1); } }
-  .multi-note { font-size: var(--t-label); color: var(--faint); margin-top: var(--s-3); font-family: var(--font-mono); }
+  .multi-note { font-size: var(--t-label); color: var(--muted); margin-top: var(--s-3); font-family: var(--font-mono); }
   .multi-note.warn { color: var(--warn); }
   /* カスタム設定（縦横比・解像度） */
   .custom-cfg { margin-top: var(--s-4); padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface-2); }
@@ -715,7 +715,7 @@
   .shot-item + .shot-item { border-top: 1px solid var(--line); border-radius: 0; }
   .shot-item .sck { width: 20px; height: 20px; border-radius: var(--r-xs); border: 1.5px solid var(--line-strong); display: grid; place-items: center; color: transparent; }
   .shot-item .sck .ic { width: 11px; height: 11px; stroke-width: 3.5; }
-  .shot-item.up .sck { background: var(--good); border-color: var(--good); color: #0F1A14; }
+  .shot-item.up .sck { background: var(--good); border-color: var(--good); color: var(--on-good); }
   .shot-item .si-name { font-size: var(--t-body-sm); font-weight: 700; }
   .shot-item .si-desc { font-size: var(--t-label-sm); color: var(--muted); }
   .shot-item .si-tag { font-family: var(--font-mono); font-size: var(--t-label-sm); color: var(--muted); }
@@ -736,7 +736,7 @@
   .dash-hero { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: var(--s-5); padding: var(--s-8) 0 var(--s-6); align-items: stretch; }
   .hero-new {
     position: relative; overflow: hidden; border-radius: var(--r-xl); padding: var(--s-8);
-    background: linear-gradient(135deg, #1B2352, #14151C); color: #EEF0F8; display: flex; flex-direction: column; justify-content: center;
+    background: linear-gradient(135deg, var(--accent-soft), #14151C); color: #EEF0F8; display: flex; flex-direction: column; justify-content: center;
     box-shadow: var(--shadow-lift);
   }
   .hero-new::after { content:""; position:absolute; right:-40px; top:-40px; width:220px; height:220px; border-radius:50%; background: var(--glow); opacity:.4; pointer-events: none; }
@@ -900,7 +900,7 @@
      Export / delivery
      ========================================================================== */
   .exp-head { display: flex; align-items: center; gap: var(--s-4); padding: var(--s-8) 0 var(--s-2); }
-  .exp-check { width: 48px; height: 48px; border-radius: 50%; background: var(--good); color: #0F1A14; display: grid; place-items: center; flex: none; box-shadow: 0 6px 20px color-mix(in srgb, var(--good) 40%, transparent); }
+  .exp-check { width: 48px; height: 48px; border-radius: 50%; background: var(--good); color: var(--on-good); display: grid; place-items: center; flex: none; box-shadow: 0 6px 20px color-mix(in srgb, var(--good) 40%, transparent); }
   .exp-check .ic { width: 24px; height: 24px; stroke-width: 3; }
   .exp-head h1 { font-family: var(--font-display); font-size: var(--t-headline); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
   .exp-head .sub { color: var(--muted); font-size: var(--t-body-sm); margin-top: 4px; }
@@ -1241,13 +1241,13 @@
   .plan-card { border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-5); background: var(--surface-2); display: flex; flex-direction: column; }
   .plan-card .pc-tier { font-size: var(--t-label); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .plan-card .pc-price { font-family: var(--font-display); font-weight: 800; font-size: 24px; letter-spacing: -.02em; margin-top: var(--s-1); }
-  .plan-card .pc-sub { font-size: var(--t-label); color: var(--faint); margin-top: 2px; }
+  .plan-card .pc-sub { font-size: var(--t-label); color: var(--muted); margin-top: 2px; }
   .plan-card .pc-metrics { display: flex; gap: var(--s-2); align-items: baseline; font-size: var(--t-body-sm); padding: var(--s-3) 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: var(--s-4) 0; }
   .plan-card .pc-metrics b { font-weight: 700; } .plan-card .pc-metrics span { color: var(--muted); }
   .plan-card .badge-cur { align-self: flex-start; margin-top: var(--s-3); }
   /* credits: purchase packs + auto top-up */
   .pack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--s-3); }
-  .pack-card { position: relative; border: 1px solid var(--line); border-radius: 12px; padding: var(--s-4); background: var(--surface-2);
+  .pack-card { position: relative; border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-4); background: var(--surface-2);
     display: flex; flex-direction: column; gap: 4px; cursor: pointer; text-align: left; color: inherit; font: inherit; }
   .pack-card:hover { border-color: var(--accent-ink); }
   .pack-card.sel { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface-2)); }
@@ -1255,7 +1255,7 @@
   .pack-card .pk-credits { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -.02em; }
   .pack-card .pk-price { color: var(--ink); font-size: var(--t-body); font-weight: 600; }
   .pack-card .pk-sub { color: var(--muted); font-size: var(--t-label-sm); }
-  .pack-card .pk-unit { color: var(--faint); font-size: var(--t-label-sm); font-family: var(--font-mono); }
+  .pack-card .pk-unit { color: var(--muted); font-size: var(--t-label-sm); font-family: var(--font-mono); }
   .pack-card .pk-tag { position: absolute; top: 10px; right: 10px; font-size: var(--t-label-sm); color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--r-full); padding: 1px 8px; }
   /* 列・行で並ぶ数字は等幅数字で桁を揃える（価格・メトリクス・ダッシュ統計。mono系は元々等幅） */
   .plan-card .pc-price, .plan-card .pc-metrics, .pack-card .pk-credits, .pack-card .pk-price,
@@ -1348,7 +1348,7 @@
   .member-row .me { color: var(--muted); font-size: var(--t-label); flex: none; }
   .member-row .badge { margin-left: auto; }
   .member-row .rm { border: none; background: none; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 8px; }
-  .member-row .rm:hover { background: var(--hover); color: var(--bad, #c4553d); }
+  .member-row .rm:hover { background: var(--hover); color: var(--crit); }
   .sel { height: var(--control-h); padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink); font: inherit; }
   /* view-only (viewer role): hide write controls, show banner */
   .ro-banner { position: sticky; top: 0; z-index: 120; background: var(--accent); color: #fff;
