@@ -1802,6 +1802,24 @@
       </div>
     </div>
     <div class="panel pad">
+      <div class="panel-h">パスワード</div>
+      <div class="fld"><label for="setNewPass">新しいパスワード</label>
+        <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
+          <input id="setNewPass" type="password" minlength="6" placeholder="6文字以上" autocomplete="new-password"></div></div>
+      <div class="fld"><label for="setNewPass2">新しいパスワード（確認）</label>
+        <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
+          <input id="setNewPass2" type="password" minlength="6" placeholder="もう一度入力" autocomplete="new-password"></div></div>
+      <div class="cta-row"><button class="btn btn-primary wauto" id="setPassSave"><span>パスワードを更新</span></button>
+        <span class="save-note" id="setPassNote" hidden>更新しました</span></div>
+    </div>
+    <div class="panel pad">
+      <div class="panel-h">通知</div>
+      <label class="switch-row"><input type="checkbox" id="notifDone"><span>制作が完了したらメールで知らせる</span></label>
+      <hr class="soft-sep">
+      <label class="switch-row"><input type="checkbox" id="notifNews"><span>Spot からのお知らせ・新機能を受け取る</span></label>
+      <p class="muted" id="notifNote" style="margin:12px 0 0;font-size:var(--t-label-sm)">クレジットの低残高メールは「クレジットを追加」で設定できます。</p>
+    </div>
+    <div class="panel pad">
       <div class="panel-h">プラン</div>
       <div class="set-plan"><b id="setPlanName">—</b><span class="muted" id="setPlanSpots"></span></div>
       <div class="cta-row"><button class="btn btn-ghost" id="setToBilling"><span>プランと請求を見る</span></button></div>
@@ -3742,6 +3760,36 @@
       } catch (e) { if (window.toast) window.toast('保存に失敗しました: ' + e.message, false, 2600); }
       finally { btn.disabled = false; }
     });
+  })();
+  // パスワード更新
+  (function wirePassword() {
+    const btn = document.getElementById('setPassSave'); if (!btn) return;
+    btn.addEventListener('click', async () => {
+      const p1 = document.getElementById('setNewPass'), p2 = document.getElementById('setNewPass2');
+      const v1 = p1.value, v2 = p2.value;
+      if (v1.length < 6) { toast(L('Password must be 6+ characters.', 'パスワードは6文字以上にしてください。'), false, 2400); p1.focus(); return; }
+      if (v1 !== v2) { toast(L('Passwords do not match.', 'パスワードが一致しません。'), false, 2400); p2.focus(); return; }
+      btn.disabled = true;
+      try {
+        const { error } = await sb.auth.updateUser({ password: v1 });
+        if (error) throw error;
+        p1.value = ''; p2.value = '';
+        const note = document.getElementById('setPassNote'); if (note) { note.hidden = false; setTimeout(() => note.hidden = true, 2000); }
+      } catch (e) { toast(L('Failed to update: ', 'パスワード更新に失敗: ') + e.message, false, 2800); }
+      finally { btn.disabled = false; }
+    });
+  })();
+  // 通知設定（端末ごとの表示設定・localStorage）
+  (function wireNotifications() {
+    const done = document.getElementById('notifDone'), news = document.getElementById('notifNews');
+    if (!done || !news) return;
+    try {
+      done.checked = localStorage.getItem('spot-notif-done') !== '0';   // 既定ON
+      news.checked = localStorage.getItem('spot-notif-news') !== '0';
+    } catch (_) {}
+    const save = (k, el) => { try { localStorage.setItem(k, el.checked ? '1' : '0'); } catch (_) {} };
+    done.addEventListener('change', () => save('spot-notif-done', done));
+    news.addEventListener('change', () => save('spot-notif-news', news));
   })();
 
   // ---- billing screen ----
