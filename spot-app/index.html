@@ -2873,6 +2873,14 @@
   });
   document.getElementById('scriptBack').addEventListener('click', gotoWizard);
   document.getElementById('scriptNext').addEventListener('click', () => {
+    // クレジット消費前の平易な確認（低ITリテラシー配慮・誤操作/コスト防止）
+    const cost = 1, bal = Number(acctInfo.credits) || 0;   // 生成=1クレジット（＝CM1本）
+    if (bal < cost) {
+      if (confirm(L('Not enough credits. Add credits now?', 'クレジットが足りません。クレジットを追加しますか？')) && window.gotoCredits) window.gotoCredits();
+      return;
+    }
+    if (!confirm(L(`This generation uses ${cost} credit (1 ad). ${bal} left. Continue?`,
+                   `この生成で ${cost} クレジット（＝CM1本）を使います。残り ${bal} クレジット。よろしいですか？`))) return;
     if (window.onGenerate) window.onGenerate(window.__currentProjectId);   // jobs をDBに投入（データ層）
     toast(L('Generating 8 cuts… live-action = AI / UI = code-drawn','8カットを生成中… 実写=AI / UI=コード描画'), true, 1600);
     setTimeout(() => {
