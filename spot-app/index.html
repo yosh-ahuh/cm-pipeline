@@ -821,6 +821,8 @@
   .auth-brand { display: flex; align-items: center; gap: 11px; }
   .auth-brand .wordmark { font-size: 22px; letter-spacing: -.02em; }
   .auth-brand-m { display: none; margin-bottom: var(--s-5); }
+  .auth-type { display: flex; width: 100%; }
+  .auth-type button { flex: 1; justify-content: center; }
   .field.ico input { padding-left: 42px; }
   .field.ico .fi { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--faint); display: grid; place-items: center; pointer-events: none; }
   .field.ico .fi .ic { width: 18px; height: 18px; }
@@ -1197,6 +1199,21 @@
       <h1 class="auth-h" id="authH">おかえりなさい</h1>
       <p class="auth-sub" id="authSub">メールアドレスとパスワードでサインイン。</p>
       <form id="authForm" class="auth-form" novalidate>
+        <div class="auth-signup-only" id="signupFields" hidden>
+          <div class="seg auth-type" id="authType" role="group" aria-label="アカウント種別">
+            <button type="button" data-type="personal" aria-pressed="true">個人</button>
+            <button type="button" data-type="org" aria-pressed="false">組織・会社</button>
+          </div>
+          <div style="margin-top:var(--s-3)">
+            <label class="f-label" for="authName">お名前</label>
+            <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-user"/></svg></span><input id="authName" type="text" placeholder="山田 太郎" autocomplete="name"></div>
+          </div>
+          <div id="authCompanyWrap" hidden style="margin-top:var(--s-3)">
+            <label class="f-label" for="authCompany">会社・組織名</label>
+            <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-users"/></svg></span><input id="authCompany" type="text" placeholder="株式会社スポット" autocomplete="organization"></div>
+            <p class="muted" style="margin:6px 0 0;font-size:var(--t-label-sm)">ロゴや請求情報は、登録後にプロフィールから追加できます。</p>
+          </div>
+        </div>
         <div>
           <label class="f-label" for="authEmail">メールアドレス</label>
           <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-mail"/></svg></span><input id="authEmail" type="email" placeholder="you@company.com" autocomplete="email" autocapitalize="off" spellcheck="false" inputmode="email" required></div>
@@ -3200,8 +3217,9 @@
     const signin = mode === 'signin';
     hEl.textContent = signin ? 'おかえりなさい' : 'アカウントを作成';
     const subEl = document.getElementById('authSub');
-    if (subEl) subEl.textContent = signin ? 'メールアドレスとパスワードでサインイン。' : 'メールアドレスとパスワードで登録します。';
+    if (subEl) subEl.textContent = signin ? 'メールアドレスとパスワードでサインイン。' : '個人／組織を選んで登録します。';
     submitText.textContent = signin ? 'サインイン' : 'アカウント作成';
+    const sf = document.getElementById('signupFields'); if (sf) sf.hidden = signin;   // 種別・お名前・会社名は登録時のみ
     document.getElementById('authToggleText').textContent = signin ? 'Spot は初めてですか?' : 'すでにアカウントをお持ちですか?';
     document.getElementById('authToggle').textContent = signin ? 'アカウントを作成' : 'サインイン';
     passEl.autocomplete = signin ? 'current-password' : 'new-password';
@@ -3209,17 +3227,39 @@
     document.getElementById('authEmail').focus();
   });
 
+  // アカウント種別（個人 / 組織）切替 — 組織のとき会社名を表示
+  let acctType = 'personal';
+  const typeSeg = document.getElementById('authType');
+  if (typeSeg) typeSeg.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-type]'); if (!b) return;
+    acctType = b.getAttribute('data-type');
+    typeSeg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    const cw = document.getElementById('authCompanyWrap'); if (cw) cw.hidden = acctType !== 'org';
+  });
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault(); errEl.hidden = true;
     const email = document.getElementById('authEmail').value.trim();
     const password = passEl.value;
     if (!email || password.length < 6) { fail('メールアドレスとパスワードを入力してください。'); (email ? passEl : document.getElementById('authEmail')).focus(); return; }
+    // 登録時の追加入力（お名前・組織名）
+    const nameEl = document.getElementById('authName'), companyEl = document.getElementById('authCompany');
+    const displayName = nameEl ? nameEl.value.trim() : '';
+    const companyName = companyEl ? companyEl.value.trim() : '';
+    if (mode === 'signup') {
+      if (!displayName) { fail('お名前を入力してください。'); nameEl.focus(); return; }
+      if (acctType === 'org' && !companyName) { fail('会社・組織名を入力してください。'); companyEl.focus(); return; }
+    }
     submitEl.disabled = true; submitEl.setAttribute('aria-busy', 'true');
     const label = submitText.textContent; submitText.innerHTML = '<span class="tsp" style="border-color:#fff;border-right-color:transparent"></span>';
     try {
       const { data, error } = mode === 'signin'
         ? await sb.auth.signInWithPassword({ email, password })
-        : await sb.auth.signUp({ email, password });
+        : await sb.auth.signUp({ email, password, options: { data: {
+            display_name: displayName,
+            account_type: acctType,
+            company_name: acctType === 'org' ? companyName : null,
+          } } });
       if (error) throw error;
       if (mode === 'signup' && !data.session) {
         fail('確認メールを送信しました。メール内のリンクで認証してからログインしてください。', true);
