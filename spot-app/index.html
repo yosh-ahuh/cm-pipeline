@@ -554,9 +554,9 @@
   .opt {
     text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-md);
     padding: var(--s-4); position: relative; display: flex; flex-direction: column; gap: 8px; min-height: 112px;
-    transition: border-color var(--dur-fast), background var(--dur-fast), transform var(--dur-fast), box-shadow var(--dur-fast);
+    transition: border-color var(--dur-fast), background var(--dur-fast), transform var(--dur) var(--ease-spring), box-shadow var(--dur-fast);
   }
-  .opt:hover { border-color: var(--line-strong); background: var(--surface-2); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .opt:hover { border-color: var(--line-strong); background: var(--surface-2); transform: translateY(-3px); box-shadow: var(--shadow); }
   .opt:active { transform: translateY(0) scale(.985); }
   .opt[aria-pressed="true"], .opt[aria-checked="true"] { border-color: var(--accent-ink); background: color-mix(in srgb, var(--accent-soft) 50%, var(--surface)); }
   .opt .o-ic { width: 36px; height: 36px; border-radius: var(--r-sm); background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center; color: var(--accent-ink); }
@@ -700,8 +700,8 @@
   .make-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: var(--s-3); }
   .make-card { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; text-align: left;
     padding: var(--s-4); background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1);
-    cursor: pointer; transition: transform var(--dur-fast) var(--ease-standard), border-color var(--dur-fast), box-shadow var(--dur-fast); }
-  .make-card:hover { transform: translateY(-3px); border-color: var(--accent-ink); box-shadow: var(--shadow); }
+    cursor: pointer; transition: transform var(--dur) var(--ease-spring), border-color var(--dur-fast), box-shadow var(--dur-fast); }
+  .make-card:hover { transform: translateY(-4px); border-color: var(--accent-ink); box-shadow: var(--shadow); }
   .make-card:active { transform: translateY(-1px); }
   .make-card:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
   /* フォーマット比率が“見て”分かるプレビュー枠 */
@@ -721,7 +721,7 @@
     background: var(--surface-2); color: var(--faint); opacity: 0; transform: translateX(-4px); transition: opacity var(--dur-fast), transform var(--dur-fast); }
   .make-go .ic { width: 13px; height: 13px; }
   .make-card:hover .make-go { opacity: 1; transform: translateX(0); color: var(--accent-ink); background: var(--accent-soft); }
-  @media (prefers-reduced-motion: reduce) { .make-card, .make-go { transition: none; } .make-card:hover { transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .make-card, .make-go, .opt { transition: none; } .make-card:hover, .opt:hover { transform: none; } }
 
   /* 常設「3ステップ」ガイド（低ITリテラシー向け）。制作物のあるリピーターでは畳む＝制作物を優先 */
   #view-dash.has-work .guide3 { display: none; }
@@ -796,7 +796,7 @@
 
   /* empty state */
   .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: var(--s-10) var(--s-4); display: flex; flex-direction: column; align-items: center; gap: var(--s-3); }
-  .empty .e-ic { width: 56px; height: 56px; border-radius: var(--r-lg); background: var(--surface-2); display: grid; place-items: center; color: var(--accent-ink); }
+  .empty .e-ic { width: 60px; height: 60px; border-radius: var(--r-lg); background: var(--accent-soft); display: grid; place-items: center; color: var(--accent-ink); box-shadow: var(--shadow-1); }
   .empty .e-ic .ic { width: 26px; height: 26px; }
   .empty h4 { margin: 0; font-size: var(--t-title); color: var(--ink); font-weight: 700; }
   .empty p { font-size: var(--t-body-sm); max-width: 40ch; }

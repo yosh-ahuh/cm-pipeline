@@ -80,6 +80,7 @@
   /* --- motion (M3 easing) --- */
   --ease-standard: cubic-bezier(.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(.05, .7, .1, 1);
+  --ease-spring: cubic-bezier(.34, 1.4, .64, 1);   /* やさしいバネ（選択面のホバーに・軽いオーバーシュート） */
   --dur-fast: 120ms;
   --dur: 200ms;
   --dur-slow: 320ms;
