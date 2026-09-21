@@ -3579,26 +3579,10 @@
         grid.querySelectorAll('[data-upgrade]').forEach(b => b.addEventListener('click',
           () => openCheckout(b.getAttribute('data-upgrade'))));   // Stripe Payment Link（config）
       }
-      // お支払い履歴（クレジット付与＝購入の台帳行から）。Stripe の領収書は請求ポータルで。
+      // お支払い履歴：実際の決済(Stripe)は Supabase に記録がない（add_credits は台帳に残さない）。
+      // credit_ledger は「消費」記録なので購入履歴として出すと誤り → 領収書は請求ポータルへ誘導。
       const hist = document.getElementById('billHistory');
-      if (hist) {
-        let rows = [];
-        try {
-          const { data } = await sb.from('credit_ledger')
-            .select('created_at, credits, usd').gt('credits', 0)
-            .order('created_at', { ascending: false }).limit(12);
-          rows = data || [];
-        } catch (_) { rows = []; }
-        if (rows.length) {
-          hist.innerHTML = rows.map(r => {
-            const d = new Date(r.created_at).toLocaleDateString(document.documentElement.lang === 'ja' ? 'ja-JP' : 'en-US');
-            const amt = r.usd ? `$${Number(r.usd).toFixed(2)}` : `+${Number(r.credits)} ${L('credits', 'クレジット')}`;
-            return `<div class="bill-hist-row"><span>${d}</span><span class="muted">${L('Credit purchase', 'クレジット購入')}</span><span class="bh-amt">${amt}</span></div>`;
-          }).join('');
-        } else {
-          hist.innerHTML = `<p class="muted" style="margin:0;font-size:var(--t-label)">${L('No payments yet.', 'まだお支払いはありません。')}</p>`;
-        }
-      }
+      if (hist) hist.innerHTML = `<p class="muted" style="margin:0;font-size:var(--t-label)">${L('Receipts and payment history are available in the billing portal.', '領収書・お支払い履歴は請求ポータルでご確認いただけます。')}</p>`;
       // 料金の目安（credit_costs）— 折りたたみパネル内。見出しは summary に集約済み。
       const { data: costs } = await sb.from('credit_costs').select('action, credits');
       const cc = document.getElementById('creditCosts');
