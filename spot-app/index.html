@@ -1443,7 +1443,7 @@
         </div>
         <div id="authFieldPass">
           <div class="f-labelrow"><label class="f-label" for="authPass">パスワード</label>
-            <button type="button" class="linkbtn auth-forgot" id="authForgot">パスワードを忘れた?</button></div>
+            <button type="button" class="linkbtn auth-forgot" id="authForgot">パスワードをお忘れですか?</button></div>
           <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
             <input id="authPass" type="password" placeholder="6文字以上" autocomplete="current-password" required minlength="6">
             <button type="button" class="eye" id="authEye" aria-label="パスワードを表示" aria-pressed="false"><svg class="ic"><use href="#i-eye"/></svg></button>
@@ -3443,10 +3443,10 @@
     'または': 'or', 'Google で続ける': 'Continue with Google', 'Microsoft で続ける': 'Continue with Microsoft',
     '現在のアカウントに戻る': 'Back to current account', 'そのアカウントに再度サインインしてください。': 'Please sign in to that account again.',
     // パスワードリセット / 認証番号ログイン
-    'パスワードを忘れた?': 'Forgot password?', 'パスワードなしでサインイン（認証番号）': 'Sign in without a password (code)',
+    'パスワードをお忘れですか?': 'Forgot password?', 'パスワードなしでサインイン（認証番号）': 'Sign in without a password (code)',
     'サインインに戻る': 'Back to sign in', '認証番号を再送する': 'Resend code',
-    'パスワードをリセット': 'Reset password', '登録メールにリセット用リンクを送ります。': "We'll email a reset link to your address.",
-    'リセットリンクを送信': 'Send reset link', '認証番号でサインイン': 'Sign in with a code',
+    'パスワードの再設定': 'Reset password', '登録メールに再設定用のリンクを送ります。': "We'll email a reset link to your address.",
+    '再設定リンクを送信': 'Send reset link', '認証番号でサインイン': 'Sign in with a code',
     'メールに届く番号で、パスワードなしで安全にサインインできます。': 'Sign in securely with the code sent to your email — no password.',
     '認証番号を送信': 'Send code', '新しいパスワードを設定': 'Set a new password', 'パスワードを更新': 'Update password',
     '新しいパスワードを入力してください。': 'Enter your new password.', '認証番号（メールに届いた番号）': 'Verification code (from email)',
@@ -3986,7 +3986,7 @@
   const HEAD = {
     signin:   ['おかえりなさい', 'メールアドレスとパスワードでサインイン。', 'サインイン'],
     signup:   ['アカウントを作成', '個人／組織を選んで登録します。', 'アカウント作成'],
-    reset:    ['パスワードをリセット', '登録メールにリセット用リンクを送ります。', 'リセットリンクを送信'],
+    reset:    ['パスワードの再設定', '登録メールに再設定用のリンクを送ります。', '再設定リンクを送信'],
     otp:      ['認証番号でサインイン', 'メールに届く番号で、パスワードなしで安全にサインインできます。', '認証番号を送信'],
     recovery: ['新しいパスワードを設定', '新しいパスワードを入力してください。', 'パスワードを更新'],
   };
@@ -4127,11 +4127,11 @@
         submitBusy(false);
         if (error) throw error;
         fail('パスワード再設定用のメールを送信しました。メール内のリンクを開いて新しいパスワードを設定してください。', true);
-        startCooldown(submitEl, setSubmit, OTP_COOLDOWN, 'リセットリンクを送信');   // 連投防止のカウントダウン
+        startCooldown(submitEl, setSubmit, OTP_COOLDOWN, '再設定リンクを送信');   // 連投防止のカウントダウン
       } catch (err) {
         submitBusy(false);
         const sec = parseRetrySec(err.message);
-        if (sec != null) { fail(window.L(`For security, please wait ${sec} seconds.`, `セキュリティのため、あと ${sec} 秒お待ちください。`), true); startCooldown(submitEl, setSubmit, sec, 'リセットリンクを送信'); }
+        if (sec != null) { fail(window.L(`For security, please wait ${sec} seconds.`, `セキュリティのため、あと ${sec} 秒お待ちください。`), true); startCooldown(submitEl, setSubmit, sec, '再設定リンクを送信'); }
         else fail(authErrMsg(err));
       }
       return;
