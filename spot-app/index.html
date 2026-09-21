@@ -1814,6 +1814,15 @@
       <span class="save-note" id="companySaveNote" hidden>保存しました</span></div>
   </div>
 
+  <!-- 個人→組織へのアップグレード（個人アカウントのオーナーのみ表示） -->
+  <div class="panel pad" id="upgradePanel" hidden>
+    <div class="panel-h">組織・チームで使う</div>
+    <p class="muted" style="margin:0 0 16px;font-size:var(--t-label)">会社・チームに切り替えると、会社名やロゴを設定でき、メンバーを招待して同じワークスペースで制作できます。いまの動画・クレジットはそのまま引き継がれます。</p>
+    <div class="fld"><label for="upgradeName">会社・組織名</label>
+      <input id="upgradeName" type="text" maxlength="80" placeholder="株式会社スポット" autocomplete="organization"></div>
+    <div class="cta-row"><button class="btn btn-primary wauto" id="upgradeBtn"><svg class="ic"><use href="#i-users"/></svg><span>組織にアップグレード</span></button></div>
+  </div>
+
   <div class="settings-grid">
     <div class="panel pad">
       <div class="panel-h">プロフィール</div>
@@ -3598,8 +3607,15 @@
   // 会社プロフィール（組織アカウントのみ）: 会社名 + ロゴ
   async function loadCompanyProfile() {
     const panel = document.getElementById('companyPanel'); if (!panel) return;
+    const up = document.getElementById('upgradePanel');
     const org = currentOrg;
-    if (!org || org.is_personal) { panel.hidden = true; return; }   // 個人アカウントでは非表示
+    const isOwner = window.__isOwner ? window.__isOwner() : true;
+    if (!org || org.is_personal) {   // 個人アカウント：会社プロフィール非表示、（オーナーなら）昇格パネル表示
+      panel.hidden = true;
+      if (up) up.hidden = !(org && org.is_personal && isOwner);
+      return;
+    }
+    if (up) up.hidden = true;
     panel.hidden = false;
     const nameEl = document.getElementById('companyName'); if (nameEl) nameEl.value = org.name || '';
     // ブランドのロゴを表示
@@ -3706,6 +3722,28 @@
         if (note) { note.hidden = false; setTimeout(() => note.hidden = true, 2000); }
       } catch (e) { toast(L('Failed to save: ', '保存に失敗: ') + e.message, false, 2600); }
       finally { save.disabled = false; }
+    });
+    // 個人 → 組織への昇格
+    const upBtn = document.getElementById('upgradeBtn');
+    if (upBtn) upBtn.addEventListener('click', async () => {
+      if (!currentOrg || !currentOrg.is_personal) return;
+      if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can do this.', 'この操作はオーナーのみ可能です。'), false, 2400); return; }
+      const nameEl = document.getElementById('upgradeName');
+      const name = (nameEl.value || '').trim();
+      if (!name) { toast(L('Enter a company name.', '会社・組織名を入力してください。'), false, 2400); nameEl.focus(); return; }
+      if (!confirm(L('Switch this workspace to an organization? Your videos and credits are kept.', 'このワークスペースを組織に切り替えますか？ 動画・クレジットはそのまま引き継がれます。'))) return;
+      upBtn.disabled = true;
+      try {
+        const { error } = await sb.from('organizations').update({ name, is_personal: false }).eq('id', currentOrg.id);
+        if (error) throw error;
+        currentOrg.name = name; currentOrg.is_personal = false;
+        try { await sb.rpc('create_brand', { p_org: currentOrg.id, p_name: name, p_assets: {} }); } catch (_) {}
+        if (window.__orgs) { const o = window.__orgs.find(x => x.id === currentOrg.id); if (o) { o.name = name; o.is_personal = false; } }
+        if (window.renderWorkspaces) window.renderWorkspaces();
+        toast(L('Switched to an organization', '組織に切り替えました'), true, 2200);
+        await loadCompanyProfile();   // パネルを会社プロフィールに切替
+      } catch (e) { toast(L('Failed: ', '失敗: ') + e.message, false, 2800); }
+      finally { upBtn.disabled = false; }
     });
     if (logoBtn && logoInput) logoBtn.addEventListener('click', () => logoInput.click());
     if (logoInput) logoInput.addEventListener('change', async () => {
