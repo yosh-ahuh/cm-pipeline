@@ -1068,13 +1068,14 @@
   /* billing: plan cards — feature list + popular */
   .plan-card { position: relative; }
   .plan-card .feat { list-style: none; margin: 0 0 var(--s-4); padding: 0; display: flex; flex-direction: column; gap: var(--s-2); }
-  .plan-card .feat li { display: flex; align-items: center; gap: var(--s-2); font-size: var(--t-body-sm); }
-  .plan-card .feat li .ic { width: 15px; height: 15px; flex: none; }
+  /* 折り返し時もアイコンは1行目に揃える（align-items:flex-start + 光学的に微調整） */
+  .plan-card .feat li { display: flex; align-items: flex-start; gap: var(--s-2); font-size: var(--t-body-sm); line-height: 1.45; }
+  .plan-card .feat li .ic { width: 15px; height: 15px; flex: none; margin-top: 2px; }
   .plan-card .feat li.on { color: var(--ink); } .plan-card .feat li.on .ic { color: var(--good); }
   .plan-card .feat li.off { color: var(--faint); } .plan-card .feat li.off .ic { color: var(--faint); stroke-width: 2.4; }
-  .plan-card .feat li > span:first-of-type { min-width: 0; }
-  /* 「近日」= プラン特典表示だが製品未提供。控えめに区別（正直さ） */
-  .feat-soon { flex: none; margin-left: auto; font-size: var(--t-label-sm); font-weight: 700; letter-spacing: .02em;
+  .plan-card .feat li > span:first-of-type { min-width: 0; flex: 1; }
+  /* 「近日」= プラン特典表示だが製品未提供。控えめに区別（正直さ）。折り返しても1行目に揃える */
+  .feat-soon { flex: none; margin-top: 1px; font-size: var(--t-label-sm); font-weight: 700; letter-spacing: .02em; white-space: nowrap;
     color: var(--warn); background: color-mix(in srgb, var(--warn) 16%, transparent); border-radius: var(--r-full); padding: 1px 7px; }
   .plan-card .btn { margin-top: auto; }
   .plan-card.current { border-color: var(--line); box-shadow: none; background: var(--surface); opacity: .82; }
