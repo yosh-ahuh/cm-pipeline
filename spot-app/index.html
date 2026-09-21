@@ -947,6 +947,15 @@
   .rx-h .rx-mark::after { content: ""; position: absolute; top: 0; left: 0; width: 42%; height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); animation: ai-sheen 3.6s var(--ease-standard) infinite; }
   @media (prefers-reduced-motion: reduce) { .ai-spark .ic { animation: none; } .rx-h .rx-mark::after { display: none; } }
+  /* ワークスペース右パネルの折りたたみ（一点集中・情報密度を下げる／Canva風の“必要な時だけ開く”） */
+  .side .panel.is-acc > .panel-h { cursor: pointer; user-select: none; }
+  .side .panel.is-acc > .panel-h:hover { color: var(--ink); }
+  .side .panel.is-acc > .panel-h .acc-chev { margin-left: 8px; flex: none; color: var(--faint); transition: transform var(--dur-fast) var(--ease-standard); }
+  .side .panel.is-acc > .panel-h .acc-chev .ic { width: 15px; height: 15px; }
+  .side .panel.is-acc:not(.collapsed) > .panel-h .acc-chev { transform: rotate(180deg); }
+  .side .panel.is-acc.collapsed { padding-bottom: 0; }
+  .side .panel.is-acc.collapsed > .panel-h { padding-bottom: var(--s-4); }
+  .side .panel.is-acc.collapsed > :not(.panel-h) { display: none; }
   .job { display: flex; align-items: center; gap: 8px; font-size: var(--t-body-sm); min-height: 28px; }
   .job .jd { flex: none; width: 8px; height: 8px; border-radius: 50%; }
   .job.running .jd { animation: pulse2 1.2s infinite; }
@@ -2785,6 +2794,25 @@
     gotoWizard();
     showStep(val ? 1 : 0);   // 配信先が決まっていれば業種へ、無指定なら最初から
   };
+
+  // ワークスペース右パネルを折りたたみ化（既定は「声」だけ開き、調整・品質チェックは畳む＝一点集中）
+  (function accordionizeSidePanels() {
+    document.querySelectorAll('#voicePanel, #adjustPanel, #qcPanel').forEach(p => {
+      const h = p.querySelector('.panel-h'); if (!h) return;
+      p.classList.add('is-acc');
+      const chev = document.createElement('span');
+      chev.className = 'acc-chev'; chev.setAttribute('aria-hidden', 'true');
+      chev.innerHTML = '<svg class="ic"><use href="#i-chevron-down"/></svg>';
+      h.appendChild(chev);
+      h.setAttribute('role', 'button'); h.setAttribute('tabindex', '0');
+      const collapsed = p.id !== 'voicePanel';   // 声だけ開いた状態で始める
+      p.classList.toggle('collapsed', collapsed);
+      h.setAttribute('aria-expanded', String(!collapsed));
+      const toggle = () => { const c = p.classList.toggle('collapsed'); h.setAttribute('aria-expanded', String(!c)); };
+      h.addEventListener('click', toggle);
+      h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    });
+  })();
 
   // ---------- script / storyboard view ----------
   const SCUT = [
