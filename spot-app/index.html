@@ -950,11 +950,13 @@
   .pack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--s-3); }
   .pack-card { position: relative; border: 1px solid var(--line); border-radius: 12px; padding: var(--s-4); background: var(--surface-2);
     display: flex; flex-direction: column; gap: 4px; cursor: pointer; text-align: left; color: inherit; font: inherit; }
-  .pack-card:hover { border-color: var(--accent); }
-  .pack-card.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
-  .pack-card .pk-credits { font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+  .pack-card:hover { border-color: var(--accent-ink); }
+  .pack-card.sel { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface-2)); }
+  .pack-card.sel .pk-credits { color: var(--accent-ink); }
+  .pack-card .pk-credits { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -.02em; }
   .pack-card .pk-price { color: var(--ink); font-size: var(--t-body); font-weight: 600; }
   .pack-card .pk-sub { color: var(--muted); font-size: var(--t-label-sm); }
+  .pack-card .pk-unit { color: var(--faint); font-size: var(--t-label-sm); font-family: var(--font-mono); }
   .pack-card .pk-tag { position: absolute; top: 10px; right: 10px; font-size: var(--t-label-sm); color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--r-full); padding: 1px 8px; }
   .switch-row { display: flex; align-items: center; gap: 10px; font-size: var(--t-body); cursor: pointer; }
   .switch-row input { width: 18px; height: 18px; flex: none; accent-color: var(--accent); }
@@ -3682,17 +3684,27 @@
     const isJa = document.documentElement.lang === 'ja';
     grid.innerHTML = CREDIT_PACKS.map(p => {
       const price = isJa ? `¥${p.jpy.toLocaleString()}` : `$${p.usd}`;
+      const unit = isJa ? `¥${Math.round(p.jpy / p.credits).toLocaleString()}` : `$${(p.usd / p.credits).toFixed(2)}`;
       const tag = isJa ? p.tagJa : p.tagEn;
-      return `<button type="button" class="pack-card${p.key === selectedPack ? ' sel' : ''}" data-pack="${p.key}" aria-pressed="${p.key === selectedPack}">
+      const sel = p.key === selectedPack;
+      return `<button type="button" class="pack-card${sel ? ' sel' : ''}" data-pack="${p.key}" aria-pressed="${sel}">
         ${tag ? `<span class="pk-tag">${tag}</span>` : ''}
         <span class="pk-credits">${p.credits}</span>
         <span class="pk-price">${price}</span>
         <span class="pk-sub">${L(`about ${p.credits} videos`, `CM 約${p.credits}本`)}</span>
+        <span class="pk-unit">${L(`${unit}/video`, `1本あたり ${unit}`)}</span>
       </button>`;
     }).join('');
     grid.querySelectorAll('[data-pack]').forEach(b => b.addEventListener('click', () => {
       selectedPack = b.getAttribute('data-pack'); renderCreditPacks();
     }));
+    // 購入ボタンのラベルを選択パックに反映（何を買うか明確に）
+    const buy = document.getElementById('crBuy'); const sp = CREDIT_PACKS.find(p => p.key === selectedPack);
+    if (buy && sp) {
+      const price = isJa ? `¥${sp.jpy.toLocaleString()}` : `$${sp.usd}`;
+      const span = buy.querySelector('span');
+      if (span) span.textContent = L(`Buy ${sp.credits} credits for ${price}`, `${sp.credits}クレジットを ${price} で購入`);
+    }
   }
   window.loadCredits = async function () {
     try {
