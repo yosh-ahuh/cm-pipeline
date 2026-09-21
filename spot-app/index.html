@@ -577,7 +577,10 @@
   .multi-note { font-size: var(--t-label); color: var(--faint); margin-top: var(--s-3); font-family: var(--font-mono); }
   .multi-note.warn { color: var(--warn); }
 
-  .wiz-nav { display: flex; gap: var(--s-2); margin-top: var(--s-6); align-items: center; }
+  /* 作成フローの下部アクションバーは常時見える位置に固定（主CTAへ常にアクセス・Canva/モダンUI流） */
+  .wiz-nav { display: flex; gap: var(--s-2); margin-top: var(--s-6); align-items: center;
+    position: sticky; bottom: 0; z-index: 6; padding: var(--s-5) 0 var(--s-4);
+    background: linear-gradient(to top, var(--ground) 68%, transparent); }
   .wiz-nav .grow { flex: 1; }
 
   /* prescription panel */
