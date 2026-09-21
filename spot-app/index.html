@@ -1344,6 +1344,10 @@
   .proj:hover .proj-move, .proj-move:focus-visible { opacity: 1; }
   .proj-move .ic { width: 16px; height: 16px; }
   .proj-move:hover { background: rgba(0,0,0,.68); }
+  .proj-del { position: absolute; top: 8px; right: 44px; z-index: 2; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 8px; background: rgba(0,0,0,.45); color: #fff; cursor: pointer; opacity: 0; transition: opacity var(--dur-fast), background var(--dur-fast); }
+  .proj:hover .proj-del, .proj-del:focus-visible { opacity: 1; }
+  .proj-del svg { width: 15px; height: 15px; }
+  .proj-del:hover { background: var(--crit); }
   .col-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
   .col-card { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); cursor: pointer; color: var(--ink); font: inherit; text-align: left; transition: border-color var(--dur-fast), background var(--dur-fast), transform var(--dur-fast); }
   .col-card:hover { border-color: var(--line-strong); background: var(--surface-2); transform: translateY(-1px); }
@@ -5614,6 +5618,21 @@
   document.addEventListener('click', async e => {
     const mv = e.target.closest('.proj-move');
     if (mv) { e.stopPropagation(); if (!(window.__canWrite && window.__canWrite())) { if (window.toast) window.toast(L('View-only access.', '閲覧のみの権限です。'), false, 1800); return; } openMoveMenu(mv, mv.getAttribute('data-move')); return; }
+    const del = e.target.closest('.proj-del');
+    if (del) { e.stopPropagation();
+      if (!(window.__canWrite && window.__canWrite())) { if (window.toast) window.toast(L('View-only access.', '閲覧のみの権限です。'), false, 1800); return; }
+      const id = del.getAttribute('data-del');
+      if (await openConfirm({ title: L('Delete this video?', 'この動画を削除しますか？'), message: L('This cannot be undone.', '元に戻せません。'),
+        actions: [{ id: 'ok', label: L('Delete', '削除する'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }] }) !== 'ok') return;
+      try {
+        const { error } = await sb.from('projects').delete().eq('id', id); if (error) throw error;
+        if (window.toast) window.toast(L('Video deleted', '動画を削除しました'), true, 1600);
+        if (!document.getElementById('view-media').hidden) window.loadMedia();
+        else if (!document.getElementById('view-collections').hidden) window.loadCollections();
+        else loadProjects();
+      } catch (err) { console.warn('delete project failed:', err); if (window.toast) window.toast(L("Couldn't delete it. Please try again.", '削除できませんでした。もう一度お試しください。'), false, 2600); }
+      return;
+    }
     const mm = e.target.closest('#moveMenu .mm-item');
     if (mm) {
       const proj = moveMenu.dataset.proj, val = mm.getAttribute('data-mm');
@@ -5652,6 +5671,7 @@
       <div class="proj-thumb" style="background:linear-gradient(150deg, ${c1}, ${c2})">
         <span class="proj-status ${s.cls}"><span class="sd"></span>${s.st}</span>
         <button class="proj-move" data-move="${p.id}" title="コレクションに移動" aria-label="コレクションに移動"><svg class="ic"><use href="#i-folder"/></svg></button>
+        <button class="proj-del" data-del="${p.id}" title="削除" aria-label="この動画を削除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13M10 11v6M14 11v6"/></svg></button>
         <div class="pt-mini">${fmts.length ? '<i></i><i></i>' : ''}</div>
       </div>
       <div class="proj-body">
