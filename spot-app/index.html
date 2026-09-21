@@ -664,7 +664,7 @@
   }
   .hero-new::after { content:""; position:absolute; right:-40px; top:-40px; width:220px; height:220px; border-radius:50%; background: radial-gradient(circle, var(--accent), transparent 70%); opacity:.4; pointer-events: none; }
   .hero-new .hn-eye { font-family: var(--font-mono); font-size: var(--t-label-sm); letter-spacing: .12em; color: var(--accent-ink); }
-  .hero-new h2 { font-family: var(--font-display); font-size: var(--t-display); font-weight: 800; letter-spacing: -.02em; margin: 8px 0 8px; line-height: 1.15; }
+  .hero-new h1 { font-family: var(--font-display); font-size: var(--t-display); font-weight: 800; letter-spacing: -.02em; margin: 8px 0 8px; line-height: 1.15; }
   .hero-new p { font-size: var(--t-body); color: #B4BAD4; max-width: 44ch; line-height: 1.65; margin: 0 0 var(--s-6); }
   .hn-btn {
     align-self: flex-start; background: var(--accent); color: var(--on-accent); border-radius: var(--r-md); min-height: 48px; padding: 0 22px;
@@ -705,7 +705,7 @@
   }
 
   .dash-h { display: flex; align-items: center; gap: var(--s-3); margin: var(--s-2) 0 var(--s-4); flex-wrap: wrap; }
-  .dash-h h3 { font-size: var(--t-title); font-weight: 700; }
+  .dash-h h2, .dash-h h3 { font-size: var(--t-title); font-weight: 700; }
   .dash-h .filters { margin-left: auto; display: flex; gap: 6px; }
   .media-h .filters { margin-left: 0; }
   .media-search { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative;
@@ -945,7 +945,7 @@
     .context { padding: var(--s-5) 0 var(--s-4); }
     .title-h1 { font-size: 22px; }
     .hero-new { padding: var(--s-6); }
-    .hero-new h2, .wiz-title { font-size: 26px; }
+    .hero-new h1, .wiz-title { font-size: 26px; }
     .usage { flex-direction: column; }
     .hn-btn { align-self: stretch; justify-content: center; }
     .variants { flex-wrap: wrap; }
@@ -1338,7 +1338,7 @@
   <section class="dash-hero">
     <div class="hero-new">
       <div class="hn-eye">Spot</div>
-      <h2>選ぶだけで、広告動画。</h2>
+      <h1>選ぶだけで、広告動画。</h1>
       <p>配信先・業種・ターゲットを選ぶだけ。AIがディレクターとして台本を組み、実写もUIも音声も生成。その日のうちに、クライアント確認できる初稿が出てきます。</p>
       <button class="hn-btn" id="newCM"><svg class="ic"><use href="#i-plus"/></svg><span>新規CMをつくる</span></button>
     </div>
@@ -1358,7 +1358,7 @@
   </section>
 
   <section class="guide3" aria-labelledby="guide3H">
-    <h3 class="guide3-h" id="guide3H">つくり方は、かんたん3ステップ</h3>
+    <h2 class="guide3-h" id="guide3H">つくり方は、かんたん3ステップ</h2>
     <div class="guide3-row">
       <div class="g3-card">
         <span class="g3-num">1</span>
@@ -1379,7 +1379,7 @@
   </section>
 
   <div class="dash-h">
-    <h3>制作中・完成したCM</h3>
+    <h2>制作中・完成したCM</h2>
     <div class="filters" role="group" aria-label="絞り込み">
       <button class="filter" aria-pressed="true" data-filter="all">すべて</button>
       <button class="filter" aria-pressed="false" data-filter="progress">制作中</button>
