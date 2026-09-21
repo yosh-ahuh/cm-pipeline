@@ -484,6 +484,14 @@
   .field .send { position: absolute; right: 4px; width: 34px; height: 34px; border-radius: var(--r-xs); display: grid; place-items: center; color: var(--muted); }
   .field .send:hover { background: var(--hover); color: var(--ink); }
   .field-hint { font-size: var(--t-label-sm); color: var(--faint); margin-top: 6px; }
+  /* R1（LINE準拠）: 送信前のライブ検証 — error=赤枠+赤ヘルプ、正=かすかな緑、必須=赤* */
+  .field.err input { border-color: var(--crit); background: color-mix(in srgb, var(--crit) 6%, var(--surface-2)); }
+  .field.err input:focus { border-color: var(--crit); box-shadow: 0 0 0 3px var(--crit-soft); }
+  .field.ok input { border-color: color-mix(in srgb, var(--good) 50%, var(--line-strong)); }
+  .f-help { font-size: var(--t-label-sm); margin-top: 6px; line-height: 1.5; }
+  .f-help.err { color: var(--crit); display: flex; gap: 5px; align-items: flex-start; }
+  .f-help.err .ic { width: 13px; height: 13px; flex: none; margin-top: 2px; stroke-width: 3; }
+  .f-label .req { color: var(--crit); margin-left: 3px; font-weight: 700; }
 
   .qc { padding: var(--s-2) var(--s-4) var(--s-3); display: flex; flex-direction: column; gap: 2px; }
   .qc-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: var(--t-body-sm); }
@@ -1527,21 +1535,21 @@
         <!-- 登録 step3: プロフィール（組織は 会社名 → 氏名 の順） -->
         <div class="auth-signup-only" id="authFieldProfile" hidden>
           <div id="authCompanyWrap" hidden>
-            <label class="f-label" for="authCompany">会社・組織名</label>
+            <label class="f-label" for="authCompany">会社・組織名<span class="req" aria-hidden="true">*</span></label>
             <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-users"/></svg></span><input id="authCompany" type="text" placeholder="株式会社スポット" autocomplete="organization"></div>
             <p class="muted" style="margin:6px 0 0;font-size:var(--t-label-sm)">ロゴや請求情報は、登録後にプロフィールから追加できます。</p>
           </div>
           <div id="authNameWrap" style="margin-top:var(--s-3)">
-            <label class="f-label" for="authName">お名前</label>
+            <label class="f-label" for="authName">お名前<span class="req" aria-hidden="true">*</span></label>
             <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-user"/></svg></span><input id="authName" type="text" placeholder="山田 太郎" autocomplete="name"></div>
           </div>
         </div>
         <div id="authFieldEmail">
-          <label class="f-label" for="authEmail">メールアドレス</label>
+          <label class="f-label" for="authEmail">メールアドレス<span class="req" aria-hidden="true">*</span></label>
           <div class="field ico"><span class="fi"><svg class="ic"><use href="#i-mail"/></svg></span><input id="authEmail" type="email" placeholder="you@company.com" autocomplete="email" autocapitalize="off" spellcheck="false" inputmode="email" required></div>
         </div>
         <div id="authFieldPass">
-          <div class="f-labelrow"><label class="f-label" for="authPass">パスワード</label>
+          <div class="f-labelrow"><label class="f-label" for="authPass">パスワード<span class="req" aria-hidden="true">*</span></label>
             <button type="button" class="linkbtn auth-forgot" id="authForgot">パスワードをお忘れですか?</button></div>
           <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
             <input id="authPass" type="password" placeholder="6文字以上" autocomplete="current-password" required minlength="6">
@@ -1549,7 +1557,7 @@
           </div>
         </div>
         <div id="authFieldPass2" hidden>
-          <label class="f-label" for="authPass2">パスワード（確認）</label>
+          <label class="f-label" for="authPass2">パスワード（確認）<span class="req" aria-hidden="true">*</span></label>
           <div class="field ico pw"><span class="fi"><svg class="ic"><use href="#i-lock"/></svg></span>
             <input id="authPass2" type="password" placeholder="もう一度入力" autocomplete="new-password" minlength="6">
           </div>
@@ -2714,13 +2722,16 @@
 
   // toast helper
   const toasts = document.getElementById('toasts');
-  function toast(msg, spin=true, ms=2200) {
+  function toast(msg, spin=true, ms=2600) {
+    // LINE 準拠(R3): トーストは常に1つ。新しいものを出す前に既存を消す。
+    toasts.querySelectorAll('.toast').forEach(el => el.remove());
     const t = document.createElement('div');
     t.className = 'toast';
     t.innerHTML = (spin?'<span class="tsp"></span>':'<svg class="ic"><use href="#i-check"/></svg>') + '<span></span>';
     t.lastChild.textContent = msg;
     toasts.appendChild(t);
-    setTimeout(()=>{ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, ms);
+    if (t._t) clearTimeout(t._t);
+    t._t = setTimeout(()=>{ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, ms);
   }
 
   const roGuard = () => (window.__canWrite && !window.__canWrite()) ? (toast(L('View-only access.', '閲覧のみの権限です。'), false, 1800), true) : false;
@@ -4294,6 +4305,8 @@
       ['authEmail', 'authPass', 'authPass2'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     }
     if (m !== 'otp') otpSent = false;
+    // モード/ステップ切替で古い検証表示を消す
+    ['authEmail', 'authPass', 'authPass2', 'authName', 'authCompany', 'authNewPass', 'authNewPass2'].forEach(id => { const el = document.getElementById(id); if (el) clearFieldState(el); });
     // モード変更でクールダウンをリセット（残ったカウントダウン/無効化を解除）
     ['authSubmit', 'authOtpResend'].forEach(id => { const el = document.getElementById(id); if (el && el._cd) { clearInterval(el._cd); el._cd = null; el.disabled = false; } });
     const [h, sub, submit] = HEAD[m] || HEAD.signin;
@@ -4375,6 +4388,74 @@
   });
 
   const isEmail = (v) => /.+@.+\..+/.test(v || '');
+
+  // ---- R1（LINE準拠）: 送信前のライブ入力検証。やさしく・その場で。----
+  //   blur で検証表示、input でエラー中なら即クリア（直したら即消える＝安心感）。
+  function setFieldState(input, msg) {
+    const w = input && input.closest('.field'); if (!w) return;
+    const bad = !!msg;
+    w.classList.toggle('err', bad);
+    w.classList.toggle('ok', !bad && !!(input.value || '').trim());
+    input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    let help = w.nextElementSibling;
+    const isHelp = help && help.classList && help.classList.contains('f-help');
+    if (!isHelp) {
+      if (!bad) return;
+      help = document.createElement('p'); help.className = 'f-help'; w.after(help);
+    }
+    if (bad) {
+      help.className = 'f-help err';
+      help.innerHTML = '<svg class="ic"><use href="#i-alert"/></svg><span></span>';
+      help.lastChild.textContent = msg;
+      help.hidden = false;
+    } else if (help && help.classList.contains('f-help')) {
+      help.className = 'f-help'; help.textContent = ''; help.hidden = true;
+    }
+  }
+  const clearFieldState = (input) => setFieldState(input, '');
+  // 各フィールドの検証ルール（現在のモード/ステップ/種別で要否が変わる）
+  function validateField(input) {
+    if (!input || input.hidden || input.disabled) return true;
+    const v = (input.value || '').trim();
+    const L = window.L;
+    switch (input.id) {
+      case 'authEmail':
+        if (!v) return setFieldState(input, L('Please enter your email.', 'メールアドレスを入力してください。')), false;
+        if (!isEmail(v)) return setFieldState(input, L('Check the email format (e.g. you@company.com).', 'メールアドレスの形式をご確認ください（例: you@company.com）。')), false;
+        break;
+      case 'authPass': case 'authNewPass':
+        if (v.length < 6) return setFieldState(input, L('Use at least 6 characters.', 'パスワードは6文字以上にしてください。')), false;
+        break;
+      case 'authPass2': {
+        const p = (passEl.value || '');
+        if (v !== p) return setFieldState(input, L('Passwords do not match.', '確認用のパスワードが一致しません。')), false;
+        break;
+      }
+      case 'authNewPass2': {
+        const p = (document.getElementById('authNewPass').value || '');
+        if (v !== p) return setFieldState(input, L('Passwords do not match.', '確認用のパスワードが一致しません。')), false;
+        break;
+      }
+      case 'authName':
+        if (!v) return setFieldState(input, L('Please enter your name.', 'お名前を入力してください。')), false;
+        break;
+      case 'authCompany':
+        if (!v) return setFieldState(input, L('Please enter your company or team name.', '会社・組織名を入力してください。')), false;
+        break;
+    }
+    clearFieldState(input);
+    return true;
+  }
+  ['authEmail', 'authPass', 'authPass2', 'authName', 'authCompany', 'authNewPass', 'authNewPass2'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    el.addEventListener('blur', () => { if ((el.value || '').trim()) validateField(el); });   // 空欄はまだ責めない
+    el.addEventListener('input', () => {
+      const w = el.closest('.field');
+      if (w && w.classList.contains('err')) validateField(el);   // エラー中は直したら即消す
+      if (el.id === 'authPass') { const p2 = document.getElementById('authPass2'); if (p2 && p2.closest('.field').classList.contains('err')) validateField(p2); }
+    });
+  });
+
   let submitLabel = '';
   function submitBusy(on, label) {
     submitEl.disabled = on;
