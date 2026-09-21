@@ -1029,8 +1029,11 @@
   /* team / members */
   .member-list { display: flex; flex-direction: column; gap: 6px; }
   .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
-  .member-row .mn { font-weight: 500; color: var(--ink); }
-  .member-row .me { color: var(--muted); font-size: var(--t-label); }
+  .member-row .m-avatar { width: 34px; height: 34px; flex: none; border-radius: var(--r-full); background: var(--surface-3);
+    display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: var(--t-body-sm); color: var(--muted); }
+  .member-row .m-id { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+  .member-row .mn { font-weight: 500; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .member-row .me { color: var(--muted); font-size: var(--t-label); flex: none; }
   .member-row .badge { margin-left: auto; }
   .member-row .rm { border: none; background: none; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: 8px; }
   .member-row .rm:hover { background: var(--hover); color: var(--bad, #c4553d); }
@@ -3446,9 +3449,11 @@
     const list = document.getElementById('memberList');
     if (list) list.innerHTML = members.map(m => {
       const canRemove = isOwner && m.user_id !== currentUid && !(m.role === 'owner');
+      const nm = m.display_name || userTxt;
+      const initial = (nm || '?').trim().charAt(0).toUpperCase() || '?';
       return `<div class="member-row">
-        <span class="mn">${esc(m.display_name || userTxt)}</span>
-        ${m.user_id === currentUid ? `<span class="me">${youTxt}</span>` : ''}
+        <span class="m-avatar" aria-hidden="true">${esc(initial)}</span>
+        <span class="m-id"><span class="mn">${esc(nm)}</span>${m.user_id === currentUid ? `<span class="me">${youTxt}</span>` : ''}</span>
         <span class="badge ${m.role === 'owner' ? 'badge--accent' : 'badge--neutral'}">${roleLabel[m.role] || m.role}</span>
         ${canRemove ? `<button class="rm" data-remove="${m.user_id}" title="${rmTxt}">${rmTxt}</button>` : ''}
       </div>`;
