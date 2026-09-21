@@ -1085,12 +1085,20 @@
   .proj-move .ic { width: 16px; height: 16px; }
   .proj-move:hover { background: rgba(0,0,0,.68); }
   .col-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
-  .col-card { display: flex; align-items: center; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); cursor: pointer; color: var(--ink); font: inherit; text-align: left; }
-  .col-card:hover { border-color: var(--line-strong); background: var(--surface-2); }
-  .col-ic { width: 38px; height: 38px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-ink); display: grid; place-items: center; flex: none; }
-  .col-ic .ic { width: 20px; height: 20px; }
-  .col-name { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .col-count { font-family: var(--font-mono); font-size: var(--t-label); color: var(--muted); background: var(--surface-2); padding: 2px 9px; border-radius: var(--r-full); }
+  .col-card { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); cursor: pointer; color: var(--ink); font: inherit; text-align: left; transition: border-color var(--dur-fast), background var(--dur-fast), transform var(--dur-fast); }
+  .col-card:hover { border-color: var(--line-strong); background: var(--surface-2); transform: translateY(-1px); }
+  .col-card:hover .col-chev { color: var(--accent-ink); transform: translateX(2px); }
+  .col-ic { width: 42px; height: 42px; border-radius: var(--r-md); background: var(--accent-soft); color: var(--accent-ink); display: grid; place-items: center; flex: none; }
+  .col-ic .ic { width: 21px; height: 21px; }
+  .col-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .col-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .col-meta { font-size: var(--t-label); color: var(--muted); }
+  .col-chev { width: 16px; height: 16px; flex: none; color: var(--faint); transition: color var(--dur-fast), transform var(--dur-fast); }
+  .col-empty { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--s-2);
+    padding: var(--s-10) var(--s-6); border: 1px dashed var(--line-strong); border-radius: var(--r-lg); background: var(--surface); }
+  .col-empty-ic { width: 52px; height: 52px; border-radius: var(--r-lg); background: var(--accent-soft); color: var(--accent-ink); display: grid; place-items: center; margin-bottom: var(--s-1); }
+  .col-empty-ic .ic { width: 26px; height: 26px; }
+  .col-empty-h { font-family: var(--font-display); font-weight: 800; font-size: var(--t-title); }
   .col-detail-h { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
   .col-detail-h h2 { font-size: var(--t-title-lg); margin: 0; }
   .move-menu { position: fixed; z-index: 120; min-width: 200px; max-height: 320px; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-lift); padding: 5px; }
@@ -1783,7 +1791,7 @@
   </div></section>
   <div id="colList">
     <div class="cta-row" style="margin-bottom:16px">
-      <button class="btn btn-primary" id="newCollection" data-write-only><svg class="ic"><use href="#i-plus"/></svg><span>新規コレクション</span></button>
+      <button class="btn btn-primary wauto" id="newCollection" data-write-only><svg class="ic"><use href="#i-plus"/></svg><span>新規コレクション</span></button>
     </div>
     <div class="col-grid" id="collectionsGrid"></div>
   </div>
@@ -3995,7 +4003,11 @@
     });
   }
   function colTile(id, name, count) {
-    return `<button class="col-card" data-col="${id}"><span class="col-ic"><svg class="ic"><use href="#i-folder"/></svg></span><span class="col-name">${name}</span><span class="col-count">${count}</span></button>`;
+    return `<button class="col-card" data-col="${id}">
+      <span class="col-ic"><svg class="ic"><use href="#i-folder"/></svg></span>
+      <span class="col-body"><span class="col-name">${name}</span><span class="col-meta">${count} ${L('videos', '本')}</span></span>
+      <svg class="ic col-chev"><use href="#i-arrow-right"/></svg>
+    </button>`;
   }
   window.loadCollections = async function () {
     const list = document.getElementById('colList'), detail = document.getElementById('colDetail');
@@ -4009,8 +4021,16 @@
       const { data: projs } = await q;
       const counts = {}; let uncat = 0;
       (projs || []).forEach(p => { if (p.collection_id) counts[p.collection_id] = (counts[p.collection_id] || 0) + 1; else uncat++; });
-      grid.innerHTML = _collections.map(c => colTile(c.id, esc(c.name), counts[c.id] || 0)).join('')
-        + colTile('__uncat__', L('Uncategorized', '未分類'), uncat);
+      if (_collections.length === 0 && uncat === 0) {
+        grid.innerHTML = `<div class="col-empty">
+          <span class="col-empty-ic"><svg class="ic"><use href="#i-folder"/></svg></span>
+          <div class="col-empty-h">${L('No videos yet', 'まだ動画がありません')}</div>
+          <p class="muted" style="margin:0;font-size:var(--t-label)">${L('Once you make videos, organize them into collections here.', '動画をつくると、ここでフォルダのように整理できます。')}</p>
+        </div>`;
+      } else {
+        grid.innerHTML = _collections.map(c => colTile(c.id, esc(c.name), counts[c.id] || 0)).join('')
+          + colTile('__uncat__', L('Uncategorized', '未分類'), uncat);
+      }
       const nc = document.getElementById('newCollection'); if (nc) nc.hidden = !(window.__canWrite && window.__canWrite());
     } catch (e) { grid.innerHTML = emptyState('接続に失敗しました', e.message); }
   };
