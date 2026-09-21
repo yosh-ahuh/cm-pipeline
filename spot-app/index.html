@@ -957,6 +957,9 @@
   .company-logo img { width: 100%; height: 100%; object-fit: cover; }
   .company-logo .ic { width: 26px; height: 26px; }
   .company-logo-side { min-width: 0; }
+  .settings-2col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); }
+  @media (max-width: 460px) { .settings-2col { grid-template-columns: 1fr; } }
+  .panel-subh { font-weight: 700; font-size: var(--t-body-sm); color: var(--ink); margin: 0 0 var(--s-3); }
   .fld { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--s-3); }
   .fld label { font-size: var(--t-label); color: var(--muted); }
   .fld input { height: var(--control-h); border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink); padding: 0 12px; font-size: var(--t-body-sm); font-family: var(--font-jp); }
@@ -1785,6 +1788,28 @@
     </div>
     <div class="fld" style="margin-top:16px"><label for="companyName">会社・組織名</label>
       <input id="companyName" type="text" maxlength="80" placeholder="株式会社スポット" autocomplete="organization"></div>
+
+    <hr class="soft-sep">
+    <div class="panel-subh">請求先情報 <span class="muted" style="font-weight:400">（任意・請求書/税に使用）</span></div>
+    <div class="fld"><label for="billLegalName">請求先の会社名義</label>
+      <input id="billLegalName" type="text" maxlength="120" placeholder="株式会社スポット" autocomplete="organization"></div>
+    <div class="fld"><label for="billTaxId">VAT / 税ID / 適格請求書番号</label>
+      <input id="billTaxId" type="text" maxlength="64" placeholder="T1234567890123" autocomplete="off"></div>
+    <div class="settings-2col">
+      <div class="fld"><label for="billCountry">国</label>
+        <input id="billCountry" type="text" maxlength="56" placeholder="日本" autocomplete="country-name"></div>
+      <div class="fld"><label for="billPostal">郵便番号</label>
+        <input id="billPostal" type="text" maxlength="16" placeholder="150-0001" autocomplete="postal-code"></div>
+    </div>
+    <div class="fld"><label for="billAddress">住所（番地・建物）</label>
+      <input id="billAddress" type="text" maxlength="160" placeholder="渋谷区神宮前1-2-3" autocomplete="address-line1"></div>
+    <div class="settings-2col">
+      <div class="fld"><label for="billCity">市区町村</label>
+        <input id="billCity" type="text" maxlength="64" placeholder="渋谷区" autocomplete="address-level2"></div>
+      <div class="fld"><label for="billState">都道府県</label>
+        <input id="billState" type="text" maxlength="64" placeholder="東京都" autocomplete="address-level1"></div>
+    </div>
+
     <div class="cta-row"><button class="btn btn-primary wauto" id="companySave" data-write-only><span>会社情報を保存</span></button>
       <span class="save-note" id="companySaveNote" hidden>保存しました</span></div>
   </div>
@@ -3590,6 +3615,14 @@
         } else { box.innerHTML = '<svg class="ic"><use href="#i-users"/></svg>'; }
       }
     } catch (_) {}
+    // 請求先情報（billing_prefs の住所系カラム）
+    try {
+      const { data: bp } = await sb.from('billing_prefs').select('legal_name,tax_id,country,postal_code,address,city,state').eq('org_id', org.id).maybeSingle();
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+      set('billLegalName', bp && bp.legal_name); set('billTaxId', bp && bp.tax_id);
+      set('billCountry', bp && bp.country); set('billPostal', bp && bp.postal_code);
+      set('billAddress', bp && bp.address); set('billCity', bp && bp.city); set('billState', bp && bp.state);
+    } catch (_) {}
   }
   // ---- team screen（メンバー管理を独立ビュー化）----
   window.loadTeam = async function () {
@@ -3659,6 +3692,16 @@
         if (error) throw error;
         currentOrg.name = name;
         try { await sb.from('brands').update({ name }).eq('org_id', currentOrg.id); } catch (_) {}
+        // 請求先情報を billing_prefs に upsert（014 適用済みなら保存、未適用なら無視）
+        try {
+          const val = id => { const el = document.getElementById(id); return el ? (el.value || '').trim() || null : null; };
+          await sb.from('billing_prefs').upsert({
+            org_id: currentOrg.id,
+            legal_name: val('billLegalName'), tax_id: val('billTaxId'), country: val('billCountry'),
+            postal_code: val('billPostal'), address: val('billAddress'), city: val('billCity'), state: val('billState'),
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'org_id' });
+        } catch (_) {}
         if (window.renderWorkspaces) window.renderWorkspaces();   // サイドバーのワークスペース名を更新
         if (note) { note.hidden = false; setTimeout(() => note.hidden = true, 2000); }
       } catch (e) { toast(L('Failed to save: ', '保存に失敗: ') + e.message, false, 2600); }
