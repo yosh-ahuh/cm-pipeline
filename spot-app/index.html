@@ -689,6 +689,19 @@
   .dash-h { display: flex; align-items: center; gap: var(--s-3); margin: var(--s-2) 0 var(--s-4); flex-wrap: wrap; }
   .dash-h h3 { font-size: var(--t-title); font-weight: 700; }
   .dash-h .filters { margin-left: auto; display: flex; gap: 6px; }
+  .media-h .filters { margin-left: 0; }
+  .media-search { margin-left: auto; display: flex; align-items: center; gap: 8px; position: relative;
+    background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: var(--r-full); padding: 0 12px; height: var(--control-h-sm); min-width: 210px; }
+  .media-search:focus-within { border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .media-search > .ic { width: 16px; height: 16px; color: var(--faint); flex: none; }
+  .media-search input { flex: 1; min-width: 0; background: none; border: none; color: var(--ink); font-size: var(--t-body-sm); height: 100%; outline: none; font-family: var(--font-jp); }
+  .media-search input::placeholder { color: var(--faint); }
+  .media-search input::-webkit-search-cancel-button { display: none; }
+  .ms-clear { flex: none; color: var(--muted); display: grid; place-items: center; }
+  .ms-clear:hover { color: var(--ink); }
+  .ms-clear .ic { width: 14px; height: 14px; }
+  .media-count { font-size: var(--t-label); margin: calc(-1 * var(--s-2)) 0 var(--s-1); }
+  @media (max-width: 560px) { .media-search { width: 100%; min-width: 0; } .media-h .filters { width: 100%; } }
   .filter { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-full); min-height: var(--control-h-sm); padding: 0 14px; font-size: var(--t-label); color: var(--muted); font-weight: 500; transition: border-color var(--dur-fast), color var(--dur-fast), background var(--dur-fast); }
   .filter:hover { color: var(--ink); background: var(--hover); }
   .filter[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--ground); font-weight: 700; }
@@ -1173,6 +1186,7 @@
   <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
   <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M4 7l8 6 8-6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
   <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M17.9 17.9A10.9 10.9 0 0 1 12 19c-7 0-11-7-11-7a20 20 0 0 1 5.1-5.9M9.9 4.2A10 10 0 0 1 12 4c7 0 11 7 11 7a20 20 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2M1 1l22 22"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></symbol>
@@ -1915,13 +1929,19 @@
     <h1 class="title-h1">メディア</h1>
     <div class="title-sub">生成した動画の一覧です。</div>
   </div></section>
-  <div class="dash-h">
+  <div class="dash-h media-h">
     <div class="filters" role="group" aria-label="絞り込み">
       <button class="filter" aria-pressed="true" data-filter="all">すべて</button>
       <button class="filter" aria-pressed="false" data-filter="progress">制作中</button>
       <button class="filter" aria-pressed="false" data-filter="done">完成</button>
     </div>
+    <div class="media-search">
+      <svg class="ic"><use href="#i-search"/></svg>
+      <input id="mediaSearch" type="search" placeholder="名前で検索" autocomplete="off" aria-label="動画を名前で検索">
+      <button type="button" class="ms-clear" id="mediaSearchClear" aria-label="検索をクリア" hidden><svg class="ic"><use href="#i-x"/></svg></button>
+    </div>
   </div>
+  <div class="media-count muted" id="mediaCount" hidden></div>
   <div class="proj-grid" id="mediaGrid"></div>
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
@@ -2682,18 +2702,30 @@
     if (p && e.target === p) { e.preventDefault(); openProjCard(p); }
   });
   let projFilter = 'all';
+  let mediaSearch = '';   // メディア画面の名前検索（小文字）
   function applyProjFilter() {   // ダッシュボード(#projGrid)とメディア(#mediaGrid)の両方に適用
     document.querySelectorAll('#projGrid, #mediaGrid').forEach(grid => {
-      let shown = 0;
+      const isMedia = grid.id === 'mediaGrid';
+      let shown = 0, total = 0;
       grid.querySelectorAll('.proj').forEach(p => {
-        const on = projFilter === 'all' || p.dataset.group === projFilter;
+        total++;
+        const statusOk = projFilter === 'all' || p.dataset.group === projFilter;
+        let searchOk = true;
+        if (isMedia && mediaSearch) { const nm = (p.querySelector('.proj-name')?.textContent || '').toLowerCase(); searchOk = nm.includes(mediaSearch); }
+        const on = statusOk && searchOk;
         p.hidden = !on; if (on) shown++;
       });
       let none = grid.querySelector('.empty.filtered');
-      if (!shown && grid.querySelector('.proj')) {
+      if (!shown && total) {
         if (!none) { none = document.createElement('div'); none.className = 'empty filtered'; grid.appendChild(none); }
-        none.innerHTML = '<h4>該当するCMはありません</h4><p>フィルタを「すべて」に戻すと全件が表示されます。</p>';
+        none.innerHTML = (isMedia && mediaSearch)
+          ? '<h4>該当する動画がありません</h4><p>別のキーワードを試すか、検索をクリアしてください。</p>'
+          : '<h4>該当するCMはありません</h4><p>フィルタを「すべて」に戻すと全件が表示されます。</p>';
       } else if (none) none.remove();
+      if (isMedia) {   // 件数表示（絞り込み中のみ）
+        const c = document.getElementById('mediaCount'), active = !!mediaSearch || projFilter !== 'all';
+        if (c) { c.hidden = !(active && total); c.textContent = active ? `${total}件中 ${shown}件` : ''; }
+      }
     });
   }
   window.applyProjFilter = applyProjFilter;
@@ -2703,6 +2735,17 @@
     document.querySelectorAll('.dash-h .filters .filter').forEach(x => x.setAttribute('aria-pressed', x.dataset.filter === projFilter ? 'true' : 'false'));
     applyProjFilter();
   });
+  // メディア名前検索
+  (function wireMediaSearch() {
+    const input = document.getElementById('mediaSearch'), clear = document.getElementById('mediaSearchClear');
+    if (!input) return;
+    input.addEventListener('input', () => {
+      mediaSearch = (input.value || '').trim().toLowerCase();
+      if (clear) clear.hidden = !mediaSearch;
+      applyProjFilter();
+    });
+    if (clear) clear.addEventListener('click', () => { input.value = ''; mediaSearch = ''; clear.hidden = true; applyProjFilter(); input.focus(); });
+  })();
 
   // view switching
   const vDash = document.getElementById('view-dash');
