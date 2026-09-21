@@ -1635,6 +1635,7 @@
 
   <div class="wiz-nav">
     <button class="btn btn-ghost" id="scriptBack"><svg class="ic"><use href="#i-arrow-left"/></svg><span>選択に戻る</span></button>
+    <button class="btn btn-tonal wauto" id="scriptSaveLater"><span>保存して後で続ける</span></button>
     <div class="grow"></div>
     <button class="btn btn-primary auto" id="scriptNext"><span>この構成で生成する</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
   </div>
@@ -2919,6 +2920,11 @@
     if (backFn && !e.target.closest('input, textarea, [contenteditable="true"]')) backFn();
   });
   document.getElementById('scriptBack').addEventListener('click', gotoWizard);
+  // 保存して後で続ける：プロジェクトはウィザード完了時にDB保存済み。ここでは安心させて中断＝ホームへ。
+  document.getElementById('scriptSaveLater').addEventListener('click', () => {
+    toast(L('Draft saved. Continue anytime from Media.', '下書きを保存しました。メディアからいつでも続けられます。'), true, 1800);
+    setTimeout(gotoDash, 700);
+  });
   document.getElementById('scriptNext').addEventListener('click', () => {
     // クレジット消費前の平易な確認（低ITリテラシー配慮・誤操作/コスト防止）
     const cost = 1, bal = Number(acctInfo.credits) || 0;   // 生成=1クレジット（＝CM1本）
@@ -3128,6 +3134,7 @@
     'はじめる（新しい動画をつくる）': 'Get started (make a new video)', 'あとで見る': 'Later',
     // home 常設3ステップ
     'つくり方は、かんたん3ステップ': 'How it works — three simple steps',
+    '保存して後で続ける': 'Save & continue later',
     '配信先・業種・ターゲットを選ぶだけ。文章は書きません。': 'Just pick channel, industry, and audience. No writing.',
     '台本・映像・音声をAIが自動で生成します。待つだけ。': 'AI generates the script, footage, and audio. Just wait.',
     'できあがった動画を確認して、そのまま書き出せます。': 'Review the finished video and export it as-is.',
