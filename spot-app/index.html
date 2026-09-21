@@ -870,9 +870,16 @@
 
   /* jobs (Realtime generation) */
   .panel-h .rt { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--faint); }
-  .jobs-meter { height: 4px; margin: 10px var(--s-4) 0; border-radius: 2px; background: var(--surface-2); overflow: hidden; }
-  .jobs-meter i { display: block; height: 100%; background: var(--accent-ink); transition: width var(--dur-slow) var(--ease-emphasized); }
-  .jobs { list-style: none; margin: 0; padding: var(--s-2) var(--s-4) 4px; display: flex; flex-direction: column; gap: 2px; }
+  .jobs-meter { height: 6px; margin: var(--s-3) 0 0; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; }
+  .jobs-meter i { display: block; height: 100%; background: var(--accent); transition: width var(--dur-slow) var(--ease-emphasized); }
+  .jobs { list-style: none; margin: var(--s-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  /* 生成の状況フィードバック */
+  .gen-status { display: flex; align-items: center; gap: 8px; font-size: var(--t-body-sm); margin-top: var(--s-2); flex-wrap: wrap; }
+  .gen-status .ic { width: 16px; height: 16px; flex: none; }
+  .gen-status.run { color: var(--muted); }
+  .gen-status.ok { color: var(--good); } .gen-status.ok .ic { color: var(--good); }
+  .gen-status.err { color: var(--crit); } .gen-status.err .ic { color: var(--crit); }
+  .gen-status .btn { margin-left: auto; }
   .job { display: flex; align-items: center; gap: 8px; font-size: var(--t-body-sm); min-height: 28px; }
   .job .jd { flex: none; width: 8px; height: 8px; border-radius: 50%; }
   .job.running .jd { animation: pulse2 1.2s infinite; }
@@ -2456,6 +2463,7 @@
     renderSpecs();
     setCrumb([['ホーム', gotoDash], [window.__currentProjectName || 'プロジェクト', gotoWorkspace], ['書き出し']], gotoWorkspace);
   }
+  window.gotoExport = gotoExport;   // データ層（生成完了→書き出し導線）から呼べるように
 
   // ---------- wizard ----------
   const sel = { media: [], industry: null, target: null, angle: null, tone: null };
@@ -4786,17 +4794,28 @@
     let panel = document.getElementById('jobsPanel');
     if (!panel) {
       panel = document.createElement('div');
-      panel.id = 'jobsPanel'; panel.className = 'panel';
+      panel.id = 'jobsPanel'; panel.className = 'panel pad';
+      panel.setAttribute('aria-live', 'polite');   // 生成の進捗/完了/失敗をスクリーンリーダーに通知
       side.insertBefore(panel, side.firstChild);
     }
     const jobs = Object.values(jobsState)
       .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+    const total = jobs.length;
     const done = jobs.filter(j => ['done', 'skipped'].includes(j.status)).length;
+    const failed = jobs.filter(j => ['failed', 'blocked'].includes(j.status)).length;
     const usd = jobs.reduce((s, j) => s + (Number(j.usd) || 0), 0);
-    const pct = jobs.length ? Math.round(done / jobs.length * 100) : 0;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    const allDone = total > 0 && done === total;
+    // 状況フィードバック（生成中=進捗＋目安、完了=次アクション、失敗=再試行）
+    let statusHtml = '';
+    if (total === 0) statusHtml = `<div class="gen-status">${L('Preparing…', '準備しています…')}</div>`;
+    else if (failed) statusHtml = `<div class="gen-status err"><svg class="ic"><use href="#i-alert"/></svg><span>${L('Some cuts failed. Please try again.', '一部の生成に失敗しました。もう一度お試しください。')}</span></div>`;
+    else if (allDone) statusHtml = `<div class="gen-status ok"><svg class="ic"><use href="#i-check"/></svg><span>${L('Generation complete', '生成が完了しました')}</span><button class="btn btn-ghost wauto" id="genToExport"><span>${L('Go to export', '書き出しへ')}</span></button></div>`;
+    else statusHtml = `<div class="gen-status run"><span class="spin"></span><span>${L(`Generating… ${done}/${total} done · a few minutes`, `生成中… ${done}/${total} 完了 ・ 数分お待ちください`)}</span></div>`;
     panel.innerHTML = `
-      <div class="panel-h">Generation <span class="rt">Realtime</span><span class="count">${done}/${jobs.length}</span></div>
-      <div class="jobs-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Generation progress"><i style="width:${pct}%"></i></div>
+      <div class="panel-h">${L('Generation', '生成の進捗')} <span class="rt">Realtime</span><span class="count${allDone ? ' ok' : ''}">${done}/${total}</span></div>
+      ${statusHtml}
+      <div class="jobs-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="${L('Generation progress', '生成の進捗')}"><i style="width:${pct}%"></i></div>
       <ul class="jobs">
         ${jobs.map(j => `
           <li class="job ${j.status}">
@@ -4804,8 +4823,9 @@
             <span class="jn">${STAGE_LABEL[j.stage] || j.stage}${j.cut ? ' · ' + j.cut : ''}</span>
             <span class="js">${j.status}</span>
           </li>`).join('')}
-      </ul>
-      <div class="qc-note" style="border:none">Est. cost $${usd.toFixed(2)}</div>`;
+      </ul>`;
+    const gte = document.getElementById('genToExport');
+    if (gte) gte.addEventListener('click', () => { if (window.gotoExport) window.gotoExport(); });
     updatePipeline();
     updateGenPanels();
   }
