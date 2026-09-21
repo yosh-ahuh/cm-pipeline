@@ -2463,8 +2463,25 @@
   ];
   const boardList = document.getElementById('boardList');
   let scriptEditable = false;
+  // 実プロジェクトの cuts（{id,role,type}）→ 絵コンテカードに写像。詳細な台本はAIが後工程で生成。
+  function boardFromCuts(cuts) {
+    const total = cuts.length || 1;
+    return cuts.map((c, i) => {
+      const kind = CUT_KIND[c.type] || '実写';
+      const [c1, c2] = CUT_GRAD[kind] || ['#4a5560', '#20272e'];
+      const label = ROLE_LABEL[c.role] || c.role || ('カット' + (i + 1));
+      const model = c.type === 'live-action' ? 'AI生成' : (c.type === 'ui' ? '提供UI/コード' : 'コード描画');
+      const s = Math.round(30 / total * i), e = Math.round(30 / total * (i + 1));
+      const pad = n => String(n).padStart(2, '0');
+      return { n: '#' + (i + 1), kind, scene: label, secs: `0:${pad(s)}–0:${pad(e)}`, tl: label,
+        dark: kind === 'アプリ画面', c1, c2, na: '—', telop: '—',
+        shot: L(`AI generates the script & footage for this cut. `, `このカットの台本・映像はAIが生成します。`) + `<b>${model}</b>` };
+    });
+  }
   function renderBoard() {
-    boardList.innerHTML = SCUT.map(c => `
+    const rc = Array.isArray(window.__scriptCuts) && window.__scriptCuts.length ? window.__scriptCuts : null;
+    const data = rc ? boardFromCuts(rc) : SCUT;   // 実プロジェクトがあれば実 cuts、無ければデモ(SCUT)
+    boardList.innerHTML = data.map(c => `
       <article class="scut">
         <div class="scut-frame" style="background:linear-gradient(155deg, ${c.c1}, ${c.c2})">
           <span class="n">${c.n}</span>
@@ -2474,11 +2491,12 @@
         <div class="scut-body">
           <div class="scut-top"><span class="scut-scene">${c.scene}</span><span class="scut-secs">${c.secs}</span></div>
           ${c.na!=='—' ? `<div class="scut-na${scriptEditable?' editable':''}" ${scriptEditable?'contenteditable="true" role="textbox" aria-label="ナレーション" spellcheck="false"':''}><span class="lab" contenteditable="false">NA</span>${c.na}</div>` : ''}
-          <div class="scut-telop"><span class="lab">字幕</span>${c.telop}</div>
+          ${c.telop!=='—' ? `<div class="scut-telop"><span class="lab">字幕</span>${c.telop}</div>` : ''}
           <div class="scut-shot"><span class="cam"><svg class="ic"><use href="#i-camera"/></svg></span><span class="txt"><b>撮影指示:</b> ${c.shot}</span></div>
         </div>
       </article>`).join('');
   }
+  window.__renderBoard = renderBoard;   // データ層/遷移から再描画できるよう公開
   renderBoard();
 
   document.getElementById('scriptMode').addEventListener('click', e => {
@@ -2579,6 +2597,7 @@
     hideAll(); vScript.hidden = false; focusView(vScript); _nav(true, 'new');
     setCrumb([['ホーム', gotoDash], ['新規CM', gotoWizard], ['台本・絵コンテ']], gotoWizard);
     if (window.renderShotList) window.renderShotList();   // Supabase 接続時は実案件の素材リスト（アップロード可）に差し替え
+    if (window.__renderBoard) window.__renderBoard();     // 絵コンテを実 cuts で再描画（無ければデモ）
   }
   function gotoWorkspace() {
     hideAll(); vWork.hidden = false; focusView(vWork); _nav(true, null);
@@ -3832,6 +3851,8 @@
       delivery: { platforms: sel.media || [] },
       cuts: generateCuts(sel),   // 伝え方から構成（カット列）を自動生成
     };
+    window.__scriptCuts = spec.cuts;   // 台本・絵コンテ画面を実 cuts に連動（renderBoard が参照）
+    if (window.__renderBoard) window.__renderBoard();
     try {
       const insertRow = { name: spec.meta.name, spec, status: 'draft' };
       if (currentOrg && currentOrg.id) insertRow.org_id = currentOrg.id;   // 現在の組織に所属させる（未解決時はトリガが個人orgを補完）
