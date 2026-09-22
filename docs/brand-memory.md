@@ -33,6 +33,7 @@
 
 ## 進捗
 - ✅ **Phase 1 実装済**：`window.__brandDefaults()`（現org の projects.spec.selections を最大30件集計→各軸の最頻値・媒体は4割以上）。`applyBrandDefaults()`＋`applySelToUI()` を `gotoWizard` で呼び、ウィザードの初期選択をブランドの“いつもの設定”に。注記「このブランドのいつもの設定を反映しました」。履歴2本未満/未サインインは demo 既定のまま。スキーマ変更なし。stub履歴で動作確認済み。
+- ✅ **Phase 1 可視化**：ワークスペースのプロフィールに「このブランドの傾向」（媒体/業種/ターゲット/伝え方/トーンのタグ＋N本から）＝`renderBrandInsights()`。ブランドメモリを見える化。
 - ⏳ Phase 2/3 未着手（worker側の参照注入／学習）。
 
 関連: [[workspace-brand-model]] [[multi-seat-design]] [[consistency-audit-2026-09]]。
