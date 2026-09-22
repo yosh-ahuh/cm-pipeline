@@ -32,10 +32,10 @@
 | トークン | 値 | 用途 |
 |---|---|---|
 | `--ground` | `#131318` | ページ地 |
-| `--surface-low` | `#191920` | サイドバー・レール・くぼみ |
-| `--surface` | `#1E1E26` | カード・パネル |
-| `--surface-2` | `#25252F` | 入力欄・入れ子のくぼみ |
-| `--surface-3` | `#2C2C37` | カード上のホバー |
+| `--surface-low` | `#1A1A21` | サイドバー・レール・くぼみ |
+| `--surface` | `#222230` | カード・パネル |
+| `--surface-2` | `#2A2A36` | 入力欄・入れ子のくぼみ |
+| `--surface-3` | `#323240` | カード上のホバー |
 
 **文字（on-surface）**
 | `--ink` `#F1EDE4` 主要 | `--muted` `#A8A49A` 補助 | `--faint` `#8A867C` 三次 | `--outline` `#5A5866` 装飾線 |
@@ -53,10 +53,13 @@
 | 危険 | `--crit` (+`-soft`) | `#E07A64` | 枯渇・失敗・削除 |
 | 強調赤 | `--brand-red` | `#D7000F` | 実写カット等の限定用途 |
 
+**面上の文字色（on-*）**: `--on-accent` `#FFFFFF`（accent面）/ `--on-good` `#0F1A14`（good面）。
+**光彩（indigo=光源）**: `--glow`（放射グラデの塗り＝ヒーロー/FAB/結果リビールの疑似要素）/ `--glow-shadow`（選択面・FABの色付き影）。
+**暗幕**: `--scrim`（モーダル/ボトムシートの dimmer）。
 **状態レイヤー（M3）**: `--hover`（ink 6%）/ `--pressed`（ink 10%）
 **影**: `--shadow-1`（カード）/ `--shadow`（浮上）/ `--shadow-lift`（ドラッグ・ホバー浮上）
 
-> ⚠️ **`--on-accent` 以外の「色の上の文字色」規約が未整備。** バッジ等でアクセント面に文字を載せる時の色を規約化すべき（§10-F）。
+> `--on-accent`/`--on-good` で主要な「色の上の文字色」を規約化済み（§10-F 一部対応）。warn/brand-red 面の on-* と `-soft` 変種は未整備。
 
 ### 2.2 タイポグラフィ
 
@@ -85,7 +88,7 @@
 **基準**: パネル間=`--s-6`、パネル内=`--s-4`、密なリスト行間=`--s-2`。
 
 ### 2.4 角丸・影・コントロール高さ
-`--r-xs`6 / `--r-sm`8 / `--r-md`12 / `--r-lg`16 / `--r-xl`24 / `--r-full`999。別名 `--radius`=r-lg(16), `--radius-sm`=r-sm(8)。
+`--r-xs`7 / `--r-sm`10 / `--r-md`14 / `--r-lg`20 / `--r-xl`28 / `--r-full`999（Canva風にひと回り大きめ）。別名 `--radius`=r-lg(20), `--radius-sm`=r-sm(10)。
 **基準**: ボタン/入力=`--r-sm`、カード=`--r-md`〜`--r-lg`、ピル=`--r-full`。
 **コントロール高さ**（P2で追加）: `--control-h`40（入力/セレクト）/ `--control-h-sm`34（フィルタ）/ `--control-h-lg`44（ボタン）。
 
@@ -307,7 +310,7 @@ E `--card`撤廃 ／ G mono 500統一 ／ I `.count`中立化＋`.ok`。
 意味 : --accent(+hover/ink/soft) / --good(+soft) / --warn / --crit(+soft) / --cool
 影   : --shadow-1 / --shadow / --shadow-lift
 字   : --font-display / --font-jp / --font-mono ; --t-display..--t-label-sm(11)
-角丸 : --r-xs6/--r-sm8/--r-md12/--r-lg16/--r-xl24/--r-full ; --radius(16)
+角丸 : --r-xs7/--r-sm10/--r-md14/--r-lg20/--r-xl28/--r-full ; --radius(20)
 余白 : --s-1..--s-10 (4/8/12/16/20/24/32/40)
 動き : --ease-standard/--ease-emphasized ; --dur-fast120/--dur200/--dur-slow320
 ```
