@@ -904,6 +904,14 @@
   .exp-check .ic { width: 24px; height: 24px; stroke-width: 3; }
   .exp-head h1 { font-family: var(--font-display); font-size: var(--t-headline); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
   .exp-head .sub { color: var(--muted); font-size: var(--t-body-sm); margin-top: 4px; }
+  /* 実ファイル未書き出し時のプレビュー注記（正直さ） */
+  .exp-preview-note { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 var(--s-4); padding: 12px 14px;
+    background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent-ink) 28%, transparent); border-radius: var(--r-md);
+    color: var(--accent-ink); font-size: var(--t-body-sm); line-height: 1.55; }
+  .exp-preview-note .ic { width: 17px; height: 17px; flex: none; margin-top: 1px; }
+  .exp-preview-note b { color: var(--ink); }
+  /* プレビュー状態では成功チェックを中立トーンに（“完了”の誤認を避ける） */
+  .exp-check.pending { background: var(--surface-3); color: var(--muted); box-shadow: none; }
   .export-board { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: var(--s-6); padding: var(--s-5) 0 56px; align-items: start; }
 
   .deliv { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-1); overflow: hidden; }
@@ -2054,11 +2062,16 @@
 <!-- ============================ EXPORT / DELIVERY VIEW ============================ -->
 <main class="wrap" id="view-export" hidden>
   <div class="exp-head">
-    <div class="exp-check" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></div>
+    <div class="exp-check" id="expCheck" aria-hidden="true"><svg class="ic"><use href="#i-check"/></svg></div>
     <div>
-      <h1>書き出し完了 ・ 9本</h1>
+      <h1 id="expTitle">書き出し完了 ・ 9本</h1>
       <div class="sub">3パターン（A/B/C）× 3形式（横・縦・正方形）。クライアントには「イントロを選んで、その3形式を納品」で提示できます。</div>
     </div>
+  </div>
+  <!-- まだ実ファイルが書き出されていないときの正直な注記（生成完了後に本物のDL/検証が反映される） -->
+  <div class="exp-preview-note" id="expPreviewNote" hidden>
+    <svg class="ic"><use href="#i-alert"/></svg>
+    <span>これは仕上がりの<b>プレビュー</b>です。実際の動画ファイルと配信前チェックは、生成が完了すると反映され、ダウンロードできるようになります。</span>
   </div>
 
   <div class="export-board">
@@ -2350,10 +2363,10 @@
     </div>
     <div class="panel pad">
       <div class="panel-h">通知設定</div>
-      <label class="switch-row"><input type="checkbox" id="notifDone"><span>制作が完了したらメールで知らせる</span></label>
+      <label class="switch-row"><input type="checkbox" id="notifDone"><span>制作が完了したらメールで知らせる</span><span class="feat-soon">近日</span></label>
       <hr class="soft-sep">
-      <label class="switch-row"><input type="checkbox" id="notifNews"><span>Spot からのお知らせ・新機能を受け取る</span></label>
-      <p class="muted" id="notifNote" style="margin:12px 0 0;font-size:var(--t-label-sm)">クレジットが少なくなったときのお知らせメールは「クレジットを追加」で設定できます。</p>
+      <label class="switch-row"><input type="checkbox" id="notifNews"><span>Spot からのお知らせ・新機能を受け取る</span><span class="feat-soon">近日</span></label>
+      <p class="muted" id="notifNote" style="margin:12px 0 0;font-size:var(--t-label-sm)">メール通知は近日対応予定です。いまは設定の保存のみできます。クレジットが少なくなったときのお知らせメールは「クレジットを追加」で設定できます。</p>
     </div>
     <div class="panel pad">
       <div class="panel-h">表示言語</div>
@@ -2559,7 +2572,7 @@
     </div>
   </div>
   <div class="panel pad">
-    <div class="panel-h">自動チャージ <span class="count" id="autoTopupState" style="color:var(--muted)">オフ</span></div>
+    <div class="panel-h">自動チャージ <span class="feat-soon">近日</span> <span class="count" id="autoTopupState" style="color:var(--muted)">オフ</span></div>
     <p class="muted" style="margin:0 0 14px">残高が少なくなったら、自動でクレジットを補充します。作業が途中で止まりません。</p>
     <label class="switch-row"><input type="checkbox" id="topupEnabled"><span>自動チャージを有効にする</span></label>
     <div class="topup-fields" id="topupFields" hidden>
@@ -2577,7 +2590,7 @@
     <div class="cta-row" style="margin-top:14px">
       <button class="btn btn-ghost wauto" id="topupSave"><span>設定を保存</span></button>
     </div>
-    <p class="muted" id="topupNote" style="margin:12px 0 0;font-size:var(--t-label)">※ 自動チャージの実行には、保存済みのお支払い方法が必要です。</p>
+    <p class="muted" id="topupNote" style="margin:12px 0 0;font-size:var(--t-label)">※ 自動チャージの自動実行は近日対応予定です。いまは設定の保存のみできます（保存した内容は対応開始時にそのまま使えます）。実行には保存済みのお支払い方法が必要です。</p>
   </div>
   <div class="panel pad">
     <div class="panel-h">クレジット利用明細</div>
@@ -2776,7 +2789,7 @@
   }
   freeEdit.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); sendFreeEdit(); } });
   document.getElementById('freeEditSend').addEventListener('click', sendFreeEdit);
-  document.getElementById('wsShare').addEventListener('click', () => toast(L('Share link copied','共有リンクをコピーしました'), false, 1600));
+  document.getElementById('wsShare').addEventListener('click', () => toast(L('Shareable links are coming soon.', '共有リンクの発行は準備中です。'), false, 2600));
   document.getElementById('playBtn').addEventListener('click', () => toast(L('Preview playback is coming in the next build','プレビュー再生は次のビルドで有効になります'), false, 2000));
 
   // ---- keyboard: arrow-key navigation for tablists / radiogroups / segmented controls (M3 & HIG) ----
@@ -3105,18 +3118,42 @@
     wireRealRenders();   // 実レンダー(mp4)があれば本物のDLリンクを各ボタンへ（無ければデモのまま）
   }
   // 実 renders（variant×format の mp4）があれば、各DLボタンに storage_path を紐づけて本物のダウンロードにする。
+  // 実ファイルの有無で「書き出し完了」表示を正直に切り替える（0本＝プレビュー注記、N本＝完了N本）。
   async function wireRealRenders() {
+    let realCount = 0;
     try {
       const pid = window.__currentProjectId;
-      if (!sb || !pid) return;
-      const { data: rends } = await sb.from('renders').select('variant,format,storage_path').eq('project_id', pid).not('storage_path', 'is', null);
-      if (!rends || !rends.length || window.__currentProjectId !== pid) return;
-      const map = {}; rends.forEach(r => { map[`${r.variant}/${r.format}`] = r.storage_path; });
-      document.querySelectorAll('#delivList .dl').forEach(btn => {
-        const path = map[`${btn.dataset.variant}/${btn.dataset.format}`];
-        if (path) { btn.dataset.path = path; btn.closest('.dfile').classList.add('is-real'); }
-      });
+      if (sb && pid) {
+        const { data: rends } = await sb.from('renders').select('variant,format,storage_path').eq('project_id', pid).not('storage_path', 'is', null);
+        if (rends && rends.length && window.__currentProjectId === pid) {
+          const map = {}; rends.forEach(r => { map[`${r.variant}/${r.format}`] = r.storage_path; });
+          document.querySelectorAll('#delivList .dl').forEach(btn => {
+            const path = map[`${btn.dataset.variant}/${btn.dataset.format}`];
+            if (path) { btn.dataset.path = path; btn.closest('.dfile').classList.add('is-real'); realCount++; }
+          });
+        }
+      }
     } catch (_) { /* 失敗時はデモのDL（トースト）にフォールバック */ }
+    setExportHonesty(realCount);
+  }
+  // 書き出しビューの見出し・チェック・注記・QCバッジを実ファイル数で正直に更新
+  function setExportHonesty(realCount) {
+    const L = window.L || ((en, ja) => ja);   // 初期描画時は window.L 未定義のため日本語にフォールバック
+    const title = document.getElementById('expTitle');
+    const check = document.getElementById('expCheck');
+    const note = document.getElementById('expPreviewNote');
+    const badges = document.querySelector('#preflight .cc-badges');   // 「済み」主張＝実ファイルが無いうちは出さない
+    if (realCount > 0) {
+      if (title) title.textContent = L(`Export complete · ${realCount} files`, `書き出し完了 ・ ${realCount}本`);
+      if (check) check.classList.remove('pending');
+      if (note) note.hidden = true;
+      if (badges) badges.hidden = false;
+    } else {
+      if (title) title.textContent = L('Finish preview', '仕上がりプレビュー');
+      if (check) check.classList.add('pending');
+      if (note) note.hidden = false;
+      if (badges) badges.hidden = true;
+    }
   }
   window.__renderDeliv = renderDeliv;
   renderDeliv();
@@ -3131,10 +3168,16 @@
         if (data && data.signedUrl) { window.open(data.signedUrl, '_blank', 'noopener'); return; }
       } catch (_) { /* 失敗時は下のデモ挙動へ */ }
     }
-    toast(L('Download started','ダウンロードを開始しました'), false, 1600);
+    // 実レンダーが無い＝まだ書き出されていない。正直に伝える（偽の「開始しました」は出さない）。
+    toast(L('This video is not exported yet. It will be ready to save once generation finishes.', 'この動画はまだ書き出されていません。生成が終わると保存できます。'), false, 3200);
   });
-  document.getElementById('dlAll').addEventListener('click', () => { if (dlGuard()) return; toast(L('Downloading 9 videos + thumbnails as ZIP…','9本 + サムネイルをZIPでダウンロード中…'), true, 1800); });
-  document.getElementById('shareLink').addEventListener('click', () => { if (dlGuard()) return; toast(L('Share link copied','共有リンクをコピーしました'), false, 1600); });
+  document.getElementById('dlAll').addEventListener('click', () => {
+    if (dlGuard()) return;
+    const real = document.querySelectorAll('#delivList .dfile.is-real').length;
+    if (real > 0) toast(L('Bulk ZIP is coming soon. For now, save each video from its ↓ button.', '一括ZIPは準備中です。各動画は ↓ ボタンから個別に保存できます。'), false, 3400);
+    else toast(L('Your videos are not exported yet. They will be ready once generation finishes.', 'まだ書き出しが完了していません。生成が終わると保存できます。'), false, 3200);
+  });
+  document.getElementById('shareLink').addEventListener('click', () => { if (dlGuard()) return; toast(L('Shareable links are coming soon.', '共有リンクの発行は準備中です。'), false, 2600); });
   document.getElementById('backToWork').addEventListener('click', gotoWorkspace);
 
   function gotoExport() {
@@ -4048,10 +4091,13 @@
     '残高がこの数を下回ったら': 'When balance falls below',
     'このぶんを補充する': 'Add this many credits',
     '残高が少なくなったらメールで知らせる': 'Email me when my balance runs low',
-    'クレジットが少なくなったときのお知らせメールは「クレジットを追加」で設定できます。': 'You can set up low-balance email alerts under “Add credits”.',
+    'メール通知は近日対応予定です。いまは設定の保存のみできます。クレジットが少なくなったときのお知らせメールは「クレジットを追加」で設定できます。': 'Email notifications are coming soon — for now, your choices are just saved. Low-balance email alerts can be set up under “Add credits”.',
     'この数を下回ったら通知': 'Notify when below',
     '設定を保存': 'Save settings',
-    '※ 自動チャージの実行には、保存済みのお支払い方法が必要です。': '* Auto top-up requires a saved payment method to run.',
+    '近日': 'Soon',
+    '※ 自動チャージの自動実行は近日対応予定です。いまは設定の保存のみできます（保存した内容は対応開始時にそのまま使えます）。実行には保存済みのお支払い方法が必要です。': '* Automatic top-up execution is coming soon — for now your settings are only saved (they will work as-is once it launches). Running it will require a saved payment method.',
+    'これは仕上がりの': 'This is a ', 'プレビュー': 'preview', 'です。実際の動画ファイルと配信前チェックは、生成が完了すると反映され、ダウンロードできるようになります。': ' of the finished result. The actual video files and pre-delivery checks appear once generation completes, and become downloadable then.',
+    '仕上がりプレビュー': 'Finish preview',
     'クレジット利用明細': 'Credit activity',
     '当日': 'Same day', '修正は分単位': 'revisions in minutes',
     'すべてダウンロード（ZIP）': 'Download all (ZIP)', '共有リンクを作成': 'Create share link',
