@@ -1460,10 +1460,22 @@
   .col-empty-h { font-family: var(--font-display); font-weight: 800; font-size: var(--t-title); }
   .col-detail-h { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
   .col-detail-h h2 { font-size: var(--t-title-lg); margin: 0; }
-  .move-menu { position: fixed; z-index: 120; min-width: 200px; max-height: 320px; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-lift); padding: 5px; }
-  .mm-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 11px; border: none; background: none; border-radius: 8px; cursor: pointer; color: var(--ink); font: inherit; text-align: left; }
+  .move-menu { position: fixed; z-index: 120; min-width: 200px; max-height: 320px; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); box-shadow: var(--shadow-lift); padding: 5px; }
+  .mm-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 11px; border: none; background: none; border-radius: var(--r-xs); cursor: pointer; color: var(--ink); font: inherit; text-align: left; }
   .mm-item:hover { background: var(--hover); }
   .mm-item .ic { width: 15px; height: 15px; }
+  /* 汎用スクリム（ボトムシート等の暗幕・LINE Modal dimmer） */
+  .sheet-scrim { position: fixed; inset: 0; z-index: 119; background: var(--scrim); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  /* モバイル：選択リストをボトムシート化（LINE Bottom Sheet：上角14px・ハンドルバー・全幅・単一導線） */
+  @media (max-width: 720px) {
+    .move-menu.as-sheet { position: fixed; left: 0; right: 0; bottom: 0; top: auto !important; width: 100%; min-width: 0; max-width: 100%;
+      max-height: 76vh; border: none; border-radius: var(--r-lg) var(--r-lg) 0 0; box-shadow: var(--shadow-lift);
+      padding: 6px 10px max(14px, env(safe-area-inset-bottom)); animation: sheet-in var(--dur-slow) var(--ease-emphasized); }
+    .move-menu.as-sheet::before { content:""; display:block; width: 40px; height: 4px; border-radius: var(--r-full); background: var(--line-strong); margin: 6px auto 8px; }
+    .move-menu.as-sheet .sheet-title { font-weight: 700; font-size: var(--t-body-sm); color: var(--muted); padding: 2px 8px 8px; }
+    .move-menu.as-sheet .mm-item { padding: 14px 12px; border-radius: var(--r-sm); min-height: 48px; font-size: var(--t-body-lg); }
+    .move-menu.as-sheet .mm-sep { margin: 4px 0; }
+  }
   .mm-new { color: var(--accent-ink); }
   .mm-sep { height: 1px; background: var(--line); margin: 4px 6px; }
   .col-badge { display: inline-flex; align-items: center; gap: 4px; font-size: var(--t-label-sm); color: var(--accent-ink); background: var(--accent-soft); border-radius: var(--r-full); padding: 2px 8px; margin-left: auto; max-width: 46%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2473,6 +2485,7 @@
 </main>
 
 <!-- move-to-collection popover -->
+<div class="sheet-scrim" id="sheetScrim" hidden></div>
 <div class="move-menu" id="moveMenu" role="menu" aria-label="コレクションに移動" hidden></div>
 
 <!-- name modal (create / rename collection) -->
@@ -6119,19 +6132,32 @@
   })();
   // move-to-collection popover
   const moveMenu = document.getElementById('moveMenu');
+  const sheetScrim = document.getElementById('sheetScrim');
+  const isSheet = () => window.matchMedia('(max-width: 720px)').matches;
   async function openMoveMenu(btn, projectId) {
     if (!moveMenu) return;
     await fetchCollections();
     moveMenu.dataset.proj = projectId;
-    moveMenu.innerHTML = `<button class="mm-item" data-mm="__none__">${L('Uncategorized', '未分類')}</button>`
+    const sheet = isSheet();
+    const title = sheet ? `<div class="sheet-title">${L('Move to collection', 'コレクションに移動')}</div>` : '';
+    moveMenu.innerHTML = title
+      + `<button class="mm-item" data-mm="__none__">${L('Uncategorized', '未分類')}</button>`
       + _collections.map(c => `<button class="mm-item" data-mm="${c.id}">${esc(c.name)}</button>`).join('')
       + `<div class="mm-sep"></div><button class="mm-item mm-new" data-mm="__new__"><svg class="ic"><use href="#i-plus"/></svg><span>${L('New collection', '新規コレクション')}</span></button>`;
-    const r = btn.getBoundingClientRect();
-    moveMenu.style.top = Math.round(r.bottom + 6) + 'px';
-    moveMenu.style.left = Math.round(Math.max(8, Math.min(r.left, window.innerWidth - 230))) + 'px';
+    moveMenu.classList.toggle('as-sheet', sheet);
+    if (sheet) {   // モバイル＝ボトムシート（下から・暗幕あり）
+      moveMenu.style.top = ''; moveMenu.style.left = '';
+      if (sheetScrim) sheetScrim.hidden = false;
+    } else {       // デスクトップ＝ボタン近傍のポップオーバー
+      const r = btn.getBoundingClientRect();
+      moveMenu.style.top = Math.round(r.bottom + 6) + 'px';
+      moveMenu.style.left = Math.round(Math.max(8, Math.min(r.left, window.innerWidth - 230))) + 'px';
+      if (sheetScrim) sheetScrim.hidden = true;
+    }
     moveMenu.hidden = false;
   }
-  function closeMoveMenu() { if (moveMenu) moveMenu.hidden = true; }
+  function closeMoveMenu() { if (moveMenu) moveMenu.hidden = true; if (sheetScrim) sheetScrim.hidden = true; }
+  if (sheetScrim) sheetScrim.addEventListener('click', closeMoveMenu);
   document.addEventListener('click', async e => {
     const mv = e.target.closest('.proj-move');
     if (mv) { e.stopPropagation(); if (!(window.__canWrite && window.__canWrite())) { if (window.toast) window.toast(L('View-only access.', '閲覧のみの権限です。'), false, 1800); return; } openMoveMenu(mv, mv.getAttribute('data-move')); return; }
