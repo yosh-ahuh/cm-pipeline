@@ -3000,7 +3000,7 @@
   function acctAction(a) {   // 主メニュー/サブメニュー共通のアクション
     if (a === 'switch-account') { (acctSwitch && acctSwitch.hidden) ? openAcctSwitch() : closeAcctSwitch(); return; }
     closeAcctMenu(); closeDrawer();
-    if (a === 'add-workspace') { gotoSettings(); if (window.toast) toast(L('Add or upgrade your workspace here.', 'ここでワークスペースの追加・アップグレードができます。'), false, 2600); return; }
+    if (a === 'add-workspace') { if (window.__createWorkspace) window.__createWorkspace(); else gotoSettings(); return; }
     if (a === 'settings') { gotoSettings(); return; }
     if (a === 'account') { if (window.gotoAccount) window.gotoAccount(); return; }
     if (a === 'help') { const to = (window.__cfg && window.__cfg.supportEmail) || ''; if (to) { location.href = 'mailto:' + to + '?subject=' + encodeURIComponent('Spot feedback'); } else toast(L('Help & feedback is coming soon.', 'ヘルプ＆フィードバックは準備中です。'), false, 2400); return; }
@@ -6094,6 +6094,26 @@
       return data.id;
     } catch (e) { console.warn('collection create failed:', e); if (window.toast) window.toast(window.L("Couldn't create it. Please try again.", 'コレクションをつくれませんでした。もう一度お試しください。'), false, 2600); return null; }
   }
+  // 新しいワークスペース（＝ブランド／会社／組織）を作成して切り替える。workspace=brand の単一概念に整合。
+  window.__createWorkspace = async function () {
+    if (!sb) { if (window.toast) window.toast(L('Please sign in first.', '先にサインインしてください。'), false, 2200); return; }
+    const name = await openNameModal({
+      title: L('New workspace', '新しいワークスペース'),
+      okLabel: L('Create workspace', 'ワークスペースを作成'),
+    });
+    if (!name) return;
+    try {
+      const { data, error } = await sb.rpc('create_workspace', { p_name: name });
+      if (error) throw error;
+      if (window.toast) window.toast(L('Workspace created', 'ワークスペースを作成しました'), true, 2000);
+      if (window.__switchOrg && data) await window.__switchOrg(data);   // 作成した新WSに切り替え
+    } catch (e) {
+      console.warn('create workspace failed:', e);
+      const msg = /workspace name is required/i.test(String(e && e.message)) ? L('Please enter a workspace name.', 'ワークスペース名を入力してください。')
+        : L("Couldn't create the workspace. Please try again.", 'ワークスペースをつくれませんでした。もう一度お試しください。');
+      if (window.toast) window.toast(msg, false, 2600);
+    }
+  };
   async function renameCollection(id, currentName) {
     if (!id || id === '__uncat__' || !(window.__canWrite && window.__canWrite())) return;
     const name = await openNameModal({ title: L('Rename collection', 'コレクション名を変更'), value: currentName, okLabel: L('Save', '保存') });
