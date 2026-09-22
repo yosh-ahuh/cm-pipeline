@@ -918,7 +918,14 @@
   .exp-preview-note .ic { width: 17px; height: 17px; flex: none; margin-top: 1px; }
   .exp-preview-note b { color: var(--ink); }
   /* プレビュー状態では成功チェックを中立トーンに（“完了”の誤認を避ける） */
-  .exp-check.pending { background: var(--surface-3); color: var(--muted); box-shadow: none; }
+  .exp-check.pending { background: var(--surface-3); color: var(--muted); box-shadow: none; animation: none; }
+  /* 実ファイルが揃った瞬間の“お披露目”＝チェックが弾んで現れる（LINE Feedback: 完了は祝う） */
+  .exp-check.bloom { animation: premiereBloom var(--dur-slow) var(--ease-spring) both; }
+  @keyframes premiereBloom {
+    0%   { transform: scale(.4); box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 55%, transparent); }
+    60%  { transform: scale(1.14); box-shadow: 0 0 0 14px color-mix(in srgb, var(--good) 0%, transparent); }
+    100% { transform: scale(1); box-shadow: 0 6px 20px color-mix(in srgb, var(--good) 40%, transparent); }
+  }
   .export-board { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: var(--s-6); padding: var(--s-5) 0 56px; align-items: start; }
 
   .deliv { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-1); overflow: hidden; }
@@ -3165,12 +3172,12 @@
     const badges = document.querySelector('#preflight .cc-badges');   // 「済み」主張＝実ファイルが無いうちは出さない
     if (realCount > 0) {
       if (title) title.textContent = L(`Export complete · ${realCount} files`, `書き出し完了 ・ ${realCount}本`);
-      if (check) check.classList.remove('pending');
+      if (check) { check.classList.remove('pending'); check.classList.remove('bloom'); void check.offsetWidth; check.classList.add('bloom'); }   // お披露目アニメを毎回確実に再生
       if (note) note.hidden = true;
       if (badges) badges.hidden = false;
     } else {
       if (title) title.textContent = L('Finish preview', '仕上がりプレビュー');
-      if (check) check.classList.add('pending');
+      if (check) { check.classList.add('pending'); check.classList.remove('bloom'); }
       if (note) note.hidden = false;
       if (badges) badges.hidden = true;
     }
