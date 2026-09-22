@@ -2357,14 +2357,6 @@
     </div>
   </div>
 
-  <!-- 個人→組織へのアップグレード（個人アカウントのオーナーのみ表示） -->
-  <div class="panel pad" id="upgradePanel" hidden>
-    <div class="panel-h">組織・チームで使う</div>
-    <p class="muted" style="margin:0 0 16px;font-size:var(--t-label)">会社・チームに切り替えると、会社名やロゴを設定でき、メンバーを招待して同じワークスペースで制作できます。いまの動画・クレジットはそのまま引き継がれます。</p>
-    <div class="fld"><label for="upgradeName">会社・組織名</label>
-      <input id="upgradeName" type="text" maxlength="80" placeholder="株式会社スポット" autocomplete="organization"></div>
-    <div class="cta-row"><button class="btn btn-primary wauto" id="upgradeBtn"><svg class="ic"><use href="#i-users"/></svg><span>組織にアップグレード</span></button></div>
-  </div>
 
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
@@ -2862,7 +2854,7 @@
     const orgs = (window.__orgs || []);
     const cur = window.__getOrg && window.__getOrg();
     const roleL = { owner: L('Owner', 'オーナー'), member: L('Member', 'メンバー'), viewer: L('View-only', '閲覧のみ') };
-    const nameOf = o => o.is_personal ? L('Personal', '個人') : o.name;
+    const nameOf = o => o.name || L('Personal', '個人');   // 案X: どのWSも実名(＝ブランド名)を表示。未設定時のみ「個人」
     // (1) 上部：現在のワークスペースを読み取り専用で表示（切替はしない）
     if (now) {
       if (!cur) { now.hidden = true; now.innerHTML = ''; }
@@ -5330,7 +5322,7 @@
       if (!currentOrg) return;
       if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can edit this.', '編集はオーナーのみ可能です。'), false, 2400); return; }
       const name = (document.getElementById('companyName').value || '').trim();
-      if (!name) { toast(L('Enter a company name.', '会社・組織名を入力してください。'), false, 2400); return; }
+      if (!name) { toast(L('Enter a workspace name.', 'ワークスペース名を入力してください。'), false, 2400); return; }
       save.disabled = true;
       try {
         const { error } = await sb.from('organizations').update({ name }).eq('id', currentOrg.id);
@@ -5347,35 +5339,13 @@
             updated_at: new Date().toISOString(),
           }, { onConflict: 'org_id' });
         } catch (_) {}
-        if (window.renderWorkspaces) window.renderWorkspaces();   // サイドバーのワークスペース名を更新
+        if (window.__orgs) { const o = window.__orgs.find(x => x.id === currentOrg.id); if (o) o.name = name; }   // 一覧の名前を更新
+        if (window.__renderWorkspaces) window.__renderWorkspaces();   // サイドバー/切替の名前を即時更新
         if (note) { note.hidden = false; setTimeout(() => note.hidden = true, 2000); }
       } catch (e) { console.warn('company profile save failed:', e); toast(L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2600); }
       finally { save.disabled = false; }
     });
-    // 個人 → 組織への昇格
-    const upBtn = document.getElementById('upgradeBtn');
-    if (upBtn) upBtn.addEventListener('click', async () => {
-      if (!currentOrg || !currentOrg.is_personal) return;
-      if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can do this.', 'この操作はオーナーのみ可能です。'), false, 2400); return; }
-      const nameEl = document.getElementById('upgradeName');
-      const name = (nameEl.value || '').trim();
-      if (!name) { toast(L('Enter a company name.', '会社・組織名を入力してください。'), false, 2400); nameEl.focus(); return; }
-      if (await openConfirm({ title: L('Switch to an organization?', '組織に切り替えますか？'),
-        message: L('Your videos and credits are kept.', '動画・クレジットはそのまま引き継がれます。'),
-        actions: [{ id: 'ok', label: L('Switch', '切り替える'), variant: 'primary' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }] }) !== 'ok') return;
-      upBtn.disabled = true;
-      try {
-        const { error } = await sb.from('organizations').update({ name, is_personal: false }).eq('id', currentOrg.id);
-        if (error) throw error;
-        currentOrg.name = name; currentOrg.is_personal = false;
-        try { await sb.rpc('create_brand', { p_org: currentOrg.id, p_name: name, p_assets: {} }); } catch (_) {}
-        if (window.__orgs) { const o = window.__orgs.find(x => x.id === currentOrg.id); if (o) { o.name = name; o.is_personal = false; } }
-        if (window.renderWorkspaces) window.renderWorkspaces();
-        toast(L('Switched to an organization', '組織に切り替えました'), true, 2200);
-        await loadCompanyProfile();   // パネルを会社プロフィールに切替
-      } catch (e) { console.warn('org upgrade failed:', e); toast(L("Couldn't switch to an organization. Please try again.", '組織への切り替えができませんでした。もう一度お試しください。'), false, 2800); }
-      finally { upBtn.disabled = false; }
-    });
+    // 案X（workspace=brand）: 個人→組織 昇格フローは廃止（全WSがブランド・プロフィールを持つため不要）。
     if (logoBtn && logoInput) logoBtn.addEventListener('click', () => logoInput.click());
     if (logoInput) logoInput.addEventListener('change', async () => {
       const f = logoInput.files && logoInput.files[0]; if (!f || !currentOrg) return;
