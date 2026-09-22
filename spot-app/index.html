@@ -585,6 +585,13 @@
   .wiz-step { display: none; }
   .wiz-step.on { display: block; animation: fade var(--dur-slow) var(--ease-emphasized); }
   @keyframes fade { from { opacity: 0; transform: translateY(6px); } }
+  /* ステップ到着時、選択カードが少しずつ立ち上がる（stagger）。backwards=遅延中はfrom状態を保持し、終了後はホバー等の通常挙動へ戻す */
+  .wiz-step.on .opt { animation: optArrive var(--dur) var(--ease-emphasized) backwards; }
+  .wiz-step.on .opt:nth-child(2) { animation-delay: 45ms; }
+  .wiz-step.on .opt:nth-child(3) { animation-delay: 90ms; }
+  .wiz-step.on .opt:nth-child(4) { animation-delay: 135ms; }
+  .wiz-step.on .opt:nth-child(n+5) { animation-delay: 175ms; }
+  @keyframes optArrive { from { opacity: 0; transform: translateY(10px); } }
   /* 主役の質問：大きく・見出し書体で。「選ぶだけ」の1問に集中させる（LINE反映） */
   .step-q { font-family: var(--font-display); font-size: var(--t-display); font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; line-height: 1.2; text-wrap: balance; }
   .step-q.sub { font-family: var(--font-jp); font-size: var(--t-title); font-weight: 700; letter-spacing: 0; margin-top: var(--s-6); }
@@ -890,7 +897,7 @@
 
   /* empty state */
   .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: var(--s-10) var(--s-4); display: flex; flex-direction: column; align-items: center; gap: var(--s-3); }
-  .empty .e-ic { width: 60px; height: 60px; border-radius: var(--r-lg); background: var(--accent-soft); display: grid; place-items: center; color: var(--accent-ink); box-shadow: var(--shadow-1); }
+  .empty .e-ic { width: 60px; height: 60px; border-radius: var(--r-lg); background: var(--accent-soft); display: grid; place-items: center; color: var(--accent-ink); box-shadow: var(--shadow-1), var(--glow-shadow); }
   .empty .e-ic .ic { width: 26px; height: 26px; }
   .empty h4 { margin: 0; font-size: var(--t-title); color: var(--ink); font-weight: 700; }
   .empty p { font-size: var(--t-body-sm); max-width: 40ch; }
@@ -3857,7 +3864,7 @@
     '配信先・業種・ターゲットを選ぶだけ。AIがディレクターとして台本を組み、実写もUIも音声もつくります。その日のうちに、クライアント確認できる初稿が出てきます。':
       'Pick your channel, industry, and audience. AI directs the script and generates the footage, UI, and voiceover — a client-ready first cut lands the same day.',
     '新規CMをつくる': 'New ad video', '最初のCMをつくる': 'Create your first ad',
-    'まだCMがありません': 'No ad videos yet', '配信先・業種・ターゲットを選ぶだけで、その日のうちに初稿が届きます。': 'Pick a channel, industry and audience — a first cut lands the same day.',
+    'まずは1本、いっしょに作ってみましょう': 'Let’s make your first one together', '配信先・業種・ターゲットを選ぶだけ。その日のうちに初稿が届きます。': 'Just pick a channel, industry and audience — a first cut lands the same day.',
     '該当するCMはありません': 'Nothing matches this filter', 'フィルタを「すべて」に戻すと全件が表示されます。': 'Switch the filter back to “All” to see everything.',
     '接続に失敗しました': 'Connection failed', '作成中': 'Generating',
     '今月つくったCM': 'Ads made this month',
@@ -6202,8 +6209,8 @@
   function emptyState(msg, detail) {
     return `<div class="empty">
       <div class="e-ic"><svg class="ic"><use href="#${msg ? 'i-alert' : 'i-film'}"/></svg></div>
-      <h4>${msg || 'まだCMがありません'}</h4>
-      <p>${detail ? esc(detail) : '配信先・業種・ターゲットを選ぶだけで、その日のうちに初稿が届きます。'}</p>
+      <h4>${msg || 'まずは1本、いっしょに作ってみましょう'}</h4>
+      <p>${detail ? esc(detail) : '配信先・業種・ターゲットを選ぶだけ。その日のうちに初稿が届きます。'}</p>
       <button class="hn-btn" onclick="document.getElementById('newCM').click()"><svg class="ic"><use href="#i-plus"/></svg><span>最初のCMをつくる</span></button></div>`;
   }
 
