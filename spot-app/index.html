@@ -2312,10 +2312,10 @@
     </div>
   </div>
 
-  <!-- 会社プロフィール（組織アカウントのみ表示） -->
+  <!-- ワークスペースのプロフィール（案X：個人/組織を問わず全WSで表示） -->
   <div class="panel pad" id="companyPanel" hidden>
-    <div class="panel-h">会社プロフィール</div>
-    <p class="muted" style="margin:0 0 16px;font-size:var(--t-label)">ロゴと会社名は、動画のプレビューや納品物・請求に使われます。</p>
+    <div class="panel-h">ワークスペースのプロフィール</div>
+    <p class="muted" style="margin:0 0 16px;font-size:var(--t-label)">ロゴとワークスペース名は、動画のプレビューや納品物・請求に使われます。</p>
     <div class="company-row">
       <div class="company-logo" id="companyLogo"><svg class="ic"><use href="#i-users"/></svg></div>
       <div class="company-logo-side">
@@ -2324,8 +2324,8 @@
         <input type="file" id="companyLogoInput" accept="image/svg+xml,image/png,image/jpeg" hidden>
       </div>
     </div>
-    <div class="fld" style="margin-top:16px"><label for="companyName">会社・組織名</label>
-      <input id="companyName" type="text" maxlength="80" placeholder="株式会社スポット" autocomplete="organization"></div>
+    <div class="fld" style="margin-top:16px"><label for="companyName">ワークスペース名</label>
+      <input id="companyName" type="text" maxlength="80" placeholder="株式会社スポット / ブランド名" autocomplete="organization"></div>
 
     <hr class="soft-sep">
     <div class="panel-subh">請求先情報 <span class="muted" style="font-weight:400">（任意・請求書/税に使用）</span></div>
@@ -2348,7 +2348,7 @@
         <input id="billState" type="text" maxlength="64" placeholder="東京都" autocomplete="address-level1"></div>
     </div>
 
-    <div class="cta-row"><button class="btn btn-primary wauto" id="companySave" data-write-only><span>会社情報を保存</span></button>
+    <div class="cta-row"><button class="btn btn-primary wauto" id="companySave" data-write-only><span>保存する</span></button>
       <span class="save-note" id="companySaveNote" hidden>保存しました</span></div>
     <div class="danger-zone" id="orgDangerZone" hidden>
       <div class="dz-h">ワークスペースの削除</div>
@@ -3874,6 +3874,8 @@
     // サイドバー刷新
     'メニュー': 'Menu', '管理': 'Manage', 'ワークスペース': 'Workspace', 'ワークスペースを追加する': 'Add a workspace',
     'アカウント・ワークスペース': 'Account & workspace',
+    'ワークスペースのプロフィール': 'Workspace profile', 'ワークスペース名': 'Workspace name', '保存する': 'Save',
+    'ロゴとワークスペース名は、動画のプレビューや納品物・請求に使われます。': 'Your logo and workspace name appear in previews, deliverables and invoices.',
     'ヘルプ＆フィードバック': 'Help & feedback', 'アカウントを切り替える': 'Switch account',
     '別のアカウントでサインイン': 'Sign in with another account', 'アカウントを管理する': 'Manage account',
     'ヘルプ＆フィードバックは準備中です。': 'Help & feedback is coming soon.',
@@ -5219,14 +5221,11 @@
     const up = document.getElementById('upgradePanel');
     const org = currentOrg;
     const isOwner = window.__isOwner ? window.__isOwner() : true;
-    if (!org || org.is_personal) {   // 個人アカウント：会社プロフィール非表示、（オーナーなら）昇格パネル表示
-      panel.hidden = true;
-      if (up) up.hidden = !(org && org.is_personal && isOwner);
-      return;
-    }
+    if (!org) { panel.hidden = true; if (up) up.hidden = true; return; }
+    // 案X（workspace=brand）：個人/組織を問わず、どのワークスペースもプロフィール（名前+ロゴ）を持つ。昇格パネルは廃止。
     if (up) up.hidden = true;
     panel.hidden = false;
-    { const dz = document.getElementById('orgDangerZone'); if (dz) dz.hidden = !isOwner; }   // 削除はオーナーのみ
+    { const dz = document.getElementById('orgDangerZone'); if (dz) dz.hidden = !isOwner || org.is_personal; }   // 削除はオーナーのみ・基点(個人)WSは削除不可
     const nameEl = document.getElementById('companyName'); if (nameEl) nameEl.value = org.name || '';
     // ブランドのロゴを表示
     { const box = document.getElementById('companyLogo'); if (box && !box.querySelector('img')) box.innerHTML = '<span class="sk" aria-hidden="true" style="display:block;width:100%;height:100%;border-radius:inherit"></span>'; }   // 読み込み中スケルトン
