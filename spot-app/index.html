@@ -18,7 +18,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800;900&family=DM+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="styles/tokens.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
@@ -53,7 +53,7 @@
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body {
     margin: 0;
-    background: var(--ground);
+    background: var(--surface-low);   /* サイドバーと同色に統一（セクション背景） */
     color: var(--ink);
     font-family: var(--font-jp);
     font-size: var(--t-body);
@@ -174,7 +174,7 @@
   /* ---- slim topbar (in-project only on desktop; always on mobile for the menu button) ---- */
   header#topbar {
     border-bottom: 1px solid var(--line);
-    background: color-mix(in srgb, var(--ground) 78%, transparent);
+    background: color-mix(in srgb, var(--surface-low) 78%, transparent);   /* サイドバー色に統一 */
     -webkit-backdrop-filter: saturate(1.4) blur(12px); backdrop-filter: saturate(1.4) blur(12px);
     position: sticky; top: 0; z-index: 20;
   }

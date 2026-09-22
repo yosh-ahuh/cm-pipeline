@@ -51,8 +51,9 @@
   --shadow-lift: 0 4px 16px rgba(0,0,0,.30), 0 28px 60px rgba(0,0,0,.44);
 
   /* --- type --- */
-  --font-display: "Bricolage Grotesque", "Zen Kaku Gothic New", sans-serif;
-  --font-jp: "Zen Kaku Gothic New", -apple-system, "Hiragino Sans", sans-serif;
+  /* Noto Sans JP に統一（見出しも本文も。数値用の mono のみ DM Mono を維持） */
+  --font-display: "Noto Sans JP", -apple-system, "Hiragino Sans", sans-serif;
+  --font-jp: "Noto Sans JP", -apple-system, "Hiragino Sans", sans-serif;
   --font-mono: "DM Mono", ui-monospace, monospace;
   --t-display: 32px;   /* hero / wizard title */
   --t-headline: 26px;  /* page title */
