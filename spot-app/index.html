@@ -1607,12 +1607,12 @@
           <div class="type-cards" id="authType" role="radiogroup" aria-label="アカウント種別">
             <button type="button" class="type-card" data-type="personal" role="radio" aria-checked="true">
               <span class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
-              <span class="tc-body"><span class="tc-name">個人</span><span class="tc-desc">個人でCMをつくる。あとから組織に切り替えできます</span></span>
+              <span class="tc-body"><span class="tc-name">個人</span><span class="tc-desc">自分の名前ではじめます。ロゴ・ブランド名はあとから設定できます</span></span>
               <span class="tc-check"><svg class="ic"><use href="#i-check"/></svg></span>
             </button>
             <button type="button" class="type-card" data-type="org" role="radio" aria-checked="false">
               <span class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4v18M19 21V11l-7-4"/><path d="M9 9h0M9 13h0M9 17h0"/></svg></span>
-              <span class="tc-body"><span class="tc-name">組織・会社</span><span class="tc-desc">チームで共有・ブランド管理。会社名を登録します</span></span>
+              <span class="tc-body"><span class="tc-name">会社・ブランド</span><span class="tc-desc">会社・ブランド名ではじめ、チームで共有できます</span></span>
               <span class="tc-check"><svg class="ic"><use href="#i-check"/></svg></span>
             </button>
           </div>
@@ -2701,12 +2701,12 @@
     <div class="type-cards" id="cpType" role="radiogroup" aria-label="アカウント種別" style="margin-bottom:var(--s-4)">
       <button type="button" class="type-card" data-type="personal" role="radio" aria-checked="true">
         <span class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
-        <span class="tc-body"><span class="tc-name">個人</span><span class="tc-desc">個人でCMをつくる。あとから組織に切り替えできます</span></span>
+        <span class="tc-body"><span class="tc-name">個人</span><span class="tc-desc">自分の名前ではじめます。ロゴ・ブランド名はあとから設定できます</span></span>
         <span class="tc-check"><svg class="ic"><use href="#i-check"/></svg></span>
       </button>
       <button type="button" class="type-card" data-type="org" role="radio" aria-checked="false">
         <span class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4v18M19 21V11l-7-4"/><path d="M9 9h0M9 13h0M9 17h0"/></svg></span>
-        <span class="tc-body"><span class="tc-name">組織・会社</span><span class="tc-desc">チームで共有・ブランド管理。会社名を登録します</span></span>
+        <span class="tc-body"><span class="tc-name">会社・ブランド</span><span class="tc-desc">会社・ブランド名ではじめ、チームで共有できます</span></span>
         <span class="tc-check"><svg class="ic"><use href="#i-check"/></svg></span>
       </button>
     </div>
@@ -3932,6 +3932,10 @@
     'おかえりなさい': 'Welcome back', 'メールアドレスとパスワードでサインイン。': 'Sign in with your email and password.',
     '実写もアプリ画面もAIがつくる': 'AI makes both live-action and app screens',
     '個人／組織を選んで登録します。': 'Choose personal or organization to sign up.',
+    'はじめ方を選ぶ': 'Choose how to start', '個人ではじめるか、会社・ブランドではじめるかを選んでください。': 'Start as yourself, or as a company / brand.',
+    '会社・ブランドの情報': 'Company / brand details', '会社・ブランド名とお名前を入力してください。': 'Enter your company / brand name and your name.',
+    '会社・ブランド': 'Company / brand', '自分の名前ではじめます。ロゴ・ブランド名はあとから設定できます': 'Start under your name — add a logo and brand name later.',
+    '会社・ブランド名ではじめ、チームで共有できます': 'Start with a company / brand name and share with your team.',
     'Spot にサインイン': 'Sign in to Spot', 'Spot アカウントを作成': 'Create your Spot account',
     'メールアドレス': 'Email', 'パスワード': 'Password', '6文字以上': 'At least 6 characters',
     'サインイン': 'Sign in', 'アカウント作成': 'Create account', 'アカウントを作成': 'Create an account',
@@ -4550,8 +4554,8 @@
     const isOrg = acctType === 'org';
     const heads = {
       1: ['アカウントを作成', 'メールアドレスとパスワードを入力してください。', '次へ'],
-      2: ['利用形態を選ぶ', '個人か、組織（会社）でのご利用かを選んでください。', '次へ'],
-      3: isOrg ? ['組織の情報', '会社・組織名とお名前を入力してください。', 'アカウントを作成']
+      2: ['はじめ方を選ぶ', '個人ではじめるか、会社・ブランドではじめるかを選んでください。', '次へ'],
+      3: isOrg ? ['会社・ブランドの情報', '会社・ブランド名とお名前を入力してください。', 'アカウントを作成']
                : ['お名前', '表示に使うお名前を入力してください。', 'アカウントを作成'],
     };
     const [h, sub, submit] = heads[step] || heads[1];
