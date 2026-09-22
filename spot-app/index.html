@@ -965,6 +965,20 @@
   .cmp-v { text-align: right; font-family: var(--font-display); font-weight: 800; font-size: 17px; letter-spacing: -.01em; }
   .cmp-v small { font-family: var(--font-jp); font-size: var(--t-label-sm); color: var(--muted); font-weight: 500; display: block; }
   .cmp-row.komadori .cmp-v { color: var(--accent-ink); }
+  /* お手本（採用）トグル */
+  .keep-toggle { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; margin-bottom: var(--s-3);
+    padding: 12px 14px; border: 1.5px solid var(--line-strong); border-radius: var(--r-md); background: var(--surface-2); cursor: pointer;
+    transition: border-color var(--dur-fast), background var(--dur-fast), box-shadow var(--dur); }
+  .keep-toggle:hover { border-color: var(--accent-ink); }
+  .keep-toggle[aria-pressed="true"] { border-color: var(--accent-ink); background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); box-shadow: var(--glow-shadow); }
+  .keep-toggle .k-star { width: 20px; height: 20px; flex: none; color: var(--faint); }
+  .keep-toggle[aria-pressed="true"] .k-star { color: var(--accent-ink); }
+  .keep-toggle .k-body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .keep-toggle .k-body b { font-size: var(--t-body-sm); }
+  .keep-toggle .k-body small { font-size: var(--t-label); color: var(--muted); line-height: 1.4; }
+  .keep-toggle .k-check { flex: none; margin-left: auto; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; color: transparent; }
+  .keep-toggle[aria-pressed="true"] .k-check { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .keep-toggle .k-check .ic { width: 12px; height: 12px; stroke-width: 3.5; }
   .exp-actions { display: flex; flex-direction: column; gap: var(--s-2); }
   .exp-actions .btn { flex: 1; }
 
@@ -2141,6 +2155,12 @@
         <div class="panel-h" style="border-top:1px solid var(--line)">配信先仕様</div>
         <div class="cc-specs" id="ccSpecs"></div>
       </div>
+      <!-- お手本（採用）：このCMをブランドのお手本に。ブランドメモリが優先的に学ぶ。 -->
+      <button type="button" class="keep-toggle" id="keepBrandBtn" aria-pressed="false" data-write-only>
+        <svg class="ic k-star"><use href="#i-sparkle"/></svg>
+        <span class="k-body"><b id="keepBrandLabel">このブランドのお手本にする</b><small>お手本にすると、次からの初期値がこの傾向に近づきます。</small></span>
+        <span class="k-check"><svg class="ic"><use href="#i-check"/></svg></span>
+      </button>
       <div class="exp-actions">
         <button class="btn btn-primary" id="dlAll"><svg class="ic"><use href="#i-download"/></svg><span>すべてダウンロード（ZIP）</span></button>
         <button class="btn btn-ghost" id="shareLink"><svg class="ic"><use href="#i-share"/></svg><span>共有リンクを作成</span></button>
@@ -3160,6 +3180,7 @@
       </div>
     </div>`).join('');
     wireRealRenders();   // 実レンダー(mp4)があれば本物のDLリンクを各ボタンへ（無ければデモのまま）
+    if (window.__loadKeepState) window.__loadKeepState();   // お手本トグルの状態を反映
   }
   // 実 renders（variant×format の mp4）があれば、各DLボタンに storage_path を紐づけて本物のダウンロードにする。
   // 実ファイルの有無で「書き出し完了」表示を正直に切り替える（0本＝プレビュー注記、N本＝完了N本）。
@@ -3223,6 +3244,33 @@
   });
   document.getElementById('shareLink').addEventListener('click', () => { if (dlGuard()) return; toast(L('Shareable links are coming soon.', '共有リンクの発行は準備中です。'), false, 2600); });
   document.getElementById('backToWork').addEventListener('click', gotoWorkspace);
+  // お手本（採用）トグル：projects.approved を切替。ブランドメモリが優先的に学ぶ。
+  (function wireKeepToggle() {
+    const btn = document.getElementById('keepBrandBtn'); if (!btn) return;
+    const label = document.getElementById('keepBrandLabel');
+    const setUI = (on) => {
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (label) label.textContent = on ? L('Saved as a brand reference', 'このブランドのお手本に設定済み') : L('Use as a brand reference', 'このブランドのお手本にする');
+    };
+    // 書き出しビューを開くたびに現プロジェクトの approved を読み込む
+    window.__loadKeepState = async function () {
+      setUI(false);
+      const pid = window.__currentProjectId; if (!sb || !pid) return;
+      try { const { data } = await sb.from('projects').select('approved').eq('id', pid).single(); if (data && window.__currentProjectId === pid) setUI(!!data.approved); } catch (_) {}
+    };
+    btn.addEventListener('click', async () => {
+      if (window.__canWrite && !window.__canWrite()) { toast(L('View-only access.', '閲覧のみの権限です。'), false, 2000); return; }
+      const pid = window.__currentProjectId; if (!sb || !pid) return;
+      const next = btn.getAttribute('aria-pressed') !== 'true';
+      setUI(next); btn.disabled = true;
+      try {
+        const { error } = await sb.from('projects').update({ approved: next }).eq('id', pid); if (error) throw error;
+        toast(next ? L('Added to this brand’s references', 'このブランドのお手本にしました') : L('Removed from references', 'お手本から外しました'), true, 1800);
+        if (window.__renderBrandInsights) window.__renderBrandInsights();   // 傾向サマリを更新
+      } catch (e) { console.warn('keep toggle failed:', e); setUI(!next); toast(L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2400); }
+      finally { btn.disabled = false; }
+    });
+  })();
 
   function gotoExport() {
     hideAll(); vExport.hidden = false; _nav(true, null);
@@ -5867,9 +5915,13 @@
   window.__brandDefaults = async function () {
     if (!sb || !currentOrg) return null;
     try {
-      let q = sb.from('projects').select('spec, created_at').order('created_at', { ascending: false }).limit(30);
-      q = currentOrg.id ? q.eq('org_id', currentOrg.id) : q;
-      const { data } = await q;
+      const base = () => { let q = sb.from('projects').select('spec, created_at, approved').order('created_at', { ascending: false }).limit(30); return currentOrg.id ? q.eq('org_id', currentOrg.id) : q; };
+      let data = null, approvedBased = false;
+      try {   // お手本（approved）があればそれを優先して学ぶ。列未適用/失敗時は下の全件へ。
+        const r = await base().eq('approved', true);
+        if (r.data && r.data.length >= 2) { data = r.data; approvedBased = true; }
+      } catch (_) {}
+      if (!data) { const r = await base(); data = r.data; }
       if (!data || data.length < 2) return null;   // 最低2本たまってからブランド既定を出す
       const tally = { media: {}, industry: {}, target: {}, angle: {}, tone: {} };
       const bump = (o, k) => { if (k != null && k !== '') o[k] = (o[k] || 0) + 1; };
@@ -5881,7 +5933,7 @@
       const top = o => { let best = null, bn = 0; for (const k in o) if (o[k] > bn) { bn = o[k]; best = k; } return best; };
       const often = Object.entries(tally.media).filter(([, n]) => n >= Math.ceil(data.length * 0.4)).map(([k]) => k);
       const topMedia = often.length ? often : (top(tally.media) ? [top(tally.media)] : []);
-      return { count: data.length, media: topMedia,
+      return { count: data.length, approvedBased, media: topMedia,
         industry: top(tally.industry), target: top(tally.target), angle: top(tally.angle), tone: top(tally.tone) };
     } catch (_) { return null; }
   };
@@ -5905,6 +5957,7 @@
       box.hidden = tags.length === 0;
     } catch (_) { box.hidden = true; }
   }
+  window.__renderBrandInsights = renderBrandInsights;
 
   window.onWizardComplete = async function (sel) {
     if (!sb) return;
