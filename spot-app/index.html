@@ -567,6 +567,11 @@
   /* 導入は控えめに（主役は各ステップの「質問」。LINE=1画面1タスク） */
   .wiz-title { font-family: var(--font-display); font-size: var(--t-title-lg); font-weight: 700; letter-spacing: -.01em; margin-top: 8px; line-height: 1.3; color: var(--muted); }
   .wiz-title small { font-family: var(--font-jp); font-weight: 500; font-size: var(--t-body-sm); color: var(--faint); display: block; margin-top: 4px; letter-spacing: 0; line-height: 1.55; }
+  /* ブランドメモリの注記（“いつもの設定”を反映） */
+  .brand-default-note { display: inline-flex; align-items: center; gap: 7px; margin-top: 12px; padding: 6px 12px;
+    background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent-ink) 26%, transparent); border-radius: var(--r-full);
+    color: var(--accent-ink); font-size: var(--t-label); font-weight: 700; }
+  .brand-default-note .ic { width: 14px; height: 14px; }
 
   .wiz-board { display: grid; grid-template-columns: 180px minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 60px; align-items: start; }
 
@@ -1780,6 +1785,10 @@
     <h1 class="wiz-title">つくりたいCMを、選ぶだけ。
       <small>プロンプトは書かなくて大丈夫。選択肢の裏に、広告制作の勝ちパターンが入っています。</small>
     </h1>
+    <div class="brand-default-note" id="brandDefaultNote" hidden>
+      <svg class="ic"><use href="#i-sparkle"/></svg>
+      <span>このブランドのいつもの設定を反映しました。変更できます。</span>
+    </div>
   </div>
 
   <div class="wiz-board">
@@ -3349,7 +3358,39 @@
       mediaNote.textContent = ok ? '選択中の配信先から、書き出す形式が決まります。' : '配信先をひとつ以上選んでください。';
     }
   }
-  // seed defaults (Mirai Koji-matching) so the panel opens live
+  // sel の内容を選択カードUIへ反映（ブランド既定値の適用などで使用）
+  function applySelToUI() {
+    document.querySelectorAll('#view-wizard .opt-grid').forEach(grid => {
+      const multi = grid.dataset.multi === 'true';
+      const val = sel[grid.dataset.key];
+      const attr = multi ? 'aria-pressed' : 'aria-checked';
+      grid.querySelectorAll('.opt').forEach(o => {
+        const on = multi ? (Array.isArray(val) && val.includes(o.dataset.val)) : (o.dataset.val === val);
+        o.setAttribute(attr, on ? 'true' : 'false');
+      });
+    });
+    renderRx(); validateStep();
+  }
+  // ブランドメモリ（Phase 1）：このワークスペース＝ブランドの過去の選択を初期値に反映＝“いつもの設定”。
+  //   履歴が乏しい/未サインインの間は demo 既定のまま。適用できたら注記を出す。
+  async function applyBrandDefaults() {
+    try {
+      if (!window.__brandDefaults) return;
+      const d = await window.__brandDefaults();
+      const note = document.getElementById('brandDefaultNote');
+      if (!d) { if (note) note.hidden = true; return; }
+      if (Array.isArray(d.media) && d.media.length) sel.media = d.media;
+      if (d.industry) sel.industry = d.industry;
+      if (d.target)   sel.target   = d.target;
+      if (d.angle)    sel.angle    = d.angle;
+      if (d.tone)     sel.tone     = d.tone;
+      applySelToUI();
+      if (note) note.hidden = false;
+    } catch (_) {}
+  }
+  window.__applyBrandDefaults = applyBrandDefaults;
+
+  // seed defaults so the panel opens live（ブランド履歴が無い時のフォールバック）
   sel.media = ['YouTube','リール/ショート','SNSタイムライン'];
   sel.industry = 'SaaS・アプリ'; sel.target = '実務担当者'; sel.angle = '課題解決'; sel.tone = 'ドキュメンタリー';
   renderRx();
@@ -3707,6 +3748,7 @@
   function gotoWizard() {
     hideAll(); vWiz.hidden = false; focusView(vWiz); _nav(true, 'new');
     setCrumb([['ホーム', gotoDash], ['新規CM', null], ['制作をはじめる']], gotoDash);
+    applyBrandDefaults();   // ブランドメモリ：このブランドの“いつもの設定”を初期反映（履歴が無ければ demo 既定のまま）
   }
   function gotoDash() {
     hideAll(); vDash.hidden = false; focusView(vDash); _nav(false, 'home');
@@ -3867,6 +3909,7 @@
     'メニュー': 'Menu', '管理': 'Manage', 'ワークスペース': 'Workspace', 'ワークスペースを追加する': 'Add a workspace',
     'アカウント・ワークスペース': 'Account & workspace',
     'ワークスペースのプロフィール': 'Workspace profile', 'ワークスペース名': 'Workspace name', '保存する': 'Save',
+    'このブランドのいつもの設定を反映しました。変更できます。': 'Prefilled with this brand’s usual settings — you can change them.',
     'ロゴとワークスペース名は、動画のプレビューや納品物・請求に使われます。': 'Your logo and workspace name appear in previews, deliverables and invoices.',
     'ヘルプ＆フィードバック': 'Help & feedback', 'アカウントを切り替える': 'Switch account',
     '別のアカウントでサインイン': 'Sign in with another account', 'アカウントを管理する': 'Manage account',
@@ -5795,6 +5838,30 @@
     </div>`;
   }
   function setText(id, txt) { const el = document.getElementById(id); if (el) el.textContent = txt; }
+
+  // ブランドメモリ（Phase 1）：現ワークスペース＝ブランドの過去projectの selections を集計して“いつもの設定”を返す。
+  //   スキーマ変更不要（projects.spec.selections を集計）。履歴が乏しい間は null（ウィザードは demo 既定のまま）。
+  window.__brandDefaults = async function () {
+    if (!sb || !currentOrg) return null;
+    try {
+      let q = sb.from('projects').select('spec, created_at').order('created_at', { ascending: false }).limit(30);
+      q = currentOrg.id ? q.eq('org_id', currentOrg.id) : q;
+      const { data } = await q;
+      if (!data || data.length < 2) return null;   // 最低2本たまってからブランド既定を出す
+      const tally = { media: {}, industry: {}, target: {}, angle: {}, tone: {} };
+      const bump = (o, k) => { if (k != null && k !== '') o[k] = (o[k] || 0) + 1; };
+      for (const row of data) {
+        const s = (row.spec && row.spec.selections) || {};
+        (Array.isArray(s.media) ? s.media : []).forEach(m => bump(tally.media, m));
+        bump(tally.industry, s.industry); bump(tally.target, s.target); bump(tally.angle, s.angle); bump(tally.tone, s.tone);
+      }
+      const top = o => { let best = null, bn = 0; for (const k in o) if (o[k] > bn) { bn = o[k]; best = k; } return best; };
+      const often = Object.entries(tally.media).filter(([, n]) => n >= Math.ceil(data.length * 0.4)).map(([k]) => k);
+      const topMedia = often.length ? often : (top(tally.media) ? [top(tally.media)] : []);
+      return { count: data.length, media: topMedia,
+        industry: top(tally.industry), target: top(tally.target), angle: top(tally.angle), tone: top(tally.tone) };
+    } catch (_) { return null; }
+  };
 
   window.onWizardComplete = async function (sel) {
     if (!sb) return;
