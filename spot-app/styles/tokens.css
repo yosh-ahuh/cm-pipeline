@@ -6,9 +6,9 @@
   /* --- tonal surfaces（ダーク・やわらかめ / Canva風の浮遊感）
      カード面(--surface)を ground から少し持ち上げ、影を控えめにして“やさしい深度”を出す。 */
   --ground: #131318;        /* page */
-  --surface-low: #1A1A21;   /* rails, wells */
-  --surface: #222230;       /* cards, panels（少し持ち上げてカードを浮かせる） */
-  --surface-2: #2A2A36;     /* inputs / nested wells */
+  --surface-low: #1A1A21;   /* rails, wells, サイドバー */
+  --surface: #1A1A21;       /* cards, panels＝サイドバーと同色に統一（旧 #222230） */
+  --surface-2: #2A2A36;     /* inputs / nested wells（カード上で少し浮く） */
   --surface-3: #323240;     /* hover on cards */
 
   /* --- on-surface --- */
