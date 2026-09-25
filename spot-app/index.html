@@ -1302,8 +1302,8 @@
   .pack-card { position: relative; border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-4); background: var(--surface-2);
     display: flex; flex-direction: column; gap: 4px; cursor: pointer; text-align: left; color: inherit; font: inherit; }
   .pack-card:hover { border-color: var(--accent-ink); }
-  .pack-card.sel { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface-2)); }
-  .pack-card.sel .pk-credits { color: var(--accent-ink); }
+  .pack-card.pk-sel { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: color-mix(in srgb, var(--accent-soft) 40%, var(--surface-2)); }
+  .pack-card.pk-sel .pk-credits { color: var(--accent-ink); }
   .pack-card .pk-credits { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -.02em; }
   .pack-card .pk-price { color: var(--ink); font-size: var(--t-body); font-weight: 600; }
   .pack-card .pk-sub { color: var(--muted); font-size: var(--t-label-sm); }
@@ -5748,7 +5748,7 @@
       const unit = isJa ? `¥${Math.round(p.jpy / p.credits).toLocaleString()}` : `$${(p.usd / p.credits).toFixed(2)}`;
       const tag = isJa ? p.tagJa : p.tagEn;
       const sel = p.key === selectedPack;
-      return `<button type="button" class="pack-card${sel ? ' sel' : ''}" data-pack="${p.key}" aria-pressed="${sel}">
+      return `<button type="button" class="pack-card${sel ? ' pk-sel' : ''}" data-pack="${p.key}" aria-pressed="${sel}">
         ${tag ? `<span class="pk-tag">${tag}</span>` : ''}
         <span class="pk-credits">${p.credits}</span>
         <span class="pk-price">${price}</span>
