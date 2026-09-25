@@ -3009,12 +3009,15 @@
         + `<svg class="ic as-check" aria-hidden="true"><use href="#i-check"/></svg></div>`;
       return;
     }
+    const curAvatarImg = document.querySelector('#amAvatar img');   // ヘッダで解決済みの現在アカウントのアバター（OAuth画像/アップロード画像）
     box.innerHTML = accts.map(a => {
       const cur = a.id === curId;
       const initial = escHtml((a.name || a.email || '?').charAt(0));
       // 設定アバターはキャッシュ(data URL)を優先。a.avatar は http/data の完全URLのときのみ使う（Storageパスは壊れるため除外）。失敗時はイニシャルへ。
       const cav = readAvatarCache(a.email);
-      const src = cav || (a.avatar && /^(https?:|data:)/.test(a.avatar) ? a.avatar : '');
+      let src = cav || (a.avatar && /^(https?:|data:)/.test(a.avatar) ? a.avatar : '');
+      // 現在のアカウントは、ヘッダで解決済みのアバターを流用（Google等のOAuth画像を確実に反映：a.avatar/キャッシュが未整備でも出る）
+      if (!src && cur && curAvatarImg) src = curAvatarImg.getAttribute('src') || '';
       const inner = src ? `${initial}<img class="av-img" src="${src}" alt="" onerror="this.remove()">` : initial;
       return `<button type="button" class="menu-item as-acct${cur ? ' as-current' : ''}" role="menuitemradio" aria-checked="${cur ? 'true' : 'false'}" data-acct="${a.id}">`
         + `<span class="avatar" aria-hidden="true">${inner}</span>`
