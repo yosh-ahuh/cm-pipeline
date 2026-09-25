@@ -3145,8 +3145,11 @@
     if (acctInfo.max != null) set('acctMax', max);
     const meter = document.getElementById('acctMeter');
     if (meter && acctInfo.credits != null) {
-      meter.querySelector('i').style.width = Math.max(0, Math.min(100, (credits / max) * 100)) + '%';
-      meter.setAttribute('aria-valuemax', max); meter.setAttribute('aria-valuenow', credits);
+      // バーは「今月つかったぶん」を表す（消費メーター）。新規は空・使い切りで満タン。満タン＝上限という誤読を防ぐ。
+      const used = Math.max(0, Math.min(max, max - credits));
+      meter.querySelector('i').style.width = Math.max(0, Math.min(100, (used / max) * 100)) + '%';
+      meter.setAttribute('aria-label', (window.L ? window.L('Used this month', '今月の使用') : '今月の使用'));
+      meter.setAttribute('aria-valuemax', max); meter.setAttribute('aria-valuenow', used);
     }
   };
   document.getElementById('exportBtn').addEventListener('click', () => {
@@ -5002,6 +5005,7 @@
   let sb = null;
   let currentUid = null;
   let currentOrg = null;     // { id, name, plan, credits, role, is_personal }。006 未適用時は null（profiles にフォールバック）。
+  let oauthAvatar = '';      // Google 等のOAuth画像URL（user_metadata.avatar_url|picture）。DBにアイコン未設定のときのフォールバック。
 
   let PLAN_CREDITS = 1;      // プラン上限（メーター分母）。org.plan → plans.spots_per_month から取得。
   let PLAN_NAME = 'Free';
@@ -5054,6 +5058,7 @@
 
   window.onAppReady = async function (session, client) {
     sb = client; currentUid = session.user.id;
+    { const md = (session.user || {}).user_metadata || {}; oauthAvatar = md.avatar_url || md.picture || ''; }   // Googleサインアップ等のプロフィール画像を控える
     // メール言語をユーザーに追従：現在のUI言語を user_metadata.lang に保つ。
     //   → reset/OTP/確認メールのテンプレートが {{ .Data.lang }} で日本語/英語を出し分けできる。
     try {
@@ -5088,6 +5093,7 @@
     if (avatarPath) {
       try { url = /^https?:/.test(avatarPath) ? avatarPath : ((await sb.storage.from('assets').createSignedUrl(avatarPath, 3600)).data || {}).signedUrl; } catch (_) {}
     }
+    if (!url && oauthAvatar) url = oauthAvatar;   // 自前アイコン未設定なら Google 等のOAuth画像を使う
     ['acctAvatar', 'amAvatar'].forEach(id => {
       const el = document.getElementById(id); if (!el) return;
       if (url) el.innerHTML = `<img src="${url}" alt="">`;
@@ -5252,7 +5258,8 @@
         const small = cards[1].querySelector('.u-v small');
         if (small) small.textContent = L(' credits', ' 本');   // 総残高で表示（購入/繰越で月次付与を超えるため /max は使わない）
         const meter = cards[1].querySelector('.u-meter i');
-        if (meter) meter.style.width = Math.max(0, Math.min(100, (c / (PLAN_CREDITS || 1)) * 100)) + '%';
+        // バーは「今月つかったぶん」。実データ（今月のCM本数 count）を月次付与に対する割合で。新規は空・使い切りで満タン。
+        if (meter) meter.style.width = Math.max(0, Math.min(100, ((count || 0) / (PLAN_CREDITS || 1)) * 100)) + '%';
       }
       if (prof && window.onAccountInfo) window.onAccountInfo({ plan: PLAN_NAME, credits: c, max: PLAN_CREDITS });   // account menu (keeps last values if the query fails)
     } catch (_) { /* noop */ }
@@ -5294,6 +5301,7 @@
         if (url) { box.innerHTML = `<img src="${url}" alt="">`; return; }
       } catch (_) {}
     }
+    if (oauthAvatar) { box.innerHTML = `<img src="${oauthAvatar}" alt="" onerror="this.remove()">`; return; }   // 自前アイコン未設定なら Google 等のOAuth画像
     box.textContent = initial;
   }
   // アイコンのアップロード → Storage 保存 → set_avatar_url RPC（015_profile_avatar.sql）
@@ -5668,11 +5676,14 @@
       if (bar) {
         if (max > 0) {
           bar.hidden = false;
-          const ratio = c / max;
+          // バーは「今月つかったぶん÷月次付与」（消費メーター）。新規は空・使い切りで満タン。
+          //   色は使用量で意味づけ：ゆとり=good（緑）／残りわずか=warn／使い切り=crit。
+          const used = Math.max(0, Math.min(max, max - c));
+          const usedRatio = used / max;
           const meter = document.getElementById('billMeter');
           if (meter) {
-            meter.style.width = Math.max(0, Math.min(100, ratio * 100)) + '%';
-            meter.style.background = ratio <= 0.15 ? 'var(--crit)' : ratio <= 0.4 ? 'var(--warn)' : 'var(--good)';
+            meter.style.width = Math.max(0, Math.min(100, usedRatio * 100)) + '%';
+            meter.style.background = usedRatio >= 1 ? 'var(--crit)' : usedRatio >= 0.85 ? 'var(--warn)' : 'var(--good)';
           }
         } else { bar.hidden = true; }
       }
