@@ -5030,6 +5030,7 @@
   window.__isOwner = () => currentOrg ? currentOrg.role === 'owner' : true;   // 個人利用(org未解決)は owner 扱い
   window.__switchOrg = async function (id) {
     try { localStorage.setItem('spot-org', id); } catch (_) {}
+    if (window.__resetGridCache) window.__resetGridCache();   // 別ワークスペース＝別データ。前回の内容を残さずスケルトンから読み直す
     await loadOrg(); applyRoleUI();
     loadProjects(); refreshCredits(); refreshUsage();
     if (window.__renderWorkspaces) window.__renderWorkspaces();
@@ -5544,6 +5545,7 @@
       try { localStorage.setItem('spot-org', orgId); } catch (_) {}
       if (window.toast) window.toast(window.L(`Joined “${inv.org_name}”`, `「${inv.org_name}」に参加しました`), true, 2600);
       stripInvite();
+      if (window.__resetGridCache) window.__resetGridCache();   // 参加＝別ワークスペースのデータへ。読み直す
       await loadOrg(); applyRoleUI(); loadProjects(); refreshCredits(); refreshUsage();
     } catch (e) {
       const m = /seat limit/i.test(e.message)
@@ -6064,10 +6066,13 @@
     });
   };
 
+  const _gridLoaded = new Set();   // 一度でも描画し終えたグリッド。再訪時はスケルトンを出さず静かに更新する（毎回の点滅を防ぐ）
+  window.__resetGridCache = () => _gridLoaded.clear();   // ワークスペース切替などデータが入れ替わる時に呼ぶ
   async function renderVideos(gridId, opts) {   // 現在のワークスペースの動画を描画（ホーム/メディア/コレクション共通）
     const grid = document.getElementById(gridId);
     if (!grid) return;
-    grid.innerHTML = skeleton(4);   // M3 skeleton while fetching — no blank flash
+    const key = gridId + (opts && opts.collectionId ? ':' + opts.collectionId : opts && opts.uncategorized ? ':uncat' : '');
+    if (!_gridLoaded.has(key)) grid.innerHTML = skeleton(4);   // 初回のみスケルトン。再訪時は前回の内容を保ったまま裏で更新（点滅回避）
     try {
       await fetchCollections();   // バッジ名の解決用
       let q = sb.from('projects').select('id,name,product,status,spec,updated_at,collection_id');
@@ -6078,6 +6083,7 @@
       if (error) throw error;
       // ホーム：制作物があるリピーターは初回向けの「3ステップ」を畳んで制作物を優先（Canva風の情報順序）
       if (gridId === 'projGrid') { const dash = document.getElementById('view-dash'); if (dash) dash.classList.toggle('has-work', !!(data && data.length)); }
+      _gridLoaded.add(key);   // 以降このグリッドは再訪してもスケルトンを出さない
       if (!data || !data.length) { grid.innerHTML = (opts && opts.emptyMsg) || emptyState(); return; }
       grid.innerHTML = data.map(card).join('');
       if (window.applyProjFilter) window.applyProjFilter();
@@ -6190,7 +6196,7 @@
     const list = document.getElementById('colList'), detail = document.getElementById('colDetail');
     if (list) list.hidden = false; if (detail) detail.hidden = true;
     const grid = document.getElementById('collectionsGrid'); if (!grid) return;
-    grid.innerHTML = skeleton(3);
+    if (!_gridLoaded.has('collectionsGrid')) grid.innerHTML = skeleton(3);   // 初回のみスケルトン。再訪時は静かに更新
     try {
       await fetchCollections();
       let q = sb.from('projects').select('collection_id');
@@ -6198,6 +6204,7 @@
       const { data: projs } = await q;
       const counts = {}; let uncat = 0;
       (projs || []).forEach(p => { if (p.collection_id) counts[p.collection_id] = (counts[p.collection_id] || 0) + 1; else uncat++; });
+      _gridLoaded.add('collectionsGrid');   // 以降このグリッドは再訪してもスケルトンを出さない
       if (_collections.length === 0 && uncat === 0) {
         grid.innerHTML = `<div class="col-empty">
           <span class="col-empty-ic"><svg class="ic"><use href="#i-folder"/></svg></span>
