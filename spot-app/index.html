@@ -1393,11 +1393,14 @@
   /* team / members */
   .member-list { display: flex; flex-direction: column; gap: 6px; }
   .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
-  .member-row .m-avatar { width: 34px; height: 34px; flex: none; border-radius: var(--r-full); background: var(--surface-3);
+  .member-row .m-avatar { position: relative; width: 34px; height: 34px; flex: none; border-radius: var(--r-full); background: var(--surface-3); border: 1.5px solid var(--line-strong); overflow: hidden;
     display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: var(--t-body-sm); color: var(--muted); }
-  .member-row .m-id { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+  .member-row .m-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .member-row .m-id { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .member-row .m-name-row { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
   .member-row .mn { font-weight: 500; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .member-row .me { color: var(--muted); font-size: var(--t-label); flex: none; }
+  .member-row .me-email { color: var(--muted); font-size: var(--t-label); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .member-row .badge { margin-left: auto; }
   .member-row .rm { border: none; background: none; color: var(--muted); cursor: pointer; padding: 4px 8px; border-radius: var(--r-xs); }
   .member-row .rm:hover { background: var(--hover); color: var(--crit); }
@@ -3147,12 +3150,13 @@
     if (acctInfo.credits != null) set('acctCredits', credits);   // 実値が来るまではスケルトンのまま（暫定0を出さない）
     if (acctInfo.max != null) set('acctMax', max);
     const meter = document.getElementById('acctMeter');
-    if (meter && acctInfo.credits != null) {
-      // バーは「今月つかったぶん」を表す（消費メーター）。新規は空・使い切りで満タン。満タン＝上限という誤読を防ぐ。
-      const used = Math.max(0, Math.min(max, max - credits));
+    // バーは「今月つくった本数 ÷ 月次付与」の消費メーター。新規は空、つくるたびに増える。満タン＝上限という誤読を防ぐ。
+    //   used は refreshUsage が今月の実本数で渡す（残高の差ではないので補充/購入で崩れない）。無い間はゲージを動かさない。
+    if (meter && acctInfo.used != null) {
+      const used = Math.max(0, Number(acctInfo.used) || 0);
       meter.querySelector('i').style.width = Math.max(0, Math.min(100, (used / max) * 100)) + '%';
       meter.setAttribute('aria-label', (window.L ? window.L('Used this month', '今月の使用') : '今月の使用'));
-      meter.setAttribute('aria-valuemax', max); meter.setAttribute('aria-valuenow', used);
+      meter.setAttribute('aria-valuemax', max); meter.setAttribute('aria-valuenow', Math.min(used, max));
     }
   };
   document.getElementById('exportBtn').addEventListener('click', () => {
@@ -5232,8 +5236,9 @@
     try {
       const cards = document.querySelectorAll('#view-dash .usage .u-card');
       const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
-      const { count } = await sb.from('projects')
-        .select('id', { count: 'exact', head: true }).gte('created_at', monthStart.toISOString());
+      let cq = sb.from('projects').select('id', { count: 'exact', head: true }).gte('created_at', monthStart.toISOString());
+      if (currentOrg && currentOrg.id) cq = cq.eq('org_id', currentOrg.id);   // 現在のワークスペースの本数だけ数える（ゲージの分子）
+      const { count } = await cq;
       if (cards[0]) setLeadNumber(cards[0].querySelector('.u-v'), String(count ?? 0));
       // 先月比 ＋ 制作会社換算（1本=30万円の目安）を実データで
       if (cards[0]) {
@@ -5241,9 +5246,10 @@
         if (note) {
           try {
             const lastStart = new Date(monthStart); lastStart.setMonth(lastStart.getMonth() - 1);
-            const { count: lastCount } = await sb.from('projects')
-              .select('id', { count: 'exact', head: true })
+            let lq = sb.from('projects').select('id', { count: 'exact', head: true })
               .gte('created_at', lastStart.toISOString()).lt('created_at', monthStart.toISOString());
+            if (currentOrg && currentOrg.id) lq = lq.eq('org_id', currentOrg.id);
+            const { count: lastCount } = await lq;
             const n = count || 0, diff = n - (lastCount || 0), man = n * 30;
             note.textContent = n === 0
               ? L('No videos this month yet.', '今月はまだありません。まず1本つくってみましょう。')
@@ -5264,7 +5270,7 @@
         // バーは「今月つかったぶん」。実データ（今月のCM本数 count）を月次付与に対する割合で。新規は空・使い切りで満タン。
         if (meter) meter.style.width = Math.max(0, Math.min(100, ((count || 0) / (PLAN_CREDITS || 1)) * 100)) + '%';
       }
-      if (prof && window.onAccountInfo) window.onAccountInfo({ plan: PLAN_NAME, credits: c, max: PLAN_CREDITS });   // account menu (keeps last values if the query fails)
+      if (prof && window.onAccountInfo) window.onAccountInfo({ plan: PLAN_NAME, credits: c, max: PLAN_CREDITS, used: (count || 0) });   // account menu＋サイドバーゲージ（used=今月の作成本数）
     } catch (_) { /* noop */ }
   }
   // 「12<small>…</small>」の先頭テキストノード（数字）だけ差し替える。
@@ -5406,14 +5412,26 @@
     setText('teamSeats', seatTxt + viewerTxt);
     const roleLabel = { owner: window.L('Owner', 'オーナー'), member: window.L('Member', 'メンバー'), viewer: window.L('Viewer', '閲覧のみ') };
     const youTxt = window.L('(you)', '（あなた）'), rmTxt = window.L('Remove', '削除'), userTxt = window.L('User', 'ユーザー');
+    // アバターURLを解決：http/data はそのまま、Storageパス(自前アップロード)は署名URL化。列が無い旧RPCでも安全にスキップ。
+    await Promise.all(members.map(async m => {
+      const a = m.avatar;
+      if (!a) return;
+      if (/^(https?:|data:)/.test(a)) { m._src = a; return; }
+      try { const { data } = await sb.storage.from('assets').createSignedUrl(a, 3600); m._src = data && data.signedUrl; } catch (_) {}
+    }));
     const list = document.getElementById('memberList');
     if (list) list.innerHTML = members.map(m => {
       const canRemove = isOwner && m.user_id !== currentUid && !(m.role === 'owner');
       const nm = m.display_name || userTxt;
       const initial = (nm || '?').trim().charAt(0).toUpperCase() || '?';
+      const avInner = m._src ? `${esc(initial)}<img src="${esc(m._src)}" alt="" onerror="this.remove()">` : esc(initial);
+      const emailRow = m.email ? `<span class="me-email">${esc(m.email)}</span>` : '';   // 022適用後にメール表示（未適用なら非表示）
       return `<div class="member-row">
-        <span class="m-avatar" aria-hidden="true">${esc(initial)}</span>
-        <span class="m-id"><span class="mn">${esc(nm)}</span>${m.user_id === currentUid ? `<span class="me">${youTxt}</span>` : ''}</span>
+        <span class="m-avatar" aria-hidden="true">${avInner}</span>
+        <span class="m-id">
+          <span class="m-name-row"><span class="mn">${esc(nm)}</span>${m.user_id === currentUid ? `<span class="me">${youTxt}</span>` : ''}</span>
+          ${emailRow}
+        </span>
         <span class="badge ${m.role === 'owner' ? 'badge--accent' : 'badge--neutral'}">${roleLabel[m.role] || m.role}</span>
         ${canRemove ? `<button class="rm" data-remove="${m.user_id}" title="${rmTxt}">${rmTxt}</button>` : ''}
       </div>`;
