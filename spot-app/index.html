@@ -520,7 +520,7 @@
   /* ==========================================================================
      Buttons (M3 filled / tonal / outlined / text)
      ========================================================================== */
-  .cta-row { display: flex; gap: var(--s-2); margin-top: var(--s-1); }
+  .cta-row { display: flex; gap: var(--s-2); margin-top: var(--s-5); align-items: center; }   /* フォーム末尾と保存ボタンの間にゆとり（メリハリ） */
   .btn {
     flex: 1; border-radius: var(--r-sm); min-height: var(--control-h-lg); padding: 0 18px; font-size: var(--t-body-sm); font-weight: 700;
     display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap;
@@ -1074,7 +1074,7 @@
   .auth-step { flex: 1; height: 4px; border-radius: var(--r-full); background: var(--line-strong); transition: background var(--dur-fast); }
   .auth-step.on { background: var(--accent); }
   /* 戻る / 次へ を横並びに */
-  .auth-cta { display: flex; gap: 10px; align-items: stretch; }
+  .auth-cta { display: flex; gap: 10px; align-items: stretch; margin-top: var(--s-4); }   /* 入力/選択カードとアクションの間にメリハリ（12pxの詰まりを解消） */
   .auth-cta .hn-btn { flex: 1; margin: 0; }
   .auth-back-btn { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 54px; padding: 0 20px; border: 1px solid var(--line-strong); border-radius: var(--r-full); background: transparent; color: var(--muted); font: inherit; font-weight: 600; cursor: pointer; transition: border-color var(--dur-fast), color var(--dur-fast); }
   .auth-back-btn:hover { border-color: var(--accent-ink); color: var(--ink); }
