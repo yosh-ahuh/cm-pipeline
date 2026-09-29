@@ -13,8 +13,10 @@ _MINIMAX_EMOTIONS = {"happy", "sad", "angry", "neutral", "fearful", "surprised",
 
 
 class MiniMaxTTS(Adapter):
-    endpoint = "fal-ai/minimax/speech-02-hd"
-    model = "minimax-speech-02-hd"
+    # 常に最新方針（2026-09 更新）: speech-02-hd → **speech-2.8-hd**。
+    # ※voice_id は版で対応リストが変わり得る。--live スモークで日本語ボイスの実在を確認すること。
+    endpoint = "fal-ai/minimax/speech-2.8-hd"
+    model = "minimax-speech-2.8-hd"
     ext = "mp3"
     kind = "audio"
 
@@ -34,8 +36,9 @@ class MiniMaxTTS(Adapter):
 
 
 class Lyria2(Adapter):
-    endpoint = "fal-ai/lyria2"
-    model = "lyria2"
+    # 常に最新方針（2026-09 更新）: Lyria2 → **Lyria 3 Pro**（BGM品質向上）。クラス名は互換のため据置。
+    endpoint = "fal-ai/lyria3/pro"
+    model = "lyria3-pro"
     ext = "mp3"
     kind = "audio"
 

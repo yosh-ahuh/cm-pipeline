@@ -15,9 +15,11 @@ _SEEDREAM_SIZE = {"16:9": "landscape_16_9", "9:16": "portrait_16_9", "1:1": "squ
 
 
 class SeedreamT2I(Adapter):
-    """Seedream v4 text-to-image（新規スチル生成）。実キーで疎通確認済み。"""
-    endpoint = "fal-ai/bytedance/seedream/v4/text-to-image"
-    model = "seedream-v4"
+    """Seedream text-to-image（新規スチル生成）。
+    常に最新方針（2026-09 更新）: v4 → **v5 Pro**（構図追従・文字・肌質すべて向上）。
+    ※fal の bytedance/ ネームスペース（fal-ai/ 接頭辞なし）。image_size 値は v4 と同系。本番前に --live スモークテスト。"""
+    endpoint = "bytedance/seedream/v5/pro/text-to-image"
+    model = "seedream-v5-pro"
     ext = "jpg"
     kind = "image"
 
@@ -51,8 +53,9 @@ class Imagen4(Adapter):
 
 
 class SeedreamEdit(Adapter):
-    endpoint = "fal-ai/bytedance/seedream/v4/edit"
-    model = "seedream-v4-edit"
+    # 常に最新方針（2026-09 更新）: v4 edit → **v5 Pro edit**（高解像の焼き直し）。
+    endpoint = "bytedance/seedream/v5/pro/edit"
+    model = "seedream-v5-pro-edit"
     ext = "png"
     kind = "image"
 

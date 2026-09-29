@@ -7,29 +7,42 @@
 from __future__ import annotations
 
 from .. import prices
-from .fal_video import KlingVideo, VeoVideo
+from .fal_video import KlingVideo, VeoVideo, Seedance25Video
 from .fal_image import Imagen4, SeedreamEdit, SeedreamT2I
 from .fal_consistency import NanoBananaEdit
 from .fal_audio import MiniMaxTTS, Lyria2, MMAudioSFX, ElevenLabsSFX
 
-# 疎通確認（2026-09-11 実キー）: imagen4 は未提供 / Seedream v4 t2i は動作・肌◎ /
-# nano-banana edit は動作（ref付きで人物一貫性）。
-#   ・新規スチル: SeedreamT2I（text-to-image）
-#   ・人物一貫性: NanoBananaEdit（前カットの still を ref に）。pipeline が ref を渡せない時は t2i にフォールバック。
-_still = SeedreamT2I()
+# 「常に最新」方針（2026-09 更新）で各アダプタを最新版に更新：
+#   Kling 2.5→v3 turbo pro / Seedream v4→v5 Pro / nano-banana→pro / MiniMax 02-hd→2.8-hd / Lyria2→Lyria3 Pro。
+#   Seedance 2.5 を新たに選択肢として追加。旧モデル名は下のエイリアスで新実装に解決（既存 spec 互換）。
+#   ⚠ 各エンドポイントは fal 公開一覧で実在確認済みだが、body/レスポンス形状は本番前に必ず --live でスモークテストすること
+#     （tools/check_models.py で新版の有無を随時チェックできる）。
+_still = SeedreamT2I()          # Seedream v5 Pro (t2i)
+_kling = KlingVideo()           # Kling v3 turbo pro
+_veo = VeoVideo()               # Veo 3.1（現行トップ・据置）
+_seedance = Seedance25Video()   # Seedance 2.5
+_nano = NanoBananaEdit()        # Nano Banana Pro
+_minimax = MiniMaxTTS()         # MiniMax speech 2.8-hd
+_lyria = Lyria2()               # Lyria 3 Pro
+_mmaudio = MMAudioSFX()
+_eleven = ElevenLabsSFX()
 
-# 正規化済みモデル名 → アダプタ・インスタンス（ステートレスなので使い回し可）。
+# 正規化済みモデル名 → アダプタ・インスタンス（ステートレス＝使い回し可）。旧名も新実装に解決。
 ADAPTERS = {
-    "veo3.1": VeoVideo(),
-    "kling-2.5-turbo-pro": KlingVideo(),
-    "seedream-v4": _still,
-    "imagen4": _still,            # 未提供 → Seedream t2i に解決
-    "seedream-v4-edit": _still,   # 高解像 edit は後日。当面 t2i
-    "nano-banana": NanoBananaEdit(),   # 人物一貫性（要 ref。無ければ pipeline が t2i にフォールバック）
-    "minimax-speech-02-hd": MiniMaxTTS(),
-    "lyria2": Lyria2(),
-    "mmaudio-v2": MMAudioSFX(),
-    "elevenlabs-sfx-v2": ElevenLabsSFX(),   # 当該アカウントで upstream 400（サウンドロゴは当面スキップ）
+    # --- 動画化 (image-to-video) ---
+    "veo3.1": _veo,
+    "kling-3-turbo-pro": _kling, "kling-2.5-turbo-pro": _kling,   # 旧名→新実装
+    "seedance-2.5": _seedance,
+    # --- スチル (text-to-image) ---
+    "seedream-v5-pro": _still, "seedream-v4": _still, "imagen4": _still,   # imagen4 未提供 → Seedream に解決
+    "seedream-v5-pro-edit": _still, "seedream-v4-edit": _still,            # 高解像 edit は当面 t2i にフォールバック
+    # --- 人物一貫性 ---
+    "nano-banana-pro": _nano, "nano-banana": _nano,
+    # --- 音声 ---
+    "minimax-speech-2.8-hd": _minimax, "minimax-speech-02-hd": _minimax,
+    "lyria3-pro": _lyria, "lyria2": _lyria,
+    "mmaudio-v2": _mmaudio,
+    "elevenlabs-sfx-v2": _eleven,   # 当該アカウントで upstream 400（サウンドロゴは当面スキップ）
 }
 _UNUSED = (Imagen4, SeedreamEdit)
 

@@ -20,8 +20,10 @@ KLING_NEGATIVE = ("blur, distortion, low quality, extra fingers, morphing face, 
 
 
 class KlingVideo(Adapter):
-    endpoint = "fal-ai/kling-video/v2.5-turbo/pro/image-to-video"
-    model = "kling-2.5-turbo-pro"
+    # 常に最新方針（2026-09 更新）: Kling 2.5 turbo pro → v3 turbo pro（ネイティブ4K・動き/一貫性向上）。
+    # body 形状は v2.5 と同一（prompt/image_url/duration/negative_prompt）。※本番投入前に必ず --live スモークテスト。
+    endpoint = "fal-ai/kling-video/v3/turbo/pro/image-to-video"
+    model = "kling-3-turbo-pro"
     ext = "mp4"
     kind = "video"
 
@@ -35,6 +37,29 @@ class KlingVideo(Adapter):
 
     def extract_url(self, resp: dict) -> str:
         return resp["video"]["url"]
+
+
+class Seedance25Video(Adapter):
+    # ByteDance Seedance 2.5（image-to-video）。2026時点で最上位クラス（30秒/4K・優れたモーション/リップシンク）。
+    # ※fal の bytedance/ ネームスペース（fal-ai/ 接頭辞なし）。本番投入前に --live スモークテスト。
+    endpoint = "bytedance/seedance-2.5/image-to-video"
+    model = "seedance-2.5"
+    ext = "mp4"
+    kind = "video"
+
+    def build_body(self, req: GenRequest) -> dict:
+        body = {
+            "prompt": req.prompt,
+            "image_url": data_uri(req.image_path, mime_of(req.image_path)),
+            "resolution": req.resolution or "1080p",
+        }
+        if req.duration:
+            body["duration"] = req.duration
+        return body
+
+    def extract_url(self, resp: dict) -> str:
+        v = resp.get("video") or {}
+        return v["url"] if isinstance(v, dict) else v
 
 
 class VeoVideo(Adapter):

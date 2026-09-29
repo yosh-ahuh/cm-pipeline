@@ -11,8 +11,9 @@ GUARD = " 顔・髪型・服装を完全一致で保持。ロゴなし。ONE sin
 
 
 class NanoBananaEdit(Adapter):
-    endpoint = "fal-ai/nano-banana/edit"
-    model = "nano-banana"
+    # 常に最新方針（2026-09 更新）: nano-banana → **nano-banana-pro**（Google最新・人物一貫性/文字精度向上）。
+    endpoint = "fal-ai/nano-banana-pro/edit"
+    model = "nano-banana-pro"
     ext = "png"
     kind = "image"
 
