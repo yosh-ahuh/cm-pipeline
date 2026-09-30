@@ -102,6 +102,11 @@ def fal_post(endpoint: str, body: dict, key: str, *, timeout: int = 560) -> dict
             return json.load(r)
     except urllib.error.HTTPError as e:
         detail = e.read().decode(errors="replace")[:400]
+        low = detail.lower()
+        # 残高不足/クォータ超過は「全生成が止まる」重大事象。ログで即検知できるよう目立つ印を付ける
+        # （worker がこの印を出力→運用側は "FAL_BALANCE_OR_QUOTA" を監視してアラート/自動チャージにつなぐ）。
+        if e.code in (402, 429) or any(k in low for k in ("insufficient", "balance", "quota", "exhausted", "payment required", "out of credits")):
+            raise RuntimeError(f"FAL_BALANCE_OR_QUOTA fal {endpoint} HTTP {e.code}: {detail}") from e
         raise RuntimeError(f"fal {endpoint} HTTP {e.code}: {detail}") from e
 
 
