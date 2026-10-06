@@ -53,6 +53,7 @@ python3 worker.py            # 全プロジェクトの pending を処理して�
 python3 worker.py --watch    # 5秒間隔で常駐
 python3 worker.py --live     # 実生成: cm-pipeline のステージを実行し assets へアップロード（FAL_KEY or ../../.fal_key）
 # 台本ステージ（script）: --live かつ ANTHROPIC_API_KEY があれば Claude（claude-opus-5-5）が台本を書く。無ければテンプレート台本。
+# 検品ステージ（review）: --live かつ ANTHROPIC_API_KEY があれば Claude が各スチルを 9 項目（指・小道具・光・文字・一貫性・コラージュ化・日本考証・実在人物・偽UI）で判定。NG は 1 回作り直して再検品。キー無しは通過。
 #   依存: cm-pipeline/.venv/bin/python -m pip install -r worker/requirements.txt
 # ブランド取り込み（brand_sources.status=pending）も同じループで処理。python3 worker.py --brand <brand_id> で単体実行。
 ```
