@@ -1,0 +1,30 @@
+# ワーカーイメージに含めないもの（秘密・依存・生成物・フロント）
+.git
+.fal_key
+**/.env
+*.env
+**/node_modules
+**/.venv
+.venv
+**/__pycache__
+**/.DS_Store
+# 生成物・レンダー（イメージを肥大化させない）
+cm-pipeline/projects/*/generated
+cm-pipeline/projects/*/out
+cm-pipeline/projects/_supabase
+ad-prototype/public/projects
+ad-prototype/out
+generated
+# フロントや資料はワーカーに不要
+spot-app/index.html
+spot-app/share.html
+spot-app/assets
+spot-app/styles
+spot-app/supabase
+docs
+LINE Design System
+*.html
+*.png
+*.jpg
+*.mp4
+*.mov

@@ -1,0 +1,14 @@
+# Railway 設定（プロジェクト Spot / サービス Spot）。リポジトリ直下の Dockerfile でビルドする。
+# デプロイ: リポジトリ直下で `railway up`（railway link 済みなら）。変数はダッシュボード or `railway variables --set KEY=VALUE`。
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# ワーカーは 1 台だけ（複数台で同じ jobs を取り合わない）
+numReplicas = 1
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+# Stripe Webhook（任意）。使わないなら STRIPE_WEBHOOK=0 にしてヘルスチェックも外す
+healthcheckPath = "/healthz"
+healthcheckTimeout = 60

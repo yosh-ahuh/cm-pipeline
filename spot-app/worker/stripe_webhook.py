@@ -114,6 +114,11 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b)
 
+    def do_GET(self):   # コンテナのヘルスチェック用（Railway の healthcheckPath=/healthz）
+        if self.path.split("?")[0] in ("/healthz", "/health", "/"):
+            return self._reply(200, "ok")
+        return self._reply(404, "not found")
+
     def do_POST(self):
         if self.path.rstrip("/") not in ("/stripe/webhook", "/webhook", ""):
             return self._reply(404, "not found")
@@ -129,7 +134,9 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> int:
-    env("STRIPE_WEBHOOK_SECRET"); env("SUPABASE_URL"); env("SUPABASE_SERVICE_ROLE_KEY")
+    env("SUPABASE_URL"); env("SUPABASE_SERVICE_ROLE_KEY")
+    if not os.environ.get("STRIPE_WEBHOOK_SECRET"):
+        print("WARN: STRIPE_WEBHOOK_SECRET 未設定 — 待機はしますが署名検証に失敗するため全イベントを拒否します（Stripe接続後に設定）", flush=True)
     port = int(os.environ.get("PORT", "8790"))
     print(f"stripe webhook listening on 0.0.0.0:{port}  (POST /stripe/webhook)", flush=True)
     ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()

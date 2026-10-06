@@ -58,6 +58,19 @@ python3 worker.py --live     # 実生成: cm-pipeline のステージを実行�
 # ブランド取り込み（brand_sources.status=pending）も同じループで処理。python3 worker.py --brand <brand_id> で単体実行。
 ```
 
+### 常駐（コンテナ／Railway）
+
+リポジトリ直下の `Dockerfile`（cm-pipeline ＋ Remotion ＋ ffmpeg ＋ 日本語フォント同梱）と `railway.toml` を使う。ワーカーは **1 台だけ**動かす（複数台やローカル同時起動は同じ jobs を取り合う）。
+
+```bash
+docker build -t spot-worker .                                   # 初回は手元で一度ビルドを通す
+docker run --env-file spot-app/worker/.env -e FAL_KEY=... -p 8080:8080 spot-worker
+railway link --project Spot && railway up                        # Railway（変数はダッシュボードで設定）
+```
+
+必要な変数: `SUPABASE_URL` `SUPABASE_SERVICE_ROLE_KEY` `FAL_KEY`。任意: `ANTHROPIC_API_KEY`（台本・検品・ブランド要約）、`RESEND_API_KEY` `RESEND_FROM` `APP_URL`（完了メール）、`STRIPE_WEBHOOK_SECRET`、`WORKER_MODE=dry`（ドライラン）、`STRIPE_WEBHOOK=0`（Webhook を同居させない）。
+`/healthz` がヘルスチェック。生成物は `/app/cm-pipeline/projects` に出るので、残したければボリュームをマウントする。
+
 `--live` の流れ: `projects.spec` → `cm-pipeline/projects/_supabase/<project_id>/project.yaml` に写像 →
 still / review（NG なら 1 回再生成）/ animate / audio / build を実行 → 生成物を `assets/<owner>/<project>/` に
 アップロードし `generations`（スチル・クリップ・音声）と `renders`（媒体別 mp4）に記録。
