@@ -92,14 +92,29 @@ def _read_yaml(path: Path) -> dict:
 
 
 def _parse_checklist(path: Path) -> list[str]:
-    """quality-rules.md から検品項目を抽出（箇条書き行を項目化）。"""
+    """quality-rules.md から検品項目を抽出。
+
+    スチル1枚で判定できる項目だけを拾う: A 表（破綻検出 A1〜A6）、C（日本考証）、D3（実在人物との類似）、
+    D4（偽UI）。B（後処理で対応）や末尾の「プロセス教訓」の箇条書きは検品項目ではないので含めない。
+    形式は「項目: 検出内容」。"""
     if not path.is_file():
         return []
     items: list[str] = []
+    strip = lambda t: re.sub(r"`([^`]*)`", r"\1", t.replace("**", "")).strip()   # noqa: E731
+    section = ""
     for line in path.read_text(encoding="utf-8").splitlines():
-        m = re.match(r"^\s*[-*]\s+(.*\S)", line)
-        if m:
-            items.append(m.group(1).strip())
+        h = re.match(r"^##\s+([A-Z])\.", line)
+        if h:
+            section = h.group(1)
+            continue
+        if section == "C":
+            m = re.match(r"^\s*[-*]\s+(.*\S)", line)
+            if m:
+                items.append("日本考証: " + strip(m.group(1)))
+            continue
+        row = re.match(r"^\|\s*([AD]\d)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|", line)
+        if row and (row.group(1).startswith("A") or row.group(1) in ("D3", "D4")):
+            items.append(f"{strip(row.group(2))}: {strip(row.group(3))}")
     # フォールバック：ミライ工事で実証した最重要チェック（UI「品質チェック」と対応）。
     return items or [
         "手・指の破綻", "小道具の形状", "光のフレア", "文字化け・偽UI",

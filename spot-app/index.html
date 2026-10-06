@@ -7844,6 +7844,7 @@
   //   R5（LINE準拠）削除確認の3型: 高=このダイアログ＋irreversible:true（「元に戻せません」明記・Delete は --crit）
   //                              中=このダイアログ（戻せる/影響が限定的）／ 低=確認なしで実行し toast（＋必要なら snackbar で「元に戻す」）
   //   ボタン配置は「肯定=右・否定=左」（モバイルは縦積みで肯定が上）。
+  window.openConfirm = openConfirm;   // 他スクリプト（素材ステップ・ウィザード離脱ガード）からも使う
   function openConfirm(opts) {
     return new Promise(resolve => {
       const scrim = document.getElementById('confirmModal');

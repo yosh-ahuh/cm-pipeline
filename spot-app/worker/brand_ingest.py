@@ -65,11 +65,18 @@ def _get(url: str, limit: int = MAX_BYTES, timeout: int = TIMEOUT) -> tuple[byte
 
 
 def robots_allowed(url: str) -> bool:
+    """robots.txt を自前の UA で取得して判定（RobotFileParser.read は Python 既定 UA で取りに行き、
+    bot 対策で 403 を返すサイトを「全面禁止」と誤判定する）。RFC 9309 に倣い 4xx＝robots 無し＝許可、取得不能も許可。"""
     try:
         p = urllib.parse.urlsplit(url)
+        req = urllib.request.Request(f"{p.scheme}://{p.netloc}/robots.txt", headers={"User-Agent": UA})
+        try:
+            with urllib.request.urlopen(req, timeout=8) as r:
+                body = r.read(64 * 1024).decode("utf-8", errors="replace")
+        except urllib.error.HTTPError as e:
+            return True   # 4xx＝robots 無し、5xx＝判定不能 → いずれも許可
         rp = urllib.robotparser.RobotFileParser()
-        rp.set_url(f"{p.scheme}://{p.netloc}/robots.txt")
-        rp.read()
+        rp.parse(body.splitlines())
         return rp.can_fetch(UA, url)
     except Exception:  # noqa: BLE001  robots が無い／読めない → 許可扱い
         return True

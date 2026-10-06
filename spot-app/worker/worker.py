@@ -383,13 +383,17 @@ class LiveRunner:
             if f.is_file():
                 self._put(f, "still", cut_id, r.get("model"), r.get("usd", 0.0))
         elif stage == "review":
+            f = self.proj.generated / f"{cut_id}.still.png"
+            mtime0 = f.stat().st_mtime if f.is_file() else 0.0
             r = p.review_one(self.proj, ctx, cut, retake=True)
             if r.get("status") == "ng":
                 # NG → スチルを再生成して再検品（1回）。それでもNGなら失敗扱い
-                p.still_one(self.proj, ctx, cut)
+                r2 = p.still_one(self.proj, ctx, cut)
                 r = p.review_one(self.proj, ctx, cut, retake=False)
                 if r.get("status") == "ng":
                     raise RuntimeError("検品NG: " + ", ".join(r.get("ng") or []))
+                if f.is_file() and f.stat().st_mtime > mtime0:   # 作り直したスチルを Storage にも反映（古い方を上書き）
+                    self._put(f, "still", cut_id, r2.get("model"), r2.get("usd", 0.0))
         elif stage == "animate":
             r = p.animate_one(self.proj, ctx, cut)
             if r.get("status") == "blocked":
@@ -400,8 +404,14 @@ class LiveRunner:
         elif stage == "audio":
             p.audio(self.proj, ctx)
             adir = self.proj.generated / "audio"
+            # 台帳（ledger）から音声ファイルごとのモデル・原価を引く（cut 列 = na1 / bgm_main 等 = ファイル名の stem）
+            led = {}
+            for rec in self.ledger.read(self.proj):
+                if rec.get("stage") == "audio" and rec.get("cut"):
+                    led[rec["cut"]] = rec
             for f in sorted(adir.glob("*.mp3")) if adir.is_dir() else []:
-                self._put(f, "audio", None, None, 0.0)
+                rec = led.get(f.stem) or {}
+                self._put(f, "audio", f.stem, rec.get("model"), float(rec.get("usd") or 0.0))
         elif stage == "build":
             res = p.build(self.proj, ctx)
             report = Path(res.get("report", ""))
