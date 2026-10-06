@@ -184,7 +184,16 @@
   | 高 | ワークスペース・アカウント・動画の削除 | 中央ダイアログ `openConfirm({…, irreversible:true})` → **「この操作は元に戻せません。」を赤で明記**、Delete は `.btn-danger`（`--crit`）。アカウントは type-to-confirm 併用 |
   | 中 | メンバー除外・コレクション削除（動画は残る） | 中央ダイアログ（irreversible なし）。影響範囲を本文に書く |
   | 低 | 下書きの破棄・一覧からの非表示など取り消せる操作 | 確認なしで実行し toast。取り消しが要るなら snackbar の「元に戻す」 |
-  配置は **肯定＝右・否定＝左**（`openConfirm` が自動で並べ替え）。モバイル（≤480px）は幅 320・縦積みで肯定が上。
+  配置は **肯定＝右・否定＝左**（`openConfirm` が自動で並べ替え）。モバイル（≤720px）では**中重要度の確認はボトムシート（ActionSheet）**、高重要度（`irreversible` / `requireText`）は中央ダイアログのまま（LINE Delete 3 型と一致・R15）。
+- **Bottom Sheet（LINE R15・2026-10-06）**: モバイル（≤720px）専用。上角 **`--r-sheet` 14px 固定**・幅 100%・ハンドルバー 40×4・dimmer は `--scrim`・`sheet-in` でせり上がり。適用: アカウントメニュー（`.menu`）、コレクション移動（`.move-menu.as-sheet`）、中重要度の確認（`.modal-card.as-sheet`）。**タブレット/PC では使わない**（ポップオーバー/ダイアログ）。ボタンは縦積みで肯定が上、3 ボタンは置かない。
+- **FAB（LINE R16）**: `.fab-new` 直径 **`--fab` 54px**・右下 16px・`--accent-grad`＋glow。≤720px で表示（ウィザード/台本/書き出し中は非表示、閲覧のみは非表示）。400〜720px は **Pill FAB**（アイコン＋「新規CM」）で意味を明示、それ未満は円。主導線は常に「新規CM」の 1 つ。
+- **Tooltip（LINE R17・Small）**: `data-tip`（`title` は初回表示時に `data-tip` へ移して二重表示を防ぐ）。hover/focus で表示・1 画面 1 つ・画面端 ≥8px・対象から 6px・1 行・自動幅。対象はアイコン単体ボタンと**折りたたみ時のサイドバー項目**（ラベルが見えている間は出さない）。タッチでは focus 時のみ。
+- **Coachmark（LINE R17・Large）**: `showCoachmark(target, {key, text})`。accent 面・最大 3 行・× で閉じる・1 画面 1 つ・`localStorage spot-coach-<key>` で一度きり。使用: オンボーディング後の最初のホームで「新規CM」（FAB か主ボタン）を指す。
+- **Circular progress（LINE R19）**: `cprogHtml(pct, size, state)` → `.cprog.xs|s|m|l`（径 20/26/40/52・stroke 2.5/3/3/5）。`pct` 省略で indeterminate（回転）。`role=img aria-label="N%"`。使用: 生成の進捗（準備中=indeterminate、作成中=％）。Skeleton とは併用しない。
+- **Page Indicator（LINE R20）**: `.page-ind`（dot 5px・active 7px・内側 12px）を「ステップ N / 4」に併記。`showStep` が on/done を更新。
+- **pressed（LINE R18）**: ダーク面の pressed は**明るく**＝Spot の `--pressed`（ink 10% の白オーバーレイ）で整合済み。
+- **グリッド・ガター（LINE R21）**: カード一覧 16px（`--s-4`）、密なリスト（ジョブ・メンバー）8px、モバイルの左右余白は 16px 以上（`.wrap`）。
+- **トークンの 100 刻みスケール（LINE R22）**: 採用しない（運用コストに見合わない。`--t-*`/`--s-*` の意味名を維持）。
 
 ### 3.9 アイコン
 SVGスプライト（`<symbol id="i-*">`）を `<svg class="ic"><use href="#i-..."/>` で参照。`.ic`（18px, currentColor, stroke2）、`.ic.sm`(14) `.ic.lg`(22)。

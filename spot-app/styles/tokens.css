@@ -78,6 +78,7 @@
   --r-lg: 20px;
   --r-xl: 28px;
   --r-full: 999px;
+  --r-sheet: 14px;         /* ボトムシート上角（LINE 固定値。他の角丸トークンとは独立） */
   --radius: var(--r-lg);
   --radius-sm: var(--r-sm);
 
@@ -102,5 +103,6 @@
 
   /* --- sizes --- */
   --topbar-h: 60px;
+  --fab: 54px;         /* FAB 直径（LINE 54pt） */
   --target: 40px;      /* desktop min hit area */
 }

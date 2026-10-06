@@ -72,6 +72,21 @@
   /* keyboard focus (both M3 and HIG require a visible ring) */
   :focus { outline: none; }
   :focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; border-radius: var(--r-xs); }
+  /* R17（LINE準拠）Tooltip(Small): 自動幅・1行・画面端≥8px・対象から6px・1画面1つ。hover/focus で表示 */
+  .tip { position: fixed; z-index: 300; pointer-events: none; background: var(--ink); color: var(--ground); font-size: var(--t-label); font-weight: 600;
+    padding: 6px 10px; border-radius: var(--r-xs); box-shadow: var(--shadow); white-space: nowrap; max-width: calc(100vw - 16px); opacity: 0; transition: opacity var(--dur-fast); }
+  .tip.on { opacity: 1; }
+  .tip::after { content: ""; position: absolute; left: var(--ax, 50%); top: 100%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: var(--ink); }
+  .tip.below::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--ink); }
+  /* R17 Coachmark(Large): 初回の案内。最大3行・×で閉じる・1画面1つ・localStorage で一度きり */
+  .coach { position: fixed; z-index: 290; width: min(300px, calc(100vw - 16px)); background: var(--accent); color: var(--on-accent); border-radius: var(--r-md);
+    padding: 12px 36px 12px 14px; font-size: var(--t-body-sm); line-height: 1.55; box-shadow: var(--shadow-lift), var(--glow-shadow); animation: rise var(--dur-slow) var(--ease-emphasized); }
+  .coach .coach-x { position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: var(--r-xs); display: grid; place-items: center; color: inherit; background: transparent; border: none; cursor: pointer; }
+  .coach .coach-x:hover { background: color-mix(in srgb, #fff 16%, transparent); }
+  .coach .coach-x .ic { width: 14px; height: 14px; stroke-width: 2.5; }
+  .coach::after { content: ""; position: absolute; left: var(--ax, 24px); top: 100%; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--accent); }
+  .coach.below::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--accent); }
+  .coach b { font-weight: 800; }
   /* a11y: 視覚的に隠してスクリーンリーダーにだけ読ませる（ライブリージョン等） */
   .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .skip {
@@ -663,6 +678,11 @@
   @media (max-width: 520px) { .custom-cfg .cfg-grid { grid-template-columns: 1fr; } }
 
   /* 作成フローの下部アクションバーは常時見える位置に固定（主CTAへ常にアクセス・Canva/モダンUI流） */
+  /* R20（LINE準拠）Page Indicator: dot 5px / active 7px、内側12px。ステップ数が一目で分かる（「N / 4」と併記） */
+  .page-ind { display: inline-flex; align-items: center; gap: 12px; margin-left: 10px; vertical-align: middle; }
+  .page-ind i { width: 5px; height: 5px; border-radius: 50%; background: var(--line-strong); display: block; transition: transform var(--dur-fast), background var(--dur-fast); }
+  .page-ind i.on { width: 7px; height: 7px; background: var(--ink); }
+  .page-ind i.done { background: var(--accent-ink); }
   .wiz-nav { display: flex; gap: var(--s-2); margin-top: var(--s-6); align-items: center;
     position: sticky; bottom: 0; z-index: 6; padding: var(--s-5) 0 var(--s-4);
     background: linear-gradient(to top, var(--ground) 68%, transparent); }
@@ -776,7 +796,7 @@
   .hero-new p { font-size: var(--t-body); color: #B4BAD4; max-width: 44ch; line-height: 1.65; margin: 0 0 var(--s-6); }
   /* モバイルFAB「新規CM」——親指の届く位置に常に主導線を（LINE FAB反映・既定は非表示） */
   .fab-new { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 60;
-    width: 56px; height: 56px; border-radius: var(--r-full); display: none; place-items: center; border: none; cursor: pointer;
+    width: var(--fab); height: var(--fab); border-radius: var(--r-full); display: none; place-items: center; border: none; cursor: pointer;
     background: var(--accent-grad); color: var(--on-accent); box-shadow: var(--shadow-lift), var(--glow-shadow);
     transition: transform var(--dur) var(--ease-spring), box-shadow var(--dur); }
   .fab-new::before { content:""; position:absolute; inset:-7px; border-radius:inherit; background: var(--glow); opacity:.5; filter: blur(7px); z-index:-1; pointer-events:none; }
@@ -784,6 +804,12 @@
   .fab-new:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift), 0 14px 36px -6px color-mix(in srgb, var(--accent) 52%, transparent); }
   .fab-new:active { transform: scale(.94); }
   @media (max-width: 720px) { body.signed-in .fab-new { display: grid; } }
+  /* R16（LINE準拠）: 直径54・右下16px。横幅に余裕がある端末では Pill FAB（アイコン＋「新規CM」）にして意味を明示 */
+  .fab-new .lbl { display: none; font-size: var(--t-body); font-weight: 700; white-space: nowrap; }
+  @media (min-width: 400px) and (max-width: 720px) {
+    body.signed-in .fab-new { width: auto; padding: 0 20px 0 16px; grid-auto-flow: column; gap: 8px; }
+    .fab-new .lbl { display: inline; }
+  }
   body.readonly-role .fab-new { display: none !important; }
   body:has(#view-wizard:not([hidden])) .fab-new,
   body:has(#view-script:not([hidden])) .fab-new,
@@ -1155,6 +1181,16 @@
 
   /* jobs (Realtime generation) */
   .panel-h .rt { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--faint); }
+  /* R19（LINE準拠）Circular progress: 径 xs20 / s26 / m40 / l52、stroke 2.5 / 3 / 3 / 5。determinate は --p(0-100)、.indet は回転 */
+  .cprog { --sz: 26px; --sw: 3px; --p: 0; width: var(--sz); height: var(--sz); flex: none; display: inline-block; vertical-align: middle; }
+  .cprog.xs { --sz: 20px; --sw: 2.5px; } .cprog.s { --sz: 26px; --sw: 3px; } .cprog.m { --sz: 40px; --sw: 3px; } .cprog.l { --sz: 52px; --sw: 5px; }
+  .cprog svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+  .cprog circle { fill: none; stroke-width: var(--sw); }
+  .cprog .trk { stroke: var(--surface-3); }
+  .cprog .ind { stroke: var(--accent); stroke-linecap: round; stroke-dasharray: 100 100; stroke-dashoffset: calc(100 - var(--p)); transition: stroke-dashoffset var(--dur-slow) var(--ease-emphasized); }
+  .cprog.indet .ind { stroke-dasharray: 28 100; stroke-dashoffset: 0; animation: cprog-spin 1s linear infinite; transform-origin: 50% 50%; }
+  .cprog.ok .ind { stroke: var(--good); } .cprog.err .ind { stroke: var(--crit); }
+  @keyframes cprog-spin { to { transform: rotate(360deg); } }
   .jobs-meter { height: 6px; margin: var(--s-3) 0 0; border-radius: var(--r-full); background: var(--surface-3); overflow: hidden; }
   .jobs-meter i { display: block; height: 100%; background: var(--accent); transition: width var(--dur-slow) var(--ease-emphasized); }
   .jobs { list-style: none; margin: var(--s-3) 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
@@ -1224,11 +1260,11 @@
     .scrim { background: rgba(0,0,0,.5); }
     .menu {
       top: auto; right: 0; bottom: 0; left: 0; width: auto; max-width: none;
-      border-radius: var(--r-xl) var(--r-xl) 0 0; border-bottom: 0;
+      border-radius: var(--r-sheet) var(--r-sheet) 0 0; border-bottom: 0;   /* R15: シート上角は 14px 固定 */
       padding: var(--s-2) 0 max(var(--s-4), env(safe-area-inset-bottom));
       transform-origin: bottom center; animation: sheet-in var(--dur-slow) var(--ease-emphasized);
     }
-    .menu::before { content: ""; display: block; width: 32px; height: 4px; border-radius: 2px; margin: 0 auto var(--s-2); background: var(--line-strong); }
+    .menu::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; margin: 0 auto var(--s-2); background: var(--line-strong); }   /* ハンドルバー 40×4 */
     .menu-item { min-height: 48px; }
     .context { padding: var(--s-5) 0 var(--s-4); }
     .title-h1 { font-size: 22px; }
@@ -1545,7 +1581,7 @@
   /* モバイル：選択リストをボトムシート化（LINE Bottom Sheet：上角14px・ハンドルバー・全幅・単一導線） */
   @media (max-width: 720px) {
     .move-menu.as-sheet { position: fixed; left: 0; right: 0; bottom: 0; top: auto !important; width: 100%; min-width: 0; max-width: 100%;
-      max-height: 76vh; border: none; border-radius: var(--r-lg) var(--r-lg) 0 0; box-shadow: var(--shadow-lift);
+      max-height: 76vh; border: none; border-radius: var(--r-sheet) var(--r-sheet) 0 0; box-shadow: var(--shadow-lift);
       padding: 6px 10px max(14px, env(safe-area-inset-bottom)); animation: sheet-in var(--dur-slow) var(--ease-emphasized); }
     .move-menu.as-sheet::before { content:""; display:block; width: 40px; height: 4px; border-radius: var(--r-full); background: var(--line-strong); margin: 6px auto 8px; }
     .move-menu.as-sheet .sheet-title { font-weight: 700; font-size: var(--t-body-sm); color: var(--muted); padding: 2px 8px 8px; }
@@ -1570,6 +1606,15 @@
   .modal-irrev { display: flex; gap: 6px; align-items: flex-start; margin: 10px 0 0; color: var(--crit); font-size: var(--t-label); font-weight: 700; line-height: 1.5; }
   .modal-irrev .ic { width: 14px; height: 14px; flex: none; margin-top: 2px; stroke-width: 3; }
   @media (max-width: 480px) { .modal-card { max-width: 320px; padding: 20px; } #confirmActions { flex-direction: column-reverse; } #confirmActions .btn { width: 100%; } }
+  /* R15（LINE Delete 3型の「中」＝ActionSheet）: モバイルでは戻せる確認をボトムシートで出す（高重要度=irreversible は中央ダイアログのまま） */
+  @media (max-width: 720px) {
+    .modal-scrim:has(> .modal-card.as-sheet) { place-items: end stretch; padding: 0; }
+    .modal-card.as-sheet { max-width: none; width: 100%; border-radius: var(--r-sheet) var(--r-sheet) 0 0; border-bottom: 0;
+      padding: 8px 16px max(16px, env(safe-area-inset-bottom)); animation: sheet-in var(--dur-slow) var(--ease-emphasized); }
+    .modal-card.as-sheet::before { content: ""; display: block; width: 40px; height: 4px; border-radius: 2px; margin: 0 auto 12px; background: var(--line-strong); }
+    .modal-card.as-sheet #confirmActions { flex-direction: column-reverse; }
+    .modal-card.as-sheet #confirmActions .btn { width: 100%; min-height: 48px; }
+  }
   .confirm-input { display: block; margin: 14px 0 0; font-size: var(--t-label); color: var(--muted); }
   .confirm-input input { display: block; width: 100%; margin-top: 6px; }
   .btn-danger { background: var(--crit); color: var(--on-crit); border: 1px solid transparent; }
@@ -1585,7 +1630,8 @@
 <body class="booting">
 <a class="skip" href="#main">本文へスキップ</a>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
   <symbol id="i-forward" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
@@ -1849,7 +1895,7 @@
 <!-- ============================ WIZARD VIEW ============================ -->
 <main class="wrap" id="view-wizard" hidden>
   <div class="wiz-head">
-    <div class="wiz-eyebrow"><span>新規CM ・ ステップ <span id="stepNum">1</span> / 4</span><span class="wiz-progress" aria-hidden="true"><i id="wizProg"></i></span></div>
+    <div class="wiz-eyebrow"><span>新規CM ・ ステップ <span id="stepNum">1</span> / 4<span class="page-ind" id="pageInd" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span></span><span class="wiz-progress" aria-hidden="true"><i id="wizProg"></i></span></div>
     <h1 class="wiz-title">つくりたいCMを、選ぶだけ。
       <small>プロンプトは書かなくて大丈夫。選択肢の裏に、広告制作の勝ちパターンが入っています。</small>
     </h1>
@@ -2769,11 +2815,12 @@
 </div>
 
 <!-- モバイル用 FAB：新規CMをつくる（#newCM の導線を再利用＝権限ガードも継承） -->
-<button type="button" class="fab-new" id="fabNew" aria-label="新規CMをつくる" title="新規CMをつくる"><svg class="ic"><use href="#i-plus"/></svg></button>
+<button type="button" class="fab-new" id="fabNew" aria-label="新規CMをつくる" title="新規CMをつくる"><svg class="ic"><use href="#i-plus"/></svg><span class="lbl">新規CM</span></button>
 
 <div class="toast-wrap" id="toasts" role="status" aria-live="polite"></div>
 <!-- a11y: 画面遷移・生成完了/失敗・書き出し完了をスクリーンリーダーへ通知するライブリージョン（window.announce） -->
 <div id="a11yLive" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<div class="tip" id="tip" role="tooltip" hidden></div>
 <div id="a11yAlert" class="sr-only" role="alert" aria-atomic="true"></div>
 
 <script>
@@ -2902,6 +2949,68 @@
     return t;
   }
   window.snackbar = snackbar;
+
+  // ---- R17（LINE準拠）Tooltip(Small): data-tip / title / aria-label を hover・focus で表示。1画面1つ、画面端≥8px、対象から6px ----
+  //   対象: アイコン単体ボタン・折りたたみサイドバーの項目・カードの操作ボタン。title は二重表示を避けるため data-tip に移す。
+  (function tooltips() {
+    const tip = document.getElementById('tip'); if (!tip) return;
+    const SEL = '[data-tip], .icon-btn[title], .btn.icon-only[title], .sb-item[title], .sb-acct[title], .proj-move[title], .proj-del[title], .col-del[title], .fab-new[title], .vp[title], [aria-label].icon-only';
+    let cur = null;
+    function textFor(el) {
+      if (el.hasAttribute('title')) { el.dataset.tip = el.getAttribute('title'); el.removeAttribute('title'); }
+      return el.dataset.tip || el.getAttribute('aria-label') || '';
+    }
+    function show(el) {
+      if (el.classList.contains('sb-item') && !document.body.classList.contains('sb-collapsed')) return;   // ラベルが見えている間は不要
+      const text = textFor(el); if (!text) return;
+      cur = el; tip.textContent = text; tip.hidden = false; tip.classList.remove('below');
+      const r = el.getBoundingClientRect(); const tw = tip.offsetWidth, th = tip.offsetHeight;
+      let x = r.left + r.width / 2 - tw / 2; x = Math.max(8, Math.min(innerWidth - tw - 8, x));
+      let y = r.top - th - 6; if (y < 8) { y = r.bottom + 6; tip.classList.add('below'); }
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+      tip.style.setProperty('--ax', Math.max(10, Math.min(tw - 10, r.left + r.width / 2 - x)) + 'px');
+      requestAnimationFrame(() => tip.classList.add('on'));
+    }
+    function hide() { cur = null; tip.classList.remove('on'); tip.hidden = true; }
+    document.addEventListener('pointerover', e => { const el = e.target.closest && e.target.closest(SEL); if (el && el !== cur && e.pointerType !== 'touch') show(el); });
+    document.addEventListener('pointerout', e => { if (cur && !cur.contains(e.relatedTarget)) hide(); });
+    document.addEventListener('focusin', e => { const el = e.target.closest && e.target.closest(SEL); if (el) show(el); });
+    document.addEventListener('focusout', hide);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
+    document.addEventListener('scroll', hide, true);
+  })();
+
+  // ---- R17 Coachmark(Large): 初回だけの案内（最大3行・×で閉じる・1画面1つ・一度閉じたら出さない） ----
+  function showCoachmark(target, opts) {
+    if (!target || !opts || !opts.key) return null;
+    try { if (localStorage.getItem('spot-coach-' + opts.key)) return null; } catch (_) {}
+    if (document.querySelector('.coach')) return null;
+    if (target.offsetParent === null) return null;
+    const c = document.createElement('div'); c.className = 'coach'; c.setAttribute('role', 'note');
+    c.innerHTML = '<span></span><button type="button" class="coach-x" aria-label="閉じる"><svg class="ic"><use href="#i-close"/></svg></button>';
+    c.firstChild.innerHTML = opts.html || ''; if (opts.text) c.firstChild.textContent = opts.text;
+    document.body.appendChild(c);
+    const place = () => {
+      const r = target.getBoundingClientRect(); const w = c.offsetWidth, h = c.offsetHeight;
+      let x = r.left + r.width / 2 - w / 2; x = Math.max(8, Math.min(innerWidth - w - 8, x));
+      let y = r.top - h - 10; c.classList.remove('below'); if (y < 8) { y = r.bottom + 10; c.classList.add('below'); }
+      c.style.left = x + 'px'; c.style.top = y + 'px';
+      c.style.setProperty('--ax', Math.max(16, Math.min(w - 16, r.left + r.width / 2 - x)) + 'px');
+    };
+    place();
+    const close = () => { c.remove(); window.removeEventListener('resize', place); try { localStorage.setItem('spot-coach-' + opts.key, '1'); } catch (_) {} };
+    c.querySelector('.coach-x').addEventListener('click', close);
+    target.addEventListener('click', close, { once: true });
+    window.addEventListener('resize', place);
+    return c;
+  }
+  window.showCoachmark = showCoachmark;
+
+  // ---- R19 Circular progress の HTML（pct 省略で indeterminate）----
+  window.cprogHtml = function (pct, size, state) {
+    const indet = pct == null;
+    return `<span class="cprog ${size || 's'}${indet ? ' indet' : ''}${state ? ' ' + state : ''}" style="--p:${indet ? 0 : Math.max(0, Math.min(100, pct))}" role="img" aria-label="${indet ? '' : Math.round(pct) + '%'}"><svg viewBox="0 0 36 36"><circle class="trk" cx="18" cy="18" r="15.9155"/><circle class="ind" cx="18" cy="18" r="15.9155"/></svg></span>`;
+  };
 
   // ---- a11y: 状態変化の通知（ARIA live）。polite=画面遷移・完了、assertive=失敗など注意を要するもの ----
   //   同じ文を続けて入れても読まれるよう、一度空にしてからセットする。
@@ -3706,6 +3815,7 @@
     });
     document.getElementById('stepNum').textContent = n + 1;
     if (wizProg) wizProg.style.width = ((n + 1) / 4 * 100) + '%';
+    document.querySelectorAll('#pageInd i').forEach((d, i) => { d.classList.toggle('on', i === n); d.classList.toggle('done', i < n); });   // R20
     wizBack.style.visibility = n === 0 ? 'hidden' : 'visible';
     wizNextText.textContent = n === 3 ? 'AIが構成を設計' : '次へ';
     validateStep();
@@ -4043,6 +4153,13 @@
     hideAll(); vDash.hidden = false; focusView(vDash); _nav(false, 'home');
     setCrumb([['ホーム']]);
     if (window.applyProjFilter) window.applyProjFilter();
+    // R17: オンボーディング後の最初のホームで、主導線を一度だけ指し示す（1画面1つ・閉じたら二度と出ない）
+    let onboarded = null; try { onboarded = localStorage.getItem('spot-onboarded'); } catch (_) {}
+    if (onboarded && window.showCoachmark) setTimeout(() => {
+      const fab = document.getElementById('fabNew'); const btn = document.getElementById('newCM');
+      const target = (fab && fab.offsetParent !== null) ? fab : btn;
+      window.showCoachmark(target, { key: 'home-new', text: L('Start here. Pick a channel, industry and audience — a first cut lands the same day.', '次のCMはここから。配信先・業種・ターゲットを選ぶだけで、その日のうちに初稿が届きます。') });
+    }, 600);
   }
   function gotoSettings() {   // = プロフィール設定
     hideAll(); vSettings.hidden = false; focusView(vSettings); _nav(false, 'profile');
@@ -6391,8 +6508,11 @@
         { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' },
       ];
       const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); pick(null); } };
-      const release = window.trapFocus ? window.trapFocus(scrim.querySelector('.modal-card')) : null;   // Tab をダイアログ内に閉じ込め、閉じたら元の要素へ
-      const cleanup = () => { scrim.hidden = true; document.removeEventListener('keydown', onKey); scrim.onclick = null; const w = document.getElementById('confirmInputWrap'); if (w) w.remove(); const i = document.getElementById('confirmIrrev'); if (i) i.remove(); if (release) release(); };
+      // R15: モバイルでは「戻せる確認（中重要度）」をボトムシート（ActionSheet）で。高重要度（irreversible / type-to-confirm）は中央ダイアログ
+      const card = scrim.querySelector('.modal-card');
+      card.classList.toggle('as-sheet', !!(matchMedia('(max-width: 720px)').matches && !opts.irreversible && !opts.requireText));
+      const release = window.trapFocus ? window.trapFocus(card) : null;   // Tab をダイアログ内に閉じ込め、閉じたら元の要素へ
+      const cleanup = () => { scrim.hidden = true; document.removeEventListener('keydown', onKey); scrim.onclick = null; const w = document.getElementById('confirmInputWrap'); if (w) w.remove(); const i = document.getElementById('confirmIrrev'); if (i) i.remove(); card.classList.remove('as-sheet'); if (release) release(); };
       const pick = (id) => { cleanup(); resolve(id); };
       // type-to-confirm（重要な削除向け）：requireText.value と一致するまで危険/主ボタンを無効化
       let inputEl = null;
@@ -6958,10 +7078,10 @@
     }
     // 状況フィードバック（生成中=進捗＋目安、完了=次アクション、失敗=再試行）
     let statusHtml = '';
-    if (total === 0) statusHtml = `<div class="gen-status">${L('Preparing…', '準備しています…')}</div>`;
+    if (total === 0) statusHtml = `<div class="gen-status">${window.cprogHtml ? window.cprogHtml(null, 's') : ''}<span>${L('Preparing…', '準備しています…')}</span></div>`;
     else if (failed) statusHtml = `<div class="gen-status err"><svg class="ic"><use href="#i-alert"/></svg><span>${L('Some cuts failed. Please try again.', '一部のカットをつくれませんでした。もう一度お試しください。')}</span></div>`;
     else if (allDone) statusHtml = `<div class="gen-status ok"><svg class="ic"><use href="#i-check"/></svg><span>${L('Your ad is ready', 'CMができあがりました')}</span><button class="btn btn-ghost wauto" id="genToExport"><span>${L('Go to export', '書き出しへ')}</span></button></div>`;
-    else statusHtml = `<div class="gen-status run"><span class="ai-spark" aria-hidden="true"><svg class="ic"><use href="#i-sparkle"/></svg></span><span>${L(`AI is creating… ${done}/${total} done · a few minutes`, `AIが制作中です… ${done}/${total} 完了 ・ 数分お待ちください`)}</span></div>`;
+    else statusHtml = `<div class="gen-status run">${window.cprogHtml ? window.cprogHtml(pct, 's') : ''}<span class="ai-spark" aria-hidden="true"><svg class="ic"><use href="#i-sparkle"/></svg></span><span>${L(`AI is creating… ${done}/${total} done · a few minutes`, `AIが制作中です… ${done}/${total} 完了 ・ 数分お待ちください`)}</span></div>`;
     panel.innerHTML = `
       <div class="panel-h">${L('Progress', '作成の進捗')} <span class="rt">${L('Live', 'リアルタイム')}</span><span class="count${allDone ? ' ok' : ''}">${done}/${total}</span></div>
       ${statusHtml}

@@ -319,7 +319,15 @@ R1〜R7 を `spot-app/index.html` と `docs/design-system.md` に反映した。
 - R12: `.sb-scrim` 40%、項目 3〜5・2 階層までを規約化。
 - R13: `.proj.is-new`（24 時間以内）＋「新着」バッジ、右アクション ≤2 を規約化。
 - R14: 空状態にボタン 1 つ（コレクション空に「メディアを開く」）。
-残り: P3（Bottom Sheet / FAB / Tooltip / 円形進捗 / Page Indicator / ガター / トークン 100 刻み）。
+### ✅ P3 反映済み（2026-10-06）
+- R15: シート上角を `--r-sheet` 14px に統一（アカウントメニュー・コレクション移動）、**中重要度の確認をモバイルでは ActionSheet**（`.modal-card.as-sheet`）に。高重要度は中央ダイアログ。
+- R16: FAB を `--fab` 54px に。400〜720px は Pill FAB（「新規CM」ラベル）。
+- R17: Tooltip(Small)＝`data-tip`（title を自動移行）、Coachmark(Large)＝`showCoachmark()`（オンボーディング後のホームで主導線を指す・一度きり）。
+- R18: `--pressed` の整合を確認（文書化）。
+- R19: `.cprog`＋`cprogHtml()`（径 20/26/40/52）。生成の進捗に適用。
+- R20: `.page-ind` をウィザードの「ステップ N / 4」に併記。
+- R21: ガター規約を文書化。R22: 不採用（文書化）。
+LINE Design System の反映は P1〜P3 で完了。
 
 ### 最優先7項目（P1）の補足
 - **R1 フォーム**: Spot は入力の共有スタイルをトークン統一済み（§3.7）。欠けているのは**エラー/必須/カウンタの体系**。LINE は「focus=青枠 / error=赤枠+赤ヘルプ+カウンタ色分け / 必須*赤」を厳密規定。低ITリテラシー層には**送信前のライブ検証**が特に効く（LINE も「エラーは送信後でなくライブ」を明記）。値サイズは 16px 推奨（Spot `--t-title`）＝iOS の入力ズーム回避にもなる。
