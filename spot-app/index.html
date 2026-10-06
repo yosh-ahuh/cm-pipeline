@@ -494,6 +494,14 @@
   .f-help.err { color: var(--crit); display: flex; gap: 5px; align-items: flex-start; }
   .f-help.err .ic { width: 13px; height: 13px; flex: none; margin-top: 2px; stroke-width: 3; }
   .f-label .req { color: var(--crit); margin-left: 3px; font-weight: 700; }
+  /* R1（LINE準拠・続）: .fld（設定系フォーム）と台本欄にも同じ検証体系。プレースホルダは専用色、文字カウンタは右下 */
+  .fld label .req { color: var(--crit); margin-left: 3px; font-weight: 700; }
+  .fld input::placeholder, .fld textarea::placeholder, .os-text::placeholder { color: var(--faint); }
+  .fld.err input, .fld.err textarea, .own-script.err .os-text { border-color: var(--crit); background: color-mix(in srgb, var(--crit) 6%, var(--surface-2)); }
+  .fld.err input:focus, .fld.err textarea:focus, .own-script.err .os-text:focus { border-color: var(--crit); box-shadow: 0 0 0 3px var(--crit-soft); }
+  .fld .f-help { margin-top: 0; }
+  .f-count { font-size: var(--t-label-sm); color: var(--faint); text-align: right; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .f-count.over { color: var(--crit); font-weight: 700; }
 
   .qc { padding: var(--s-2) var(--s-4) var(--s-3); display: flex; flex-direction: column; gap: 2px; }
   .qc-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: var(--t-body-sm); }
@@ -552,6 +560,13 @@
   /* ボタン内の「送信中…」表示（スピナー＋ラベル）。色は currentColor 依存で白CTA・アクセントリンク両対応 */
   .btn-busy { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
   .btn-spin { display: inline-block; width: 15px; height: 15px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; opacity: .9; flex: none; }
+  /* R2（LINE準拠）: disabled は薄く・押せない。Loading 中（aria-busy）は薄くせずスピナーで「処理中」を示す */
+  .btn:disabled, .hn-btn:disabled, .linkbtn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn[aria-busy="true"], .hn-btn[aria-busy="true"] { opacity: 1; cursor: progress; }
+  /* R3（LINE準拠）: 行動が要るフィードバックは toast ではなく snackbar（アクション1つ・長め表示） */
+  .toast.snack { gap: 14px; }
+  .toast .ts-act { color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; background: none; border: none; padding: 4px 6px; margin: -4px -6px -4px 0; border-radius: var(--r-xs); cursor: pointer; }
+  .toast .ts-act:hover { background: color-mix(in srgb, var(--ground) 14%, transparent); }
   .toast .ic { width: 16px; height: 16px; color: var(--good); stroke-width: 3; }
   @keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.98); } }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -859,6 +874,8 @@
   .filter { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-full); min-height: var(--control-h-sm); padding: 0 14px; font-size: var(--t-label); color: var(--muted); font-weight: 500; transition: border-color var(--dur-fast), color var(--dur-fast), background var(--dur-fast); }
   .filter:hover { color: var(--ink); background: var(--hover); }
   .filter[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--ground); font-weight: 700; }
+  /* R4（LINE準拠）: 選択中のチップは色だけでなく ✓ でも示す（色覚・低ITリテラシー配慮） */
+  .filter[aria-pressed="true"]::before { content: "✓"; font-weight: 700; margin-right: 5px; font-size: .9em; }
 
   .proj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(255px,1fr)); gap: var(--s-4); padding-bottom: 50px; }
   .proj { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-1); text-align: left; transition: transform var(--dur), box-shadow var(--dur), border-color var(--dur); min-width: 0; }
@@ -1390,6 +1407,9 @@
   .badge--success { color: var(--good);       background: var(--good-soft); }
   .badge--warn    { color: var(--warn);        background: color-mix(in srgb, var(--warn) 16%, transparent); }
   .badge--danger  { color: var(--crit);        background: var(--crit-soft); }
+  /* R4（LINE準拠）: 数値バッジは高さ規格 18/20、等幅数字、溢れは fmtCount() で 99+ */
+  .badge--num { min-width: 18px; height: 18px; padding: 0 6px; justify-content: center; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .badge--num.lg { min-width: 20px; height: 20px; }
   /* team / members */
   .member-list { display: flex; flex-direction: column; gap: 6px; }
   .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
@@ -1530,6 +1550,10 @@
   #confirmModal .modal-h { margin-bottom: 8px; }
   #confirmActions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
   #confirmActions .btn:disabled { opacity: .45; cursor: not-allowed; }
+  /* R5（LINE準拠）: 重要度「高」の削除は中央ダイアログで「元に戻せません」を明記、Delete は --crit。モバイルは幅を絞る */
+  .modal-irrev { display: flex; gap: 6px; align-items: flex-start; margin: 10px 0 0; color: var(--crit); font-size: var(--t-label); font-weight: 700; line-height: 1.5; }
+  .modal-irrev .ic { width: 14px; height: 14px; flex: none; margin-top: 2px; stroke-width: 3; }
+  @media (max-width: 480px) { .modal-card { max-width: 320px; padding: 20px; } #confirmActions { flex-direction: column-reverse; } #confirmActions .btn { width: 100%; } }
   .confirm-input { display: block; margin: 14px 0 0; font-size: var(--t-label); color: var(--muted); }
   .confirm-input input { display: block; width: 100%; margin-top: 6px; }
   .btn-danger { background: var(--crit); color: #fff; border: 1px solid transparent; }
@@ -2345,7 +2369,7 @@
       </div>
     </div>
     <hr class="soft-sep">
-    <div class="fld"><label for="setName">表示名</label>
+    <div class="fld"><label for="setName">表示名<span class="req" aria-hidden="true">*</span></label>
       <input id="setName" type="text" maxlength="60" placeholder="山田 太郎" autocomplete="name"></div>
     <div class="fld"><label for="setEmail">メールアドレス</label>
       <input id="setEmail" type="email" readonly></div>
@@ -2367,7 +2391,7 @@
         <input type="file" id="companyLogoInput" accept="image/svg+xml,image/png,image/jpeg" hidden>
       </div>
     </div>
-    <div class="fld" style="margin-top:16px"><label for="companyName">ワークスペース名</label>
+    <div class="fld" style="margin-top:16px"><label for="companyName">ワークスペース名<span class="req" aria-hidden="true">*</span></label>
       <input id="companyName" type="text" maxlength="80" placeholder="株式会社スポット / ブランド名" autocomplete="organization"></div>
 
     <!-- ブランドの傾向（ブランドメモリ：このブランドが積み重ねてきた選択の要約） -->
@@ -2830,7 +2854,9 @@
 
   // toast helper
   const toasts = document.getElementById('toasts');
-  function toast(msg, spin=true, ms=2600) {
+  // R3（LINE準拠）: toast は「結果の通知」専用＝アクションを持たない・自動消滅 3〜4 秒・常に1つ・不透明な面。
+  //   行動が要るとき（元に戻す / 再試行 / 開く）は snackbar(msg, {label, onAction}) を使う。
+  function toast(msg, spin=true, ms=3200) {
     // LINE 準拠(R3): トーストは常に1つ。新しいものを出す前に既存を消す。
     toasts.querySelectorAll('.toast').forEach(el => el.remove());
     const t = document.createElement('div');
@@ -2841,6 +2867,107 @@
     if (t._t) clearTimeout(t._t);
     t._t = setTimeout(()=>{ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, ms);
   }
+
+  function snackbar(msg, opts) {
+    opts = opts || {};
+    toasts.querySelectorAll('.toast').forEach(el => el.remove());
+    const t = document.createElement('div'); t.className = 'toast snack';
+    const tx = document.createElement('span'); tx.textContent = msg; t.appendChild(tx);
+    if (opts.label) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'ts-act'; b.textContent = opts.label;
+      b.onclick = () => { t.remove(); if (opts.onAction) opts.onAction(); };
+      t.appendChild(b);
+    }
+    toasts.appendChild(t);
+    setTimeout(() => { if (!t.isConnected) return; t.style.transition = 'opacity .3s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, opts.ms || 8000);
+    return t;
+  }
+  window.snackbar = snackbar;
+
+  // R2（LINE準拠）: ボタンの Loading 状態。待ちが発生する主アクションは内部スピナー＋文言で「処理中」を示し、二重送信を防ぐ。
+  //   使い方: btnBusy(btn, true, '保存中…') … btnBusy(btn, false)。disabled 直書きの代わりに使う。
+  function btnBusy(btn, on, label) {
+    if (!btn) return;
+    const LL = (en, ja) => (window.L ? window.L(en, ja) : ja);
+    if (on) {
+      if (btn.dataset.busy === '1') return;
+      btn.dataset.busy = '1'; btn._html = btn.innerHTML;
+      btn.disabled = true; btn.setAttribute('aria-busy', 'true');
+      btn.innerHTML = '<span class="btn-busy"><span class="btn-spin"></span><span></span></span>';
+      btn.querySelector('.btn-busy span:last-child').textContent = label || LL('Please wait…', '少々お待ちください…');
+    } else {
+      btn.disabled = false; btn.removeAttribute('aria-busy');
+      if (btn.dataset.busy !== '1') return;
+      delete btn.dataset.busy;
+      if (btn._html != null) { btn.innerHTML = btn._html; btn._html = null; }
+    }
+  }
+  window.btnBusy = btnBusy;
+
+  // R4（LINE準拠）: 数値バッジの溢れ表示（既定 99+）
+  window.fmtCount = (n, max) => { max = max || 99; n = Number(n) || 0; return n > max ? max + '+' : String(n); };
+
+  // R1（LINE準拠）: 共通ライブ検証＋文字カウンタ（.fld / .field / .own-script 共通）。
+  //   blur で検証、エラー中は input で即再判定（直したら即消える）。送信前の検証に _validate() を使う。
+  function fieldSetError(input, msg) {
+    const w = input && input.closest('.fld, .field, .own-script'); if (!w) return;
+    const bad = !!msg;
+    w.classList.toggle('err', bad);
+    input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+    let help = w.classList.contains('field') ? (w.nextElementSibling && w.nextElementSibling.classList.contains('f-help') ? w.nextElementSibling : null)
+                                             : w.querySelector(':scope > .f-help');
+    if (!help) {
+      if (!bad) return;
+      help = document.createElement('p'); help.className = 'f-help';
+      if (w.classList.contains('field')) w.after(help); else { const c = w.querySelector(':scope > .f-count'); if (c) c.before(help); else w.appendChild(help); }
+    }
+    if (bad) { help.className = 'f-help err'; help.innerHTML = '<svg class="ic"><use href="#i-alert"/></svg><span></span>'; help.lastChild.textContent = msg; help.hidden = false; }
+    else { help.className = 'f-help'; help.textContent = ''; help.hidden = true; }
+  }
+  function fieldLive(input, rule) {
+    if (!input || input._live) return input && input._validate;
+    input._live = true; rule = rule || {};
+    const LL = (en, ja) => (window.L ? window.L(en, ja) : ja);
+    const run = () => {
+      const v = (input.value || '').trim();
+      const req = typeof rule.required === 'function' ? rule.required() : !!rule.required;
+      let msg = '';
+      if (req && !v) msg = (typeof rule.msg === 'function' ? rule.msg() : rule.msg) || LL('Please fill this in.', '入力してください。');
+      else if (rule.min && v && v.length < rule.min) msg = LL(`Please enter at least ${rule.min} characters.`, `${rule.min}文字以上で入力してください。`);
+      else if (rule.max && v.length > rule.max) msg = LL(`Up to ${rule.max} characters.`, `${rule.max}文字以内で入力してください。`);
+      else if (rule.check) msg = rule.check(v) || '';
+      fieldSetError(input, msg);
+      return !msg;
+    };
+    input.addEventListener('blur', run);
+    input.addEventListener('input', () => { const w = input.closest('.fld, .field, .own-script'); if (w && w.classList.contains('err')) run(); });
+    input._validate = run;
+    return run;
+  }
+  function fieldCounter(input, max) {
+    if (!input || input._count) return;
+    input._count = true;
+    const w = input.closest('.fld, .field, .own-script') || input.parentElement;
+    const c = document.createElement('div'); c.className = 'f-count'; c.setAttribute('aria-live', 'polite');
+    if (w.classList.contains('field')) w.after(c); else input.after(c);
+    const upd = () => {
+      const n = (input.value || '').length;
+      c.textContent = n + '/' + max; c.classList.toggle('over', n > max);
+      if (n > max) fieldSetError(input, (window.L ? window.L(`Up to ${max} characters.`, `${max}文字以内で入力してください。`) : `${max}文字以内で入力してください。`));
+      else if (w.classList.contains('err') && input._validate) input._validate();
+      else if (w.classList.contains('err')) fieldSetError(input, '');
+    };
+    input.addEventListener('input', upd); upd();
+  }
+  window.fieldLive = fieldLive; window.fieldCounter = fieldCounter; window.fieldSetError = fieldSetError;
+  // 適用: 設定系フォーム（必須＝表示名・ワークスペース名）と上限のある入力、台本欄
+  fieldLive(document.getElementById('setName'), { required: true, msg: () => (window.L ? window.L('Please enter your display name.', '表示名を入力してください。') : '表示名を入力してください。') });
+  fieldCounter(document.getElementById('setName'), 60);
+  fieldLive(document.getElementById('companyName'), { required: true, msg: () => (window.L ? window.L('Please enter a workspace name.', 'ワークスペース名を入力してください。') : 'ワークスペース名を入力してください。') });
+  fieldCounter(document.getElementById('companyName'), 80);
+  fieldCounter(document.getElementById('nameModalInput'), 60);
+  fieldCounter(document.getElementById('billLegalName'), 120);
+  fieldCounter(document.getElementById('ownScriptText'), 2000);
 
   const roGuard = () => (window.__canWrite && !window.__canWrite()) ? (toast(L('View-only access.', '閲覧のみの権限です。'), false, 1800), true) : false;
   document.getElementById('chips').addEventListener('click', e => {
@@ -3283,7 +3410,7 @@
         toast(next ? L('Added to this brand’s references', 'このブランドのお手本にしました') : L('Removed from references', 'お手本から外しました'), true, 1800);
         if (window.__renderBrandInsights) window.__renderBrandInsights();   // 傾向サマリを更新
       } catch (e) { console.warn('keep toggle failed:', e); setUI(!next); toast(L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2400); }
-      finally { btn.disabled = false; }
+      finally { btnBusy(btn, false); }
     });
   })();
 
@@ -5457,16 +5584,16 @@
         if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can do this.', 'この操作はオーナーのみ可能です。'), false, 2400); return; }
         const nm = currentOrg.name || 'このワークスペース';
         const r = await openConfirm({ title: L('Delete this workspace?', 'このワークスペースを削除しますか？'),
-          message: L(`“${nm}” and all its videos and members will be permanently deleted. This cannot be undone.`, `「${nm}」と、含まれるすべての動画・メンバーが完全に削除されます。元に戻せません。`),
+          message: L(`“${nm}” and all its videos and members will be permanently deleted.`, `「${nm}」と、含まれるすべての動画・メンバーが完全に削除されます。`), irreversible: true,
           actions: [{ id: 'ok', label: L('Delete workspace', 'ワークスペースを削除'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }] });
         if (r !== 'ok') return;
-        delBtn.disabled = true;
+        btnBusy(delBtn, true, L('Deleting…', '削除中…'));
         try {
           const { error } = await sb.rpc('delete_organization', { p_org: currentOrg.id }); if (error) throw error;
           try { localStorage.removeItem('spot-org'); } catch (_) {}
           if (window.toast) window.toast(L('Workspace deleted', 'ワークスペースを削除しました'), true, 1600);
           setTimeout(() => location.reload(), 800);   // 個人ワークスペースへクリーンに復帰
-        } catch (err) { console.warn('delete org failed:', err); delBtn.disabled = false;
+        } catch (err) { console.warn('delete org failed:', err); btnBusy(delBtn, false);
           const last = /keep at least one workspace|personal workspace cannot/i.test(String(err && err.message));
           if (window.toast) window.toast(last ? L('You must keep at least one workspace.', '少なくとも1つのワークスペースは必要です。')
             : L("Couldn't delete the workspace. Please try again.", 'ワークスペースを削除できませんでした。もう一度お試しください。'), false, 2800); }
@@ -5474,9 +5601,10 @@
     if (save) save.addEventListener('click', async () => {
       if (!currentOrg) return;
       if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can edit this.', '編集はオーナーのみ可能です。'), false, 2400); return; }
-      const name = (document.getElementById('companyName').value || '').trim();
-      if (!name) { toast(L('Enter a workspace name.', 'ワークスペース名を入力してください。'), false, 2400); return; }
-      save.disabled = true;
+      const nameEl = document.getElementById('companyName');
+      const name = (nameEl.value || '').trim();
+      if (nameEl._validate ? !nameEl._validate() : !name) { nameEl.focus(); return; }
+      btnBusy(save, true, L('Saving…', '保存中…'));
       try {
         const { error } = await sb.from('organizations').update({ name }).eq('id', currentOrg.id);
         if (error) throw error;
@@ -5496,7 +5624,7 @@
         if (window.__renderWorkspaces) window.__renderWorkspaces();   // サイドバー/切替の名前を即時更新
         if (note) { note.hidden = false; setTimeout(() => note.hidden = true, 2000); }
       } catch (e) { console.warn('company profile save failed:', e); toast(L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2600); }
-      finally { save.disabled = false; }
+      finally { btnBusy(save, false); }
     });
     // 案X（workspace=brand）: 個人→組織 昇格フローは廃止（全WSがブランド・プロフィールを持つため不要）。
     if (logoBtn && logoInput) logoBtn.addEventListener('click', () => logoInput.click());
@@ -5523,7 +5651,7 @@
     if (create) create.addEventListener('click', async () => {
       if (!currentOrg) return;
       const role = document.getElementById('inviteRole').value;
-      create.disabled = true;
+      btnBusy(create, true, L('Creating…', '作成中…'));
       try {
         const { data: token, error } = await sb.rpc('create_invite', { p_org: currentOrg.id, p_email: null, p_role: role });
         if (error) throw error;
@@ -5532,7 +5660,7 @@
         if (inp) inp.value = url; if (box) box.hidden = false;
         try { await navigator.clipboard.writeText(url); if (window.toast) window.toast(window.L('Invite link copied', '招待リンクをコピーしました'), true, 2000); } catch (_) {}
       } catch (e) { console.warn('invite create failed:', e); if (window.toast) window.toast(window.L("Couldn't create the invite. Please try again.", '招待リンクをつくれませんでした。もう一度お試しください。'), false, 2600); }
-      finally { create.disabled = false; }
+      finally { btnBusy(create, false); }
     });
     panel.addEventListener('click', async (e) => {
       const rm = e.target.closest('[data-remove]'); if (!rm || !currentOrg) return;
@@ -5592,7 +5720,8 @@
     btn.addEventListener('click', async () => {
       if (!sb) return;
       const nameEl = document.getElementById('setName'); const note = document.getElementById('setSaveNote');
-      btn.disabled = true;
+      if (nameEl._validate && !nameEl._validate()) { nameEl.focus(); return; }
+      btnBusy(btn, true, L('Saving…', '保存中…'));
       try {
         // 表示名の更新は RPC 経由（profiles はクライアント直接 UPDATE を許可していないため）。
         const { error } = await sb.rpc('update_display_name', { p_name: (nameEl.value || '').trim() });
@@ -5600,7 +5729,7 @@
         if (window.__refreshAccountChip) window.__refreshAccountChip();   // サイドバー下部/メニューの氏名も更新
         if (note) { note.hidden = false; setTimeout(() => { note.hidden = true; }, 2000); }
       } catch (e) { console.warn('password save failed:', e); if (window.toast) window.toast(window.L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2600); }
-      finally { btn.disabled = false; }
+      finally { btnBusy(btn, false); }
     });
   })();
   // パスワード更新
@@ -5611,14 +5740,14 @@
       const v1 = p1.value, v2 = p2.value;
       if (v1.length < 6) { toast(L('Password must be 6+ characters.', 'パスワードは6文字以上にしてください。'), false, 2400); p1.focus(); return; }
       if (v1 !== v2) { toast(L('Passwords do not match.', 'パスワードが一致しません。'), false, 2400); p2.focus(); return; }
-      btn.disabled = true;
+      btnBusy(btn, true, L('Updating…', '変更中…'));
       try {
         const { error } = await sb.auth.updateUser({ password: v1 });
         if (error) throw error;
         p1.value = ''; p2.value = '';
         const note = document.getElementById('setPassNote'); if (note) { note.hidden = false; setTimeout(() => note.hidden = true, 2000); }
       } catch (e) { toast(window.__authErrMsg ? window.__authErrMsg(e) : (L('Failed to update: ', 'パスワード更新に失敗: ') + e.message), false, 2800); }
-      finally { btn.disabled = false; }
+      finally { btnBusy(btn, false); }
     });
   })();
   // 表示言語を切り替えたら、ログイン中は user_metadata.lang も更新（メール言語をUIに追従）
@@ -5637,12 +5766,12 @@
       const word = L('DELETE', '削除');
       const r = await openConfirm({
         title: L('Delete your account?', 'アカウントを削除しますか？'),
-        message: L('Your account and all data (videos, workspaces, credits) will be permanently deleted. This cannot be undone.', 'アカウントと、あなたのすべてのデータ（動画・ワークスペース・クレジット）が完全に削除されます。元に戻せません。'),
+        message: L('Your account and all data (videos, workspaces, credits) will be permanently deleted.', 'アカウントと、あなたのすべてのデータ（動画・ワークスペース・クレジット）が完全に削除されます。'), irreversible: true,
         requireText: { label: L(`Type “${word}” to confirm`, `確認のため「${word}」と入力してください`), value: word, placeholder: word },
         actions: [{ id: 'ok', label: L('Delete account', 'アカウントを削除'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }],
       });
       if (r !== 'ok') return;
-      btn.disabled = true;
+      btnBusy(btn, true, L('Deleting…', '削除中…'));
       try {
         const { data, error } = await sb.functions.invoke('delete-account');
         if (error) throw error;
@@ -5652,7 +5781,7 @@
         try { localStorage.removeItem('spot-org'); } catch (_) {}
         try { await sb.auth.signOut(); } catch (_) {}
         setTimeout(() => location.reload(), 1200);
-      } catch (err) { console.warn('delete account failed:', err); btn.disabled = false; if (window.toast) window.toast(L("Couldn't delete the account. Please try again.", 'アカウントを削除できませんでした。もう一度お試しください。'), false, 3000); }
+      } catch (err) { console.warn('delete account failed:', err); btnBusy(btn, false); if (window.toast) window.toast(L("Couldn't delete the account. Please try again.", 'アカウントを削除できませんでした。もう一度お試しください。'), false, 3000); }
     });
   })();
   // 通知設定（端末ごとの表示設定・localStorage）
@@ -5866,7 +5995,7 @@
     if (save) save.addEventListener('click', async () => {
       if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can change billing.', '課金設定はオーナーのみ可能です。'), false, 2600); return; }
       if (!currentOrg) { toast(L('Workspace not ready.', 'ワークスペースが未準備です。'), false, 2600); return; }
-      save.disabled = true;
+      btnBusy(save, true, L('Saving…', '保存中…'));
       const row = {
         org_id: currentOrg.id,
         topup_enabled: document.getElementById('topupEnabled').checked,
@@ -5881,7 +6010,7 @@
         if (error) throw error;
         toast(L('Settings saved', '設定を保存しました'), true, 2000);
       } catch (e) { console.warn('save failed:', e); toast(L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2800); }
-      finally { save.disabled = false; }
+      finally { btnBusy(save, false); }
     });
   })();
   // Stripe Payment Link（コード不要）。client_reference_id に「組織id」を付け（課金は組織単位）、
@@ -6146,12 +6275,15 @@
     const n = _collections.length;
     if (!n) { if (b) b.remove(); return; }
     if (!b) { b = document.createElement('span'); b.className = 'sb-badge'; el.appendChild(b); }
-    b.textContent = n;
+    b.textContent = window.fmtCount ? window.fmtCount(n) : n;   // R4: 99+
   }
   window.__updateCollectionsBadge = updateCollectionsBadge;
   // 名前入力モーダル（作成/リネーム共用、prompt の置き換え）
   // 汎用の確認ダイアログ（ブラウザ標準 confirm の置換）。押されたアクションの id を resolve（scrim/Escは null）。
-  //   opts: { title, message?, actions?:[{id,label,variant:'primary'|'ghost'|'danger'}] }
+  //   opts: { title, message?, irreversible?:bool, requireText?, actions?:[{id,label,variant:'primary'|'ghost'|'danger'}] }
+  //   R5（LINE準拠）削除確認の3型: 高=このダイアログ＋irreversible:true（「元に戻せません」明記・Delete は --crit）
+  //                              中=このダイアログ（戻せる/影響が限定的）／ 低=確認なしで実行し toast（＋必要なら snackbar で「元に戻す」）
+  //   ボタン配置は「肯定=右・否定=左」（モバイルは縦積みで肯定が上）。
   function openConfirm(opts) {
     return new Promise(resolve => {
       const scrim = document.getElementById('confirmModal');
@@ -6162,12 +6294,19 @@
       titleEl.textContent = opts.title || '';
       msgEl.textContent = opts.message || ''; msgEl.hidden = !opts.message;
       { const old = document.getElementById('confirmInputWrap'); if (old) old.remove(); }   // 前回の入力欄を掃除
+      { const old = document.getElementById('confirmIrrev'); if (old) old.remove(); }
+      if (opts.irreversible) {
+        const n = document.createElement('p'); n.id = 'confirmIrrev'; n.className = 'modal-irrev';
+        n.innerHTML = '<svg class="ic"><use href="#i-alert"/></svg><span></span>';
+        n.lastChild.textContent = L('This cannot be undone.', 'この操作は元に戻せません。');
+        msgEl.after(n);
+      }
       const actions = opts.actions || [
         { id: 'ok', label: L('OK', 'OK'), variant: 'primary' },
         { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' },
       ];
       const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); pick(null); } };
-      const cleanup = () => { scrim.hidden = true; document.removeEventListener('keydown', onKey); scrim.onclick = null; const w = document.getElementById('confirmInputWrap'); if (w) w.remove(); };
+      const cleanup = () => { scrim.hidden = true; document.removeEventListener('keydown', onKey); scrim.onclick = null; const w = document.getElementById('confirmInputWrap'); if (w) w.remove(); const i = document.getElementById('confirmIrrev'); if (i) i.remove(); };
       const pick = (id) => { cleanup(); resolve(id); };
       // type-to-confirm（重要な削除向け）：requireText.value と一致するまで危険/主ボタンを無効化
       let inputEl = null;
@@ -6176,10 +6315,11 @@
         wrap.textContent = opts.requireText.label || '';
         inputEl = document.createElement('input'); inputEl.type = 'text'; inputEl.autocomplete = 'off'; inputEl.autocapitalize = 'off'; inputEl.spellcheck = false;
         inputEl.placeholder = opts.requireText.placeholder || '';
-        wrap.appendChild(inputEl); msgEl.after(wrap);
+        wrap.appendChild(inputEl); (document.getElementById('confirmIrrev') || msgEl).after(wrap);
       }
       actEl.innerHTML = '';
-      actions.forEach(a => {
+      // 否定（ghost）を左、肯定（primary/danger）を右に並べる
+      [...actions].sort((a, b) => (a.variant === 'ghost' ? 0 : 1) - (b.variant === 'ghost' ? 0 : 1)).forEach(a => {
         const b = document.createElement('button');
         b.className = 'btn ' + (a.variant === 'danger' ? 'btn-danger' : a.variant === 'ghost' ? 'btn-ghost' : 'btn-primary');
         if (opts.requireText && (a.variant === 'danger' || a.variant === 'primary')) b.disabled = true;
@@ -6372,7 +6512,7 @@
     if (del) { e.stopPropagation();
       if (!(window.__canWrite && window.__canWrite())) { if (window.toast) window.toast(L('View-only access.', '閲覧のみの権限です。'), false, 1800); return; }
       const id = del.getAttribute('data-del');
-      if (await openConfirm({ title: L('Delete this video?', 'この動画を削除しますか？'), message: L('This cannot be undone.', '元に戻せません。'),
+      if (await openConfirm({ title: L('Delete this video?', 'この動画を削除しますか？'), message: L('The video and its files will be removed from this workspace.', 'この動画とファイルがワークスペースから削除されます。'), irreversible: true,
         actions: [{ id: 'ok', label: L('Delete', '削除する'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }] }) !== 'ok') return;
       try {
         const { error } = await sb.from('projects').delete().eq('id', id); if (error) throw error;

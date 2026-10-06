@@ -131,6 +131,11 @@
 移行済み: `.member-row .badge`（枠線→variant）。
 未移行（幾何は近いが独自クラスのまま・positioning都合）: `.badge-cur` / `.col-badge` / `.pk-tag` / `.sb-badge` / `.proj-status` / `.filter[aria-pressed]`。→ 見た目はaccent系で概ね揃っているが、順次 `.badge--*` へ寄せる。
 
+**用途規約（LINE R4・2026-10-06）**
+- **数値バッジ** `.badge--num`（高さ 18 / `.lg` 20、等幅数字）。件数は必ず `fmtCount(n)` を通す＝**99 を超えたら `99+`**（`.sb-badge` 適用済み）。
+- **チップの3分類**: *Action*（押すと何かが起きる＝`.chip`「もっと明るく」等）／*Filter*（一覧の絞り込み＝`.filter[aria-pressed]`。選択中は塗り＋**✓ を前置**）／*Choice*（ウィザードの単一/複数選択＝`.opt[aria-pressed]`。選択マークは ✓、未選択に + は付けない）。
+- バッジは**状態を伝える読み取り専用**。押せるものはチップかボタンにする（バッジにクリックを持たせない）。
+
 ### 3.5 メーター ✅（P1-Aで統合）
 **単一コンポーネント** `.u-meter`（既定6px）＋ `.u-meter.sm`(5px) / `.u-meter.big`(10px)。塗り=`--accent`・形状=`--r-full`・地=`--surface-3` に統一。
 残量で色を変える場合は塗り `<i>` の `background` を呼び出し側で `--good/--warn/--crit` に上書き（請求ヒーローが実施）。ダッシュボード/サイドバー/請求で共用。
@@ -149,15 +154,42 @@
 - **`.field`**: **末尾アクション付き入力**（送信ボタン・パスワードの目トグル等）。`.fld` とは別用途の意図的パターン。
 > ✅ **入力の共有スタイルはトークン統一済み**（border=line-strong / radius=r-sm / bg=surface-2 / focus=accent-soft リング / 高さ=`--control-h`）。`.fld`=プレーン、`.field`=末尾アクション付き の2パターン。認証(`.auth-form .field`)のみ h48 の意図的な大サイズ（スコープ限定）。
 
+**検証・必須・カウンタの体系（LINE R1・2026-10-06）** — `.field` / `.fld` / `.own-script` 共通
+- **必須**: ラベル右に赤 `*`（`<span class="req" aria-hidden="true">*</span>`、`--crit`）。
+- **ライブ検証**: `fieldLive(input, {required, min, max, check, msg})`。**blur で判定・エラー中は input で即再判定**（直せば即消える）。送信前は `input._validate()` を呼び、false なら focus して中断。
+- **エラー表示**: 枠 `--crit` ＋ 薄い赤地（6%）＋ 直下に `.f-help.err`（⚠アイコン＋文）。`aria-invalid` 連動。エラー以外のヘルプは `.field-hint`（`--muted`）。
+- **プレースホルダ**: 専用色 `--faint`（本文には使わない色をここでだけ使う）。
+- **文字カウンタ**: `fieldCounter(input, max)` → 右下に `n/max`（`--faint`・等幅）。超過で `--crit` 太字＋エラー化。適用: 表示名60・ワークスペース名80・コレクション名60・請求先名120・持ち込み台本2000。
+- **値のフォントサイズ**: 16px 以上（`--t-body-lg`）を推奨（iOS の入力ズーム回避）。認証は適用済み、設定系は `--t-body-sm` のまま（PC 主体のため据え置き）。
+
 ### 3.8 フィードバック
 - **`.toast`**（`#toasts`、下中央、成功/失敗/スピナー）。`window.toast(msg, ok, ms)`。
 - **`.modal-scrim`/`.modal-card`**（コレクション作成/リネーム等）。
 - **`.move-menu`**（ポップオーバー：コレクション移動）。
 
+**規範（LINE R2/R3/R5・2026-10-06）**
+- **Toast** = 結果の通知専用。**アクションを持たない**／**自動消滅 3.2 秒（既定）・最長 4 秒**／**常に 1 つ**（新しいものが古いものを置き換える）／面は不透明（`--ink`）／下 24px。
+- **Snackbar** `window.snackbar(msg, {label, onAction, ms=8000})` = **行動が要る**フィードバック（元に戻す・再試行・開く）。アクションは **1 つ**、長め表示。toast と同じスロットを使い同時に 1 つ。
+- **ボタン Loading** `btnBusy(btn, true, '保存中…')` → 内部スピナー＋文言、`disabled`＋`aria-busy`。終了は `btnBusy(btn, false)`（元のラベルを復元）。**`disabled` は薄く（.5）、Loading は薄くしない**（処理中であって無効ではない）。生成・保存・購入・削除・招待など待ちのある主アクションは必ずこれを使う（`x.disabled = true` 直書き禁止）。
+- **削除確認の3型**（重要度別）:
+  | 重要度 | 例 | UI |
+  |---|---|---|
+  | 高 | ワークスペース・アカウント・動画の削除 | 中央ダイアログ `openConfirm({…, irreversible:true})` → **「この操作は元に戻せません。」を赤で明記**、Delete は `.btn-danger`（`--crit`）。アカウントは type-to-confirm 併用 |
+  | 中 | メンバー除外・コレクション削除（動画は残る） | 中央ダイアログ（irreversible なし）。影響範囲を本文に書く |
+  | 低 | 下書きの破棄・一覧からの非表示など取り消せる操作 | 確認なしで実行し toast。取り消しが要るなら snackbar の「元に戻す」 |
+  配置は **肯定＝右・否定＝左**（`openConfirm` が自動で並べ替え）。モバイル（≤480px）は幅 320・縦積みで肯定が上。
+
 ### 3.9 アイコン
 SVGスプライト（`<symbol id="i-*">`）を `<svg class="ic"><use href="#i-..."/>` で参照。`.ic`（18px, currentColor, stroke2）、`.ic.sm`(14) `.ic.lg`(22)。
 現有: `home menu panel back forward arrow-left arrow-right check alert plus edit download share send play eye eye-off camera film folder card user users settings logout chevron-down`。
 > 追加時はこのスプライトに追記（外部アイコンフォントは使わない）。
+
+**統治ルール（LINE R7・2026-10-06）**
+- **24px グリッド・外周 2px 余白**で描く（実寸 20px 内に収める）。`viewBox="0 0 24 24"`。
+- **ストローク 2（`.ic` 既定）で統一**。塗り（Solid）は再生ボタン等の状態表現に限定し、同じ意味のアイコンを Regular/Solid で混在させない。
+- **角は丸（`stroke-linecap/linejoin: round`）**、角度は 45° 単位。
+- **命名は名詞**（`i-camera`, `i-folder`）。動詞や状態（`i-delete`, `i-active`）は避け、状態は色・クラスで表す。
+- **意味のあるアイコンにはテキストラベルを必ず併置**（アイコン単体ボタンは `aria-label` 必須）。装飾アイコンは `aria-hidden="true"`。
 
 ---
 
@@ -207,6 +239,8 @@ SVGスプライト（`<symbol id="i-*">`）を `<svg class="ic"><use href="#i-..
 - ✅ **`prefers-reduced-motion: reduce`**: 全 `animation/transition` を無効化。ただし**読み込みスピナー（`.spin`/`.toast .tsp`）は回転を維持**（必須フィードバック）。
 - ✅ **コントラスト検証（2026-09-21）**: 暗い面（ground〜surface-3）上で `ink/muted/accent-ink/good/warn/crit` はすべて WCAG AA(4.5+)。**`--faint` のみ surface-2/3 で 4.2/3.8（本文AA未満）** → 三次・装飾テキスト専用とし、**本文には使わない**（本文は `--muted` 以上）。
 - ✅ **アクセント塗りの上の文字は `--on-accent`（白, 4.8 AA）のみ**。`accent-ink`/`muted`/意味色を `--accent` 塗りに載せない（2.6以下で不合格）。バッジは `--accent-soft`(暗) 地なので `accent-ink` でAA。
+- ✅ **コントラスト運用規約（LINE R6・2026-10-06）**: LINE は 18.5px 未満を small text と定義する。Spot の本文（`--t-body-sm`=14px・`--t-label`）は**すべて small → 4.5:1 必須**。3.0:1 で許されるのは 18.5px 以上の見出し・太字の大文字のみ。**`--faint` は本文・ラベル・ヘルプ文に使わない**（プレースホルダ・カウンタ・装飾の三次情報専用）。新しい色の組み合わせを足すときはこの表に AA 比を追記してから使う。
+- ✅ **状態は色だけで伝えない**: 選択チップは ✓ 前置、エラーは ⚠ アイコン＋文、Loading はスピナー＋文言（2026-10-06）。
 - ⏳ 今後: 色だけに依存しない状態表現の最終点検（メーター等はテキスト併記済み）。
 
 ---
@@ -283,7 +317,8 @@ E `--card`撤廃 ／ G mono 500統一 ／ I `.count`中立化＋`.ok`。
 | 中間 | `.btn-tonal` | 弱い塗りが欲しい時 |
 | アイコン | `.btn.icon-only`・`.icon-btn` | ツールバー |
 | テキスト | `.linkbtn` | 最も弱い操作 |
-> 白と青の主ボタンを**同一画面に併置しない**（主役は1つ）。
+> 白と青の主ボタンを**同一画面に併置しない**（主役は1つ）。LINE の「1 画面に緑（肯定）は 1 つ・赤（破壊）は 1 つ」と同じ規約。
+> **配置**: 横並びは **主を右**、縦積み（モバイル）は **主を上**。`disabled` は薄く表示するだけで文言は変えない。処理中は `btnBusy()`（§3.8）。
 
 ### 色の上の文字色規約（F）
 - **面soft ＋ 同系ink 文字**（例: `--accent-soft` 地に `--accent-ink`）… バッジ・容器・淡い強調。
