@@ -538,7 +538,9 @@ def send_email(to: str, subject: str, html: str, text: str) -> bool:
     body = {"from": os.environ.get("RESEND_FROM", "Spot <no-reply@creativepunx.com>"),
             "to": [to], "subject": subject, "html": html, "text": text}
     req = urllib.request.Request("https://api.resend.com/emails", data=json.dumps(body).encode(),
-                                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"}, method="POST")
+                                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
+                                          "User-Agent": "SpotWorker/1.0 (+completion email)"},   # Python 既定 UA は Cloudflare に 403 (1010) で弾かれる
+                                 method="POST")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             r.read()
