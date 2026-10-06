@@ -4161,7 +4161,9 @@
       if (sb && pid) {
         const { data: rends } = await sb.from('renders').select('variant,format,storage_path').eq('project_id', pid).not('storage_path', 'is', null);
         if (rends && rends.length && window.__currentProjectId === pid) {
-          const map = {}; rends.forEach(r => { map[`${r.variant}/${r.format}`] = r.storage_path; });
+          // renders.format はワーカーが配信先名（youtube / reels_shorts / timeline）で書く。書き出しカードは形式キー（wide / vertical / square）
+          const FMT_ALIAS = { youtube: 'wide', site: 'wide', wide: 'wide', reels_shorts: 'vertical', reels: 'vertical', shorts: 'vertical', tiktok: 'vertical', vertical: 'vertical', timeline: 'square', feed: 'square', square: 'square' };
+          const map = {}; rends.forEach(r => { map[`${r.variant}/${FMT_ALIAS[r.format] || r.format}`] = r.storage_path; });
           document.querySelectorAll('#delivList .dl').forEach(btn => {
             const path = map[`${btn.dataset.variant}/${btn.dataset.format}`];
             if (path) { btn.dataset.path = path; btn.closest('.dfile').classList.add('is-real'); realCount++; }
