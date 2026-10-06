@@ -139,7 +139,8 @@
 - ✅ **F3 ブランド単位の招待・席**（§12）: `024_brand_members.sql`。席は従来どおり **アカウント全体のユニーク人数**（org_members の owner/member）。`brand_members` でメンバーごとの「見える/作れるブランド」を限定（行が無ければ全ブランド、オーナーは常に全部）。招待は `create_invite(..., p_brand_ids)` で範囲付き、`accept_invite` が範囲を書き込み、`set_member_brands` で後から変更、`remove_member` が範囲を掃除。RLS は brands/projects/collections/generations/renders/jobs に `brand_visible()`/`project_visible()` を追加（緩める変更なし）。ローカル PG14 で実証（範囲付き招待→受諾→可視範囲・他ブランドへの作成拒否・範囲変更・解除・オーナー限定）。
   アプリ: チーム画面で招待時にブランドを選択（未選択＝全ブランド）、メンバー行に範囲チップ＋オーナーの「変更」（チェックボックスのモーダル）、参加確認にブランド名表示。
 - ⏳ **DB 適用待ち: 024**（023 の後）。
-- ⏳ **F4 用語の「ブランド」一括化／ブランドメモリ Phase 2（worker）** は未着手。
+- ✅ **F4 用語統一**（2026-10-06）: org＝「アカウント」、brands＝「ブランド」、制作中の動画画面＝「制作画面」、サインイン ID の切替＝「サインインを切り替える」、旧「アカウント設定」＝「ログインとセキュリティ」。EN も Account / Brand / Editor / Sign-in に統一（design-system.md §7b）。
+- ⏳ **ブランドメモリ Phase 2（worker 参照注入）** は動画生成の再開後に。
 
 ## 13. 実装フェーズ（改訂）
 1. **F0 データモデル移行**：`collections.brand_id` 追加＋org直下データを既定ブランドへ割当／`plans.collections` 追加＋値投入／brands 複数対応／§11の既存org束ね（空振り可）。

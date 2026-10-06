@@ -1213,7 +1213,7 @@
   .rx-h .rx-mark::after { content: ""; position: absolute; top: 0; left: 0; width: 42%; height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); animation: ai-sheen 3.6s var(--ease-standard) infinite; }
   @media (prefers-reduced-motion: reduce) { .ai-spark .ic { animation: none; } .rx-h .rx-mark::after { display: none; } }
-  /* ワークスペース右パネルの折りたたみ（一点集中・情報密度を下げる／Canva風の“必要な時だけ開く”） */
+  /* アカウント右パネルの折りたたみ（一点集中・情報密度を下げる／Canva風の“必要な時だけ開く”） */
   .side .panel.is-acc > .panel-h { cursor: pointer; user-select: none; }
   .side .panel.is-acc > .panel-h:hover { color: var(--ink); }
   .side .panel.is-acc > .panel-h .acc-chev { margin-left: 8px; flex: none; color: var(--faint); transition: transform var(--dur-fast) var(--ease-standard); }
@@ -1517,14 +1517,14 @@
   .ws-item .ws-check { color: var(--accent); opacity: 0; flex: none; }
   .ws-item[aria-selected="true"] .ws-check { opacity: 1; }
   .ws-item[aria-selected="true"] .ws-name { font-weight: 600; }
-  /* ワークスペース行：名前＋プランバッジ / 役割 の2段 */
+  /* アカウント行：名前＋プランバッジ / 役割 の2段 */
   .ws-item .ws-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
   .ws-item .ws-line1 { display: flex; align-items: center; gap: 6px; min-width: 0; }
   .ws-item .ws-line1 .ws-name { flex: 0 1 auto; }
   .ws-item .ws-role { flex: none; font-size: var(--t-label-sm); color: var(--muted); }
   .plan-badge.sm { font-size: 9px; letter-spacing: .04em; padding: 0 6px; line-height: 1.7; flex: none; }
   /* --- サイドバー刷新 --- */
-  /* (1) 上部＝現在のワークスペースを読み取り専用で表示（ラベルは明瞭に） */
+  /* (1) 上部＝現在のアカウントを読み取り専用で表示（ラベルは明瞭に） */
   .sb-wsnow { display: flex; align-items: center; gap: 9px; padding: 9px 10px; border: 1px solid var(--line); background: var(--surface-2); border-radius: var(--r-sm); }
   .sb-wsnow .ws-name { flex: 1; font-size: var(--t-body-sm); font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .sb-wsnow .ws-role-pill { color: var(--accent-ink); border-color: color-mix(in srgb, var(--accent-ink) 38%, transparent); background: var(--accent-soft); font-weight: 700; }
@@ -1836,7 +1836,7 @@
     <button type="button" class="sb-item" data-act="credits" data-owner-only title="クレジットを追加"><svg class="ic"><use href="#i-plus"/></svg><span>クレジットを追加</span></button>
   </nav>
   <div class="sb-foot">
-    <button type="button" class="sb-acct" id="sbAcctBtn" aria-haspopup="menu" aria-expanded="false" title="アカウント・ワークスペース">
+    <button type="button" class="sb-acct" id="sbAcctBtn" aria-haspopup="menu" aria-expanded="false" title="アカウント">
       <span class="avatar has-dot" id="acctAvatar" aria-hidden="true"><span class="sk" style="display:block;width:100%;height:100%;border-radius:50%"></span></span>
       <div class="acct-id">
         <div class="acct-top"><span class="acct-name" id="acctName"><span class="sk" style="display:inline-block;width:84px;height:12px;border-radius:5px;vertical-align:-1px"></span></span><span class="plan-badge" id="acctPlan">Free</span></div>
@@ -1847,9 +1847,9 @@
   </div>
 </aside>
 
-<!-- アカウント/ワークスペース メニュー（下部プロフィールから開く） -->
+<!-- アカウント/アカウント メニュー（下部プロフィールから開く） -->
 <div class="scrim" id="acctScrim" hidden></div>
-<div class="menu" id="acctMenu" role="menu" aria-label="アカウント・ワークスペース" hidden>
+<div class="menu" id="acctMenu" role="menu" aria-label="アカウント" hidden>
   <button type="button" class="menu-head menu-head-btn" data-act="switch-account" aria-haspopup="menu" aria-expanded="false">
     <span class="avatar has-dot" id="amAvatar" aria-hidden="true"><span class="sk" style="display:block;width:100%;height:100%;border-radius:50%"></span></span>
     <div class="acct-id">
@@ -1863,22 +1863,22 @@
   <div id="amBrands"></div>
   <button type="button" class="menu-item" data-act="add-brand" id="amAddBrand" hidden><svg class="ic"><use href="#i-plus"/></svg><span>ブランドを追加する</span></button>
   <div class="menu-sep" id="amBrandsSep" hidden></div>
-  <div class="menu-label">ワークスペース</div>
+  <div class="menu-label">アカウント</div>
   <div id="amWorkspaces"></div>
   <div class="menu-sep"></div>
   <button type="button" class="menu-item" data-act="settings"><svg class="ic"><use href="#i-user"/></svg><span>プロフィール設定</span></button>
-  <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウント設定</span></button>
+  <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>ログインとセキュリティ</span></button>
   <button type="button" class="menu-item" data-act="help"><svg class="ic"><use href="#i-alert"/></svg><span>ヘルプ＆フィードバック</span></button>
   <div class="menu-sep"></div>
   <button type="button" class="menu-item" data-act="logout"><svg class="ic"><use href="#i-logout"/></svg><span>サインアウト</span></button>
 </div>
 
 <!-- アカウント切替サブメニュー（ヘッダの › から開く） -->
-<div class="menu" id="acctSwitch" role="menu" aria-label="アカウントを切り替える" hidden>
-  <div class="menu-label">アカウントを切り替える</div>
+<div class="menu" id="acctSwitch" role="menu" aria-label="サインインを切り替える" hidden>
+  <div class="menu-label">サインインを切り替える</div>
   <div id="asList"></div>
   <div class="menu-sep"></div>
-  <button type="button" class="menu-item" data-act="login-other"><svg class="ic"><use href="#i-plus"/></svg><span>別のアカウントでサインイン</span></button>
+  <button type="button" class="menu-item" data-act="login-other"><svg class="ic"><use href="#i-plus"/></svg><span>別のメールでサインイン</span></button>
   <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウントを管理する</span></button>
 </div>
 
@@ -2289,7 +2289,7 @@
       <div class="exp-actions">
         <button class="btn btn-primary" id="dlAll"><svg class="ic"><use href="#i-download"/></svg><span>すべてダウンロード（ZIP）</span></button>
         <button class="btn btn-ghost" id="shareLink"><svg class="ic"><use href="#i-share"/></svg><span>共有リンクを作成</span></button>
-        <button class="btn btn-ghost" id="backToWork"><span>ワークスペースに戻る</span></button>
+        <button class="btn btn-ghost" id="backToWork"><span>制作画面に戻る</span></button>
       </div>
       <div class="panel pad">
         <div class="panel-h">サムネイル（静止画）</div>
@@ -2304,7 +2304,7 @@
 <main class="wrap" id="view-workspace" hidden>
   <section class="context">
     <div>
-      <h1 class="title-h1" id="wsTitle">工事台帳CM ・ 制作ワークスペース</h1>
+      <h1 class="title-h1" id="wsTitle">工事台帳CM ・ 制作画面</h1>
       <div class="title-sub" id="wsSub">このページで進捗と仕上がりを確認できます。</div>
     </div>
     <div class="meta-row">
@@ -2487,10 +2487,10 @@
     </div>
   </div>
 
-  <!-- ワークスペースのプロフィール（案X：個人/組織を問わず全WSで表示） -->
+  <!-- アカウントのプロフィール（案X：個人/組織を問わず全WSで表示） -->
   <div class="panel pad" id="companyPanel" hidden>
-    <div class="panel-h">ワークスペースのプロフィール</div>
-    <p class="muted" style="margin:0 0 16px;font-size:var(--t-label)">ロゴとワークスペース名は、動画のプレビューや納品物・請求に使われます。</p>
+    <div class="panel-h">アカウントのプロフィール</div>
+    <p class="muted" style="margin:0 0 16px;font-size:var(--t-label)">ロゴは現在のブランドの動画・納品物に、アカウント名は請求に使われます。</p>
     <div class="company-row">
       <div class="company-logo" id="companyLogo"><svg class="ic"><use href="#i-users"/></svg></div>
       <div class="company-logo-side">
@@ -2499,7 +2499,7 @@
         <input type="file" id="companyLogoInput" accept="image/svg+xml,image/png,image/jpeg" hidden>
       </div>
     </div>
-    <div class="fld" style="margin-top:16px"><label for="companyName">ワークスペース名<span class="req" aria-hidden="true">*</span></label>
+    <div class="fld" style="margin-top:16px"><label for="companyName">アカウント名<span class="req" aria-hidden="true">*</span></label>
       <input id="companyName" type="text" maxlength="80" placeholder="株式会社スポット / ブランド名" autocomplete="organization"></div>
 
     <!-- ブランドの傾向（ブランドメモリ：このブランドが積み重ねてきた選択の要約） -->
@@ -2533,9 +2533,9 @@
     <div class="cta-row"><button class="btn btn-primary wauto" id="companySave" data-write-only><span>保存する</span></button>
       <span class="save-note" id="companySaveNote" hidden>保存しました</span></div>
     <div class="danger-zone" id="orgDangerZone" hidden>
-      <div class="dz-h">ワークスペースの削除</div>
-      <p class="muted" style="margin:0 0 12px;font-size:var(--t-label)">このワークスペースと、含まれるすべての動画・メンバーを削除します。元に戻せません。オーナーのみ実行できます。</p>
-      <button class="btn btn-danger wauto" id="orgDeleteBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg><span>このワークスペースを削除</span></button>
+      <div class="dz-h">アカウントの削除</div>
+      <p class="muted" style="margin:0 0 12px;font-size:var(--t-label)">このアカウントと、含まれるすべての動画・メンバーを削除します。元に戻せません。オーナーのみ実行できます。</p>
+      <button class="btn btn-danger wauto" id="orgDeleteBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg><span>このアカウントを削除</span></button>
     </div>
   </div>
 
@@ -2546,7 +2546,7 @@
 <!-- ============================ ACCOUNT SETTINGS VIEW ============================ -->
 <main class="wrap" id="view-account" hidden>
   <section class="context"><div>
-    <h1 class="title-h1">アカウント設定</h1>
+    <h1 class="title-h1">ログインとセキュリティ</h1>
     <div class="title-sub">パスワード・通知・表示言語。</div>
   </div></section>
   <div class="settings-grid">
@@ -2581,7 +2581,7 @@
     </div>
     <div class="panel pad">
       <div class="panel-h">アカウントの削除</div>
-      <p class="muted" style="margin:0 0 12px;font-size:var(--t-label)">アカウントと、あなたのすべてのデータ（動画・ワークスペース・クレジット）を完全に削除します。元に戻せません。</p>
+      <p class="muted" style="margin:0 0 12px;font-size:var(--t-label)">アカウントと、あなたのすべてのデータ（動画・ブランド・クレジット）を完全に削除します。元に戻せません。</p>
       <button class="btn btn-danger wauto" id="accountDeleteBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg><span>アカウントを削除</span></button>
     </div>
   </div>
@@ -2592,7 +2592,7 @@
 <main class="wrap" id="view-team" hidden>
   <section class="context"><div>
     <h1 class="title-h1">チーム・メンバー</h1>
-    <div class="title-sub">メンバーを招待して、同じワークスペースで制作します。</div>
+    <div class="title-sub">メンバーを招待して、同じアカウントで制作します。</div>
   </div></section>
   <div class="panel pad" id="teamPanel">
     <p class="muted" id="teamSeats" style="margin:0 0 12px"></p>
@@ -3211,10 +3211,10 @@
     input.addEventListener('input', upd); upd();
   }
   window.fieldLive = fieldLive; window.fieldCounter = fieldCounter; window.fieldSetError = fieldSetError;
-  // 適用: 設定系フォーム（必須＝表示名・ワークスペース名）と上限のある入力、台本欄
+  // 適用: 設定系フォーム（必須＝表示名・アカウント名）と上限のある入力、台本欄
   fieldLive(document.getElementById('setName'), { required: true, msg: () => (window.L ? window.L('Please enter your display name.', '表示名を入力してください。') : '表示名を入力してください。') });
   fieldCounter(document.getElementById('setName'), 60);
-  fieldLive(document.getElementById('companyName'), { required: true, msg: () => (window.L ? window.L('Please enter a workspace name.', 'ワークスペース名を入力してください。') : 'ワークスペース名を入力してください。') });
+  fieldLive(document.getElementById('companyName'), { required: true, msg: () => (window.L ? window.L('Please enter an account name.', 'アカウント名を入力してください。') : 'アカウント名を入力してください。') });
   fieldCounter(document.getElementById('companyName'), 80);
   fieldCounter(document.getElementById('nameModalInput'), 60);
   fieldCounter(document.getElementById('billLegalName'), 120);
@@ -3283,7 +3283,7 @@
     const cur = window.__getOrg && window.__getOrg();
     const roleL = { owner: L('Owner', 'オーナー'), member: L('Member', 'メンバー'), viewer: L('View-only', '閲覧のみ') };
     const nameOf = o => o.name || L('Personal', '個人');   // 案X: どのWSも実名(＝ブランド名)を表示。未設定時のみ「個人」
-    // (1) 上部：現在のワークスペースを読み取り専用で表示（切替はしない）
+    // (1) 上部：現在のアカウントを読み取り専用で表示（切替はしない）
     if (now) {
       if (!cur) { now.hidden = true; now.innerHTML = ''; }
       else {
@@ -3309,7 +3309,7 @@
           <span class="ws-body"><span class="ws-line1"><span class="ws-name">${escHtml(b.name)}</span>${b.frozen ? `<span class="ws-frozen">${L('Read-only', '読み取り専用')}</span>` : ''}</span></span>
           <span class="ws-check" aria-hidden="true">✓</span></button>`).join('') : '';
     }
-    // (3) 下部メニュー：ワークスペース切替リスト（名前＋プランバッジ / 役割 の2段・参考デザイン）
+    // (3) 下部メニュー：アカウント切替リスト（名前＋プランバッジ / 役割 の2段・参考デザイン）
     const planL = { free: 'FREE', starter: 'STARTER', team: 'TEAM', business: 'BUSINESS', enterprise: 'ENTERPRISE' };
     if (amBox) {
       if (!orgs.length || !cur) { amBox.innerHTML = ''; }
@@ -3366,7 +3366,7 @@
     applyCollapseLabel();
   });
   if (sbScrim) sbScrim.addEventListener('click', closeDrawer);
-  // --- 下部プロフィールから開く「アカウント・ワークスペース」メニュー ---
+  // --- 下部プロフィールから開く「アカウント」メニュー ---
   const acctMenu = document.getElementById('acctMenu');
   const acctScrim = document.getElementById('acctScrim');
   const sbAcctBtn = document.getElementById('sbAcctBtn');
@@ -3468,7 +3468,7 @@
     if (ws) {
       const id = ws.getAttribute('data-org'); const cur = window.__getOrg && window.__getOrg();
       closeAcctMenu(); closeDrawer();
-      if (cur && cur.id === id) return;   // 現在のワークスペースは何もしない
+      if (cur && cur.id === id) return;   // 現在のアカウントは何もしない
       if (window.__switchOrg) window.__switchOrg(id);
       return;
     }
@@ -3846,7 +3846,7 @@
     });
     renderRx(); validateStep();
   }
-  // ブランドメモリ（Phase 1）：このワークスペース＝ブランドの過去の選択を初期値に反映＝“いつもの設定”。
+  // ブランドメモリ（Phase 1）：このアカウント＝ブランドの過去の選択を初期値に反映＝“いつもの設定”。
   //   履歴が乏しい/未サインインの間は demo 既定のまま。適用できたら注記を出す。
   async function applyBrandDefaults() {
     try {
@@ -3956,7 +3956,7 @@
     showStep(val ? 1 : 0);   // 配信先が決まっていれば業種へ、無指定なら最初から
   };
 
-  // ワークスペース右パネルを折りたたみ化（既定は「声」だけ開き、調整・品質チェックは畳む＝一点集中）
+  // アカウント右パネルを折りたたみ化（既定は「声」だけ開き、調整・品質チェックは畳む＝一点集中）
   (function accordionizeSidePanels() {
     document.querySelectorAll('#voicePanel, #adjustPanel, #qcPanel').forEach(p => {
       const h = p.querySelector('.panel-h'); if (!h) return;
@@ -4098,7 +4098,7 @@
 
   // ---------- dashboard ----------
   const projGrid = document.getElementById('projGrid');
-  // 実データはデータ層 loadProjects() が現在のワークスペース(組織)で描画する。
+  // 実データはデータ層 loadProjects() が現在のアカウント(組織)で描画する。
   // ここでは静的デモを出さない（以前は固定6件を即描画し、ロード中に「生成中 4/8」等の
   // 身に覚えのないカードが見えていた）。データ到着までスケルトンのみ。
   projGrid.innerHTML = Array.from({ length: 4 }, () =>
@@ -4219,12 +4219,12 @@
   }
   function gotoWorkspace() {
     hideAll(); vWork.hidden = false; focusView(vWork); _nav(true, null);
-    setCrumb([['ホーム', gotoDash], [window.__currentProjectName || 'プロジェクト', null], ['ワークスペース']], gotoDash);
+    setCrumb([['ホーム', gotoDash], [window.__currentProjectName || 'プロジェクト', null], ['制作画面']], gotoDash);
   }
-  // 対象プロジェクト名でワークスペースを開く（データ層 openWorkspace から呼ぶ）。
+  // 対象プロジェクト名でアカウントを開く（データ層 openWorkspace から呼ぶ）。
   window.gotoWorkspaceFor = function (name) {
     hideAll(); vWork.hidden = false; focusView(vWork); _nav(true, null);
-    setCrumb([['ホーム', gotoDash], [name || 'プロジェクト', null], ['ワークスペース']], gotoDash);
+    setCrumb([['ホーム', gotoDash], [name || 'プロジェクト', null], ['制作画面']], gotoDash);
   };
   function gotoWizard() {
     hideAll(); vWiz.hidden = false; focusView(vWiz); _nav(true, 'new');
@@ -4250,13 +4250,13 @@
   }
   function gotoAccount() {
     hideAll(); vAccount.hidden = false; focusView(vAccount); _nav(false, null);
-    setCrumb([['ホーム', gotoDash], ['アカウント設定']], gotoDash);
+    setCrumb([['ホーム', gotoDash], ['ログインとセキュリティ']], gotoDash);
     if (window.loadAccount) window.loadAccount();
   }
   window.gotoAccount = gotoAccount;
   function gotoBilling() {
     if (window.__isOwner && !window.__isOwner()) {   // 請求はオーナー限定
-      toast(L('Only the workspace owner can view billing.', '請求情報はワークスペースのオーナーのみ閲覧できます。'), false, 2600);
+      toast(L('Only the account owner can view billing.', '請求情報はアカウントのオーナーのみ閲覧できます。'), false, 2600);
       return;
     }
     hideAll(); vBilling.hidden = false; focusView(vBilling); _nav(false, 'billing');
@@ -4265,7 +4265,7 @@
   }
   function gotoCredits() {
     if (window.__isOwner && !window.__isOwner()) {   // 課金導線はオーナー限定
-      toast(L('Only the workspace owner can add credits.', 'クレジットの追加はワークスペースのオーナーのみ可能です。'), false, 2600);
+      toast(L('Only the account owner can add credits.', 'クレジットの追加はアカウントのオーナーのみ可能です。'), false, 2600);
       return;
     }
     hideAll(); vCredits.hidden = false; focusView(vCredits); _nav(false, 'credits');
@@ -4398,13 +4398,13 @@
     'アカウントメニュー': 'Account menu', 'プロフィール・設定': 'Profile & settings', 'プランと請求': 'Plan & billing',
     'クレジットを追加': 'Add credits',
     // サイドバー刷新
-    'メニュー': 'Menu', '管理': 'Manage', 'ワークスペース': 'Workspace', 'ワークスペースを追加する': 'Add a workspace',
-    'アカウント・ワークスペース': 'Account & workspace',
-    'ワークスペースのプロフィール': 'Workspace profile', 'ワークスペース名': 'Workspace name', '保存する': 'Save',
+    'メニュー': 'Menu', '管理': 'Manage', 'アカウント': 'Account', 'アカウントを追加する': 'Add an account',
+    'アカウント': 'Account',
+    'アカウントのプロフィール': 'Account profile', 'アカウント名': 'Account name', '保存する': 'Save',
     'このブランドのいつもの設定を反映しました。変更できます。': 'Prefilled with this brand’s usual settings — you can change them.',
-    'ロゴとワークスペース名は、動画のプレビューや納品物・請求に使われます。': 'Your logo and workspace name appear in previews, deliverables and invoices.',
-    'ヘルプ＆フィードバック': 'Help & feedback', 'アカウントを切り替える': 'Switch account',
-    '別のアカウントでサインイン': 'Sign in with another account', 'アカウントを管理する': 'Manage account',
+    'ロゴは現在のブランドの動画・納品物に、アカウント名は請求に使われます。': 'The logo is used for the current brand’s videos and deliverables; the account name appears on invoices.',
+    'ヘルプ＆フィードバック': 'Help & feedback', 'サインインを切り替える': 'Switch sign-in',
+    '別のメールでサインイン': 'Sign in with another email', 'アカウントを管理する': 'Manage account',
     'ヘルプ＆フィードバックは準備中です。': 'Help & feedback is coming soon.',
     '制作をはじめる': 'Start creating', '台本・絵コンテ': 'Script & storyboard',
     '書き出し': 'Export', 'ミライ工事写真': 'Mirai Koji', '30秒CM': '30-sec ad',
@@ -4599,8 +4599,8 @@
     'プロフィール': 'Profile', '表示名': 'Display name', 'メールアドレス': 'Email',
     '保存': 'Save', '保存しました': 'Saved', 'プロフィールを保存': 'Save profile', 'プラン': 'Plan', 'プランと請求を見る': 'View plan & billing',
     '表示言語': 'Language', '左のサイドバー下部の': 'Use the', 'で切り替えられます。': 'toggle in the sidebar to switch.',
-    // プロフィール設定 / アカウント設定（分割）
-    'プロフィール設定': 'Profile settings', 'アカウント設定': 'Account settings',
+    // プロフィール設定 / ログインとセキュリティ（分割）
+    'プロフィール設定': 'Profile settings', 'ログインとセキュリティ': 'Sign-in & security',
     'あなたのアイコン・表示名・メールアドレス。': 'Your icon, display name and email.',
     'パスワード・通知・表示言語。': 'Password, notifications and language.',
     'アイコンをアップロード': 'Upload icon', 'PNG / JPG / WebP（正方形を推奨・2MBまで）': 'PNG / JPG / WebP (square recommended, up to 2MB)',
@@ -4657,12 +4657,12 @@
     'クレジット利用明細': 'Credit activity',
     '当日': 'Same day', '修正は分単位': 'revisions in minutes',
     'すべてダウンロード（ZIP）': 'Download all (ZIP)', '共有リンクを作成': 'Create share link',
-    'ワークスペースに戻る': 'Back to workspace', 'サムネイル（静止画）': 'Thumbnails (stills)',
+    '制作画面に戻る': 'Back to the editor', 'サムネイル（静止画）': 'Thumbnails (stills)',
     '各パターンのカバー画像も同梱。YouTube等のサムネイルにそのまま使えます。':
       'A cover image for each variant is included — ready to use as a YouTube thumbnail.',
     'パターン': 'Variant',
     // --- workspace view ---
-    '工事台帳CM ・ 制作ワークスペース': 'Site-ledger ad · Production workspace',
+    '工事台帳CM ・ 制作画面': 'Site-ledger ad · Production view',
     'サンプル案件を読み込み中 — 実データの代わりにミライ工事の制作データを表示しています':
       'Loading a sample project — showing Mirai Koji’s production data in place of your own.',
     '建設SaaS': 'Construction SaaS', 'YouTube・リール': 'YouTube · Reels', '長さ': 'Length',
@@ -4709,6 +4709,7 @@
     // dates
     '今日': 'Today', '2分前': '2 min ago', '1時間前': '1 hr ago',
     '昨日': 'Yesterday', '3日前': '3 days ago', '先週': 'Last week',
+    '制作画面': 'Editor', '制作画面に戻る': 'Back to the editor',
     // --- brand access scope (team) ---
     'アクセスできるブランド': 'Brand access', '（未選択＝すべてのブランド）': '(none selected = all brands)',
     'チェックしたブランドだけを表示・制作できます。すべて外すと、アカウント内の全ブランドにアクセスできます。席は変わりません。':
@@ -5571,7 +5572,7 @@
   };
   window.__switchOrg = async function (id) {
     try { localStorage.setItem('spot-org', id); } catch (_) {}
-    if (window.__resetGridCache) window.__resetGridCache();   // 別ワークスペース＝別データ。前回の内容を残さずスケルトンから読み直す
+    if (window.__resetGridCache) window.__resetGridCache();   // 別アカウント＝別データ。前回の内容を残さずスケルトンから読み直す
     await loadOrg(); await loadBrands(); applyRoleUI();
     loadProjects(); refreshCredits(); refreshUsage();
     if (window.__renderWorkspaces) window.__renderWorkspaces();
@@ -5586,7 +5587,7 @@
     let banner = document.getElementById('roBanner');
     if (ro) {
       if (!banner) { banner = document.createElement('div'); banner.id = 'roBanner'; banner.className = 'ro-banner'; document.body.insertBefore(banner, document.body.firstChild); }
-      banner.textContent = (window.L ? window.L('View-only access — you can browse this workspace but not create or edit.', '閲覧のみの権限です。閲覧はできますが、作成・編集はできません。') : '閲覧のみ');
+      banner.textContent = (window.L ? window.L('View-only access — you can browse this account but not create or edit.', '閲覧のみの権限です。閲覧はできますが、作成・編集はできません。') : '閲覧のみ');
       banner.hidden = false;
     } else if (banner) { banner.hidden = true; }
     if (window.__refreshSidebar) window.__refreshSidebar();   // サイドバーの役割ガードを更新
@@ -5741,7 +5742,7 @@
       if (c == null) return;
       const b = document.querySelector('.credits b');
       if (b) b.textContent = c;
-      const bal = document.getElementById('wsBal'); if (bal) bal.textContent = c;   // ワークスペースのクレジット残
+      const bal = document.getElementById('wsBal'); if (bal) bal.textContent = c;   // アカウントのクレジット残
       const plan = document.getElementById('wsPlan'); if (plan) plan.textContent = PLAN_CREDITS;
       if (window.onAccountInfo) window.onAccountInfo({ credits: c });
     } catch (_) { /* noop */ }
@@ -5768,7 +5769,7 @@
       const cards = document.querySelectorAll('#view-dash .usage .u-card');
       const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
       let cq = sb.from('projects').select('id', { count: 'exact', head: true }).gte('created_at', monthStart.toISOString());
-      if (currentOrg && currentOrg.id) cq = cq.eq('org_id', currentOrg.id);   // 現在のワークスペースの本数だけ数える（ゲージの分子）
+      if (currentOrg && currentOrg.id) cq = cq.eq('org_id', currentOrg.id);   // 現在のアカウントの本数だけ数える（ゲージの分子）
       const { count } = await cq;
       if (cards[0]) setLeadNumber(cards[0].querySelector('.u-v'), String(count ?? 0));
       // 先月比 ＋ 制作会社換算（1本=30万円の目安）を実データで
@@ -5927,7 +5928,7 @@
     const org = currentOrg;
     const isOwner = window.__isOwner ? window.__isOwner() : true;
     if (!org) { panel.hidden = true; if (up) up.hidden = true; return; }
-    // 案X（workspace=brand）：個人/組織を問わず、どのワークスペースもプロフィール（名前+ロゴ）を持つ。昇格パネルは廃止。
+    // 案X（workspace=brand）：個人/組織を問わず、どのアカウントもプロフィール（名前+ロゴ）を持つ。昇格パネルは廃止。
     if (up) up.hidden = true;
     panel.hidden = false;
     // 削除はオーナーのみ／基点(個人)WSは不可／最後の1つは不可（常に1つは残す）
@@ -6045,26 +6046,26 @@
     const logoBtn = document.getElementById('companyLogoBtn');
     const logoInput = document.getElementById('companyLogoInput');
     const note = document.getElementById('companySaveNote');
-    // ワークスペース（組織）の削除 — オーナーのみ・個人不可・強い確認
+    // アカウント（組織）の削除 — オーナーのみ・個人不可・強い確認
     { const delBtn = document.getElementById('orgDeleteBtn');
       if (delBtn) delBtn.addEventListener('click', async () => {
         if (!currentOrg || currentOrg.is_personal) return;
         if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can do this.', 'この操作はオーナーのみ可能です。'), false, 2400); return; }
-        const nm = currentOrg.name || 'このワークスペース';
-        const r = await openConfirm({ title: L('Delete this workspace?', 'このワークスペースを削除しますか？'),
+        const nm = currentOrg.name || 'このアカウント';
+        const r = await openConfirm({ title: L('Delete this account?', 'このアカウントを削除しますか？'),
           message: L(`“${nm}” and all its videos and members will be permanently deleted.`, `「${nm}」と、含まれるすべての動画・メンバーが完全に削除されます。`), irreversible: true,
-          actions: [{ id: 'ok', label: L('Delete workspace', 'ワークスペースを削除'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }] });
+          actions: [{ id: 'ok', label: L('Delete account', 'アカウントを削除'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }] });
         if (r !== 'ok') return;
         btnBusy(delBtn, true, L('Deleting…', '削除中…'));
         try {
           const { error } = await sb.rpc('delete_organization', { p_org: currentOrg.id }); if (error) throw error;
           try { localStorage.removeItem('spot-org'); } catch (_) {}
-          if (window.toast) window.toast(L('Workspace deleted', 'ワークスペースを削除しました'), true, 1600);
-          setTimeout(() => location.reload(), 800);   // 個人ワークスペースへクリーンに復帰
+          if (window.toast) window.toast(L('Account deleted', 'アカウントを削除しました'), true, 1600);
+          setTimeout(() => location.reload(), 800);   // 個人アカウントへクリーンに復帰
         } catch (err) { console.warn('delete org failed:', err); btnBusy(delBtn, false);
           const last = /keep at least one workspace|personal workspace cannot/i.test(String(err && err.message));
-          if (window.toast) window.toast(last ? L('You must keep at least one workspace.', '少なくとも1つのワークスペースは必要です。')
-            : L("Couldn't delete the workspace. Please try again.", 'ワークスペースを削除できませんでした。もう一度お試しください。'), false, 2800); }
+          if (window.toast) window.toast(last ? L('You must keep at least one account.', '少なくとも1つのアカウントは必要です。')
+            : L("Couldn't delete the account. Please try again.", 'アカウントを削除できませんでした。もう一度お試しください。'), false, 2800); }
       }); }
     if (save) save.addEventListener('click', async () => {
       if (!currentOrg) return;
@@ -6077,7 +6078,7 @@
         const { error } = await sb.from('organizations').update({ name }).eq('id', currentOrg.id);
         if (error) throw error;
         currentOrg.name = name;
-        // ブランド名はブランドごとに独立（ワークスペース名とは別）。1ブランドしか無いときだけ追従させる
+        // ブランド名はブランドごとに独立（アカウント名とは別）。1ブランドしか無いときだけ追従させる
         try { if ((window.__brands || []).length === 1 && currentBrand) { await sb.from('brands').update({ name }).eq('id', currentBrand.id); await loadBrands(); } } catch (_) {}
         // 請求先情報を billing_prefs に upsert（014 適用済みなら保存、未適用なら無視）
         try {
@@ -6152,7 +6153,7 @@
       }
       const rm = e.target.closest('[data-remove]'); if (!rm || !currentOrg) return;
       if (await openConfirm({ title: window.L('Remove this member?', 'このメンバーを削除しますか？'),
-        message: window.L('They will lose access to this workspace.', 'このワークスペースにアクセスできなくなります。'),
+        message: window.L('They will lose access to this account.', 'このアカウントにアクセスできなくなります。'),
         actions: [{ id: 'ok', label: window.L('Remove', '削除する'), variant: 'danger' }, { id: 'cancel', label: window.L('Cancel', 'キャンセル'), variant: 'ghost' }] }) !== 'ok') return;
       try {
         const { error } = await sb.rpc('remove_member', { p_org: currentOrg.id, p_user: rm.getAttribute('data-remove') });
@@ -6210,7 +6211,7 @@
       try { localStorage.setItem('spot-org', orgId); } catch (_) {}
       if (window.toast) window.toast(window.L(`Joined “${inv.org_name}”`, `「${inv.org_name}」に参加しました`), true, 2600);
       stripInvite();
-      if (window.__resetGridCache) window.__resetGridCache();   // 参加＝別ワークスペースのデータへ。読み直す
+      if (window.__resetGridCache) window.__resetGridCache();   // 参加＝別アカウントのデータへ。読み直す
       await loadOrg(); applyRoleUI(); loadProjects(); refreshCredits(); refreshUsage();
     } catch (e) {
       const m = /seat limit/i.test(e.message)
@@ -6274,7 +6275,7 @@
       const word = L('DELETE', '削除');
       const r = await openConfirm({
         title: L('Delete your account?', 'アカウントを削除しますか？'),
-        message: L('Your account and all data (videos, workspaces, credits) will be permanently deleted.', 'アカウントと、あなたのすべてのデータ（動画・ワークスペース・クレジット）が完全に削除されます。'), irreversible: true,
+        message: L('Your account and all data (videos, brands, credits) will be permanently deleted.', 'アカウントと、あなたのすべてのデータ（動画・ブランド・クレジット）が完全に削除されます。'), irreversible: true,
         requireText: { label: L(`Type “${word}” to confirm`, `確認のため「${word}」と入力してください`), value: word, placeholder: word },
         actions: [{ id: 'ok', label: L('Delete account', 'アカウントを削除'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }],
       });
@@ -6502,7 +6503,7 @@
     const save = document.getElementById('topupSave');
     if (save) save.addEventListener('click', async () => {
       if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can change billing.', '課金設定はオーナーのみ可能です。'), false, 2600); return; }
-      if (!currentOrg) { toast(L('Workspace not ready.', 'ワークスペースが未準備です。'), false, 2600); return; }
+      if (!currentOrg) { toast(L('Account not ready.', 'アカウントが未準備です。'), false, 2600); return; }
       btnBusy(save, true, L('Saving…', '保存中…'));
       const row = {
         org_id: currentOrg.id,
@@ -6590,7 +6591,7 @@
   }
   function setText(id, txt) { const el = document.getElementById(id); if (el) el.textContent = txt; }
 
-  // ブランドメモリ（Phase 1）：現ワークスペース＝ブランドの過去projectの selections を集計して“いつもの設定”を返す。
+  // ブランドメモリ（Phase 1）：現アカウント＝ブランドの過去projectの selections を集計して“いつもの設定”を返す。
   //   スキーマ変更不要（projects.spec.selections を集計）。履歴が乏しい間は null（ウィザードは demo 既定のまま）。
   window.__brandDefaults = async function () {
     if (!sb || !currentOrg) return null;
@@ -6618,7 +6619,7 @@
     } catch (_) { return null; }
   };
 
-  // ブランドの傾向（ブランドメモリの可視化）：ワークスペースのプロフィールに要約タグを表示。
+  // ブランドの傾向（ブランドメモリの可視化）：アカウントのプロフィールに要約タグを表示。
   async function renderBrandInsights() {
     const L = window.L || ((en, ja) => ja);
     const box = document.getElementById('brandInsights'); if (!box) return;
@@ -6737,8 +6738,8 @@
   };
 
   const _gridLoaded = new Set();   // 一度でも描画し終えたグリッド。再訪時はスケルトンを出さず静かに更新する（毎回の点滅を防ぐ）
-  window.__resetGridCache = () => _gridLoaded.clear();   // ワークスペース切替などデータが入れ替わる時に呼ぶ
-  async function renderVideos(gridId, opts) {   // 現在のワークスペースの動画を描画（ホーム/メディア/コレクション共通）
+  window.__resetGridCache = () => _gridLoaded.clear();   // アカウント切替などデータが入れ替わる時に呼ぶ
+  async function renderVideos(gridId, opts) {   // 現在のアカウントの動画を描画（ホーム/メディア/コレクション共通）
     const grid = document.getElementById(gridId);
     if (!grid) return;
     const key = gridId + (opts && opts.collectionId ? ':' + opts.collectionId : opts && opts.uncategorized ? ':uncat' : '');
@@ -6746,7 +6747,7 @@
     try {
       await fetchCollections();   // バッジ名の解決用
       let q = sb.from('projects').select('id,name,product,status,spec,updated_at,collection_id');
-      if (currentOrg && currentOrg.id) q = q.eq('org_id', currentOrg.id);   // 現在のワークスペース(組織)だけ
+      if (currentOrg && currentOrg.id) q = q.eq('org_id', currentOrg.id);   // 現在のアカウント(組織)だけ
       q = brandFilter(q);                                                   // さらに現在のブランドだけ
       if (opts && opts.collectionId) q = q.eq('collection_id', opts.collectionId);   // 絞り込みはコレクション詳細
       else if (opts && opts.uncategorized) q = q.is('collection_id', null);
@@ -6931,23 +6932,23 @@
       return data.id;
     } catch (e) { console.warn('collection create failed:', e); if (window.toast) window.toast(window.L("Couldn't create it. Please try again.", 'コレクションをつくれませんでした。もう一度お試しください。'), false, 2600); return null; }
   }
-  // 新しいワークスペース（＝ブランド／会社／組織）を作成して切り替える。workspace=brand の単一概念に整合。
+  // 新しいアカウント（＝ブランド／会社／組織）を作成して切り替える。workspace=brand の単一概念に整合。
   window.__createWorkspace = async function () {
     if (!sb) { if (window.toast) window.toast(L('Please sign in first.', '先にサインインしてください。'), false, 2200); return; }
     const name = await openNameModal({
-      title: L('New workspace', '新しいワークスペース'),
-      okLabel: L('Create workspace', 'ワークスペースを作成'),
+      title: L('New account', '新しいアカウント'),
+      okLabel: L('Create account', 'アカウントを作成'),
     });
     if (!name) return;
     try {
       const { data, error } = await sb.rpc('create_workspace', { p_name: name });
       if (error) throw error;
-      if (window.toast) window.toast(L('Workspace created', 'ワークスペースを作成しました'), true, 2000);
+      if (window.toast) window.toast(L('Account created', 'アカウントを作成しました'), true, 2000);
       if (window.__switchOrg && data) await window.__switchOrg(data);   // 作成した新WSに切り替え
     } catch (e) {
       console.warn('create workspace failed:', e);
-      const msg = /workspace name is required/i.test(String(e && e.message)) ? L('Please enter a workspace name.', 'ワークスペース名を入力してください。')
-        : L("Couldn't create the workspace. Please try again.", 'ワークスペースをつくれませんでした。もう一度お試しください。');
+      const msg = /workspace name is required/i.test(String(e && e.message)) ? L('Please enter an account name.', 'アカウント名を入力してください。')
+        : L("Couldn't create the account. Please try again.", 'アカウントをつくれませんでした。もう一度お試しください。');
       if (window.toast) window.toast(msg, false, 2600);
     }
   };
@@ -7029,7 +7030,7 @@
     if (del) { e.stopPropagation();
       if (!(window.__canWrite && window.__canWrite())) { if (window.toast) window.toast(L('View-only access.', '閲覧のみの権限です。'), false, 1800); return; }
       const id = del.getAttribute('data-del');
-      if (await openConfirm({ title: L('Delete this video?', 'この動画を削除しますか？'), message: L('The video and its files will be removed from this workspace.', 'この動画とファイルがワークスペースから削除されます。'), irreversible: true,
+      if (await openConfirm({ title: L('Delete this video?', 'この動画を削除しますか？'), message: L('The video and its files will be removed from this account.', 'この動画とファイルがアカウントから削除されます。'), irreversible: true,
         actions: [{ id: 'ok', label: L('Delete', '削除する'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }] }) !== 'ok') return;
       try {
         const { error } = await sb.from('projects').delete().eq('id', id); if (error) throw error;
@@ -7218,7 +7219,7 @@
     renderJobs();
   }
 
-  // ダッシュボードのカード / 生成後にワークスペースを「対象プロジェクト」で開く。
+  // ダッシュボードのカード / 生成後にアカウントを「対象プロジェクト」で開く。
   function renderPreviewFrame(proj) {   // プレビューを対象プロジェクトのブランド/文脈で描画（ミライ工事モックの置換）
     const spec = (proj && proj.spec) || {};
     const brand = spec.brand || {}, sel = spec.selections || {};
