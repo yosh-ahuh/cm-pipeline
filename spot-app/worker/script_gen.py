@@ -48,8 +48,11 @@ def total_seconds(spec: dict) -> int:
     if out.get("duration_frames"):
         return max(6, round(int(out["duration_frames"]) / 30))
     media = _sel(spec).get("media") or []
-    if media and all(m in ("リール/ショート",) for m in media):
+    short = ("リール/ショート", "reels_shorts", "reels", "shorts", "tiktok", "TikTok")
+    if media and all(m in short for m in media):
         return 15
+    if any(m in short for m in media):
+        return 27   # Reels/Shorts の上限 30 秒から、スプラッシュ＋AI 開示（約 2 秒）を引いた予算
     return 30
 
 
