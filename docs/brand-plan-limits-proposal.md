@@ -132,6 +132,12 @@
 - viewer は席外（無料・無制限）を踏襲。
 - 影響：`accept_invite`/招待リンク/`is_member`/`can_write`/RLS を **brand 単位**に拡張。既存 org_members は owner とアカウント全体アクセスの表現として残すか、brand_members へ寄せるか要検討（移行時に決定）。
 
+## 13b. 実装状況（2026-10-06）
+- ✅ **F0/F1/F2 実装**：`023_brands_multi.sql`（既定ブランド `default_brand`/`ensure_default_brand`・`fill_brand_id` トリガで projects/collections に brand_id 自動補完＋凍結ブランドへの書き込み拒否・`create_brand` オーナー限定＋`plans.brands` 上限（凍結中は枠外）・`delete_brand` 最後の1つ保護＋中身を既定ブランドへ退避・`set_brand_frozen`（解除は上限内のみ）・`brand_quota`・コレクション上限トリガ `plans.collections`・brands の INSERT/DELETE を RPC 限定）。ローカル PG14 で RLS/RPC/トリガのシナリオを実証（owner/member/viewer・free→team→starter の上限と凍結・削除の退避・コレクション上限）。
+- ✅ **アプリ**：ブランド切替（アカウントメニュー＋サイドバー2行目）・「ブランドを追加する」（上限到達時はプランへ誘導）・設定の「ブランド」パネル（残数メーター・切替・名前変更・読取専用/再開・削除）・動画/コレクション/ブランドメモリをブランドで絞り込み（既定ブランドは旧データ＝brand_id 未設定も含む）・凍結ブランドでは作成を止める・プランカードの「複数ブランド管理」から「近日」を外し「ブランド N つまで」に。
+- ⏳ **DB 適用待ち**：021 → 022 → 023 を SQL Editor で順に Run（023 単体でも 021 の列を保険で作るが、順番どおりが安全）。
+- ⏳ **F3 ブランド単位の招待・席**（§12）と **F4 用語の「ブランド」一括化／ブランドメモリ Phase 2** は未着手。「ワークスペース」の文言はアカウント＝ワークスペースとしてそのまま。
+
 ## 13. 実装フェーズ（改訂）
 1. **F0 データモデル移行**：`collections.brand_id` 追加＋org直下データを既定ブランドへ割当／`plans.collections` 追加＋値投入／brands 複数対応／§11の既存org束ね（空振り可）。
 2. **F1 ブランドCRUD＋上限＋凍結**：`create_brand`（plan.brands制限）／ブランド切替／ブランドのプロフィール／ダウングレード時の**選択式凍結**（`brands.frozen`）。

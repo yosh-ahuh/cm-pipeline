@@ -1530,6 +1530,30 @@
   .sb-wsnow .ws-role-pill { color: var(--accent-ink); border-color: color-mix(in srgb, var(--accent-ink) 38%, transparent); background: var(--accent-soft); font-weight: 700; }
   body.sb-collapsed .sb-wsnow { justify-content: center; padding: 6px 0; }
   body.sb-collapsed .sb-wsnow .ws-name, body.sb-collapsed .sb-wsnow .ws-role-pill { display: none; }
+  /* ブランド（アカウント内の製品/クライアント）: 2つ以上あるときだけ現在のブランドを2行目に出す */
+  .sb-wsnow { flex-wrap: wrap; }
+  .sb-wsnow .ws-brand { flex-basis: 100%; display: flex; align-items: center; gap: 6px; padding-left: 2px; font-size: var(--t-label); color: var(--muted); min-width: 0; }
+  .sb-wsnow .ws-brand .ic { width: 13px; height: 13px; flex: none; color: var(--accent-ink); }
+  .sb-wsnow .ws-brand b { color: var(--ink); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body.sb-collapsed .sb-wsnow .ws-brand { display: none; }
+  .menu-label .menu-label-sub { font-weight: 500; color: var(--faint); margin-left: 6px; font-family: var(--font-mono); letter-spacing: 0; }
+  .ws-item .ws-frozen, .sb-wsnow .ws-frozen { font-size: var(--t-label-sm); color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent); background: var(--warn-soft); border-radius: var(--r-full); padding: 1px 7px; margin-left: 6px; }
+  /* 設定: ブランド一覧 */
+  .brand-list { display: flex; flex-direction: column; gap: 8px; }
+  .brand-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); flex-wrap: wrap; }
+  .brand-row.cur { border-color: color-mix(in srgb, var(--accent-ink) 55%, var(--line)); }
+  .brand-row.frozen { opacity: .72; }
+  .brand-row .br-logo { width: var(--av-md); height: var(--av-md); border-radius: var(--r-sm); background: var(--surface-3); display: grid; place-items: center; overflow: hidden; flex: none; color: var(--muted); font-weight: 800; }
+  .brand-row .br-logo img { width: 100%; height: 100%; object-fit: cover; }
+  .brand-row .br-body { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 2px; }
+  .brand-row .br-name { font-weight: 700; color: var(--ink); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .brand-row .br-sub { font-size: var(--t-label); color: var(--muted); }
+  .brand-row .br-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .brand-row .br-actions .btn { min-height: 34px; padding: 0 12px; font-size: var(--t-label); }
+  .brand-quota { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: var(--t-label); color: var(--muted); flex-wrap: wrap; }
+  .brand-quota .u-meter { width: 120px; }
+  .brand-over { color: var(--warn); font-size: var(--t-label); margin: 0 0 12px; display: flex; gap: 6px; align-items: flex-start; line-height: 1.5; }
+  .brand-over .ic { width: 14px; height: 14px; flex: none; margin-top: 2px; }
   /* (2) ナビのグループラベル */
   .sb-navlabel { font-size: var(--t-label-sm); font-weight: 700; letter-spacing: .07em; color: var(--faint); text-transform: uppercase; padding: 12px 12px 5px; }
   body.sb-collapsed .sb-navlabel { display: none; }
@@ -1828,9 +1852,12 @@
     <svg class="ic mh-chev" aria-hidden="true"><use href="#i-chevron-down"/></svg>
   </button>
   <div class="menu-sep"></div>
+  <div class="menu-label" id="amBrandsLabel" hidden>ブランド<span class="menu-label-sub" id="amBrandsCount"></span></div>
+  <div id="amBrands"></div>
+  <button type="button" class="menu-item" data-act="add-brand" id="amAddBrand" hidden><svg class="ic"><use href="#i-plus"/></svg><span>ブランドを追加する</span></button>
+  <div class="menu-sep" id="amBrandsSep" hidden></div>
   <div class="menu-label">ワークスペース</div>
   <div id="amWorkspaces"></div>
-  <button type="button" class="menu-item" data-act="add-workspace"><svg class="ic"><use href="#i-plus"/></svg><span>ワークスペースを追加する</span></button>
   <div class="menu-sep"></div>
   <button type="button" class="menu-item" data-act="settings"><svg class="ic"><use href="#i-user"/></svg><span>プロフィール設定</span></button>
   <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウント設定</span></button>
@@ -2438,6 +2465,18 @@
     <div class="cta-row">
       <button class="btn btn-primary wauto" id="setSave"><span>プロフィールを保存</span></button>
       <span class="save-note" id="setSaveNote" hidden>保存しました</span>
+    </div>
+  </div>
+
+  <!-- ブランド（アカウント内の製品/クライアント）。Team 以上で複数・Free/Starter は 1 つ。 -->
+  <div class="panel pad" id="brandPanel" hidden>
+    <div class="panel-h">ブランド</div>
+    <p class="muted" style="margin:0 0 12px;font-size:var(--t-label)">ブランド＝1つの製品やクライアント。ブランドごとに名前・ロゴを持ち、AIはブランド単位で傾向を覚えます。クレジットと席はアカウント全体で共有です。</p>
+    <div class="brand-quota" id="brandQuota" hidden></div>
+    <div class="brand-over" id="brandOver" hidden><svg class="ic"><use href="#i-alert"/></svg><span>プランの上限を超えています。読み取り専用にするブランドを選んでください（動画は残ります。閲覧・ダウンロードはできます）。</span></div>
+    <div class="brand-list" id="brandList"></div>
+    <div class="cta-row">
+      <button type="button" class="btn btn-ghost wauto" id="brandAddBtn"><svg class="ic"><use href="#i-plus"/></svg><span>ブランドを追加</span></button>
     </div>
   </div>
 
@@ -3228,10 +3267,25 @@
       else {
         const curName = nameOf(cur), curRole = roleL[cur.role] || cur.role;
         now.hidden = false;
+        const brands = window.__brands || []; const curB = window.__getBrand && window.__getBrand();
         now.innerHTML = `<span class="ws-ic">${escHtml((curName || '?').slice(0, 1))}</span>`
           + `<span class="ws-name" title="${escHtml(curName)}">${escHtml(curName)}</span>`
-          + `<span class="ws-role-pill">${curRole}</span>`;
+          + `<span class="ws-role-pill">${curRole}</span>`
+          + (brands.length > 1 && curB ? `<span class="ws-brand"><svg class="ic"><use href="#i-folder"/></svg><b>${escHtml(curB.name)}</b>${curB.frozen ? `<span class="ws-frozen">${L('Read-only', '読み取り専用')}</span>` : ''}</span>` : '');
       }
+    }
+    // (2) ブランド切替（現在のアカウント内）。1つだけなら一覧は出さず「追加」だけ見せる（オーナー）
+    { const box = document.getElementById('amBrands'); const label = document.getElementById('amBrandsLabel'); const add = document.getElementById('amAddBrand'); const sep = document.getElementById('amBrandsSep'); const cnt = document.getElementById('amBrandsCount');
+      const brands = window.__brands || []; const curB = window.__getBrand && window.__getBrand();
+      const q = window.__brandLimits ? window.__brandLimits() : { max: 1, active: brands.length };
+      const owner = !window.__isOwner || window.__isOwner();
+      const show = !!cur && brands.length > 0 && (brands.length > 1 || owner);
+      if (label) label.hidden = !show; if (sep) sep.hidden = !show; if (add) add.hidden = !show || !owner;
+      if (cnt) cnt.textContent = q.max === 0 ? `${q.active}` : `${q.active}/${q.max}`;
+      if (box) box.innerHTML = (show && brands.length > 1) ? brands.map(b => `<button type="button" class="ws-item menu-item" role="menuitemradio" data-brand="${b.id}" aria-checked="${curB && curB.id === b.id ? 'true' : 'false'}" aria-selected="${curB && curB.id === b.id ? 'true' : 'false'}">
+          <span class="ws-ic">${escHtml((b.name || '?').slice(0, 1))}</span>
+          <span class="ws-body"><span class="ws-line1"><span class="ws-name">${escHtml(b.name)}</span>${b.frozen ? `<span class="ws-frozen">${L('Read-only', '読み取り専用')}</span>` : ''}</span></span>
+          <span class="ws-check" aria-hidden="true">✓</span></button>`).join('') : '';
     }
     // (3) 下部メニュー：ワークスペース切替リスト（名前＋プランバッジ / 役割 の2段・参考デザイン）
     const planL = { free: 'FREE', starter: 'STARTER', team: 'TEAM', business: 'BUSINESS', enterprise: 'ENTERPRISE' };
@@ -3365,7 +3419,7 @@
   function acctAction(a) {   // 主メニュー/サブメニュー共通のアクション
     if (a === 'switch-account') { (acctSwitch && acctSwitch.hidden) ? openAcctSwitch() : closeAcctSwitch(); return; }
     closeAcctMenu(); closeDrawer();
-    if (a === 'add-workspace') { if (window.__createWorkspace) window.__createWorkspace(); else gotoSettings(); return; }
+    if (a === 'add-brand' || a === 'add-workspace') { if (window.__createBrand) window.__createBrand(); else gotoSettings(); return; }
     if (a === 'settings') { gotoSettings(); return; }
     if (a === 'account') { if (window.gotoAccount) window.gotoAccount(); return; }
     if (a === 'help') { const to = (window.__cfg && window.__cfg.supportEmail) || ''; if (to) { location.href = 'mailto:' + to + '?subject=' + encodeURIComponent('Spot feedback'); } else toast(L('Help & feedback is coming soon.', 'ヘルプ＆フィードバックは準備中です。'), false, 2400); return; }
@@ -3386,6 +3440,8 @@
     }
   }
   if (acctMenu) acctMenu.addEventListener('click', (e) => {
+    const br = e.target.closest('[data-brand]');
+    if (br) { const id = br.getAttribute('data-brand'); closeAcctMenu(); closeDrawer(); if (window.__switchBrand) window.__switchBrand(id); return; }
     const ws = e.target.closest('[data-org]');
     if (ws) {
       const id = ws.getAttribute('data-org'); const cur = window.__getOrg && window.__getOrg();
@@ -4127,7 +4183,11 @@
     document.body.classList.toggle('in-project', !!inProject);
     setSbActive(act || null);
   }
-  document.getElementById('newCM').addEventListener('click', gotoWizard);
+  document.getElementById('newCM').addEventListener('click', () => {
+    const b = window.__getBrand && window.__getBrand();
+    if (b && b.frozen) { toast(L('This brand is read-only. Switch brands or upgrade your plan.', 'このブランドは読み取り専用です。別のブランドに切り替えるか、プランを変更してください。'), false, 3200); return; }
+    gotoWizard();
+  });
   { const fab = document.getElementById('fabNew'); if (fab) fab.addEventListener('click', () => document.getElementById('newCM').click()); }   // モバイルFAB → 同じ導線
   function gotoScript() {
     hideAll(); vScript.hidden = false; focusView(vScript); _nav(true, 'new');
@@ -4627,6 +4687,12 @@
     // dates
     '今日': 'Today', '2分前': '2 min ago', '1時間前': '1 hr ago',
     '昨日': 'Yesterday', '3日前': '3 days ago', '先週': 'Last week',
+    // --- brands ---
+    'ブランド': 'Brands', 'ブランドを追加する': 'Add a brand', 'ブランドを追加': 'Add brand',
+    'ブランド＝1つの製品やクライアント。ブランドごとに名前・ロゴを持ち、AIはブランド単位で傾向を覚えます。クレジットと席はアカウント全体で共有です。':
+      'A brand is one product or client. Each brand has its own name and logo, and the AI learns per brand. Credits and seats are shared across the account.',
+    'プランの上限を超えています。読み取り専用にするブランドを選んでください（動画は残ります。閲覧・ダウンロードはできます）。':
+      'You are over your plan limit. Choose which brands to make read-only (their videos stay viewable and downloadable).',
     // --- shot list (uploads) ---
     'デモ画面のスクショ': 'Demo screen shots', '操作画面のスクショ': 'How-to screen shots',
     '実際のアプリ画面（PNG/JPG・複数可）。偽UIは作りません': 'Real app screens (PNG/JPG, multiple). No fake UI is ever drawn',
@@ -5368,10 +5434,119 @@
   }
   window.__getOrg = () => currentOrg;
   window.__isOwner = () => currentOrg ? currentOrg.role === 'owner' : true;   // 個人利用(org未解決)は owner 扱い
+
+  // ---------- ブランド（アカウント＞ブランド＞コレクション＞動画。1ブランド＝1製品/クライアント。023_brands_multi.sql） ----------
+  let currentBrand = null;
+  let PLAN_LIMITS = { brands: 1, collections: 0 };   // 0 = 無制限
+  window.__brands = [];
+  async function loadBrands() {
+    currentBrand = null; window.__brands = [];
+    if (!currentOrg) { window.__brandId = null; return null; }
+    try {
+      const { data, error } = await sb.from('brands').select('id,name,assets,frozen,created_at').eq('org_id', currentOrg.id).order('created_at', { ascending: true });
+      if (error) throw error;
+      window.__brands = (data || []).map(b => ({ ...b, frozen: !!b.frozen }));
+      let pref = null; try { pref = localStorage.getItem('spot-brand:' + currentOrg.id); } catch (_) {}
+      currentBrand = window.__brands.find(b => b.id === pref) || window.__brands.find(b => !b.frozen) || window.__brands[0] || null;
+      try {
+        const { data: pl } = await sb.from('plans').select('brands,collections').eq('id', currentOrg.plan).single();
+        if (pl) PLAN_LIMITS = { brands: Number(pl.brands) || 0, collections: Number(pl.collections) || 0 };
+      } catch (_) {}
+    } catch (_) { /* brands 未適用でも動く（単一ブランド相当） */ }
+    window.__brandId = currentBrand ? currentBrand.id : null;
+    return currentBrand;
+  }
+  window.__getBrand = () => currentBrand;
+  window.__brandLimits = () => ({ max: PLAN_LIMITS.brands, active: (window.__brands || []).filter(b => !b.frozen).length, total: (window.__brands || []).length, collections: PLAN_LIMITS.collections });
+  // 現在のブランドで絞る。既定ブランド（最古）には brand_id 未設定の旧データも含める（移行前後で動画が消えない）
+  function brandFilter(q) {
+    const brands = window.__brands || [];
+    if (!currentBrand || brands.length < 2) return q;
+    return currentBrand.id === brands[0].id ? q.or(`brand_id.eq.${currentBrand.id},brand_id.is.null`) : q.eq('brand_id', currentBrand.id);
+  }
+  window.__brandFilter = brandFilter;
+  window.__switchBrand = async function (id) {
+    const b = (window.__brands || []).find(x => x.id === id); if (!b || !currentOrg) return;
+    currentBrand = b; window.__brandId = b.id;
+    try { localStorage.setItem('spot-brand:' + currentOrg.id, id); } catch (_) {}
+    if (window.__resetGridCache) window.__resetGridCache();
+    loadProjects(); refreshUsage();
+    if (window.__renderWorkspaces) window.__renderWorkspaces();
+    if (window.loadCollections) window.loadCollections();
+    if (window.announce) window.announce(L(`Switched to ${b.name}`, `${b.name} に切り替えました`));
+  };
+  async function upgradeForBrands() {
+    const q = window.__brandLimits();
+    const r = await openConfirm({ title: L('Brand limit reached', 'ブランド数が上限です'),
+      message: L(`Your plan includes ${q.max} brand${q.max === 1 ? '' : 's'}. Upgrade to manage more products or clients.`, `現在のプランで持てるブランドは ${q.max} つです。製品やクライアントを増やすにはプランを変更してください。`),
+      actions: [{ id: 'ok', label: L('See plans', 'プランを見る'), variant: 'primary' }, { id: 'cancel', label: L('Not now', '今はしない'), variant: 'ghost' }] });
+    if (r === 'ok' && window.gotoBilling) window.gotoBilling();
+  }
+  window.__createBrand = async function () {
+    if (!sb || !currentOrg) { if (window.toast) window.toast(L('Please sign in first.', '先にサインインしてください。'), false, 2200); return; }
+    if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can add brands.', 'ブランドの追加はオーナーのみ可能です。'), false, 2400); return; }
+    const q = window.__brandLimits();
+    if (q.max !== 0 && q.active >= q.max) { await upgradeForBrands(); return; }
+    const name = await openNameModal({ title: L('New brand', '新しいブランド'), okLabel: L('Create brand', 'ブランドを作成') });
+    if (!name) return;
+    try {
+      const { data, error } = await sb.rpc('create_brand', { p_org: currentOrg.id, p_name: name, p_assets: {} });
+      if (error) throw error;
+      await loadBrands();
+      if (window.toast) window.toast(L('Brand created', 'ブランドを作成しました'), true, 1800);
+      if (data) await window.__switchBrand(data);
+      if (window.loadBrandPanel) window.loadBrandPanel();
+    } catch (e) {
+      console.warn('create brand failed:', e);
+      if (/brand limit reached/i.test(String(e && e.message))) { await loadBrands(); await upgradeForBrands(); return; }
+      toast(/not allowed/i.test(String(e && e.message)) ? L('Only the owner can add brands.', 'ブランドの追加はオーナーのみ可能です。')
+        : L("Couldn't create the brand. Please try again.", 'ブランドをつくれませんでした。もう一度お試しください。'), false, 2600);
+    }
+  };
+  window.__renameBrand = async function (id) {
+    const b = (window.__brands || []).find(x => x.id === id); if (!b || !(window.__canWrite && window.__canWrite())) return;
+    const name = await openNameModal({ title: L('Rename brand', 'ブランド名を変更'), value: b.name, okLabel: L('Save', '保存') });
+    if (!name || name === b.name) return;
+    try { const { error } = await sb.from('brands').update({ name }).eq('id', id); if (error) throw error; await loadBrands(); if (window.__renderWorkspaces) window.__renderWorkspaces(); if (window.loadBrandPanel) window.loadBrandPanel(); }
+    catch (e) { console.warn('rename brand failed:', e); toast(L("Couldn't rename it. Please try again.", '名前を変更できませんでした。もう一度お試しください。'), false, 2600); }
+  };
+  window.__setBrandFrozen = async function (id, frozen) {
+    if (window.__isOwner && !window.__isOwner()) return;
+    try {
+      const { error } = await sb.rpc('set_brand_frozen', { p_brand: id, p_frozen: !!frozen }); if (error) throw error;
+      await loadBrands(); if (window.__renderWorkspaces) window.__renderWorkspaces(); if (window.loadBrandPanel) window.loadBrandPanel();
+      if (window.__resetGridCache) window.__resetGridCache(); loadProjects();
+      toast(frozen ? L('Brand set to read-only', 'ブランドを読み取り専用にしました') : L('Brand reactivated', 'ブランドを再び使えるようにしました'), true, 1800);
+    } catch (e) {
+      console.warn('freeze brand failed:', e);
+      if (/brand limit reached/i.test(String(e && e.message))) { await upgradeForBrands(); return; }
+      toast(L("Couldn't change it. Please try again.", '変更できませんでした。もう一度お試しください。'), false, 2600);
+    }
+  };
+  window.__deleteBrand = async function (id) {
+    const b = (window.__brands || []).find(x => x.id === id); if (!b) return;
+    if (window.__isOwner && !window.__isOwner()) { toast(L('Only the owner can delete brands.', 'ブランドの削除はオーナーのみ可能です。'), false, 2400); return; }
+    if ((window.__brands || []).length <= 1) { toast(L('You must keep at least one brand.', '少なくとも1つのブランドは必要です。'), false, 2600); return; }
+    const r = await openConfirm({ title: L('Delete this brand?', 'このブランドを削除しますか？'),
+      message: L(`“${b.name}” will be deleted. Its videos and collections move to your first brand.`, `「${b.name}」を削除します。動画とコレクションは最初のブランドに移動します。`),
+      actions: [{ id: 'ok', label: L('Delete brand', 'ブランドを削除'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }] });
+    if (r !== 'ok') return;
+    try {
+      const { error } = await sb.rpc('delete_brand', { p_brand: id }); if (error) throw error;
+      try { localStorage.removeItem('spot-brand:' + currentOrg.id); } catch (_) {}
+      await loadBrands(); if (window.__renderWorkspaces) window.__renderWorkspaces(); if (window.loadBrandPanel) window.loadBrandPanel();
+      if (window.__resetGridCache) window.__resetGridCache(); loadProjects(); if (window.loadCollections) window.loadCollections();
+      toast(L('Brand deleted', 'ブランドを削除しました'), true, 1800);
+    } catch (e) {
+      console.warn('delete brand failed:', e);
+      toast(/keep at least one/i.test(String(e && e.message)) ? L('You must keep at least one brand.', '少なくとも1つのブランドは必要です。')
+        : L("Couldn't delete it. Please try again.", '削除できませんでした。もう一度お試しください。'), false, 2600);
+    }
+  };
   window.__switchOrg = async function (id) {
     try { localStorage.setItem('spot-org', id); } catch (_) {}
     if (window.__resetGridCache) window.__resetGridCache();   // 別ワークスペース＝別データ。前回の内容を残さずスケルトンから読み直す
-    await loadOrg(); applyRoleUI();
+    await loadOrg(); await loadBrands(); applyRoleUI();
     loadProjects(); refreshCredits(); refreshUsage();
     if (window.__renderWorkspaces) window.__renderWorkspaces();
   };
@@ -5402,6 +5577,7 @@
       if (((session.user || {}).user_metadata || {}).lang !== want) sb.auth.updateUser({ data: { lang: want } });
     } catch (_) {}
     await loadOrg();
+    await loadBrands();                    // アカウント内のブランド一覧と現在のブランド（023 未適用でも安全）
     applyRoleUI();                         // viewer を読み取り専用に＋サイドバー更新
     if (window.__setNav) window.__setNav('home');   // 初期はホーム
     recordLogin();                         // 共有検知の記録（007 未適用なら無害にスキップ）
@@ -5671,6 +5847,54 @@
     });
   })();
   // 会社プロフィール（組織アカウントのみ）: 会社名 + ロゴ
+  // ブランド一覧パネル（設定）。追加・切替・名前変更・凍結・削除。ロゴは会社プロフィールのロゴ欄（＝現在のブランド）から。
+  async function loadBrandPanel() {
+    const panel = document.getElementById('brandPanel'); const list = document.getElementById('brandList'); if (!panel || !list) return;
+    if (!currentOrg || !(window.__brands || []).length) { panel.hidden = true; return; }
+    const brands = window.__brands || []; const q = window.__brandLimits();
+    const owner = window.__isOwner ? window.__isOwner() : true;
+    panel.hidden = false;
+    const quota = document.getElementById('brandQuota');
+    if (quota) {
+      quota.hidden = false;
+      const pct = q.max === 0 ? 0 : Math.min(100, Math.round(q.active / q.max * 100));
+      quota.innerHTML = `<span>${q.max === 0 ? L(`${q.active} brands (unlimited)`, `${q.active} ブランド（無制限）`) : L(`${q.active} / ${q.max} brands in use`, `${q.active} / ${q.max} ブランド使用中`)}</span>`
+        + (q.max === 0 ? '' : `<span class="u-meter sm" role="progressbar" aria-valuemin="0" aria-valuemax="${q.max}" aria-valuenow="${q.active}" aria-label="${L('Brands used', 'ブランド使用数')}"><i style="width:${pct}%"></i></span>`);
+    }
+    const over = q.max !== 0 && q.active > q.max;
+    const ov = document.getElementById('brandOver'); if (ov) ov.hidden = !over;
+    const addBtn = document.getElementById('brandAddBtn'); if (addBtn) addBtn.hidden = !owner;
+    const paths = brands.map(b => (b.assets && b.assets.logo) || '').filter(p => p && !/^https?:/.test(p));
+    const urls = {};
+    try { if (paths.length) { const { data } = await sb.storage.from('assets').createSignedUrls(paths, 3600); (data || []).forEach(d => { if (d.path && d.signedUrl) urls[d.path] = d.signedUrl; }); } } catch (_) {}
+    list.innerHTML = brands.map(b => {
+      const cur = currentBrand && currentBrand.id === b.id;
+      const logo = (b.assets && b.assets.logo) || ''; const url = /^https?:/.test(logo) ? logo : urls[logo];
+      return `<div class="brand-row${cur ? ' cur' : ''}${b.frozen ? ' frozen' : ''}" data-brand-row="${b.id}">
+        <span class="br-logo">${url ? `<img src="${url}" alt="">` : escHtml((b.name || '?').slice(0, 1))}</span>
+        <div class="br-body">
+          <span class="br-name">${escHtml(b.name)}${cur ? `<span class="badge badge--accent">${L('Current', '現在')}</span>` : ''}${b.frozen ? `<span class="badge badge--warn">${L('Read-only', '読み取り専用')}</span>` : ''}</span>
+          <span class="br-sub">${b.frozen ? L('Videos stay viewable; creating is paused.', '動画は閲覧できます。作成は停止中。') : L('Videos, collections and AI memory are kept per brand.', '動画・コレクション・AIの傾向はブランドごとに保持。')}</span>
+        </div>
+        <div class="br-actions">
+          ${cur ? '' : `<button type="button" class="btn btn-tonal" data-brand-switch="${b.id}"><span>${L('Switch', '切り替える')}</span></button>`}
+          <button type="button" class="btn btn-ghost" data-brand-rename="${b.id}" data-write-only><span>${L('Rename', '名前を変更')}</span></button>
+          ${owner && (over || b.frozen) ? `<button type="button" class="btn btn-ghost" data-brand-freeze="${b.id}" data-frozen="${b.frozen ? '1' : '0'}"><span>${b.frozen ? L('Reactivate', '再開する') : L('Make read-only', '読み取り専用にする')}</span></button>` : ''}
+          ${owner && brands.length > 1 ? `<button type="button" class="btn btn-ghost" data-brand-del="${b.id}"><span>${L('Delete', '削除')}</span></button>` : ''}
+        </div></div>`;
+    }).join('');
+  }
+  window.loadBrandPanel = loadBrandPanel;
+  { const list = document.getElementById('brandList'); const addBtn = document.getElementById('brandAddBtn');
+    if (addBtn) addBtn.addEventListener('click', () => window.__createBrand && window.__createBrand());
+    if (list) list.addEventListener('click', async (e) => {
+      const sw = e.target.closest('[data-brand-switch]'); if (sw) { await window.__switchBrand(sw.getAttribute('data-brand-switch')); loadBrandPanel(); loadCompanyProfile(); return; }
+      const rn = e.target.closest('[data-brand-rename]'); if (rn) { window.__renameBrand(rn.getAttribute('data-brand-rename')); return; }
+      const fz = e.target.closest('[data-brand-freeze]'); if (fz) { window.__setBrandFrozen(fz.getAttribute('data-brand-freeze'), fz.getAttribute('data-frozen') !== '1'); return; }
+      const dl = e.target.closest('[data-brand-del]'); if (dl) { window.__deleteBrand(dl.getAttribute('data-brand-del')); return; }
+    });
+  }
+
   async function loadCompanyProfile() {
     const panel = document.getElementById('companyPanel'); if (!panel) return;
     const up = document.getElementById('upgradePanel');
@@ -5686,10 +5910,11 @@
       if (dz) dz.hidden = !isOwner || org.is_personal || ownedCount <= 1; }
     const nameEl = document.getElementById('companyName'); if (nameEl) nameEl.value = org.name || '';
     renderBrandInsights();   // ブランドの傾向（ブランドメモリ）
+    loadBrandPanel();        // ブランド一覧（追加・切替・凍結・削除）
     // ブランドのロゴを表示
     { const box = document.getElementById('companyLogo'); if (box && !box.querySelector('img')) box.innerHTML = '<span class="sk" aria-hidden="true" style="display:block;width:100%;height:100%;border-radius:inherit"></span>'; }   // 読み込み中スケルトン
     try {
-      const { data: br } = await sb.from('brands').select('assets').eq('org_id', org.id).limit(1).maybeSingle();
+      const br = currentBrand ? { assets: currentBrand.assets } : (await sb.from('brands').select('assets').eq('org_id', org.id).limit(1).maybeSingle()).data;
       const logoPath = br && br.assets && br.assets.logo;
       const box = document.getElementById('companyLogo');
       if (box) {
@@ -5811,7 +6036,8 @@
         const { error } = await sb.from('organizations').update({ name }).eq('id', currentOrg.id);
         if (error) throw error;
         currentOrg.name = name;
-        try { await sb.from('brands').update({ name }).eq('org_id', currentOrg.id); } catch (_) {}
+        // ブランド名はブランドごとに独立（ワークスペース名とは別）。1ブランドしか無いときだけ追従させる
+        try { if ((window.__brands || []).length === 1 && currentBrand) { await sb.from('brands').update({ name }).eq('id', currentBrand.id); await loadBrands(); } } catch (_) {}
         // 請求先情報を billing_prefs に upsert（014 適用済みなら保存、未適用なら無視）
         try {
           const val = id => { const el = document.getElementById(id); return el ? (el.value || '').trim() || null : null; };
@@ -5834,13 +6060,13 @@
       const f = logoInput.files && logoInput.files[0]; if (!f || !currentOrg) return;
       if (f.size > 5 * 1024 * 1024) { toast(L('File too large (max 5MB).', 'ファイルが大きすぎます（5MBまで）。'), false, 2600); return; }
       const ext = (f.name.split('.').pop() || 'png').toLowerCase();
-      const path = `${currentOrg.id}/brand/logo.${ext}`;
+      const path = `${currentOrg.id}/brand/${currentBrand ? currentBrand.id + '/' : ''}logo.${ext}`;
       try {
         const up = await sb.storage.from('assets').upload(path, f, { upsert: true, contentType: f.type });
         if (up.error) throw up.error;
-        const { data: br } = await sb.from('brands').select('id, assets').eq('org_id', currentOrg.id).limit(1).maybeSingle();
-        if (br) { await sb.from('brands').update({ assets: { ...(br.assets || {}), logo: path } }).eq('id', br.id); }
-        else { await sb.rpc('create_brand', { p_org: currentOrg.id, p_name: currentOrg.name || 'Brand', p_assets: { logo: path } }); }
+        const br = currentBrand || (await sb.from('brands').select('id, assets').eq('org_id', currentOrg.id).limit(1).maybeSingle()).data;
+        if (br) { await sb.from('brands').update({ assets: { ...(br.assets || {}), logo: path } }).eq('id', br.id); await loadBrands(); }
+        else { await sb.rpc('create_brand', { p_org: currentOrg.id, p_name: currentOrg.name || 'Brand', p_assets: { logo: path } }); await loadBrands(); }
         await loadCompanyProfile();
         toast(L('Logo updated', 'ロゴを更新しました'), true, 1800);
       } catch (e) { console.warn('upload failed:', e); toast(L("Upload didn't work. Please try again.", 'アップロードできませんでした。もう一度お試しください。'), false, 2800); }
@@ -6258,7 +6484,7 @@
     // soon=true はプラン特典として表示するが製品未提供の機能（正直さ: 今使えると誤認させない）。
     const feats = [
       { on: true,               label: L('Real-time progress & QC', 'リアルタイム進捗・品質チェック') },
-      { on: brands > 1 || brands === 0, soon: true, label: brands === 0 ? L('Unlimited brands', 'ブランド無制限') : L('Multiple brands', '複数ブランド管理') },
+      { on: brands > 1 || brands === 0, label: brands === 0 ? L('Unlimited brands', 'ブランド無制限') : L(`Up to ${brands} brands`, `ブランド ${brands} つまで`) },
       { on: !!p.premium_models, soon: true, label: L('Premium AI models', 'プレミアムAIモデル') },
       { on: sort >= 3,          soon: true, label: L('Priority render queue', '優先生成キュー') },
       { on: sort >= 2,          label: L('Priority support', '優先サポート') },
@@ -6289,7 +6515,7 @@
   window.__brandDefaults = async function () {
     if (!sb || !currentOrg) return null;
     try {
-      const base = () => { let q = sb.from('projects').select('spec, created_at, approved').order('created_at', { ascending: false }).limit(30); return currentOrg.id ? q.eq('org_id', currentOrg.id) : q; };
+      const base = () => { let q = sb.from('projects').select('spec, created_at, approved').order('created_at', { ascending: false }).limit(30); q = brandFilter(q); return currentOrg.id ? q.eq('org_id', currentOrg.id) : q; };
       let data = null, approvedBased = false;
       try {   // お手本（approved）があればそれを優先して学ぶ。列未適用/失敗時は下の全件へ。
         const r = await base().eq('approved', true);
@@ -6353,6 +6579,7 @@
     try {
       const insertRow = { name: spec.meta.name, spec, status: 'draft' };
       if (currentOrg && currentOrg.id) insertRow.org_id = currentOrg.id;   // 現在の組織に所属させる（未解決時はトリガが個人orgを補完）
+      if (currentBrand) { if (currentBrand.frozen) { toast(L('This brand is read-only.', 'このブランドは読み取り専用です。'), false, 2600); return; } insertRow.brand_id = currentBrand.id; }
       const { data, error } = await sb.from('projects')
         .insert(insertRow).select().single();
       if (error) throw error;
@@ -6440,6 +6667,7 @@
       await fetchCollections();   // バッジ名の解決用
       let q = sb.from('projects').select('id,name,product,status,spec,updated_at,collection_id');
       if (currentOrg && currentOrg.id) q = q.eq('org_id', currentOrg.id);   // 現在のワークスペース(組織)だけ
+      q = brandFilter(q);                                                   // さらに現在のブランドだけ
       if (opts && opts.collectionId) q = q.eq('collection_id', opts.collectionId);   // 絞り込みはコレクション詳細
       else if (opts && opts.uncategorized) q = q.is('collection_id', null);
       const { data, error } = await q.order('updated_at', { ascending: false });
@@ -6463,7 +6691,7 @@
   async function fetchCollections() {
     if (!currentOrg) { _collections = []; return _collections; }
     try {
-      const { data } = await sb.from('collections').select('id,name').eq('org_id', currentOrg.id).order('created_at', { ascending: false });
+      const { data } = await brandFilter(sb.from('collections').select('id,name').eq('org_id', currentOrg.id)).order('created_at', { ascending: false });
       _collections = data || [];
     } catch (_) { _collections = []; }
     updateCollectionsBadge();
@@ -6614,7 +6842,9 @@
     const name = await openNameModal({ title: L('New collection', '新規コレクション'), okLabel: L('Create collection', 'コレクションを作成') });
     if (!name) return null;
     try {
-      const { data, error } = await sb.from('collections').insert({ org_id: currentOrg.id, name }).select().single();
+      const colRow = { org_id: currentOrg.id, name }; if (currentBrand) colRow.brand_id = currentBrand.id;
+      if (currentBrand && currentBrand.frozen) { toast(L('This brand is read-only.', 'このブランドは読み取り専用です。'), false, 2600); return null; }
+      const { data, error } = await sb.from('collections').insert(colRow).select().single();
       if (error) throw error;
       if (thenMoveProject) await moveToCollection(thenMoveProject, data.id);
       await fetchCollections();
