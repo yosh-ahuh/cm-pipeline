@@ -607,7 +607,25 @@
     color: var(--accent-ink); font-size: var(--t-label); font-weight: 700; }
   .brand-default-note .ic { width: 14px; height: 14px; }
 
-  .wiz-board { display: grid; grid-template-columns: 180px minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 60px; align-items: start; }
+  .wiz-board { display: grid; grid-template-columns: 220px minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 60px; align-items: start; }
+  /* P1: 7ステップの共通進捗列（ウィザード／台本／素材／初稿で共有） */
+  .steps-col { position: sticky; top: calc(var(--topbar-h) + 20px); display: flex; flex-direction: column; gap: 10px; }
+  .steps-col .steps { position: static; }
+  .cm-name-lbl { font-size: var(--t-label-sm); font-weight: 700; color: var(--muted); letter-spacing: .04em; }
+  .cm-name { width: 100%; min-height: 40px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink); font-size: var(--t-body-sm); font-weight: 700; }
+  .cm-name:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .step-nav.upcoming { opacity: .55; }
+  .step-nav .sd { display: block; font-size: var(--t-label-sm); color: var(--faint); font-weight: 400; line-height: 1.3; }
+  .free-add { display: flex; gap: 8px; margin-top: var(--s-3); align-items: center; }
+  .free-add input { flex: 1; min-height: 44px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink); font-size: var(--t-body-sm); }
+  .free-add input:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .free-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .free-chips:empty { display: none; }
+  .free-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 6px 0 12px; border-radius: var(--r-full); background: var(--accent-soft); color: var(--accent-ink); font-size: var(--t-label); font-weight: 700; }
+  .free-chip button { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; color: inherit; }
+  .free-chip button:hover { background: var(--hover); }
+  .free-chip .ic { width: 12px; height: 12px; stroke-width: 3; }
+  .step-q.sub-note { font-size: var(--t-body-sm); color: var(--muted); font-weight: 500; margin: 0 0 var(--s-3); }
 
   .steps { position: sticky; top: calc(var(--topbar-h) + 20px); list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
   .step-nav { display: grid; grid-template-columns: 24px 1fr; gap: 12px; align-items: center; min-height: 44px; padding: 0 10px; border-radius: var(--r-sm); position: relative; text-align: left; width: 100%; }
@@ -717,7 +735,105 @@
   .mode-switch button { min-height: 34px; padding: 0 16px; border-radius: 6px; font-size: var(--t-label); font-weight: 700; color: var(--muted); transition: background var(--dur-fast), color var(--dur-fast); }
   .mode-switch button:hover { color: var(--ink); }
   .mode-switch button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); }
-  .script-board { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 56px; align-items: start; }
+  .script-board { display: grid; grid-template-columns: 220px minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 56px; align-items: start; }
+  .flow-steps { position: sticky; top: calc(var(--topbar-h) + 20px); min-width: 0; max-width: 100%; }
+  .flow-steps .steps { max-width: 100%; }
+  .steps-col { min-width: 0; max-width: 100%; }
+  /* P1: 台本カードの3行（ナレーション／文字／必要な素材） */
+  .scut-row { display: grid; grid-template-columns: 76px minmax(0,1fr); gap: 8px; align-items: start; font-size: var(--t-body-sm); line-height: 1.55; }
+  .scut-row .lab { font-family: var(--font-mono); font-size: var(--t-label-sm); color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); padding: 1px 6px; border-radius: 5px; text-align: center; margin-top: 2px; }
+  .scut-row.na .lab { color: var(--accent-ink); background: var(--accent-soft); border-color: transparent; }
+  .scut-row .pending { color: var(--faint); }
+  .scut-row .need { color: var(--warn); font-weight: 700; }
+  .scut-row .auto { color: var(--good); font-weight: 700; }
+  .needs-list { padding: 6px 16px 14px; display: flex; flex-direction: column; gap: 8px; font-size: var(--t-body-sm); }
+  .needs-list .nr { display: flex; align-items: center; gap: 8px; }
+  .needs-list .badge { flex: none; }
+  /* 素材ステップ */
+  .asset-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-1); overflow: hidden; }
+  .asset-panel .panel-h { padding: var(--s-4); border-bottom: 1px solid var(--line); }
+  .asset-music { padding: var(--s-4); display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); }
+  .asset-music .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .asset-music input[type=url] { flex: 1; min-width: 200px; min-height: 42px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink); font-size: var(--t-body-sm); }
+  .asset-music input[type=url]:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .asset-note { font-size: var(--t-label); color: var(--warn); font-weight: 700; }
+  .asset-note.ok { color: var(--good); }
+  /* 初稿確認：進み具合は折りたたみ */
+  .acc-details { padding: 0 8px 8px; }
+  .acc-details summary { cursor: pointer; list-style: none; font-size: var(--t-label-sm); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 12px 8px 4px; display: flex; align-items: center; gap: 6px; }
+  .acc-details summary::-webkit-details-marker { display: none; }
+  .acc-details summary::after { content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); margin-left: auto; transition: transform var(--dur-fast); }
+  .acc-details[open] summary::after { transform: rotate(45deg); }
+  .review-points { padding: 6px 16px 14px; display: flex; flex-direction: column; gap: 8px; font-size: var(--t-body-sm); color: var(--muted); }
+  .review-points .rp { display: flex; gap: 8px; align-items: flex-start; }
+  .review-points .rp i { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); font-style: normal; font-weight: 800; font-size: var(--t-label-sm); display: grid; place-items: center; }
+  /* ホーム：続きから／目的から作る */
+  .resume { display: grid; grid-template-columns: 200px minmax(0,1fr) auto; gap: var(--s-5); align-items: center; padding: var(--s-5) var(--s-6); margin: var(--s-6) 0 var(--s-4);
+    background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); border: 2px solid var(--accent-ink); border-radius: var(--r-xl); }
+  .resume .r-thumb { height: 112px; border-radius: var(--r-md); background: linear-gradient(150deg, #3A5BA0, #233a6b); }
+  .resume .r-eye { font-family: var(--font-mono); font-size: var(--t-label-sm); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); }
+  .resume h2 { font-family: var(--font-display); font-size: 22px; font-weight: 800; margin: 4px 0 6px; }
+  .resume .r-meter { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; }
+  .resume .r-meter .u-meter { width: 240px; margin: 0; }
+  .resume .r-next { font-size: var(--t-body-sm); color: var(--muted); }
+  .resume .r-next b { color: var(--ink); }
+  .goals-start { margin: var(--s-2) 0 var(--s-6); }
+  .goals-start .dash-h { margin-bottom: var(--s-3); }
+  .goals-start .dash-h span { font-size: var(--t-label); color: var(--muted); }
+  .goal-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: var(--s-3); }
+  .goal { text-align: left; display: flex; gap: 12px; align-items: center; min-width: 0; padding: 12px 36px 12px 14px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-md); position: relative; min-height: 64px; transition: border-color var(--dur-fast), background var(--dur-fast); }
+  .goal:hover { border-color: var(--line-strong); background: var(--surface-2); }
+  .goal[aria-pressed="true"] { border-color: var(--accent-ink); background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); }
+  .goal .g-ic { flex: none; width: 36px; height: 36px; border-radius: var(--r-sm); background: var(--surface-2); color: var(--accent-ink); display: grid; place-items: center; }
+  .goal[aria-pressed="true"] .g-ic { background: var(--accent); color: var(--on-accent); }
+  .goal .g-ic svg { width: 18px; height: 18px; }
+  .goal > span:not(.g-ic):not(.g-tick) { min-width: 0; }
+  .goal .g-t { display: block; font-size: var(--t-body-sm); font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+  .goal .g-d { font-size: var(--t-label-sm); color: var(--muted); margin-top: 2px; }
+  .goal .g-tick { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; color: transparent; }
+  .goal .g-tick .ic { width: 11px; height: 11px; stroke-width: 3.5; }
+  .goal[aria-pressed="true"] .g-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .goals-start .free-add { margin-top: var(--s-3); }
+  #view-dash.has-work .dash-hero { display: none; }
+  /* モバイル：ボトムナビ（HIG タブバー相当） */
+  .bottom-nav { display: none; }
+  @media (max-width: 720px) {
+    .steps-col { position: static; }
+    .script-board { grid-template-columns: 1fr; }
+    .flow-steps { position: static; }
+    .flow-steps .steps { flex-direction: row; overflow-x: auto; gap: 4px; }
+    .flow-steps .step-nav { min-width: max-content; }
+    .step-nav .sd { display: none; }
+    .resume { grid-template-columns: 1fr; }
+    .resume .r-thumb { height: 80px; }
+    .goal-grid { grid-template-columns: 1fr; }
+    .goals-start .free-add { flex-wrap: wrap; }
+    .goals-start .free-add input { flex-basis: 100%; }
+    body.signed-in { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+    body.signed-in .bottom-nav { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
+      height: calc(64px + env(safe-area-inset-bottom)); padding: 6px 4px env(safe-area-inset-bottom); background: color-mix(in srgb, var(--surface) 92%, transparent);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid var(--line); }
+    .bn-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: var(--r-sm); font-size: var(--t-label-sm); font-weight: 700; color: var(--muted); min-height: 52px; }
+    .bn-item[aria-current="page"] { color: var(--accent-ink); }
+    .bn-item .ic { width: 22px; height: 22px; }
+    .bn-item.mk .ic { width: 40px; height: 40px; border-radius: 12px; background: var(--accent); color: var(--on-accent); padding: 9px; }
+    body.signed-in .fab-new.fab-new { display: none; }   /* ボトムナビの「作る」に統合 */
+    .toast-wrap { bottom: calc(84px + env(safe-area-inset-bottom)); }
+    .wiz-nav, .cta-row { bottom: calc(64px + env(safe-area-inset-bottom)); }   /* ボトムナビの上に重ねる */
+    /* 下部バーの長いボタンは折り返し、主ボタンは全幅 */
+    .wiz-nav { flex-wrap: wrap; }
+    .wiz-nav .btn { white-space: normal; text-align: center; }
+    .wiz-nav .btn.auto { flex: 1 1 100%; }
+    .wiz-nav .asset-note { flex-basis: 100%; }
+  }
+  @media (min-width: 721px) and (max-width: 1080px) {
+    .script-board { grid-template-columns: 1fr; }
+    .flow-steps { position: static; }
+    .flow-steps .steps { flex-direction: row; overflow-x: auto; gap: 4px; }
+    .flow-steps .step-nav { min-width: max-content; }
+    .steps-col { position: static; }
+    .goal-grid { grid-template-columns: 1fr 1fr; }
+  }
 
   .board-main { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
   .board-list { display: flex; flex-direction: column; gap: var(--s-3); }
@@ -1882,6 +1998,13 @@
   <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>アカウントを管理する</span></button>
 </div>
 
+<nav class="bottom-nav" id="bottomNav" aria-label="モバイルナビ">
+  <button type="button" class="bn-item" data-act="home"><svg class="ic"><use href="#i-home"/></svg><span>ホーム</span></button>
+  <button type="button" class="bn-item mk" data-act="new"><svg class="ic"><use href="#i-plus"/></svg><span>作る</span></button>
+  <button type="button" class="bn-item" data-act="media"><svg class="ic"><use href="#i-film"/></svg><span>マイCM</span></button>
+  <button type="button" class="bn-item" data-act="help"><svg class="ic"><use href="#i-alert"/></svg><span>ガイド</span></button>
+</nav>
+
 <header id="topbar">
   <div class="topbar-in">
     <button class="icon-btn" id="sbToggle" aria-label="メニューを開く" aria-controls="sidebar" aria-expanded="false"><svg class="ic"><use href="#i-menu"/></svg></button>
@@ -1914,6 +2037,28 @@
     </div>
   </section>
 
+  <section class="resume" id="resumeCard" hidden>
+    <div class="r-thumb" id="resumeThumb"></div>
+    <div>
+      <div class="r-eye">続きから</div>
+      <h2 id="resumeName">—</h2>
+      <div class="r-meter"><div class="u-meter" role="progressbar" aria-label="進み具合" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"><i id="resumeMeter" style="width:0%"></i></div><span class="muted" id="resumeStep" style="font-size:var(--t-label);font-weight:700"></span></div>
+      <div class="r-next">次にやること: <b id="resumeNext">—</b></div>
+    </div>
+    <button type="button" class="btn btn-primary auto" id="resumeBtn"><span>続きから再開</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
+  </section>
+
+  <section class="goals-start" id="goalsStart">
+    <div class="dash-h"><h2>目的から作る</h2><span>複数選べます。目的に合わせて流す場所と伝え方をおすすめします。</span></div>
+    <div class="goal-grid" id="homeGoals" role="group" aria-label="目的"></div>
+    <div class="free-chips" id="homeGoalsChips" aria-live="polite"></div>
+    <div class="free-add">
+      <input id="homeGoalsFree" type="text" placeholder="ほかの目的を書いて追加（例: 展示会のブースで流したい）" aria-label="ほかの目的">
+      <button type="button" class="btn btn-ghost wauto" id="homeGoalsAdd"><svg class="ic"><use href="#i-plus"/></svg><span>追加</span></button>
+      <button type="button" class="btn btn-primary wauto" id="homeGoalsStart"><span id="homeGoalsStartText">この目的で始める</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
+    </div>
+  </section>
+
   <div class="dash-h">
     <h2>制作中・完成したCM</h2>
     <div class="filters" role="group" aria-label="絞り込み">
@@ -1929,7 +2074,7 @@
 <!-- ============================ WIZARD VIEW ============================ -->
 <main class="wrap" id="view-wizard" hidden>
   <div class="wiz-head">
-    <div class="wiz-eyebrow"><span>新規CM ・ ステップ <span id="stepNum">1</span> / 4<span class="page-ind" id="pageInd" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span></span><span class="wiz-progress" aria-hidden="true"><i id="wizProg"></i></span></div>
+    <div class="wiz-eyebrow"><span>新規CM ・ ステップ <span id="stepNum">1</span> / 7<span class="page-ind" id="pageInd" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></span></span><span class="wiz-progress" aria-hidden="true"><i id="wizProg"></i></span></div>
     <h1 class="wiz-title">つくりたいCMを、選ぶだけ。
       <small>プロンプトは書かなくて大丈夫。選択肢の裏に、広告制作の勝ちパターンが入っています。</small>
     </h1>
@@ -1940,20 +2085,19 @@
   </div>
 
   <div class="wiz-board">
-    <!-- step nav -->
-    <ol class="steps" id="stepNav" aria-label="ステップ">
-      <li><button class="step-nav current" data-s="0" aria-current="step"><span class="sn">1</span><span class="st">配信先</span></button></li>
-      <li><button class="step-nav" data-s="1"><span class="sn">2</span><span class="st">業種</span></button></li>
-      <li><button class="step-nav" data-s="2"><span class="sn">3</span><span class="st">ターゲット</span></button></li>
-      <li><button class="step-nav" data-s="3"><span class="sn">4</span><span class="st">伝え方・トーン</span></button></li>
-    </ol>
+    <!-- step nav（7ステップ・共通進捗列） -->
+    <div class="steps-col">
+      <label class="cm-name-lbl" for="cmName">CM の名前</label>
+      <input id="cmName" class="cm-name" type="text" maxlength="60" placeholder="例: 夏の新規登録キャンペーン" autocomplete="off">
+      <ol class="steps" id="stepNav" aria-label="ステップ"></ol>
+    </div>
 
     <!-- steps -->
     <section>
       <!-- STEP 1: 配信先 -->
       <div class="wiz-step on" data-step="0">
         <div class="step-q">どこで流す広告ですか?</div>
-        <div class="step-hint">選んだ配信先に合わせて、長さ・縦横・冒頭フックの型が自動で決まります。複数選択できます。</div>
+        <div class="step-hint">ここで書き出し形式（横長・縦長・正方形）も決まります。選んだ配信先に合わせて、長さ・冒頭の見せ方が自動で決まります。複数選択できます。</div>
         <div class="opt-grid" data-multi="true" data-key="media" role="group" aria-label="配信先">
           <button class="opt" aria-pressed="true" data-val="YouTube" data-fmt="16:9" data-len="15〜30秒">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
@@ -2014,49 +2158,73 @@
         </div>
       </div>
 
-      <!-- STEP 2: 業種 -->
+      <!-- STEP 2: 目的（複数選択＋自由入力） -->
       <div class="wiz-step" data-step="1">
-        <div class="step-q">どんなプロダクトですか?</div>
-        <div class="step-hint">業種ごとに、見た目と伝え方が変わります。ひとつ選んでください。</div>
-        <div class="opt-grid" data-multi="false" data-key="industry" role="radiogroup" aria-label="業種">
-          <button class="opt" aria-pressed="true" data-val="SaaS・アプリ">
+        <div class="step-q">このCMで、何を実現したいですか?</div>
+        <div class="step-hint">目的に合わせて、伝え方の型をおすすめします。複数選べます。当てはまらなければ下に自由に書いてください。</div>
+        <div class="opt-grid" data-multi="true" data-key="goals" role="group" aria-label="目的">
+          <button class="opt" aria-pressed="true" data-val="問い合わせを増やしたい">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
-            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M8 3v6"/></svg></span>
-            <span class="o-name">SaaS・アプリ</span>
-            <span class="o-desc">実際のアプリ画面で信頼感。あなたの画面を映像に入れます</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h18v10H3zM7 21h10M12 18v3"/></svg></span>
+            <span class="o-name">問い合わせを増やしたい</span>
+            <span class="o-desc">YouTube広告・「困りごと」から見せる</span>
           </button>
-          <button class="opt" data-val="EC・D2C">
+          <button class="opt" data-val="資料請求・無料トライアルを増やしたい">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
-            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg></span>
-            <span class="o-name">EC・D2C</span>
-            <span class="o-desc">商品ビジュアル・商品の魅力を伝える</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h12l4 4v12H4zM8 12h8M8 16h5"/></svg></span>
+            <span class="o-name">資料請求・無料トライアルを増やしたい</span>
+            <span class="o-desc">使う場面を見せて、次の一歩を軽く</span>
           </button>
-          <button class="opt" data-val="不動産">
+          <button class="opt" data-val="サービスを知ってほしい">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
-            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10 12 3l9 7M5 9v11h14V9"/></svg></span>
-            <span class="o-name">不動産</span>
-            <span class="o-desc">空間・立地・安心感</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg></span>
+            <span class="o-name">サービスを知ってほしい</span>
+            <span class="o-desc">リール・SNS投稿・雰囲気で惹きつける</span>
           </button>
-          <button class="opt" data-val="採用">
+          <button class="opt" data-val="新機能・アップデートを伝えたい">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
-            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M17 11l2 2 4-4"/></svg></span>
-            <span class="o-name">採用</span>
-            <span class="o-desc">共感・カルチャー・働く人</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V4M5 11l7-7 7 7"/></svg></span>
+            <span class="o-name">新機能・アップデートを伝えたい</span>
+            <span class="o-desc">既存のお客さま向け・画面中心</span>
           </button>
-          <button class="opt" data-val="飲食">
+          <button class="opt" data-val="導入事例を紹介したい">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
-            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 10v11M17 3c-2 0-3 2-3 5s1 4 3 4 3-1 3-4-1-5-3-5zM17 12v9"/></svg></span>
-            <span class="o-name">飲食</span>
-            <span class="o-desc">シズル・食欲・臨場感</span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v10H8l-4 4z"/></svg></span>
+            <span class="o-name">導入事例を紹介したい</span>
+            <span class="o-desc">お客さまの声を中心に</span>
+          </button>
+          <button class="opt" data-val="イベント・セミナーに集客したい">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v15H4zM4 10h16M8 3v4M16 3v4"/></svg></span>
+            <span class="o-name">イベント・セミナーに集客したい</span>
+            <span class="o-desc">日時と申込を大きく</span>
+          </button>
+          <button class="opt" data-val="キャンペーン・期間限定を告知したい">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18"/></svg></span>
+            <span class="o-name">キャンペーン・期間限定を告知したい</span>
+            <span class="o-desc">期限を目立たせる</span>
+          </button>
+          <button class="opt" data-val="採用に使いたい">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 8a3 3 0 1 0 0 .1M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M17 11l2 2 4-4"/></svg></span>
+            <span class="o-name">採用に使いたい</span>
+            <span class="o-desc">働く人と職場を見せる</span>
           </button>
         </div>
+        <div class="free-chips" id="goalsChips" aria-live="polite"></div>
+        <div class="free-add">
+          <input id="goalsFree" type="text" placeholder="ほかの目的を書いて追加（例: 展示会のブースで流したい）" aria-label="ほかの目的">
+          <button type="button" class="btn btn-ghost wauto" id="goalsAdd"><svg class="ic"><use href="#i-plus"/></svg><span>追加</span></button>
+        </div>
+        <div class="multi-note" id="goalsNote" aria-live="polite">目的はいくつでも選べます。</div>
       </div>
 
       <!-- STEP 3: ターゲット -->
       <div class="wiz-step" data-step="2">
         <div class="step-q">誰に届けますか?</div>
-        <div class="step-hint">見る人によって、伝え方の入口とテンポが変わります。ひとつ選んでください。</div>
-        <div class="opt-grid" data-multi="false" data-key="target" role="radiogroup" aria-label="ターゲット">
+        <div class="step-hint">見る人によって、最初の2秒の見せ方とテンポが変わります。複数選べます。複数のときは、いちばん上に選んだ相手に冒頭を合わせます。</div>
+        <div class="opt-grid" data-multi="true" data-key="targets" role="group" aria-label="届ける相手">
           <button class="opt" aria-pressed="true" data-val="実務担当者">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
             <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20a8 8 0 0 1 16 0M12 3a5 5 0 0 0-5 5h10a5 5 0 0 0-5-5zM7 8v2M17 8v2"/></svg></span>
@@ -2081,13 +2249,43 @@
             <span class="o-name">Z世代</span>
             <span class="o-desc">テンポ・世界観・共感で入る</span>
           </button>
+          <button class="opt" data-val="情報システム・IT担当">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H4zM8 20h8M12 16v4M8 8h4"/></svg></span>
+            <span class="o-name">情報システム・IT担当</span>
+            <span class="o-desc">安全性と連携のしやすさを最初に</span>
+          </button>
+          <button class="opt" data-val="マーケティング・営業担当">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16M7 20v-7M12 20V6M17 20v-10"/></svg></span>
+            <span class="o-name">マーケティング・営業担当</span>
+            <span class="o-desc">成果と使い勝手を最初に</span>
+          </button>
+          <button class="opt" data-val="人事・採用担当">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 8a3 3 0 1 0 0 .1M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M17 7h4M19 5v4"/></svg></span>
+            <span class="o-name">人事・採用担当</span>
+            <span class="o-desc">働く人と職場の雰囲気を最初に</span>
+          </button>
+          <button class="opt" data-val="既存のお客さま">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20C7.5 16.5 4 13.4 4 9.3A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 8 2.3c0 4.1-3.5 7.2-8 10.7z"/></svg></span>
+            <span class="o-name">既存のお客さま</span>
+            <span class="o-desc">新しくできることを最初に</span>
+          </button>
         </div>
+        <div class="free-chips" id="targetsChips" aria-live="polite"></div>
+        <div class="free-add">
+          <input id="targetsFree" type="text" placeholder="ほかの相手を書いて追加（例: 地方の工務店の二代目社長）" aria-label="ほかの相手">
+          <button type="button" class="btn btn-ghost wauto" id="targetsAdd"><svg class="ic"><use href="#i-plus"/></svg><span>追加</span></button>
+        </div>
+        <div class="multi-note" id="targetsNote" aria-live="polite">相手はいくつでも選べます。</div>
       </div>
 
-      <!-- STEP 4: 伝え方・トーン -->
+      <!-- STEP 4: 伝えたいこと（伝え方・トーン・業種） -->
       <div class="wiz-step" data-step="3">
         <div class="step-q">どう見せますか?</div>
-        <div class="step-hint">伝え方とトーンを選びます。ひとつずつ。</div>
+        <div class="step-hint">伝え方とトーンを選びます。ひとつずつ。業種はブランド登録後に自動で入ります。</div>
         <div class="opt-grid" data-multi="false" data-key="angle" role="radiogroup" aria-label="伝え方">
           <button class="opt" aria-pressed="true" data-val="課題解決">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
@@ -2141,6 +2339,40 @@
             <span class="o-desc">洗練・ミニマル・都会的</span>
           </button>
         </div>
+        <div class="step-q sub">業種</div>
+        <div class="step-q sub-note">ブランド登録後は自動で入ります。いまは近いものをひとつ選んでください。</div>
+        <div class="opt-grid" data-multi="false" data-key="industry" role="radiogroup" aria-label="業種">
+          <button class="opt" aria-pressed="true" data-val="SaaS・アプリ">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M8 3v6"/></svg></span>
+            <span class="o-name">SaaS・アプリ</span>
+            <span class="o-desc">実際のアプリ画面で信頼感。あなたの画面を映像に入れます</span>
+          </button>
+          <button class="opt" data-val="EC・D2C">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg></span>
+            <span class="o-name">EC・D2C</span>
+            <span class="o-desc">商品ビジュアル・商品の魅力を伝える</span>
+          </button>
+          <button class="opt" data-val="不動産">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10 12 3l9 7M5 9v11h14V9"/></svg></span>
+            <span class="o-name">不動産</span>
+            <span class="o-desc">空間・立地・安心感</span>
+          </button>
+          <button class="opt" data-val="採用">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M17 11l2 2 4-4"/></svg></span>
+            <span class="o-name">採用</span>
+            <span class="o-desc">共感・カルチャー・働く人</span>
+          </button>
+          <button class="opt" data-val="飲食">
+            <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
+            <span class="o-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 10v11M17 3c-2 0-3 2-3 5s1 4 3 4 3-1 3-4-1-5-3-5zM17 12v9"/></svg></span>
+            <span class="o-name">飲食</span>
+            <span class="o-desc">シズル・食欲・臨場感</span>
+          </button>
+        </div>
       </div>
 
       <div class="wiz-nav">
@@ -2159,8 +2391,9 @@
       <div class="rx-body">
         <div class="rx-sel">
           <div class="rx-line"><span class="rl-k">配信先</span><span class="rl-v empty" data-rx="media">未選択</span></div>
+          <div class="rx-line"><span class="rl-k">目的</span><span class="rl-v empty" data-rx="goals">未選択</span></div>
+          <div class="rx-line"><span class="rl-k">届ける相手</span><span class="rl-v empty" data-rx="targets">未選択</span></div>
           <div class="rx-line"><span class="rl-k">業種</span><span class="rl-v empty" data-rx="industry">未選択</span></div>
-          <div class="rx-line"><span class="rl-k">ターゲット</span><span class="rl-v empty" data-rx="target">未選択</span></div>
           <div class="rx-line"><span class="rl-k">伝え方</span><span class="rl-v empty" data-rx="angle">未選択</span></div>
           <div class="rx-line"><span class="rl-k">トーン</span><span class="rl-v empty" data-rx="tone">未選択</span></div>
         </div>
@@ -2191,8 +2424,8 @@
 <main class="wrap" id="view-script" hidden>
   <section class="context">
     <div>
-      <h1 class="title-h1">台本と絵コンテ</h1>
-      <div class="title-sub">選択から、AIがディレクターとして構成を組みました。各カットは言葉で直せます。</div>
+      <h1 class="title-h1">台本を確認</h1>
+      <div class="title-sub">AIが構成を組みました。気になるところは言葉で直せます。この台本で、次に必要な素材が決まります。</div>
     </div>
     <div class="meta-row" style="align-items:center">
       <div class="mode-switch" id="scriptMode" role="tablist" aria-label="モード">
@@ -2203,12 +2436,13 @@
   </section>
 
   <div class="script-board">
+    <div class="flow-steps"><ol class="steps" id="flowStepsScript" aria-label="ステップ"></ol></div>
     <div class="board-main">
       <!-- 台本を持ち込む：貼り付け or アップロード -->
       <div class="own-script" id="ownScript" hidden>
         <div class="os-head">台本を持ち込む</div>
         <p class="os-sub">お持ちの台本を貼り付けるか、テキストファイルをアップロードしてください。各カットのナレーションと指示は下のカードで編集できます。</p>
-        <textarea id="ownScriptText" class="os-text" placeholder="例）&#10;#1 冒頭フック：「現場写真の整理、まだ手作業ですか？」&#10;#2 課題：毎日の集計に時間がかかる…&#10;#3 解決：スマホで撮るだけ、台帳が自動でできる"></textarea>
+        <textarea id="ownScriptText" class="os-text" placeholder="行頭に「カット1:」のように書くと、そのカット割りをそのまま使います。例）&#10;#1 冒頭フック：「現場写真の整理、まだ手作業ですか？」&#10;#2 課題：毎日の集計に時間がかかる…&#10;#3 解決：スマホで撮るだけ、台帳が自動でできる"></textarea>
         <div class="os-actions">
           <input type="file" id="ownScriptFile" accept=".txt,.md,.rtf,text/plain" hidden>
           <button type="button" class="btn btn-ghost wauto" id="ownScriptUpload"><svg class="ic"><use href="#i-plus"/></svg><span>ファイルをアップロード</span></button>
@@ -2218,8 +2452,35 @@
       <div class="board-list" id="boardList"></div>
     </div>
 
-    <aside class="shot-panel">
-      <div class="panel-h">用意する素材 <span class="count" id="shotCount">4/4</span></div>
+    <aside class="panel" id="scriptNeeds">
+      <div class="panel-h">この台本で必要な素材</div>
+      <div class="needs-list" id="needsList"></div>
+      <div class="ai-shot"><b>台本が決まってから</b>素材をお願いするので、使わない素材を用意せずに済みます。実写の人物・背景はAIがつくります。</div>
+    </aside>
+  </div>
+
+  <div class="wiz-nav">
+    <button class="btn btn-ghost" id="scriptBack"><svg class="ic"><use href="#i-arrow-left"/></svg><span>選択に戻る</span></button>
+    <button class="btn btn-tonal wauto" id="scriptSaveLater"><span>保存して後で続ける</span></button>
+    <div class="grow"></div>
+    <button class="btn btn-primary auto" id="scriptNext"><span>この台本で進む：素材をアップ</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
+  </div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ ASSETS VIEW（P1: 台本で決まった素材をアップ） ============================ -->
+<main class="wrap" id="view-assets" hidden>
+  <section class="context">
+    <div>
+      <h1 class="title-h1">素材をアップロードしてください</h1>
+      <div class="title-sub">台本で必要になった分だけお願いします。ロゴはブランドから自動で入ります。手元にないものは、あとから追加できます。</div>
+    </div>
+  </section>
+  <div class="script-board">
+    <div class="flow-steps"><ol class="steps" id="flowStepsAssets" aria-label="ステップ"></ol></div>
+    <div class="board-main">
+    <div class="asset-panel">
+      <div class="panel-h">台本で決まった素材 <span class="count" id="shotCount">0/0</span></div>
       <p style="padding:10px 16px 0;margin:0;font-size:var(--t-label-sm);color:var(--muted);line-height:1.55">各項目をクリックして、お手元のファイル（画面録画・スクショ・ロゴ・写真）をアップロードします。すべて任意で、無い場合はAIがつくります。</p>
       <div class="shot-list" id="shotList">
         <div class="shot-item up"><span class="sck"><svg class="ic"><use href="#i-check"/></svg></span><div><div class="si-name">ダッシュボード画面</div><div class="si-desc">一覧・撮影・PDFの3画面</div></div><span class="si-tag">UP済</span></div>
@@ -2230,14 +2491,34 @@
       <div class="ai-shot">
         <b>AIがディレクター。</b>台本の各カットから「何を撮ればいいか」を自動でリスト化。あなたは指示どおりに素材を上げるだけ。実写の人物・背景はAIがつくります。
       </div>
+    </div>
+      <div class="asset-panel" style="margin-top:16px">
+        <div class="panel-h">音楽の参考 <span class="count" style="color:var(--muted)">任意</span></div>
+        <div class="asset-music">
+          <p class="muted" style="margin:0;font-size:var(--t-label);line-height:1.55">雰囲気の参考にだけ使います。そのままは使いません。MP3 か YouTube のリンクで。</p>
+          <div class="row">
+            <input type="url" id="musicUrl" placeholder="https://youtube.com/watch?v=…" aria-label="YouTube のリンク" inputmode="url">
+            <button type="button" class="btn btn-ghost wauto" id="musicUrlSave"><span>リンクを保存</span></button>
+          </div>
+          <div class="row">
+            <input type="file" id="musicFile" accept="audio/*,.mp3,.m4a,.wav" hidden>
+            <button type="button" class="btn btn-ghost wauto" id="musicFileBtn"><svg class="ic"><use href="#i-plus"/></svg><span>MP3 を選ぶ</span></button>
+            <span class="faint" id="musicState" style="font-size:var(--t-label)">なしで進むと、AIが選びます</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="panel" id="assetsSide">
+      <div class="panel-h">素材はここで使われます</div>
+      <div class="needs-list" id="assetsMap"></div>
+      <div class="ai-shot"><b>スクショの撮り方:</b> Mac は shift＋command＋3、Windows は Windows＋shift＋S。アプリの画面をそのまま撮ってください。偽の画面はつくりません。</div>
     </aside>
   </div>
-
   <div class="wiz-nav">
-    <button class="btn btn-ghost" id="scriptBack"><svg class="ic"><use href="#i-arrow-left"/></svg><span>選択に戻る</span></button>
-    <button class="btn btn-tonal wauto" id="scriptSaveLater"><span>保存して後で続ける</span></button>
+    <button class="btn btn-ghost" id="assetsBack"><svg class="ic"><use href="#i-arrow-left"/></svg><span>台本に戻る</span></button>
     <div class="grow"></div>
-    <button class="btn btn-primary auto" id="scriptNext"><span>この構成でつくる</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
+    <span class="asset-note" id="assetsNote" aria-live="polite"></span>
+    <button class="btn btn-primary auto" id="assetsNext"><span>次へ：初稿をつくる</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
   </div>
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
@@ -2309,8 +2590,8 @@
 <main class="wrap" id="view-workspace" hidden>
   <section class="context">
     <div>
-      <h1 class="title-h1" id="wsTitle">工事台帳CM ・ 制作画面</h1>
-      <div class="title-sub" id="wsSub">このページで進捗と仕上がりを確認できます。</div>
+      <h1 class="title-h1" id="wsTitle">初稿を確認</h1>
+      <div class="title-sub" id="wsSub">3つの案から、気に入ったものを選んでください。映像と文字は同じで、最初の2秒の演出と音楽が違います。</div>
     </div>
     <div class="meta-row">
       <span class="meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8"/></svg>業種 <b id="wsMetaIndustry">建設SaaS</b></span>
@@ -2323,7 +2604,9 @@
   <div class="board">
     <!-- ============ pipeline rail ============ -->
     <aside class="panel rail" id="pipelinePanel">
-      <div class="panel-h">制作パイプライン</div>
+      <ol class="steps" id="flowStepsWork" aria-label="ステップ" style="padding:8px 8px 0"></ol>
+      <details class="acc-details" id="pipelineDetails">
+      <summary>制作の進み具合</summary>
       <ol class="stages">
         <li class="stage done"><div class="node"><svg class="ic"><use href="#i-check"/></svg></div><div><div class="s-name">ブリーフ</div><div class="s-desc">配信先×業種×伝え方を選択</div></div></li>
         <li class="stage done"><div class="node"><svg class="ic"><use href="#i-check"/></svg></div><div><div class="s-name">台本・絵コンテ</div><div class="s-desc">AIが構成 → 共同編集</div></div></li>
@@ -2339,6 +2622,7 @@
           <div class="ok"><svg class="ic sm"><use href="#i-check"/></svg><span>4/4 素材アップ済み</span></div>
         </div>
       </div>
+      </details>
     </aside>
 
     <!-- ============ main stage ============ -->
@@ -2392,6 +2676,14 @@
 
     <!-- ============ right panel ============ -->
     <aside class="side">
+      <div class="panel" id="reviewPointsPanel">
+        <div class="panel-h">確認のポイント</div>
+        <div class="review-points">
+          <div class="rp"><i>1</i><span>会社名・サービス名の読み方は合っていますか</span></div>
+          <div class="rp"><i>2</i><span>アプリの画面は最新のものですか</span></div>
+          <div class="rp"><i>3</i><span>電話番号・URL・金額に間違いはありませんか</span></div>
+        </div>
+      </div>
       <div class="panel" id="voicePanel">
         <div class="panel-h">ナレーションの声</div>
         <p class="muted" style="margin:0 0 10px;font-size:var(--t-label-sm);line-height:1.55">聞いてから選べます。子供〜お年寄り、声のトーンも変えられます。</p>
@@ -2442,7 +2734,7 @@
       </div>
 
       <div class="cta-row">
-        <button class="btn btn-primary" id="exportBtn"><span>この3形式を書き出す</span></button>
+        <button class="btn btn-primary" id="exportBtn"><span>この案で完成させる</span></button>
         <button class="btn btn-ghost icon-only" id="wsShare" title="共有リンク" aria-label="共有リンク"><svg class="ic"><use href="#i-share"/></svg></button>
       </div>
     </aside>
@@ -3771,9 +4063,25 @@
   window.gotoExport = gotoExport;   // データ層（生成完了→書き出し導線）から呼べるように
 
   // ---------- wizard ----------
-  const sel = { media: [], industry: null, target: null, angle: null, tone: null,
+  const sel = { media: [], goals: [], targets: [], industry: null, target: null, angle: null, tone: null,
     custom: { ratio: '16:9', res: '1080', ratioW: null, ratioH: null, resW: null, resH: null } };
-  const RX_LABELS = { media:'配信先', industry:'業種', target:'ターゲット', angle:'伝え方', tone:'トーン' };
+  const RX_LABELS = { media:'配信先', goals:'目的', targets:'届ける相手', industry:'業種', target:'ターゲット', angle:'伝え方', tone:'トーン' };
+  // P1: 自由入力で追加した目的／相手（選択肢に無い値）。sel[key] は「選択肢で選んだ値 ＋ 自由入力」の合成。
+  const customSel = { goals: [], targets: [] };
+  function mergeMulti(key, grid) {
+    const picked = grid ? [...grid.querySelectorAll('[aria-pressed="true"]')].map(x => x.dataset.val) : [];
+    return picked.concat((customSel[key] || []).filter(v => !picked.includes(v)));
+  }
+  function renderFreeChips(key) {
+    const box = document.getElementById(key + 'Chips'); if (!box) return;
+    box.innerHTML = (customSel[key] || []).map((v, i) => `<span class="free-chip"><span>${String(v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}</span><button type="button" data-rm="${i}" aria-label="削除"><svg class="ic"><use href="#i-x"/></svg></button></span>`).join('');
+  }
+  function syncMulti(key) {
+    const grid = document.querySelector(`#view-wizard .opt-grid[data-key="${key}"]`);
+    sel[key] = mergeMulti(key, grid);
+    if (key === 'targets') sel.target = sel.targets[0] || null;   // 旧フィールド互換（筆頭の相手）
+    renderFreeChips(key); renderRx(); validateStep();
+  }
 
   // カスタム設定：縦横比・解像度から表示文字列を組む（例「16:9 · 1920×1080」）
   function customFmtLabel() {
@@ -3831,8 +4139,8 @@
   });
 
   function renderRx() {
-    for (const k of ['media','industry','target','angle','tone']) {
-      const el = document.querySelector(`[data-rx="${k}"]`);
+    for (const k of ['media','goals','targets','industry','angle','tone']) {
+      const el = document.querySelector(`[data-rx="${k}"]`); if (!el) continue;
       const v = k === 'media' ? sel.media : sel[k];
       if ((Array.isArray(v) && v.length) || (!Array.isArray(v) && v)) {
         el.innerHTML = (Array.isArray(v) ? v : [v]).map(x=>'<span>'+x+'</span>').join(' ・ ');
@@ -3892,7 +4200,8 @@
       if (multi) {
         const on = o.getAttribute('aria-pressed') === 'true';
         o.setAttribute('aria-pressed', on ? 'false' : 'true');
-        sel[key] = [...grid.querySelectorAll('[aria-pressed="true"]')].map(x=>x.dataset.val);
+        sel[key] = mergeMulti(key, grid);
+        if (key === 'targets') sel.target = sel.targets[0] || null;
       } else {
         grid.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-checked','false'));
         o.setAttribute('aria-checked','true');
@@ -3905,13 +4214,25 @@
   // media step needs ≥1 channel — disable Next and explain, instead of failing silently
   const mediaNote = document.getElementById('mediaNote');
   function validateStep() {
-    const ok = step !== 0 || sel.media.length > 0;
+    const okMedia = sel.media.length > 0, okGoals = sel.goals.length > 0, okTargets = sel.targets.length > 0;
+    const ok = step === 0 ? okMedia : step === 1 ? okGoals : step === 2 ? okTargets : true;
     wizNext.disabled = !ok;
     if (mediaNote) {
-      mediaNote.classList.toggle('warn', !ok);
-      mediaNote.textContent = ok ? '選択中の配信先から、書き出す形式が決まります。' : '配信先をひとつ以上選んでください。';
+      mediaNote.classList.toggle('warn', !okMedia);
+      mediaNote.textContent = okMedia ? '選択中の配信先から、書き出す形式が決まります。' : '配信先をひとつ以上選んでください。';
     }
+    const gn = document.getElementById('goalsNote'); if (gn) { gn.classList.toggle('warn', !okGoals); gn.textContent = okGoals ? '目的はいくつでも選べます。' : '目的をひとつ以上選んでください。'; }
+    const tn = document.getElementById('targetsNote'); if (tn) { tn.classList.toggle('warn', !okTargets); tn.textContent = okTargets ? '相手はいくつでも選べます。' : '届ける相手をひとつ以上選んでください。'; }
   }
+  // 自由入力 → チップ追加／削除
+  ['goals', 'targets'].forEach(key => {
+    const inp = document.getElementById(key + 'Free'), add = document.getElementById(key + 'Add'), box = document.getElementById(key + 'Chips');
+    const push = () => { const v = (inp.value || '').trim().slice(0, 40); if (!v) { inp.focus(); return; }
+      if (!customSel[key].includes(v)) customSel[key].push(v); inp.value = ''; syncMulti(key); };
+    if (add) add.addEventListener('click', push);
+    if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); push(); } });
+    if (box) box.addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (!b) return; customSel[key].splice(Number(b.dataset.rm), 1); syncMulti(key); });
+  });
   // sel の内容を選択カードUIへ反映（ブランド既定値の適用などで使用）
   function applySelToUI() {
     document.querySelectorAll('#view-wizard .opt-grid').forEach(grid => {
@@ -3922,6 +4243,11 @@
         const on = multi ? (Array.isArray(val) && val.includes(o.dataset.val)) : (o.dataset.val === val);
         o.setAttribute(attr, on ? 'true' : 'false');
       });
+      if (multi && customSel[grid.dataset.key]) {   // 選択肢に無い値は自由入力チップとして保持
+        const opts = [...grid.querySelectorAll('.opt')].map(o => o.dataset.val);
+        customSel[grid.dataset.key] = (Array.isArray(val) ? val : []).filter(v => !opts.includes(v));
+        renderFreeChips(grid.dataset.key);
+      }
     });
     renderRx(); validateStep();
   }
@@ -3935,7 +4261,8 @@
       if (!d) { if (note) note.hidden = true; return; }
       if (Array.isArray(d.media) && d.media.length) sel.media = d.media;
       if (d.industry) sel.industry = d.industry;
-      if (d.target)   sel.target   = d.target;
+      if (d.target)   { sel.target = d.target; sel.targets = Array.isArray(d.targets) && d.targets.length ? d.targets : [d.target]; }
+      if (Array.isArray(d.goals) && d.goals.length) sel.goals = d.goals;
       if (d.angle)    sel.angle    = d.angle;
       if (d.tone)     sel.tone     = d.tone;
       applySelToUI();
@@ -3946,14 +4273,34 @@
 
   // seed defaults so the panel opens live（ブランド履歴が無い時のフォールバック）
   sel.media = ['YouTube','リール/ショート','SNSタイムライン'];
-  sel.industry = 'SaaS・アプリ'; sel.target = '実務担当者'; sel.angle = '課題解決'; sel.tone = 'ドキュメンタリー';
+  sel.industry = 'SaaS・アプリ'; sel.target = '実務担当者'; sel.targets = ['実務担当者']; sel.goals = ['問い合わせを増やしたい']; sel.angle = '課題解決'; sel.tone = 'ドキュメンタリー';
   renderRx();
+
+  // ---- P1: 7ステップの共通進捗列。ウィザード(0..3)／台本(4)／素材(5)／初稿(6) で同じ列を描く ----
+  const FLOW_STEPS = [
+    ['流す場所', '＝ 書き出し形式'], ['目的', '複数OK'], ['届ける相手', '複数OK'], ['伝えたいこと', '伝え方・トーン'],
+    ['台本を確認', 'AIがつくる／持ち込み'], ['素材をアップ', '台本で決まった分だけ'], ['初稿を確認', '3案から選ぶ'],
+  ];
+  function flowStepsHTML(cur, doneUpTo) {
+    return FLOW_STEPS.map(([t, d], i) => {
+      const done = i < (doneUpTo == null ? cur : doneUpTo), current = i === cur, upcoming = !done && !current;
+      return `<li><button type="button" class="step-nav${current ? ' current' : ''}${done ? ' done' : ''}${upcoming ? ' upcoming' : ''}" data-s="${i}" data-label="${t}"${current ? ' aria-current="step"' : ''}>` +
+        `<span class="sn">${done ? '<svg class="ic"><use href="#i-check"/></svg>' : i + 1}</span><span class="st">${t}<span class="sd">${d}</span></span></button></li>`;
+    }).join('');
+  }
+  window.renderFlowSteps = function (container, cur, doneUpTo) { if (container) container.innerHTML = flowStepsHTML(cur, doneUpTo); };
+  // ステップ列からの移動（4〜6 は案件が作成済みのときだけ）
+  function flowJump(i) {
+    if (i <= 3) { if (!vWiz.hidden) showStep(i); else { gotoWizard(); showStep(i); } return; }
+    if (!window.__currentProjectId) { toast(L('Finish steps 1–4 first.', '先にステップ 1〜4 を進めてください。'), false, 2200); return; }
+    if (i === 4) gotoScript(); else if (i === 5) (window.gotoAssets || gotoScript)(); else if (window.openWorkspace) window.openWorkspace(window.__currentProjectId); else gotoWorkspace();
+  }
+  document.addEventListener('click', e => { const b = e.target.closest('.steps .step-nav[data-s]'); if (!b) return; flowJump(+b.dataset.s); });
 
   // step nav
   let step = 0;
   const steps = document.querySelectorAll('.wiz-step');
-  const navs = document.querySelectorAll('.step-nav');
-  navs.forEach(nv => { nv.dataset.label = nv.querySelector('.st').textContent; });
+  const stepNavEl = document.getElementById('stepNav');
   const wizNext = document.getElementById('wizNext');
   const wizBack = document.getElementById('wizBack');
   const wizNextText = document.getElementById('wizNextText');
@@ -3961,20 +4308,12 @@
   function showStep(n) {
     step = n;
     steps.forEach(s => s.classList.toggle('on', +s.dataset.step === n));
-    navs.forEach(nv => {
-      const i = +nv.dataset.s;
-      nv.classList.toggle('current', i === n);
-      nv.classList.toggle('done', i < n);
-      if (i === n) nv.setAttribute('aria-current', 'step'); else nv.removeAttribute('aria-current');
-      if (i === n) { nv.innerHTML = `<span class="sn">${i + 1}</span><span class="st">${nv.dataset.label}</span>`; }
-      else if (i < n) { nv.innerHTML = `<span class="sn"><svg class="ic"><use href="#i-check"/></svg></span><span class="st">${nv.dataset.label}</span>`; }
-      else { nv.innerHTML = `<span class="sn">${i + 1}</span><span class="st">${nv.dataset.label}</span>`; }
-    });
+    window.renderFlowSteps(stepNavEl, n);
     document.getElementById('stepNum').textContent = n + 1;
-    if (wizProg) wizProg.style.width = ((n + 1) / 4 * 100) + '%';
+    if (wizProg) wizProg.style.width = ((n + 1) / 7 * 100) + '%';
     document.querySelectorAll('#pageInd i').forEach((d, i) => { d.classList.toggle('on', i === n); d.classList.toggle('done', i < n); });   // R20
     wizBack.style.visibility = n === 0 ? 'hidden' : 'visible';
-    wizNextText.textContent = n === 3 ? 'AIが構成を設計' : '次へ';
+    wizNextText.textContent = n === 3 ? 'AIが台本をつくる' : '次へ';
     validateStep();
     const q = document.querySelector('.wiz-step.on .step-q');
     if (q && document.activeElement && document.activeElement.closest('.wiz-nav, .steps')) { q.setAttribute('tabindex', '-1'); q.focus({ preventScroll: true }); }
@@ -3988,8 +4327,14 @@
     }
   });
   wizBack.addEventListener('click', () => { if (step>0) showStep(step-1); });
-  navs.forEach(nv => nv.addEventListener('click', () => showStep(+nv.dataset.s)));
   showStep(0);
+  // CM の名前：既定はブランド名＋筆頭の目的＋日付。空のまま進んだら既定を採用。
+  window.__cmNameDefault = function () {
+    const b = window.__getBrand && window.__getBrand();
+    const d = new Date().toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+    return [(b && b.name) || '', (sel.goals && sel.goals[0]) || 'CM', d].filter(Boolean).join(' / ');
+  };
+  window.__cmName = function () { const i = document.getElementById('cmName'); const v = i && i.value.trim(); return v || window.__cmNameDefault(); };
 
   // ウィザード離脱ガード（#4）：制作中に他画面へ移動しようとしたら「下書き保存 / 破棄 / キャンセル」
   let __navBypass = false;
@@ -4015,7 +4360,7 @@
   document.addEventListener('click', (e) => {
     if (__navBypass || vWiz.hidden) return;
     if (e.target.closest('#view-wizard')) return;   // ウィザード内の操作はスルー
-    const nav = e.target.closest('.sb-item, .sb-brand, #crumb button, #navBack, #acctMenu button[data-act]');
+    const nav = e.target.closest('.sb-item, .sb-brand, .bn-item, #crumb button, #navBack, #acctMenu button[data-act]');
     if (!nav) return;
     e.preventDefault(); e.stopPropagation();
     guardLeaveWizard(() => { __navBypass = true; try { nav.click(); } finally { __navBypass = false; } });
@@ -4037,7 +4382,7 @@
 
   // アカウント右パネルを折りたたみ化（既定は「声」だけ開き、調整・品質チェックは畳む＝一点集中）
   (function accordionizeSidePanels() {
-    document.querySelectorAll('#voicePanel, #adjustPanel, #qcPanel').forEach(p => {
+    document.querySelectorAll('#voicePanel, #adjustPanel, #qcPanel, #genCreditsPanel').forEach(p => {
       const h = p.querySelector('.panel-h'); if (!h) return;
       p.classList.add('is-acc');
       const chev = document.createElement('span');
@@ -4045,7 +4390,7 @@
       chev.innerHTML = '<svg class="ic"><use href="#i-chevron-down"/></svg>';
       h.appendChild(chev);
       h.setAttribute('role', 'button'); h.setAttribute('tabindex', '0');
-      const collapsed = p.id !== 'voicePanel';   // 声だけ開いた状態で始める
+      const collapsed = p.id !== 'adjustPanel';   // P1: 「言葉で直す」だけ開いた状態で始める（確認のポイントは常時表示）
       p.classList.toggle('collapsed', collapsed);
       h.setAttribute('aria-expanded', String(!collapsed));
       const toggle = () => { const c = p.classList.toggle('collapsed'); h.setAttribute('aria-expanded', String(!c)); };
@@ -4084,6 +4429,15 @@
   const boardList = document.getElementById('boardList');
   let scriptEditable = false;
   // 実プロジェクトの cuts（{id,role,type}）→ 絵コンテカードに写像。詳細な台本はAIが後工程で生成。
+  // P1: カットが要求する素材（台本確定後に素材ステップで求める）
+  function cutNeed(c) {
+    if (!c) return { kind: 'none', text: 'なし（AIがつくります）' };
+    if (c.type === 'ui') return { kind: 'need', text: 'アプリの画面写真（次のステップでアップ）' };
+    if (c.type === 'cta') return { kind: 'auto', text: 'ロゴ（ブランドから自動）' };
+    if (c.type === 'graphic') return { kind: 'none', text: 'なし（コード描画）' };
+    return { kind: 'none', text: 'なし（AIが実際に撮ったような映像をつくります）' };
+  }
+  window.__cutNeed = cutNeed;
   function boardFromCuts(cuts) {
     const total = cuts.length || 1;
     return cuts.map((c, i) => {
@@ -4093,11 +4447,21 @@
       const model = c.type === 'live-action' ? 'AI生成' : (c.type === 'ui' ? '提供UI/コード' : 'コード描画');
       const s = Math.round(30 / total * i), e = Math.round(30 / total * (i + 1));
       const pad = n => String(n).padStart(2, '0');
-      return { n: '#' + (i + 1), kind, scene: label, secs: `0:${pad(s)}–0:${pad(e)}`, tl: label,
-        dark: kind === 'アプリ画面', c1, c2, na: '—', telop: '—', note: (c.note || ''),
-        shot: L(`AI generates the script & footage for this cut. `, `このカットの台本・映像はAIがつくります。`) + `<b>${model}</b>` };
+      return { n: '#' + (i + 1), kind, scene: label, secs: `0:${pad(s)}–0:${pad(e)}`, tl: c.narration ? String(c.narration).slice(0, 24) : label,
+        dark: kind === 'アプリ画面', c1, c2, na: c.narration || '—', telop: c.caption || '—', note: (c.note || ''), need: cutNeed(c),
+        shot: L(`AI generates the footage for this cut. `, `このカットの映像はAIがつくります。`) + `<b>${model}</b>` };
     });
   }
+  function renderScriptNeeds() {
+    const box = document.getElementById('needsList'); if (!box) return;
+    const cuts = Array.isArray(window.__scriptCuts) ? window.__scriptCuts : [];
+    if (!cuts.length) { box.innerHTML = '<div class="muted">台本が決まると、ここに必要な素材が並びます。</div>'; return; }
+    const rows = cuts.map((c, i) => ({ i, need: cutNeed(c) })).filter(r => r.need.kind !== 'none');
+    const esc = v => String(v).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    box.innerHTML = (rows.length ? rows.map(r => `<div class="nr"><span class="badge ${r.need.kind === 'need' ? 'badge--warn' : 'badge--success'}">カット ${r.i + 1}</span><span>${esc(r.need.text)}</span></div>`).join('') : '<div class="nr"><span class="badge badge--success">なし</span><span>この台本は素材なしでつくれます。</span></div>')
+      + '<div class="nr"><span class="badge">任意</span><span class="muted">音楽の参考（MP3 か YouTube）</span></div>';
+  }
+  window.__renderScriptNeeds = renderScriptNeeds;
   function renderBoard() {
     const rc = Array.isArray(window.__scriptCuts) && window.__scriptCuts.length ? window.__scriptCuts : null;
     const data = rc ? boardFromCuts(rc) : SCUT;   // 実プロジェクトがあれば実 cuts、無ければデモ(SCUT)
@@ -4110,9 +4474,10 @@
         </div>
         <div class="scut-body">
           <div class="scut-top"><span class="scut-scene">${c.scene}</span><span class="scut-secs">${c.secs}</span></div>
-          ${c.na!=='—' ? `<div class="scut-na${scriptEditable?' editable':''}" ${scriptEditable?'contenteditable="true" role="textbox" aria-label="ナレーション" spellcheck="false"':''}><span class="lab" contenteditable="false">NA</span>${c.na}</div>` : ''}
-          ${c.telop!=='—' ? `<div class="scut-telop"><span class="lab">字幕</span>${c.telop}</div>` : ''}
-          <div class="scut-shot"><span class="cam"><svg class="ic"><use href="#i-camera"/></svg></span><span class="txt"><b>撮影指示:</b> ${c.shot}</span></div>
+          <div class="scut-row na"><span class="lab">ナレーション</span>${c.na!=='—' ? `<div class="scut-na${scriptEditable?' editable':''}" ${scriptEditable?'contenteditable="true" role="textbox" aria-label="ナレーション" spellcheck="false"':''} data-cut="${i}">${c.na}</div>` : `<span class="pending">AIが台本をつくります（生成時に確定）</span>`}</div>
+          <div class="scut-row"><span class="lab">文字</span>${c.telop!=='—' ? `<span>${c.telop}</span>` : `<span class="pending">ナレーションから自動でつくります</span>`}</div>
+          ${c.need ? `<div class="scut-row"><span class="lab">必要な素材</span><span class="${c.need.kind === 'need' ? 'need' : c.need.kind === 'auto' ? 'auto' : 'pending'}">${c.need.text}</span></div>` : ''}
+          <div class="scut-shot"><span class="cam"><svg class="ic"><use href="#i-camera"/></svg></span><span class="txt"><b>映像:</b> ${c.shot}</span></div>
           <div class="scut-note-row">
             <svg class="ic scut-note-ic" aria-hidden="true"><use href="#i-sparkle"/></svg>
             <input class="scut-note" data-cut="${i}" placeholder="このカットへの指示（任意）例）もっと明るく・この画面を大きく" value="${String(c.note || '').replace(/"/g, '&quot;')}" aria-label="このカットへの指示">
@@ -4120,8 +4485,8 @@
         </div>
       </article>`).join('');
   }
-  window.__renderBoard = renderBoard;   // データ層/遷移から再描画できるよう公開
-  renderBoard();
+  window.__renderBoard = function () { renderBoard(); renderScriptNeeds(); };   // データ層/遷移から再描画できるよう公開
+  renderBoard(); renderScriptNeeds();
 
   document.getElementById('scriptMode').addEventListener('click', e => {
     const b = e.target.closest('button'); if(!b) return;
@@ -4147,6 +4512,14 @@
       } catch (_) {}
     }, 600);
   }
+  boardList.addEventListener('blur', e => {   // P1: ナレーションの直接編集を保存
+    const el = e.target.closest && e.target.closest('.scut-na.editable'); if (!el) return;
+    const i = Number(el.dataset.cut); const val = el.textContent.trim();
+    saveSpecPatch((spec) => {
+      if (Array.isArray(window.__scriptCuts) && window.__scriptCuts[i]) window.__scriptCuts[i].narration = val;
+      if (spec) { spec.cuts = spec.cuts || []; spec.cuts[i] = spec.cuts[i] || {}; spec.cuts[i].narration = val; }
+    });
+  }, true);
   // 各カットへの指示（#3）
   boardList.addEventListener('input', e => {
     const inp = e.target.closest('.scut-note'); if (!inp) return;
@@ -4167,14 +4540,50 @@
       catch (_) { toast(L("Couldn't read the file.", 'ファイルを読み込めませんでした。'), false, 2600); }
       file.value = '';
     });
+    // P1: 持ち込み台本をカットに分ける。行頭「カット n:」「#n」があればそれを尊重、無ければ行（空行区切り）ごと。文章は変えない。
+    function splitOwnScript(text) {
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const marked = lines.filter(l => /^(カット|cut|#)\s*\d+\s*[:：.．]?/i.test(l));
+      const parts = marked.length >= 2 ? [] : lines;
+      if (marked.length >= 2) { let cur = null; for (const l of lines) { if (/^(カット|cut|#)\s*\d+\s*[:：.．]?/i.test(l)) { if (cur) parts.push(cur); cur = l.replace(/^(カット|cut|#)\s*\d+\s*[:：.．]?\s*/i, ''); } else if (cur != null) cur += (cur ? ' ' : '') + l; } if (cur) parts.push(cur); }
+      return parts.slice(0, 8);
+    }
     if (apply && ta) apply.addEventListener('click', () => {
       const text = (ta.value || '').trim();
       if (!text) { toast(L('Paste or upload a script first.', '台本を貼り付けるかアップロードしてください。'), false, 2400); ta.focus(); return; }
-      saveSpecPatch((spec) => { if (spec) { spec.script = spec.script || {}; spec.script.userScript = text; spec.script.source = 'user'; } });
-      toast(L('Your script will be used for this ad.', 'この台本を反映しました。CMづくりに使われます。'), true, 2200);
+      const parts = splitOwnScript(text);
+      const cuts = Array.isArray(window.__scriptCuts) ? window.__scriptCuts : [];
+      const next = parts.map((p, i) => Object.assign({}, cuts[i] || { id: 'cut' + (i + 1), role: i === parts.length - 1 ? 'cta' : 'scene', type: i === parts.length - 1 ? 'cta' : 'live-action' }, { narration: p }));
+      window.__scriptCuts = next;
+      saveSpecPatch((spec) => { if (spec) { spec.script = spec.script || {}; spec.script.userScript = text; spec.script.source = 'user'; spec.cuts = next; } });
+      renderBoard(); renderScriptNeeds();
+      toast(L(`Split into ${next.length} cuts. Your wording is kept as is.`, `${next.length} カットに分けました。文章はそのまま使います。`), true, 2600);
     });
   }
 
+  // ---------- dashboard: 目的から作る（複数選択＋自由入力） ----------
+  (function homeGoals() {
+    const grid = document.getElementById('homeGoals'); if (!grid) return;
+    const src = [...document.querySelectorAll('#view-wizard .opt-grid[data-key="goals"] .opt')];
+    grid.innerHTML = src.map(o => `<button type="button" class="goal" aria-pressed="false" data-val="${o.dataset.val}"><span class="g-ic">${o.querySelector('.o-ic').innerHTML}</span><span><span class="g-t">${o.querySelector('.o-name').textContent}</span><span class="g-d">${o.querySelector('.o-desc').textContent}</span></span><span class="g-tick"><svg class="ic"><use href="#i-check"/></svg></span></button>`).join('');
+    const free = []; const chips = document.getElementById('homeGoalsChips'), inp = document.getElementById('homeGoalsFree');
+    const esc = v => String(v).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    const picked = () => [...grid.querySelectorAll('.goal[aria-pressed="true"]')].map(b => b.dataset.val).concat(free);
+    const refresh = () => { chips.innerHTML = free.map((v, i) => `<span class="free-chip"><span>${esc(v)}</span><button type="button" data-rm="${i}" aria-label="削除"><svg class="ic"><use href="#i-x"/></svg></button></span>`).join('');
+      const n = picked().length; const t = document.getElementById('homeGoalsStartText'); if (t) t.textContent = n ? `選んだ ${n} つの目的で始める` : '目的を選ばずに始める'; };
+    grid.addEventListener('click', e => { const b = e.target.closest('.goal'); if (!b) return; b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'); refresh(); });
+    const push = () => { const v = (inp.value || '').trim().slice(0, 40); if (!v) { inp.focus(); return; } if (!free.includes(v)) free.push(v); inp.value = ''; refresh(); };
+    document.getElementById('homeGoalsAdd').addEventListener('click', push);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); push(); } });
+    chips.addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (!b) return; free.splice(Number(b.dataset.rm), 1); refresh(); });
+    document.getElementById('homeGoalsStart').addEventListener('click', () => {
+      const b = window.__getBrand && window.__getBrand();
+      if (b && b.frozen) { toast(L('This brand is read-only.', 'このブランドは読み取り専用です。'), false, 2600); return; }
+      const g = picked(); if (g.length) { sel.goals = g; applySelToUI(); }
+      gotoWizard(); showStep(0);
+    });
+    refresh();
+  })();
   // ---------- dashboard ----------
   const projGrid = document.getElementById('projGrid');
   // 実データはデータ層 loadProjects() が現在のアカウント(組織)で描画する。
@@ -4249,6 +4658,7 @@
   const vScript = document.getElementById('view-script');
   const vWork = document.getElementById('view-workspace');
   const vExport = document.getElementById('view-export');
+  const vAssets = document.getElementById('view-assets');
   const vSettings = document.getElementById('view-settings');
   const vBilling = document.getElementById('view-billing');
   const vTeam = document.getElementById('view-team');
@@ -4273,7 +4683,7 @@
   }
   navBack.addEventListener('click', () => { if (backFn) backFn(); });
   function hideAll(){
-    [vDash,vWiz,vScript,vWork,vExport,vSettings,vAccount,vBilling,vTeam,vMedia,vCollections,vCredits].forEach(v=>v.hidden=true);
+    [vDash,vWiz,vScript,vAssets,vWork,vExport,vSettings,vAccount,vBilling,vTeam,vMedia,vCollections,vCredits].forEach(v=>v.hidden=true);
     window.scrollTo(0,0);
   }
   function focusView(v) {   // move focus to the new view so keyboard/AT users land on it
@@ -4283,6 +4693,7 @@
   function _nav(inProject, act) {   // 上部バーの出し分け（工程のみ）＋サイドバーのアクティブ状態
     document.body.classList.toggle('in-project', !!inProject);
     setSbActive(act || null);
+    setBnActive(act === 'new' ? 'new' : act === 'media' ? 'media' : act === 'home' ? 'home' : null);
   }
   document.getElementById('newCM').addEventListener('click', () => {
     const b = window.__getBrand && window.__getBrand();
@@ -4290,25 +4701,67 @@
     gotoWizard();
   });
   { const fab = document.getElementById('fabNew'); if (fab) fab.addEventListener('click', () => document.getElementById('newCM').click()); }   // モバイルFAB → 同じ導線
+  // P1: モバイルのボトムナビ
+  { const bn = document.getElementById('bottomNav'); if (bn) bn.addEventListener('click', e => {
+      const b = e.target.closest('.bn-item'); if (!b) return; const a = b.dataset.act;
+      if (a === 'home') gotoDash(); else if (a === 'new') document.getElementById('newCM').click(); else if (a === 'media') gotoMedia();
+      else if (a === 'help') { const m = document.querySelector('#acctMenu [data-act="help"]'); if (m) m.click(); }
+    }); }
+  function setBnActive(act) { const bn = document.getElementById('bottomNav'); if (!bn) return; bn.querySelectorAll('.bn-item').forEach(b => { if (b.dataset.act === act) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
   function gotoScript() {
     hideAll(); vScript.hidden = false; focusView(vScript); _nav(true, 'new');
-    setCrumb([['ホーム', gotoDash], ['新規CM', gotoWizard], ['台本・絵コンテ']], gotoWizard);
-    if (window.renderShotList) window.renderShotList();   // Supabase 接続時は実案件の素材リスト（アップロード可）に差し替え
+    setCrumb([['ホーム', gotoDash], [window.__currentProjectName || '新規CM', gotoWizard], ['台本を確認']], gotoWizard);
+    window.renderFlowSteps(document.getElementById('flowStepsScript'), 4);
     if (window.__renderBoard) window.__renderBoard();     // 絵コンテを実 cuts で再描画（無ければデモ）
   }
+  // P1: 素材ステップ（台本で決まった分だけ）
+  function gotoAssets() {
+    hideAll(); vAssets.hidden = false; focusView(vAssets); _nav(true, 'new');
+    setCrumb([['ホーム', gotoDash], [window.__currentProjectName || '新規CM', gotoWizard], ['素材をアップ']], gotoScript);
+    window.renderFlowSteps(document.getElementById('flowStepsAssets'), 5);
+    renderAssetsMap();
+    if (window.renderShotList) window.renderShotList();   // Supabase 接続時は実案件の素材リスト（アップロード可）
+    else updateAssetsGate([]);
+  }
+  window.gotoAssets = gotoAssets;
+  function renderAssetsMap() {
+    const box = document.getElementById('assetsMap'); if (!box) return;
+    const cuts = Array.isArray(window.__scriptCuts) ? window.__scriptCuts : [];
+    const label = c => (ROLE_LABEL[c.role] || c.role || 'カット');
+    box.innerHTML = cuts.length ? cuts.map((c, i) => { const n = window.__cutNeed(c); return `<div class="nr"><span class="badge ${n.kind === 'need' ? 'badge--warn' : n.kind === 'auto' ? 'badge--success' : ''}">${i + 1}</span><span${n.kind === 'none' ? ' class="muted"' : ''}>${label(c)}${n.kind === 'need' ? ' ← 画面写真' : n.kind === 'auto' ? ' ← ロゴ（自動）' : ''}</span></div>`; }).join('')
+      : '<div class="muted">台本が決まると、ここに対応が表示されます。</div>';
+  }
+  // 必須素材（アプリ画面のスクショ）が足りない間は「次へ」を止めて理由を出す
+  function updateAssetsGate(items) {
+    const btn = document.getElementById('assetsNext'), note = document.getElementById('assetsNote'); if (!btn) return;
+    const missing = (items || []).filter(it => it.required && !it.paths.length);
+    btn.disabled = missing.length > 0;
+    if (note) { note.classList.toggle('ok', !missing.length); note.textContent = missing.length ? `あと ${missing.length} 件：${missing.map(m => m.name).join('・')}` : (items && items.length ? '必要な素材はそろいました' : ''); }
+  }
+  window.__onAssetsDrawn = updateAssetsGate;
+  document.getElementById('assetsBack').addEventListener('click', gotoScript);
   function gotoWorkspace() {
     hideAll(); vWork.hidden = false; focusView(vWork); _nav(true, null);
-    setCrumb([['ホーム', gotoDash], [window.__currentProjectName || 'プロジェクト', null], ['制作画面']], gotoDash);
+    setCrumb([['ホーム', gotoDash], [window.__currentProjectName || 'プロジェクト', null], ['初稿を確認']], gotoDash);
+    window.renderFlowSteps(document.getElementById('flowStepsWork'), 6);
   }
   // 対象プロジェクト名でアカウントを開く（データ層 openWorkspace から呼ぶ）。
   window.gotoWorkspaceFor = function (name) {
     hideAll(); vWork.hidden = false; focusView(vWork); _nav(true, null);
-    setCrumb([['ホーム', gotoDash], [name || 'プロジェクト', null], ['制作画面']], gotoDash);
+    setCrumb([['ホーム', gotoDash], [name || 'プロジェクト', null], ['初稿を確認']], gotoDash);
+    window.renderFlowSteps(document.getElementById('flowStepsWork'), 6);
+  };
+  // 下書きを台本画面で再開（ホームの「続きから」）
+  window.resumeAtScript = function (p) {
+    window.__currentProjectId = p.id; window.__currentProjectName = p.name;
+    window.__scriptCuts = (p.spec && Array.isArray(p.spec.cuts)) ? p.spec.cuts : [];
+    gotoScript();
   };
   function gotoWizard() {
     hideAll(); vWiz.hidden = false; focusView(vWiz); _nav(true, 'new');
     setCrumb([['ホーム', gotoDash], ['新規CM', null], ['制作をはじめる']], gotoDash);
     applyBrandDefaults();   // ブランドメモリ：このブランドの“いつもの設定”を初期反映（履歴が無ければ demo 既定のまま）
+    const nm = document.getElementById('cmName'); if (nm && window.__cmNameDefault) nm.placeholder = window.__cmNameDefault();
   }
   function gotoDash() {
     hideAll(); vDash.hidden = false; focusView(vDash); _nav(false, 'home');
@@ -4394,7 +4847,8 @@
     toast(L('Draft saved. Continue anytime from Media.', '下書きを保存しました。メディアからいつでも続けられます。'), true, 1800);
     setTimeout(gotoDash, 700);
   });
-  document.getElementById('scriptNext').addEventListener('click', async () => {
+  document.getElementById('scriptNext').addEventListener('click', () => gotoAssets());
+  document.getElementById('assetsNext').addEventListener('click', async () => {
     // クレジット消費前の平易な確認（低ITリテラシー配慮・誤操作/コスト防止）
     const cost = 1, bal = Number(acctInfo.credits) || 0;   // 生成=1クレジット（＝CM1本）
     if (bal < cost) {
@@ -4548,7 +5002,37 @@
     '明るいCM': 'Bright & upbeat', 'ポップ・軽快・前向き': 'Poppy, light, positive',
     'エモーショナル': 'Emotional', '映画的・情感・余韻': 'Cinematic, tender, lingering',
     'スタイリッシュ': 'Stylish', '洗練・ミニマル・都会的': 'Refined, minimal, urban',
-    '次へ': 'Next', 'AIが構成を設計': 'AI designs the structure', '配信先をひとつ以上選んでください。': 'Pick at least one channel.',
+    '次へ': 'Next', 'AIが構成を設計': 'AI designs the structure', 'AIが台本をつくる': 'AI writes the script', '配信先をひとつ以上選んでください。': 'Pick at least one channel.',
+    // --- P1: 7-step flow ---
+    'CM の名前': 'Ad name', '例: 夏の新規登録キャンペーン': 'e.g. Summer sign-up campaign',
+    '流す場所': 'Where it runs', '＝ 書き出し形式': '= export formats', '目的': 'Goal', '複数OK': 'pick several', '届ける相手': 'Audience',
+    '伝えたいこと': 'Message', '伝え方・トーン': 'angle & tone', '台本を確認': 'Review the script', 'AIがつくる／持ち込み': 'AI-written / your own',
+    '素材をアップ': 'Upload assets', '台本で決まった分だけ': 'only what the script needs', '初稿を確認': 'Review the first cut', '3案から選ぶ': 'pick from 3',
+    'ここで書き出し形式（横長・縦長・正方形）も決まります。選んだ配信先に合わせて、長さ・冒頭の見せ方が自動で決まります。複数選択できます。':
+      'This also sets the export formats (wide, vertical, square). Length and the opening adapt to the channels you pick. Choose as many as you like.',
+    'このCMで、何を実現したいですか?': 'What should this ad achieve?',
+    '目的に合わせて、伝え方の型をおすすめします。複数選べます。当てはまらなければ下に自由に書いてください。': 'We suggest an angle for each goal. Pick several, or write your own below.',
+    '問い合わせを増やしたい': 'Get more inquiries', 'YouTube広告・「困りごと」から見せる': 'YouTube ads · open on the pain',
+    '資料請求・無料トライアルを増やしたい': 'More sign-ups & trials', '使う場面を見せて、次の一歩を軽く': 'Show it in use, make the next step easy',
+    'サービスを知ってほしい': 'Raise awareness', 'リール・SNS投稿・雰囲気で惹きつける': 'Reels & social · lead with vibe',
+    '新機能・アップデートを伝えたい': 'Announce a new feature', '既存のお客さま向け・画面中心': 'For existing customers · screen-first',
+    '導入事例を紹介したい': 'Share a case study', 'お客さまの声を中心に': 'Customer voice first',
+    'イベント・セミナーに集客したい': 'Fill an event or webinar', '日時と申込を大きく': 'Date and sign-up, big',
+    'キャンペーン・期間限定を告知したい': 'Promote a limited offer', '期限を目立たせる': 'Make the deadline stand out',
+    '採用に使いたい': 'Use for recruiting', '働く人と職場を見せる': 'Show the people and the workplace',
+    'ほかの目的を書いて追加（例: 展示会のブースで流したい）': 'Add your own goal (e.g. play at our trade-show booth)', 'ほかの目的': 'Other goal',
+    '追加': 'Add', '目的はいくつでも選べます。': 'Pick as many goals as you like.', '目的をひとつ以上選んでください。': 'Pick at least one goal.',
+    '見る人によって、最初の2秒の見せ方とテンポが変わります。複数選べます。複数のときは、いちばん上に選んだ相手に冒頭を合わせます。':
+      'The opening 2 seconds and the pacing follow the viewer. Pick several; the opening is tuned to the first one you picked.',
+    '情報システム・IT担当': 'IT & security staff', '安全性と連携のしやすさを最初に': 'Lead with security and integrations',
+    'マーケティング・営業担当': 'Marketing & sales', '成果と使い勝手を最初に': 'Lead with results and ease of use',
+    '人事・採用担当': 'HR & recruiting', '働く人と職場の雰囲気を最初に': 'Lead with the people and workplace',
+    '既存のお客さま': 'Existing customers', '新しくできることを最初に': 'Lead with what is new',
+    'ほかの相手を書いて追加（例: 地方の工務店の二代目社長）': 'Add your own audience (e.g. second-generation owner of a local builder)', 'ほかの相手': 'Other audience',
+    '相手はいくつでも選べます。': 'Pick as many as you like.', '届ける相手をひとつ以上選んでください。': 'Pick at least one audience.',
+    '伝え方とトーンを選びます。ひとつずつ。業種はブランド登録後に自動で入ります。': 'Choose the angle and tone, one each. Industry fills in from your brand.',
+    'ブランド登録後は自動で入ります。いまは近いものをひとつ選んでください。': 'Fills in automatically once your brand is registered. For now, pick the closest.',
+    '削除': 'Remove',
     'ステップ': 'Steps',
     // prescription
     'AIのおすすめ構成': "AI's prescription", '選ぶほど、構成が決まっていく': 'The more you pick, the clearer it gets',
@@ -4571,6 +5055,33 @@
       'For Gen Z, tempo and aesthetic come first — pull them in within the first 0.5 seconds.',
     // --- script / storyboard ---
     '台本と絵コンテ': 'Script & storyboard',
+    // --- P1: script / assets / review / home ---
+    'AIが構成を組みました。気になるところは言葉で直せます。この台本で、次に必要な素材が決まります。': 'AI drafted the structure. Fix anything in plain words. This script decides which assets you need next.',
+    'この台本で進む：素材をアップ': 'Continue: upload assets', 'この台本で必要な素材': 'Assets this script needs',
+    '台本が決まってから': 'Only after the script is set', '素材をお願いするので、使わない素材を用意せずに済みます。実写の人物・背景はAIがつくります。': 'do we ask for assets, so you never prepare anything unused. AI creates the live-action people and backgrounds.',
+    'ナレーション': 'Narration', '文字': 'Caption', '必要な素材': 'Asset needed', '映像:': 'Footage:',
+    'AIが台本をつくります（生成時に確定）': 'AI writes this when generating', 'ナレーションから自動でつくります': 'Made from the narration automatically',
+    'なし（AIがつくります）': 'None (AI creates it)', 'アプリの画面写真（次のステップでアップ）': 'App screenshots (upload in the next step)',
+    'ロゴ（ブランドから自動）': 'Logo (from your brand)', 'なし（コード描画）': 'None (code-drawn)', 'なし（AIが実際に撮ったような映像をつくります）': 'None (AI creates realistic footage)',
+    '台本が決まると、ここに必要な素材が並びます。': 'Once the script is set, the assets you need appear here.', 'この台本は素材なしでつくれます。': 'This script needs no assets.',
+    '音楽の参考（MP3 か YouTube）': 'Music reference (MP3 or YouTube)', '任意': 'Optional', 'なし': 'None',
+    '素材をアップロードしてください': 'Upload your assets', '台本で必要になった分だけお願いします。ロゴはブランドから自動で入ります。手元にないものは、あとから追加できます。': 'Only what the script needs. The logo comes from your brand. Anything missing can be added later.',
+    '台本で決まった素材': 'Assets from the script', '音楽の参考': 'Music reference', '雰囲気の参考にだけ使います。そのままは使いません。MP3 か YouTube のリンクで。': 'Used only as a mood reference, never as-is. MP3 or a YouTube link.',
+    'リンクを保存': 'Save link', 'MP3 を選ぶ': 'Choose MP3', 'なしで進むと、AIが選びます': 'Skip it and AI will choose', 'YouTube のリンク': 'YouTube link',
+    '素材はここで使われます': 'Where each asset is used', 'スクショの撮り方:': 'How to take a screenshot:', 'Mac は shift＋command＋3、Windows は Windows＋shift＋S。アプリの画面をそのまま撮ってください。偽の画面はつくりません。': 'Mac: shift+command+3. Windows: Windows+shift+S. Capture the real app screen; we never fake one.',
+    '台本に戻る': 'Back to the script', '次へ：初稿をつくる': 'Next: create the first cut', '必要な素材はそろいました': 'All required assets are in',
+    '台本が決まると、ここに対応が表示されます。': 'The mapping appears once the script is set.',
+    '初稿を確認': 'Review the first cut', '3つの案から、気に入ったものを選んでください。映像と文字は同じで、最初の2秒の演出と音楽が違います。': 'Pick the one you like from 3 cuts. Same footage and captions; only the opening 2 seconds and the music differ.',
+    '制作の進み具合': 'Production progress', '確認のポイント': 'What to check',
+    '会社名・サービス名の読み方は合っていますか': 'Is the company / product name pronounced right?', 'アプリの画面は最新のものですか': 'Are the app screens up to date?', '電話番号・URL・金額に間違いはありませんか': 'Any mistakes in phone, URL or prices?',
+    'この案で完成させる': 'Finish with this cut',
+    '続きから': 'Continue', '続きから再開': 'Resume', '次にやること:': 'Next up:', '進み具合': 'Progress',
+    '目的から作る': 'Start from a goal', '複数選べます。目的に合わせて流す場所と伝え方をおすすめします。': 'Pick several. We suggest channels and an angle for each goal.',
+    'この目的で始める': 'Start with these goals', '目的を選ばずに始める': 'Start without a goal',
+    'ステップ 5 / 7': 'Step 5 / 7', 'ステップ 6 / 7': 'Step 6 / 7', 'ステップ 7 / 7': 'Step 7 / 7',
+    '台本を確認して、素材をアップする': 'Review the script, then upload assets', '初稿ができるのを待つ（完了したらお知らせします）': 'Wait for the first cut (we will notify you)', '3つの案から気に入ったものを選ぶ': 'Pick your favorite of the 3 cuts',
+    'ホーム': 'Home', '作る': 'Create', 'マイCM': 'My ads', 'ガイド': 'Guide', 'モバイルナビ': 'Mobile navigation',
+    'ブランドから自動': 'From your brand', '必須・未アップ': 'Required · not yet', 'アプリアイコン': 'App icon', 'ロゴ': 'Logo',
     '選択から、AIがディレクターとして構成を組みました。各カットは言葉で直せます。':
       'From your choices, AI directed the structure. Edit any cut in plain words.',
     'AIにおまかせ': 'Let AI handle it', '台本を持ち込む': 'Bring your own script',
@@ -6739,8 +7250,9 @@
     window.__projectReady = new Promise(r => { window.__projectReadyResolve = r; });
     const formats = dedupeFormats((sel.media || []).map(m => MEDIA_FMT[m]).filter(Boolean));
     const spec = {
-      meta: { name: projectName(sel), goal: null },
-      selections: { media: sel.media, industry: sel.industry, target: sel.target,
+      meta: { name: (window.__cmName && window.__cmName()) || projectName(sel), goal: (sel.goals && sel.goals[0]) || null },
+      selections: { media: sel.media, industry: sel.industry, target: (sel.targets && sel.targets[0]) || sel.target,
+                    targets: sel.targets || [], goals: sel.goals || [],
                     angle: sel.angle, tone: sel.tone },
       output: { formats: formats.length ? formats : [MEDIA_FMT['YouTube']] },
       // 配信前チェックの既定（書き出し時に onExportSettings で上書き）。cm-pipeline の compliance ブロックと同形。
@@ -6782,11 +7294,19 @@
     const { data: p } = await sb.from('projects').select('spec').eq('id', id).single();
     const spec = (p && p.spec) || {}; spec.brand = spec.brand || {}; spec.cuts = spec.cuts || [];
     const items = [];
+    // P1: 台本が要求するカットだけ（アプリ画面＝必須）。ロゴはブランド登録から自動で入れる。
     spec.cuts.forEach((c, i) => {
-      if (c.type === 'ui') items.push({ key: `ui:${c.id}`, name: `${ROLE_JA[c.role] || c.role || c.id}のスクショ`, desc: '実際のアプリ画面（PNG/JPG・複数可）。偽UIは作りません', multiple: true, paths: c.assets || [], cutIndex: i, folder: `ui/${c.id}` });
+      if (c.type === 'ui') items.push({ key: `ui:${c.id}`, name: `カット ${i + 1}: アプリの画面写真`, desc: 'スクリーンショット（PNG/JPG・複数可）。例: 一覧画面、入力画面、完成画面。偽の画面はつくりません', multiple: true, required: true, paths: c.assets || [], cutIndex: i, folder: `ui/${c.id}` });
     });
-    items.push({ key: 'brand:app_icon', name: 'アプリアイコン', desc: 'PNG / SVG（正方形）', multiple: false, paths: spec.brand.app_icon ? [spec.brand.app_icon] : [], brandKey: 'app_icon', folder: 'brand' });
-    items.push({ key: 'brand:logo', name: 'ロゴ', desc: 'PNG / SVG（横長可）', multiple: false, paths: spec.brand.logo ? [spec.brand.logo] : [], brandKey: 'logo', folder: 'brand' });
+    let logoAuto = false;
+    try {
+      const b = window.__getBrand && window.__getBrand();
+      const bl = b && b.assets && b.assets.logo;
+      if (!spec.brand.logo && bl) { spec.brand.logo = bl; logoAuto = true; await sb.from('projects').update({ spec }).eq('id', id); }
+    } catch (_) {}
+    const needsLogo = spec.cuts.some(c => c.type === 'cta') || !spec.cuts.length;
+    if (needsLogo) items.push({ key: 'brand:logo', name: 'ロゴ', desc: logoAuto || spec.brand.logo ? 'ブランド登録のロゴを使います。差し替えもできます' : 'PNG / SVG（横長可）。ブランドに登録すると次回から自動で入ります', multiple: false, required: false, auto: logoAuto, paths: spec.brand.logo ? [spec.brand.logo] : [], brandKey: 'logo', folder: 'brand' });
+    items.push({ key: 'brand:app_icon', name: 'アプリアイコン', desc: '任意。PNG / SVG（正方形）', multiple: false, required: false, paths: spec.brand.app_icon ? [spec.brand.app_icon] : [], brandKey: 'app_icon', folder: 'brand' });
     const draw = async () => {
       for (const it of items) it.thumbs = await thumbUrls(it.paths);
       list.innerHTML = items.map(it => `
@@ -6794,11 +7314,45 @@
           <span class="sck"><svg class="ic"><use href="#i-check"/></svg></span>
           <div><div class="si-name">${it.name}</div><div class="si-desc">${it.desc}</div>
             ${it.paths.length ? `<div class="si-thumbs">${(it.thumbs || []).map(u => u ? `<img src="${u}" alt="">` : '').join('')}</div>` : ''}</div>
-          <span class="si-tag">${it.paths.length ? (it.multiple ? `${it.paths.length}枚` : 'UP済') : '未アップ'}</span>
+          <span class="si-tag">${it.paths.length ? (it.auto ? 'ブランドから自動' : it.multiple ? `${it.paths.length}枚` : 'UP済') : (it.required ? '必須・未アップ' : '任意')}</span>
           <input type="file" accept="image/*" ${it.multiple ? 'multiple' : ''}>
         </div>`).join('');
       if (count) count.textContent = `${items.filter(i => i.paths.length).length}/${items.length}`;
+      if (window.__onAssetsDrawn) window.__onAssetsDrawn(items);
     };
+    // 音楽の参考（任意）: YouTube リンク or MP3 → spec.audio.reference
+    (function wireMusic() {
+      const url = document.getElementById('musicUrl'), save = document.getElementById('musicUrlSave'), fbtn = document.getElementById('musicFileBtn'), file = document.getElementById('musicFile'), st = document.getElementById('musicState');
+      if (!url || url.dataset.wired) return; url.dataset.wired = '1';
+      const ref = (spec.audio && spec.audio.reference) || {};
+      if (ref.youtube) { url.value = ref.youtube; if (st) st.textContent = 'YouTube のリンクを参考にします'; }
+      else if (ref.file) { if (st) st.textContent = 'ファイルを参考にします: ' + ref.file.split('/').pop(); }
+      const persist = async (patch) => {
+        const { data: cur } = await sb.from('projects').select('spec').eq('id', id).single();
+        const sp = (cur && cur.spec) || {}; sp.audio = sp.audio || {}; sp.audio.reference = Object.assign({}, sp.audio.reference || {}, patch);
+        await sb.from('projects').update({ spec: sp }).eq('id', id);
+      };
+      save.addEventListener('click', async () => {
+        const v = (url.value || '').trim();
+        if (!/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(v)) { if (window.toast) window.toast(L('Paste a YouTube link.', 'YouTube のリンクを貼り付けてください。'), false, 2400); url.focus(); return; }
+        try { await persist({ youtube: v }); if (st) st.textContent = 'YouTube のリンクを参考にします'; if (window.toast) window.toast(L('Saved the music reference.', '音楽の参考を保存しました。'), true, 1800); }
+        catch (e) { if (window.toast) window.toast(L("Couldn't save.", '保存できませんでした。'), false, 2400); }
+      });
+      fbtn.addEventListener('click', () => file.click());
+      file.addEventListener('change', async () => {
+        const f = file.files && file.files[0]; if (!f) return;
+        if (f.size > 20 * 1024 * 1024) { if (window.toast) window.toast(L('File is too large (max 20 MB).', 'ファイルが大きすぎます（最大20MB）。'), false, 2600); return; }
+        try {
+          const scope = (currentOrg && currentOrg.id) || currentUid;
+          const path = `${scope}/${id}/audio/${Date.now()}_${safeName(f.name)}`;
+          const { error } = await sb.storage.from('assets').upload(path, f, { upsert: true, contentType: f.type || 'audio/mpeg' });
+          if (error) throw error;
+          await persist({ file: path }); if (st) st.textContent = 'ファイルを参考にします: ' + f.name;
+          if (window.toast) window.toast(L('Uploaded the music reference.', '音楽の参考をアップロードしました。'), true, 1800);
+        } catch (e) { if (window.toast) window.toast(L("Upload didn't work.", 'アップロードできませんでした。'), false, 2600); }
+        file.value = '';
+      });
+    })();
     await draw();
     list.addEventListener('click', e => { const row = e.target.closest('.shot-item'); if (row && !e.target.matches('input')) row.querySelector('input').click(); });
     list.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const row = e.target.closest('.shot-item'); if (row) { e.preventDefault(); row.querySelector('input').click(); } } });
@@ -6847,7 +7401,7 @@
       const { data, error } = await q.order('updated_at', { ascending: false });
       if (error) throw error;
       // ホーム：制作物があるリピーターは初回向けの「3ステップ」を畳んで制作物を優先（Canva風の情報順序）
-      if (gridId === 'projGrid') { const dash = document.getElementById('view-dash'); if (dash) dash.classList.toggle('has-work', !!(data && data.length)); }
+      if (gridId === 'projGrid') { const dash = document.getElementById('view-dash'); if (dash) dash.classList.toggle('has-work', !!(data && data.length)); renderResume(data || []); }
       _gridLoaded.add(key);   // 以降このグリッドは再訪してもスケルトンを出さない
       if (!data || !data.length) { grid.innerHTML = (opts && opts.emptyMsg) || emptyState(); return; }
       grid.innerHTML = data.map(card).join('');
@@ -6858,6 +7412,25 @@
     }
   }
   async function loadProjects() { return renderVideos('projGrid'); }
+  // P1: ホーム「続きから」＝未完成の最新案件と次にやること
+  const RESUME = {
+    draft:      { step: 5, label: 'ステップ 5 / 7', next: '台本を確認して、素材をアップする' },
+    generating: { step: 6, label: 'ステップ 6 / 7', next: '初稿ができるのを待つ（完了したらお知らせします）' },
+    review:     { step: 7, label: 'ステップ 7 / 7', next: '3つの案から気に入ったものを選ぶ' },
+  };
+  function renderResume(list) {
+    const card = document.getElementById('resumeCard'); if (!card) return;
+    const p = (list || []).find(x => x.status && x.status !== 'done');
+    if (!p) { card.hidden = true; return; }
+    const r = RESUME[p.status] || RESUME.draft;
+    const i = Math.max(0, (list || []).indexOf(p)); const [c1, c2] = GRAD[i % GRAD.length];
+    const th = document.getElementById('resumeThumb'); if (th) th.style.background = `linear-gradient(150deg, ${c1}, ${c2})`;
+    setText('resumeName', p.name || 'プロジェクト'); setText('resumeStep', r.label); setText('resumeNext', r.next);
+    const m = document.getElementById('resumeMeter'); if (m) { m.style.width = Math.round((r.step - 1) / 7 * 100) + '%'; m.parentElement.setAttribute('aria-valuenow', String(r.step - 1)); }
+    const btn = document.getElementById('resumeBtn');
+    btn.onclick = () => { if (p.status === 'draft' && window.resumeAtScript) window.resumeAtScript(p); else window.openWorkspace(p.id); };
+    card.hidden = false;
+  }
   window.loadMedia = () => renderVideos('mediaGrid');
 
   // ---- collections (folder-式) ----
