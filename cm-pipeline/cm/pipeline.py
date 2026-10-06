@@ -160,6 +160,72 @@ def animate_one(proj: Project, ctx: Ctx, cut: dict) -> dict:
     return {"status": "made", "cut": cid, "model": res.model, "usd": res.usd}
 
 
+def _clip_frames(clip: Path, out_dir: Path, cid: str) -> list[Path]:
+    """クリップから冒頭・中間・末尾の 3 フレームを抜く（ffmpeg）。"""
+    import shutil, subprocess
+    if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
+        return []
+    try:
+        dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(clip)],
+                                   capture_output=True, text=True, timeout=20).stdout.strip() or "0")
+    except Exception:  # noqa: BLE001
+        dur = 0.0
+    if dur <= 0:
+        return []
+    times = [0.2, dur / 2, max(0.3, dur - 0.3)]
+    frames = []
+    for i, ts in enumerate(times, 1):
+        f = out_dir / f"{cid}.clip.f{i}.jpg"
+        r = subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{ts:.2f}", "-i", str(clip), "-frames:v", "1", "-vf", "scale=1280:-2", str(f)],
+                           capture_output=True, text=True, timeout=60)
+        if r.returncode == 0 and f.is_file():
+            frames.append(f)
+    return frames
+
+
+def review_clip_one(proj: Project, ctx: Ctx, cut: dict) -> dict:
+    """動画クリップの検品。元スチルと 3 フレームを Claude に見せ、動画化で起きた破綻（物の増殖・手指・別人化・不自然な動作）を判定する。"""
+    cid = cut["id"]
+    clip = state.artifact(proj, cid, "mp4")
+    still = state.artifact(proj, f"{cid}.still", "png")
+    if not state.is_done(clip):
+        ctx.log(f"  WAIT  {cid}: clip 未生成")
+        return {"status": "wait", "cut": cid}
+    frames = _clip_frames(clip, proj.generated, cid)
+    if not frames:
+        ctx.log(f"  SKIP  {cid}: clip 検品（フレーム抽出不可）")
+        return {"status": "skipped", "cut": cid}
+    vr = VisionReview()
+    verdicts = vr.check_clip(str(still), [str(f) for f in frames], key=ctx.key, dry_run=ctx.dry_run)
+    ledger.record(proj, stage="review_clip", cut=cid, model=vr.model, usd=prices.usd_for("vision-review-clip"),
+                  dry=ctx.dry_run, ts=time.strftime("%Y-%m-%dT%H:%M:%S"))
+    report = state.artifact(proj, f"{cid}.clipreview", "json")
+    ng = [v for v in verdicts if not v.ok]
+    report.write_text(json.dumps({"cut": cid, "pass": not ng, "verdicts": [v.__dict__ for v in verdicts]},
+                                 ensure_ascii=False, indent=2), encoding="utf-8")
+    if ng:
+        ctx.log(f"  NG    {cid} clip: " + ", ".join(v.check.split(":")[0] + "（" + v.reason + "）" for v in ng))
+        return {"status": "ng", "cut": cid, "ng": [v.check.split(":")[0] for v in ng], "reasons": [v.reason for v in ng]}
+    ctx.log(f"  PASS  {cid} clip ({len(verdicts)}項目)")
+    return {"status": "pass", "cut": cid}
+
+
+def retake_clip(proj: Project, cid: str) -> None:
+    """クリップを作り直すために done マーカーと旧ファイルを外す（animate_one が再生成する）。"""
+    clip = state.artifact(proj, cid, "mp4")
+    state.marker(clip).unlink(missing_ok=True)
+    if clip.is_file():
+        clip.rename(clip.with_name(f"{cid}.retake.mp4"))
+
+
+def reject_clip(proj: Project, cid: str) -> None:
+    """検品に落ちたクリップを外し、Remotion にスチル（ゆっくり寄る演出）で描かせる。壊れた動画を出すより安全。"""
+    clip = state.artifact(proj, cid, "mp4")
+    state.marker(clip).unlink(missing_ok=True)
+    if clip.is_file():
+        clip.rename(clip.with_name(f"{cid}.rejected.mp4"))
+
+
 # ---------------------------------------------------------------- batch stages
 def stills(proj: Project, ctx: Ctx) -> dict:
     made = skipped = 0

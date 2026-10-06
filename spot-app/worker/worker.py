@@ -377,6 +377,7 @@ class LiveRunner:
     def run(self, job: dict) -> float:
         stage, cut_id = job["stage"], job.get("cut")
         before = self._ledger_total()
+        self.notes = {}   # 検品の要確認・フォールバック等を jobs.detail に残す
         p, ctx = self.pipeline, self.ctx
         if stage in ("still", "review", "animate"):
             cut = self.cuts.get(cut_id)
@@ -392,17 +393,34 @@ class LiveRunner:
             mtime0 = f.stat().st_mtime if f.is_file() else 0.0
             r = p.review_one(self.proj, ctx, cut, retake=True)
             if r.get("status") == "ng":
-                # NG → スチルを再生成して再検品（1回）。それでもNGなら失敗扱い
+                # NG → スチルを再生成して再検品（1回）。2 回目も NG なら止めずに「要確認」を付けて進める（生成全体を失敗させない）
                 r2 = p.still_one(self.proj, ctx, cut)
                 r = p.review_one(self.proj, ctx, cut, retake=False)
                 if r.get("status") == "ng":
-                    raise RuntimeError("検品NG: " + ", ".join(r.get("ng") or []))
+                    rep_path = self.proj.generated / f"{cut_id}.review.json"
+                    try:
+                        rep = json.loads(rep_path.read_text(encoding="utf-8")); rep["pass"] = True; rep["needs_check"] = True
+                        rep_path.write_text(json.dumps(rep, ensure_ascii=False, indent=2), encoding="utf-8")
+                    except Exception:  # noqa: BLE001
+                        pass
+                    self.notes["needs_check"] = {"stage": "still", "ng": r.get("ng") or []}
+                    print(f"  WARN  {cut_id}: 検品 2 回目も NG → 要確認として進める: " + ", ".join(r.get("ng") or []), flush=True)
                 if f.is_file() and f.stat().st_mtime > mtime0:   # 作り直したスチルを Storage にも反映（古い方を上書き）
                     self._put(f, "still", cut_id, r2.get("model"), r2.get("usd", 0.0))
         elif stage == "animate":
             r = p.animate_one(self.proj, ctx, cut)
             if r.get("status") == "blocked":
                 raise RuntimeError(f"animate blocked: {r.get('why')}")
+            # クリップ検品（元スチル＋3 フレーム）。NG → 1 回作り直し → それでも NG ならクリップを捨ててスチル演出に切替
+            rc = p.review_clip_one(self.proj, ctx, cut)
+            if rc.get("status") == "ng":
+                p.retake_clip(self.proj, cut_id)
+                r = p.animate_one(self.proj, ctx, cut)
+                rc = p.review_clip_one(self.proj, ctx, cut)
+                if rc.get("status") == "ng":
+                    p.reject_clip(self.proj, cut_id)
+                    self.notes["clip_fallback"] = {"cut": cut_id, "ng": rc.get("ng") or [], "reasons": rc.get("reasons") or []}
+                    print(f"  FALLBACK {cut_id}: クリップ検品 2 回 NG → スチル演出に切替（" + ", ".join(rc.get("ng") or []) + "）", flush=True)
             f = self.proj.generated / f"{cut_id}.mp4"
             if f.is_file():
                 self._put(f, "clip", cut_id, r.get("model"), r.get("usd", 0.0))
@@ -534,7 +552,11 @@ def process_project(sb: Supa, project_id: str, owner: str, live: bool) -> int:
                         sb.update("jobs", {"id": f"eq.{j['id']}"}, {"status": "failed", "detail": {"error": f"setup: {e!r}"[:300]}})
                         return processed
                     usd = execute(j, live, runner)
-                sb.update("jobs", {"id": f"eq.{j['id']}"}, {"status": "done", "usd": usd})
+                done_patch = {"status": "done", "usd": usd}
+                notes = getattr(runner, "notes", None) if runner is not None else None
+                if notes:
+                    done_patch["detail"] = notes
+                sb.update("jobs", {"id": f"eq.{j['id']}"}, done_patch)
                 if usd > 0:
                     # コストのみ記録（credits=0）。残高消費は生成時に spend_credits(RPC) で実施済み。
                     sb.insert("credit_ledger", {

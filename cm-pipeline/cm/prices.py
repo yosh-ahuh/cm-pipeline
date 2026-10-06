@@ -28,6 +28,7 @@ USD: dict[str, float] = {
     "mmaudio-v2": 0.02,           # 実写カットの環境音・SE
     # --- 検品 ---
     "vision-review": 0.01,        # 1カット1チェック
+    "vision-review-clip": 0.02,   # クリップ検品（元スチル＋3フレーム）
 }
 
 # 未知モデルのフォールバック原価。
@@ -77,6 +78,6 @@ def normalize(model: str | None) -> str:
         "lyria": "lyria3-pro", "lyria2": "lyria3-pro", "lyria3": "lyria3-pro", "lyria3-pro": "lyria3-pro",
         "elevenlabs-sfx-v2": "elevenlabs-sfx-v2", "elevenlabs": "elevenlabs-sfx-v2",
         "mmaudio": "mmaudio-v2", "mmaudio-v2": "mmaudio-v2",
-        "vision-review": "vision-review",
+        "vision-review": "vision-review", "vision-review-clip": "vision-review-clip",
     }
     return aliases.get(m, m)
