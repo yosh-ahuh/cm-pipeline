@@ -607,7 +607,25 @@
     color: var(--accent-ink); font-size: var(--t-label); font-weight: 700; }
   .brand-default-note .ic { width: 14px; height: 14px; }
 
-  .wiz-board { display: grid; grid-template-columns: 220px minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 60px; align-items: start; }
+  .wiz-board { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 60px; align-items: start; }
+  /* P1-D: 上部固定の横一列ステップ（4画面共通） */
+  .flow-bar { position: sticky; top: var(--topbar-h); z-index: 15; margin: 0 calc(-1 * var(--s-6)) var(--s-5); padding: 8px var(--s-6);
+    background: color-mix(in srgb, var(--ground) 88%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  .flow-bar .steps { position: static; flex-direction: row; align-items: center; gap: 0; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+  .flow-bar .steps::-webkit-scrollbar { display: none; }
+  .flow-bar .steps li { display: flex; align-items: center; flex: none; }
+  .flow-bar .steps li + li::before { content: ""; width: 18px; height: 2px; background: var(--line-strong); margin: 0 2px; flex: none; }
+  .flow-bar .steps li:has(.step-nav.done) + li::before { background: var(--good); }
+  .flow-bar .step-nav { display: inline-flex; grid-template-columns: none; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px 0 6px; border-radius: var(--r-full); width: auto; }
+  .flow-bar .step-nav .sd { display: none; }
+  .flow-bar .step-nav .st { white-space: nowrap; font-size: var(--t-label); }
+  .flow-bar .step-nav.current { background: var(--accent-soft); }
+  .flow-bar .step-nav.current .st { color: var(--accent-ink); }
+  .flow-bar .step-nav.done .sn { background: var(--good); border-color: var(--good); color: #0F1A14; }
+  .flow-bar .step-nav.upcoming { opacity: .55; }
+  .cm-name-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .cm-name-row .cm-name { width: min(100%, 360px); }
+  .cm-name-row .cm-name-lbl { margin: 0; }
   /* P1: 7ステップの共通進捗列（ウィザード／台本／素材／初稿で共有） */
   .steps-col { position: sticky; top: calc(var(--topbar-h) + 20px); display: flex; flex-direction: column; gap: 10px; }
   .steps-col .steps { position: static; }
@@ -735,7 +753,7 @@
   .mode-switch button { min-height: 34px; padding: 0 16px; border-radius: 6px; font-size: var(--t-label); font-weight: 700; color: var(--muted); transition: background var(--dur-fast), color var(--dur-fast); }
   .mode-switch button:hover { color: var(--ink); }
   .mode-switch button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); }
-  .script-board { display: grid; grid-template-columns: 220px minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 56px; align-items: start; }
+  .script-board { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 56px; align-items: start; }
   .flow-steps { position: sticky; top: calc(var(--topbar-h) + 20px); min-width: 0; max-width: 100%; }
   .flow-steps .steps { max-width: 100%; }
   .steps-col { min-width: 0; max-width: 100%; }
@@ -801,8 +819,10 @@
     .steps-col { position: static; }
     .script-board { grid-template-columns: 1fr; }
     .flow-steps { position: static; }
-    .flow-steps .steps { flex-direction: row; overflow-x: auto; gap: 4px; }
-    .flow-steps .step-nav { min-width: max-content; }
+    .flow-bar { margin: 0 calc(-1 * var(--s-4)) var(--s-4); padding: 6px var(--s-4); }
+    .flow-bar .step-nav { padding: 0 8px 0 4px; min-height: 32px; }
+    .flow-bar .step-nav:not(.current) .st { display: none; }   /* モバイル: 現在地だけラベル、他は番号 */
+    .flow-bar .steps li + li::before { width: 10px; }
     .step-nav .sd { display: none; }
     .resume { grid-template-columns: 1fr; }
     .resume .r-thumb { height: 80px; }
@@ -2082,15 +2102,15 @@
       <svg class="ic"><use href="#i-sparkle"/></svg>
       <span>このブランドのいつもの設定を反映しました。変更できます。</span>
     </div>
-  </div>
-
-  <div class="wiz-board">
-    <!-- step nav（7ステップ・共通進捗列） -->
-    <div class="steps-col">
+    <div class="cm-name-row">
       <label class="cm-name-lbl" for="cmName">CM の名前</label>
       <input id="cmName" class="cm-name" type="text" maxlength="60" placeholder="例: 夏の新規登録キャンペーン" autocomplete="off">
-      <ol class="steps" id="stepNav" aria-label="ステップ"></ol>
     </div>
+  </div>
+  <!-- 7ステップ・共通進捗列（上部固定） -->
+  <div class="flow-bar"><ol class="steps" id="stepNav" aria-label="ステップ"></ol></div>
+
+  <div class="wiz-board">
 
     <!-- steps -->
     <section>
@@ -2435,8 +2455,8 @@
     </div>
   </section>
 
+  <div class="flow-bar"><ol class="steps" id="flowStepsScript" aria-label="ステップ"></ol></div>
   <div class="script-board">
-    <div class="flow-steps"><ol class="steps" id="flowStepsScript" aria-label="ステップ"></ol></div>
     <div class="board-main">
       <!-- 台本を持ち込む：貼り付け or アップロード -->
       <div class="own-script" id="ownScript" hidden>
@@ -2476,8 +2496,8 @@
       <div class="title-sub">台本で必要になった分だけお願いします。ロゴはブランドから自動で入ります。手元にないものは、あとから追加できます。</div>
     </div>
   </section>
+  <div class="flow-bar"><ol class="steps" id="flowStepsAssets" aria-label="ステップ"></ol></div>
   <div class="script-board">
-    <div class="flow-steps"><ol class="steps" id="flowStepsAssets" aria-label="ステップ"></ol></div>
     <div class="board-main">
     <div class="asset-panel">
       <div class="panel-h">台本で決まった素材 <span class="count" id="shotCount">0/0</span></div>
@@ -2601,10 +2621,10 @@
     </div>
   </section>
 
+  <div class="flow-bar"><ol class="steps" id="flowStepsWork" aria-label="ステップ"></ol></div>
   <div class="board">
     <!-- ============ pipeline rail ============ -->
     <aside class="panel rail" id="pipelinePanel">
-      <ol class="steps" id="flowStepsWork" aria-label="ステップ" style="padding:8px 8px 0"></ol>
       <details class="acc-details" id="pipelineDetails">
       <summary>制作の進み具合</summary>
       <ol class="stages">
