@@ -248,6 +248,12 @@ SVGスプライト（`<symbol id="i-*">`）を `<svg class="ic"><use href="#i-..
 - ✅ **アクセント塗りの上の文字は `--on-accent`（白, 4.8 AA）のみ**。`accent-ink`/`muted`/意味色を `--accent` 塗りに載せない（2.6以下で不合格）。バッジは `--accent-soft`(暗) 地なので `accent-ink` でAA。
 - ✅ **コントラスト運用規約（LINE R6・2026-10-06）**: LINE は 18.5px 未満を small text と定義する。Spot の本文（`--t-body-sm`=14px・`--t-label`）は**すべて small → 4.5:1 必須**。3.0:1 で許されるのは 18.5px 以上の見出し・太字の大文字のみ。**`--faint` は本文・ラベル・ヘルプ文に使わない**（プレースホルダ・カウンタ・装飾の三次情報専用）。新しい色の組み合わせを足すときはこの表に AA 比を追記してから使う。
 - ✅ **状態は色だけで伝えない**: 選択チップは ✓ 前置、エラーは ⚠ アイコン＋文、Loading はスピナー＋文言（2026-10-06）。
+- ✅ **文字サイズは rem**（`--t-*`。OS/ブラウザの文字拡大に追従。寸法トークンは px）。
+- ✅ **ライブリージョン** `window.announce(msg, assertive?)` — `#a11yLive`(polite) / `#a11yAlert`(role=alert)。画面遷移（h1）・生成の開始/完了/失敗・書き出し完了で使用。進捗パネルのような全文再描画は aria-live にしない（騒がしい）。
+- ✅ **ダイアログ** `trapFocus(card)` — Tab をダイアログ内に閉じ込め、閉じたら開いた要素へフォーカスを戻す（`openConfirm` / `openNameModal`）。
+- ✅ **メニュー/タブのキー操作** — `[role=menu]` は ↑↓ Home End・開いたら先頭へフォーカス・Esc で閉じる。`[role=tab]` は ←→ Home End で移動＋選択。
+- ✅ **装飾アイコン** `svg.ic` は自動で `aria-hidden="true"`（i18n ウォーカーが付与）。意味を持たせるときは `role="img" aria-label` を明示。
+- ⏳ 実機スクリーンリーダー検証（VoiceOver / NVDA）は未実施。
 - ⏳ 今後: 色だけに依存しない状態表現の最終点検（メーター等はテキスト併記済み）。
 
 ---

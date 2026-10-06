@@ -72,6 +72,8 @@
   /* keyboard focus (both M3 and HIG require a visible ring) */
   :focus { outline: none; }
   :focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; border-radius: var(--r-xs); }
+  /* a11y: 視覚的に隠してスクリーンリーダーにだけ読ませる（ライブリージョン等） */
+  .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .skip {
     position: absolute; left: 16px; top: -48px; z-index: 300; padding: 10px 14px;
     background: var(--ink); color: var(--ground); border-radius: var(--r-sm); font-weight: 700; text-decoration: none;
@@ -2770,6 +2772,9 @@
 <button type="button" class="fab-new" id="fabNew" aria-label="新規CMをつくる" title="新規CMをつくる"><svg class="ic"><use href="#i-plus"/></svg></button>
 
 <div class="toast-wrap" id="toasts" role="status" aria-live="polite"></div>
+<!-- a11y: 画面遷移・生成完了/失敗・書き出し完了をスクリーンリーダーへ通知するライブリージョン（window.announce） -->
+<div id="a11yLive" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+<div id="a11yAlert" class="sr-only" role="alert" aria-atomic="true"></div>
 
 <script>
 </script>
@@ -2897,6 +2902,68 @@
     return t;
   }
   window.snackbar = snackbar;
+
+  // ---- a11y: 状態変化の通知（ARIA live）。polite=画面遷移・完了、assertive=失敗など注意を要するもの ----
+  //   同じ文を続けて入れても読まれるよう、一度空にしてからセットする。
+  function announce(msg, assertive) {
+    const el = document.getElementById(assertive ? 'a11yAlert' : 'a11yLive');
+    if (!el || !msg) return;
+    el.textContent = '';
+    setTimeout(() => { el.textContent = msg; }, 40);
+  }
+  window.announce = announce;
+
+  // ---- a11y: ダイアログのフォーカストラップ＋閉じたら元の要素へ戻す ----
+  const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  function trapFocus(container) {
+    const opener = document.activeElement;
+    const onKey = (e) => {
+      if (e.key !== 'Tab') return;
+      const items = [...container.querySelectorAll(FOCUSABLE)].filter(x => x.offsetParent !== null);
+      if (!items.length) return;
+      const first = items[0], last = items[items.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !container.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', onKey, true);
+    return () => { document.removeEventListener('keydown', onKey, true); if (opener && opener.focus && document.body.contains(opener)) setTimeout(() => opener.focus(), 0); };
+  }
+  window.trapFocus = trapFocus;
+
+  // ---- a11y: メニュー（role=menu）とタブ（role=tab）の矢印キー操作 ----
+  document.addEventListener('keydown', e => {
+    const key = e.key;
+    const menu = e.target.closest('[role="menu"]');
+    if (menu && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) {
+      const items = [...menu.querySelectorAll('button:not([disabled]), [role="menuitem"]:not([disabled])')].filter(x => x.offsetParent !== null);
+      if (!items.length) return;
+      e.preventDefault();
+      const i = items.indexOf(document.activeElement);
+      const next = key === 'Home' ? 0 : key === 'End' ? items.length - 1 : key === 'ArrowDown' ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
+      items[next].focus();
+      return;
+    }
+    const tab = e.target.closest('[role="tab"]');
+    if (tab && ['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(key)) {
+      const list = tab.closest('[role="tablist"]'); if (!list) return;
+      const tabs = [...list.querySelectorAll('[role="tab"]')].filter(x => !x.disabled && x.offsetParent !== null);
+      if (tabs.length < 2) return;
+      e.preventDefault();
+      const i = tabs.indexOf(tab);
+      const next = key === 'Home' ? 0 : key === 'End' ? tabs.length - 1 : key === 'ArrowRight' ? (i + 1) % tabs.length : (i - 1 + tabs.length) % tabs.length;
+      tabs[next].focus(); tabs[next].click();
+    }
+  });
+  // メニューが開いたら最初の項目へフォーカス（hidden の変化を監視＝開閉コードに手を入れない）
+  new MutationObserver(muts => {
+    muts.forEach(m => {
+      const el = m.target;
+      if (el.getAttribute('role') === 'menu' && !el.hidden) {
+        const first = [...el.querySelectorAll('button:not([disabled])')].find(x => x.offsetParent !== null);
+        if (first) setTimeout(() => { if (!el.hidden && !el.contains(document.activeElement)) first.focus(); }, 40);
+      }
+    });
+  }).observe(document.body, { attributes: true, attributeFilter: ['hidden'], subtree: true });
 
   // R2（LINE準拠）: ボタンの Loading 状態。待ちが発生する主アクションは内部スピナー＋文言で「処理中」を示し、二重送信を防ぐ。
   //   使い方: btnBusy(btn, true, '保存中…') … btnBusy(btn, false)。disabled 直書きの代わりに使う。
@@ -3366,6 +3433,7 @@
     const badges = document.querySelector('#preflight .cc-badges');   // 「済み」主張＝実ファイルが無いうちは出さない
     if (realCount > 0) {
       if (title) title.textContent = L(`Export complete · ${realCount} files`, `書き出し完了 ・ ${realCount}本`);
+      if (window.announce) window.announce(L(`Export complete. ${realCount} files are ready to download.`, `書き出しが完了しました。${realCount}本をダウンロードできます。`));
       if (check) { check.classList.remove('pending'); check.classList.remove('bloom'); void check.offsetWidth; check.classList.add('bloom'); }   // お披露目アニメを毎回確実に再生
       if (note) note.hidden = true;
       if (badges) badges.hidden = false;
@@ -3943,6 +4011,7 @@
   }
   function focusView(v) {   // move focus to the new view so keyboard/AT users land on it
     v.setAttribute('tabindex', '-1'); v.focus({ preventScroll: true });
+    const h = v.querySelector('h1'); if (h && window.announce) window.announce(h.textContent.trim());   // 画面名を読み上げ
   }
   function _nav(inProject, act) {   // 上部バーの出し分け（工程のみ）＋サイドバーのアクティブ状態
     document.body.classList.toggle('in-project', !!inProject);
@@ -4506,6 +4575,8 @@
   function walk(root) {
     if (root.nodeType === 3) { translateNode(root); return; }
     if (root.nodeType !== 1 || SKIP[root.tagName]) return;
+    // a11y: 装飾アイコン（svg.ic）は読み上げ対象外。意味を持つものは aria-hidden/role/aria-label を明示しているので触らない
+    if (root.tagName === 'svg' && root.classList.contains('ic') && !root.hasAttribute('aria-hidden') && !root.hasAttribute('role') && !root.hasAttribute('aria-label')) root.setAttribute('aria-hidden', 'true');
     if (root.hasAttribute) translateAttrs(root);
     for (var n = root.firstChild; n; n = n.nextSibling) walk(n);
   }
@@ -6320,7 +6391,8 @@
         { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' },
       ];
       const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); pick(null); } };
-      const cleanup = () => { scrim.hidden = true; document.removeEventListener('keydown', onKey); scrim.onclick = null; const w = document.getElementById('confirmInputWrap'); if (w) w.remove(); const i = document.getElementById('confirmIrrev'); if (i) i.remove(); };
+      const release = window.trapFocus ? window.trapFocus(scrim.querySelector('.modal-card')) : null;   // Tab をダイアログ内に閉じ込め、閉じたら元の要素へ
+      const cleanup = () => { scrim.hidden = true; document.removeEventListener('keydown', onKey); scrim.onclick = null; const w = document.getElementById('confirmInputWrap'); if (w) w.remove(); const i = document.getElementById('confirmIrrev'); if (i) i.remove(); if (release) release(); };
       const pick = (id) => { cleanup(); resolve(id); };
       // type-to-confirm（重要な削除向け）：requireText.value と一致するまで危険/主ボタンを無効化
       let inputEl = null;
@@ -6361,8 +6433,9 @@
       setText('nameModalTitle', opts.title);
       ok.querySelector('span').textContent = opts.okLabel || L('Create', '作成');
       input.value = opts.value || '';
+      const release = window.trapFocus ? window.trapFocus(scrim.querySelector('.modal-card')) : null;
       scrim.hidden = false; setTimeout(() => { input.focus(); input.select(); }, 30);
-      const done = (val) => { scrim.hidden = true; ok.onclick = cancel.onclick = scrim.onclick = input.onkeydown = null; resolve(val); };
+      const done = (val) => { scrim.hidden = true; ok.onclick = cancel.onclick = scrim.onclick = input.onkeydown = null; if (release) release(); resolve(val); };
       ok.onclick = () => { const v = input.value.trim(); if (v) done(v); else input.focus(); };
       cancel.onclick = () => done(null);
       scrim.onclick = (e) => { if (e.target === scrim) done(null); };
@@ -6864,7 +6937,7 @@
     if (!panel) {
       panel = document.createElement('div');
       panel.id = 'jobsPanel'; panel.className = 'panel pad';
-      panel.setAttribute('aria-live', 'polite');   // 生成の進捗/完了/失敗をスクリーンリーダーに通知
+      // 進捗は全文再描画なので aria-live にしない（毎回読み上げて騒がしい）。状態の変わり目だけ announce() で通知する。
       side.insertBefore(panel, side.firstChild);
     }
     const jobs = Object.values(jobsState)
@@ -6875,6 +6948,14 @@
     const usd = jobs.reduce((s, j) => s + (Number(j.usd) || 0), 0);
     const pct = total ? Math.round(done / total * 100) : 0;
     const allDone = total > 0 && done === total;
+    // a11y: 状態の変わり目だけ読み上げ（開始／完了／失敗）
+    const genState = total === 0 ? 'none' : failed ? 'failed' : allDone ? 'done' : 'running';
+    if (window.announce && genState !== renderJobs._last) {
+      if (genState === 'running' && renderJobs._last !== 'running') window.announce(L('AI has started creating your ad.', 'AIが作成を始めました。'));
+      else if (genState === 'done') window.announce(L('Your ad is ready. You can go to export.', 'CMができあがりました。書き出しへ進めます。'));
+      else if (genState === 'failed') window.announce(L('Some cuts failed. Please try again.', '一部のカットをつくれませんでした。もう一度お試しください。'), true);
+      renderJobs._last = genState;
+    }
     // 状況フィードバック（生成中=進捗＋目安、完了=次アクション、失敗=再試行）
     let statusHtml = '';
     if (total === 0) statusHtml = `<div class="gen-status">${L('Preparing…', '準備しています…')}</div>`;

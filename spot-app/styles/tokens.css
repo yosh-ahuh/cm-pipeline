@@ -59,15 +59,17 @@
   --font-display: "Noto Sans JP", -apple-system, "Hiragino Sans", sans-serif;
   --font-jp: "Noto Sans JP", -apple-system, "Hiragino Sans", sans-serif;
   --font-mono: "DM Mono", ui-monospace, monospace;
-  --t-display: 32px;   /* hero / wizard title */
-  --t-headline: 26px;  /* page title */
-  --t-title-lg: 20px;  /* question */
-  --t-title: 16px;     /* card title */
-  --t-body-lg: 15px;
-  --t-body: 14px;
-  --t-body-sm: 13px;
-  --t-label: 12px;
-  --t-label-sm: 11px;  /* minimum text size */
+  /* 文字サイズは rem（基準 16px）＝ OS/ブラウザの「文字を大きく」設定に追従する（WCAG 1.4.4・a11y監査 2026-10-06）。
+     px 換算は右のコメント。寸法（高さ・余白・角丸）は px のまま＝文字だけが拡大しレイアウトは崩さない。 */
+  --t-display: 2rem;       /* 32px  hero / wizard title */
+  --t-headline: 1.625rem;  /* 26px  page title */
+  --t-title-lg: 1.25rem;   /* 20px  question */
+  --t-title: 1rem;         /* 16px  card title */
+  --t-body-lg: .9375rem;   /* 15px */
+  --t-body: .875rem;       /* 14px */
+  --t-body-sm: .8125rem;   /* 13px */
+  --t-label: .75rem;       /* 12px */
+  --t-label-sm: .6875rem;  /* 11px  minimum text size */
 
   /* --- shape (M3 shape scale・Canva風にひと回り大きく) --- */
   --r-xs: 7px;
