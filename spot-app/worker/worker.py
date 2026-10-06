@@ -199,13 +199,16 @@ def spec_to_project(project_id: str, spec: dict, product: str | None) -> dict:
             cut["motion"] = {"resolution": "1080p"}
             cut["telop"] = telop
         elif cut["type"] == "cta":
-            cut.update({"button": c.get("button") or "今すぐ 無料ではじめる", "badges": c.get("badges") or [],
-                        "search": c.get("search") or product, "note": c.get("note"), "telop": telop})
+            # ボタン文言は台本の字幕（例「お問い合わせはこちら」）を優先。検索語は CM 名ではなくブランド名
+            brand_name = ((spec.get("brand") or {}).get("name") or "").strip()
+            cut.update({"button": c.get("button") or c.get("caption") or "今すぐ 無料ではじめる", "badges": c.get("badges") or [],
+                        "search": c.get("search") or brand_name or product, "note": c.get("note"), "telop": telop})
         elif cut["type"] == "graphic":
             cut["value"] = c.get("value") or {"label": c.get("caption") or label}
         elif cut["type"] == "ui":
             # assets: アプリが Storage に上げたスクショのパス配列（LiveRunner が assets/ にダウンロードして差し替え）
-            cut.update({"assets": list(c.get("assets") or []), "caption": c.get("caption") or label, "telop": telop})
+            # UI カットは caption を画面下に描くので、同文の telop は重ねない（明示 telop がある場合のみ）
+            cut.update({"assets": list(c.get("assets") or []), "caption": c.get("caption") or label, "telop": c.get("telop") or []})
         else:
             cut["role"] = role
         if c.get("secs"):
