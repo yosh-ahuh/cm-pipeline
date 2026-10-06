@@ -8669,7 +8669,7 @@
     const srcs = brandIntake.sources; const done = srcs.filter(r => r.status === 'done' || r.status === 'failed').length;
     if (count) count.textContent = `${done}/${srcs.length}`;
     list.innerHTML = srcs.map(r => { const [cls, lab] = SRC_STATUS[r.status] || SRC_STATUS.pending;
-      return `<div class="pr">${r.status === 'running' || r.status === 'pending' ? '<span class="spin" aria-hidden="true"></span>' : `<svg class="ic" style="width:14px;height:14px;color:${r.status === 'done' ? 'var(--good)' : 'var(--warn)'}"><use href="#${r.status === 'done' ? 'i-check' : 'i-alert'}"/></svg>`}<span class="sname">${escHtml(srcLabel(r))}</span><span class="badge ${cls}">${r.status === 'running' && r.step ? escHtml(r.step) : lab}${r.status === 'failed' && r.error ? ' · ' + escHtml(r.error) : ''}</span></div>`; }).join('');
+      return `<div class="pr">${r.status === 'running' || r.status === 'pending' ? '<span class="spin" aria-hidden="true"></span>' : `<svg class="ic" style="width:14px;height:14px;color:${r.status === 'done' ? 'var(--good)' : 'var(--warn)'}"><use href="#${r.status === 'done' ? 'i-check' : 'i-alert'}"/></svg>`}<span class="sname">${escHtml(srcLabel(r))}</span><span class="badge ${cls}">${r.status === 'running' && r.step ? ({ fetch: L('Fetching', '取得中'), extract: L('Reading', '読み取り中'), extracted: L('Read', '読み取り済み'), summarize: L('Summarizing', 'まとめ中') }[r.step] || escHtml(r.step)) : lab}${r.status === 'failed' && r.error ? ' · ' + escHtml(r.error) : ''}</span></div>`; }).join('');
     if (srcs.length && done === srcs.length) { brandIntake.unsubscribe(); clearTimeout(brandIntake.timer); setTimeout(() => brandIntake.finish(), 400); }
   };
   brandIntake.subscribe = function () {

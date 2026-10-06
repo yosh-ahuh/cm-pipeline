@@ -1,3 +1,4 @@
 # worker 用（cm-pipeline/.venv に入れる: cm-pipeline/.venv/bin/python -m pip install -r requirements.txt）
 anthropic>=1.11
+pypdf>=6
 pyyaml

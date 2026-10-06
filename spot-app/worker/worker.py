@@ -15,7 +15,8 @@ build は spec.compliance / spec.delivery を読み、開示テロップ・C2PA�
   SUPABASE_SERVICE_ROLE_KEY    service_role キー（サーバ専用・絶対に公開しない）
   FAL_KEY                      （--live）fal.ai キー。未設定なら ../../.fal_key を読む
   ANTHROPIC_API_KEY            （--live・任意）台本ステージ（script）で Claude に台本を書かせる。未設定ならテンプレート台本
-  SPOT_SCRIPT_MODEL            （任意）台本生成モデル。既定 claude-opus-5-5
+  SPOT_SCRIPT_MODEL            （任意）台本生成／ブランド要約モデル。既定 claude-opus-5-5
+  ※ ブランド取り込み（brand_sources.status=pending）も同じループで処理する（--brand <uuid> で対象を絞れる）
   CM_PIPELINE_DIR              （任意）cm-pipeline のパス。既定は ../../cm-pipeline
   RESEND_API_KEY               （任意）制作完了メールを送る Resend の API キー。未設定ならメールは送らない
   RESEND_FROM                  （任意）差出人。既定 "Spot <no-reply@creativepunx.com>"
@@ -43,6 +44,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import script_gen  # noqa: E402  台本ステージ（P4）
+import brand_ingest  # noqa: E402  ブランド取り込み（P3）
 SPOT_ROOT = HERE.parent.parent                                   # SPOT/
 CM_DIR = Path(os.environ.get("CM_PIPELINE_DIR") or SPOT_ROOT / "cm-pipeline")
 
@@ -499,14 +501,21 @@ def notify_done(sb: Supa, project_id: str, owner: str) -> None:
         print(f"  WARN  notify_done failed: {e}", flush=True)
 
 
-def tick(sb: Supa, only_project: str | None, live: bool) -> int:
-    """処理すべきプロジェクトを見つけて進める。処理件数を返す。"""
+def tick(sb: Supa, only_project: str | None, live: bool, only_brand: str | None = None) -> int:
+    """処理すべきプロジェクトを見つけて進める。処理件数を返す。ブランド取り込み（P3）も先に進める。"""
+    total = 0
+    if not only_project:
+        try:
+            total += brand_ingest.tick_brands(sb, only_brand, live)
+        except Exception as e:  # noqa: BLE001
+            print("brand ingest error:", e, flush=True)
+    if only_brand:
+        return total
     params = {"select": "project_id", "status": "eq.pending"}
     if only_project:
         params["project_id"] = f"eq.{only_project}"
     pending = sb.select("jobs", **params)
     project_ids = sorted({p["project_id"] for p in pending})
-    total = 0
     for pid in project_ids:
         proj = sb.select("projects", id=f"eq.{pid}", select="owner,status")
         if not proj:
@@ -520,6 +529,7 @@ def tick(sb: Supa, only_project: str | None, live: bool) -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="SPOT 生成ワーカー（Supabase jobs 駆動）")
     ap.add_argument("--project", help="対象プロジェクトID（省略時は全て）")
+    ap.add_argument("--brand", help="ブランド取り込みだけを、このブランドIDについて実行")
     ap.add_argument("--watch", action="store_true", help="ポーリング常駐")
     ap.add_argument("--interval", type=float, default=5.0, help="--watch のポーリング間隔秒")
     ap.add_argument("--live", action="store_true", help="実生成（既定は DRY-RUN）")
@@ -530,12 +540,12 @@ def main(argv=None) -> int:
     print(f"SPOT worker start (mode={mode}, project={args.project or 'ALL'})", flush=True)
 
     if not args.watch:
-        n = tick(sb, args.project, args.live)
+        n = tick(sb, args.project, args.live, args.brand)
         print(f"done. processed {n} job(s).", flush=True)
         return 0
     while True:
         try:
-            tick(sb, args.project, args.live)
+            tick(sb, args.project, args.live, args.brand)
         except Exception as e:  # noqa: BLE001
             print("tick error:", e, flush=True)
         time.sleep(args.interval)
