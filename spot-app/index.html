@@ -813,6 +813,8 @@
   .goal[aria-pressed="true"] .g-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .goals-start .free-add { margin-top: var(--s-3); }
   #view-dash.has-work .dash-hero { display: none; }
+  .os-meta { font-size: var(--t-label); margin-top: 6px; }
+  .os-meta.warn { color: var(--warn); }
   /* P4: 台本ステージの状態バナー */
   .script-state { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--r-md); margin-bottom: var(--s-3); font-size: var(--t-body-sm); background: var(--accent-soft); color: var(--accent-ink); }
   .script-state.warn { background: var(--warn-soft); color: var(--warn); }
@@ -886,6 +888,8 @@
   @media (max-width: 720px) { .intake-2, .q3, .pf-grid { grid-template-columns: 1fr; } .cta-card { grid-template-columns: 48px minmax(0,1fr); } .cta-card .btn { grid-column: 1 / -1; } }
   /* モバイル：ボトムナビ（HIG タブバー相当） */
   .bottom-nav { display: none; }
+  #acctMenu .m-only { display: none; }
+  @media (max-width: 720px) { #acctMenu .m-only { display: flex; } #acctMenu .menu-label.m-only { display: block; } }
   @media (max-width: 720px) {
     .steps-col { position: static; }
     .script-board { grid-template-columns: 1fr; }
@@ -2075,6 +2079,13 @@
   <div class="menu-label">アカウント</div>
   <div id="amWorkspaces"></div>
   <div class="menu-sep"></div>
+  <!-- モバイルのみ：サイドバーに出ない項目（メディア・コレクション・チーム・請求） -->
+  <div class="menu-label m-only">メニュー</div>
+  <button type="button" class="menu-item m-only" data-act="media"><svg class="ic"><use href="#i-film"/></svg><span>メディア</span></button>
+  <button type="button" class="menu-item m-only" data-act="collections"><svg class="ic"><use href="#i-folder"/></svg><span>コレクション</span></button>
+  <button type="button" class="menu-item m-only" data-act="team" data-owner-only><svg class="ic"><use href="#i-users"/></svg><span>チーム・メンバー</span></button>
+  <button type="button" class="menu-item m-only" data-act="billing" data-owner-only><svg class="ic"><use href="#i-card"/></svg><span>プランと請求</span></button>
+  <div class="menu-sep m-only"></div>
   <button type="button" class="menu-item" data-act="settings"><svg class="ic"><use href="#i-user"/></svg><span>プロフィール設定</span></button>
   <button type="button" class="menu-item" data-act="account"><svg class="ic"><use href="#i-settings"/></svg><span>ログインとセキュリティ</span></button>
   <button type="button" class="menu-item" data-act="help"><svg class="ic"><use href="#i-alert"/></svg><span>ヘルプ＆フィードバック</span></button>
@@ -2095,7 +2106,7 @@
   <button type="button" class="bn-item" data-act="home"><svg class="ic"><use href="#i-home"/></svg><span>ホーム</span></button>
   <button type="button" class="bn-item mk" data-act="new"><svg class="ic"><use href="#i-plus"/></svg><span>作る</span></button>
   <button type="button" class="bn-item" data-act="media"><svg class="ic"><use href="#i-film"/></svg><span>マイCM</span></button>
-  <button type="button" class="bn-item" data-act="help"><svg class="ic"><use href="#i-alert"/></svg><span>ガイド</span></button>
+  <button type="button" class="bn-item" data-act="more" aria-haspopup="menu"><svg class="ic"><use href="#i-settings"/></svg><span>その他</span></button>
 </nav>
 
 <header id="topbar">
@@ -2468,7 +2479,7 @@
       <!-- STEP 3: ターゲット -->
       <div class="wiz-step" data-step="2">
         <div class="step-q">誰に届けますか?</div>
-        <div class="step-hint">見る人によって、最初の2秒の見せ方とテンポが変わります。複数選べます。複数のときは、いちばん上に選んだ相手に冒頭を合わせます。</div>
+        <div class="step-hint">見る人によって、最初の2秒の見せ方とテンポが変わります。3つまで選べます。複数のときは、最初に選んだ相手に冒頭を合わせます。</div>
         <div class="opt-grid" data-multi="true" data-key="targets" role="group" aria-label="届ける相手">
           <button class="opt" aria-pressed="true" data-val="実務担当者">
             <span class="o-tick"><svg class="ic"><use href="#i-check"/></svg></span>
@@ -2687,8 +2698,9 @@
       <!-- 台本を持ち込む：貼り付け or アップロード -->
       <div class="own-script" id="ownScript" hidden>
         <div class="os-head">台本を持ち込む</div>
-        <p class="os-sub">お持ちの台本を貼り付けるか、テキストファイルをアップロードしてください。各カットのナレーションと指示は下のカードで編集できます。</p>
+        <p class="os-sub">お持ちの台本を貼り付けるか、テキストファイルをアップロードしてください。行頭に「カット1:」「#1」と書くとそのカット割りを使い、無ければ空行ごとに分けます（最大8カット）。文章は変えません。各カットのナレーションと指示は下のカードで編集できます。</p>
         <textarea id="ownScriptText" class="os-text" placeholder="行頭に「カット1:」のように書くと、そのカット割りをそのまま使います。例）&#10;#1 冒頭フック：「現場写真の整理、まだ手作業ですか？」&#10;#2 課題：毎日の集計に時間がかかる…&#10;#3 解決：スマホで撮るだけ、台帳が自動でできる"></textarea>
+        <div class="os-meta muted" id="ownScriptMeta" aria-live="polite" hidden></div>
         <div class="os-actions">
           <input type="file" id="ownScriptFile" accept=".txt,.md,.rtf,text/plain" hidden>
           <button type="button" class="btn btn-ghost wauto" id="ownScriptUpload"><svg class="ic"><use href="#i-plus"/></svg><span>ファイルをアップロード</span></button>
@@ -3996,7 +4008,7 @@
     acctSwitch.style.left = (right ? mr.right + 8 : Math.max(8, mr.left - w - 8)) + 'px';
     acctSwitch.style.top = mr.top + 'px'; acctSwitch.style.bottom = 'auto';
   }
-  window.__closeAcctMenu = closeAcctMenu;
+  window.__closeAcctMenu = closeAcctMenu; window.__openAcctMenu = openAcctMenu;
   if (sbAcctBtn) sbAcctBtn.addEventListener('click', () => { (acctMenu && acctMenu.hidden) ? openAcctMenu() : closeAcctMenu(); });
   if (acctScrim) acctScrim.addEventListener('click', closeAcctMenu);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (acctSwitch && !acctSwitch.hidden) closeAcctSwitch(); else closeAcctMenu(); } });
@@ -4005,6 +4017,9 @@
     closeAcctMenu(); closeDrawer();
     if (a === 'add-brand' || a === 'add-workspace') { if (window.__createBrand) window.__createBrand(); else gotoSettings(); return; }
     if (a === 'settings') { gotoSettings(); return; }
+    if (a === 'media' || a === 'collections' || a === 'team' || a === 'billing' || a === 'credits') {   // モバイルの「その他」から：サイドバーと同じ遷移
+      const sbi = document.querySelector(`.sb-item[data-act="${a}"]`); if (sbi) sbi.click(); return;
+    }
     if (a === 'account') { if (window.gotoAccount) window.gotoAccount(); return; }
     if (a === 'help') { const to = (window.__cfg && window.__cfg.supportEmail) || ''; if (to) { location.href = 'mailto:' + to + '?subject=' + encodeURIComponent('Spot feedback'); } else toast(L('Help & feedback is coming soon.', 'ヘルプ＆フィードバックは準備中です。'), false, 2400); return; }
     if (a === 'login-other') { if (window.__accounts) window.__accounts.add(); else if (window.sb) window.sb.auth.signOut(); return; }
@@ -4321,6 +4336,7 @@
   // ---------- wizard ----------
   const sel = { media: [], goals: [], targets: [], industry: null, target: null, angle: null, tone: null,
     custom: { ratio: '16:9', res: '1080', ratioW: null, ratioH: null, resW: null, resH: null } };
+  const TARGETS_MAX = 3;   // 届ける相手の上限（4 つ目は選べない。自由入力も合算）
   const RX_LABELS = { media:'配信先', goals:'目的', targets:'届ける相手', industry:'業種', target:'ターゲット', angle:'伝え方', tone:'トーン' };
   // P1: 自由入力で追加した目的／相手（選択肢に無い値）。sel[key] は「選択肢で選んだ値 ＋ 自由入力」の合成。
   const customSel = { goals: [], targets: [] };
@@ -4455,6 +4471,10 @@
       const o = e.target.closest('.opt'); if(!o) return;
       if (multi) {
         const on = o.getAttribute('aria-pressed') === 'true';
+        if (!on && key === 'targets' && (sel.targets || []).length >= TARGETS_MAX) {   // 相手は 3 つまで（冒頭は筆頭の相手に合わせるため、増やしすぎると薄まる）
+          toast(L(`Up to ${TARGETS_MAX} audiences. The opening follows the first one you picked.`, `届ける相手は ${TARGETS_MAX} つまでです。冒頭は最初に選んだ相手に合わせます。`), false, 2600);
+          return;
+        }
         o.setAttribute('aria-pressed', on ? 'false' : 'true');
         sel[key] = mergeMulti(key, grid);
         if (key === 'targets') sel.target = sel.targets[0] || null;
@@ -4478,7 +4498,7 @@
       mediaNote.textContent = okMedia ? '選択中の配信先から、書き出す形式が決まります。' : '配信先をひとつ以上選んでください。';
     }
     const gn = document.getElementById('goalsNote'); if (gn) { gn.classList.toggle('warn', !okGoals); gn.textContent = okGoals ? '目的はいくつでも選べます。' : '目的をひとつ以上選んでください。'; }
-    const tn = document.getElementById('targetsNote'); if (tn) { tn.classList.toggle('warn', !okTargets); tn.textContent = okTargets ? '相手はいくつでも選べます。' : '届ける相手をひとつ以上選んでください。'; }
+    const tn = document.getElementById('targetsNote'); if (tn) { tn.classList.toggle('warn', !okTargets); tn.textContent = okTargets ? (sel.targets.length >= TARGETS_MAX ? `${TARGETS_MAX} つ選びました（上限）。冒頭は最初の相手に合わせます。` : `3 つまで選べます。冒頭は最初に選んだ相手に合わせます。`) : '届ける相手をひとつ以上選んでください。'; }
   }
   // 自由入力 → チップ追加／削除
   ['goals', 'targets'].forEach(key => {
@@ -4799,10 +4819,27 @@
     if (file && ta) file.addEventListener('change', async () => {
       const f = file.files && file.files[0]; if (!f) return;
       if (f.size > 1024 * 1024) { toast(L('File is too large (max 1 MB).', 'ファイルが大きすぎます（最大1MB）。'), false, 2600); return; }
-      try { ta.value = await f.text(); toast(L('Script loaded. Review and apply.', '台本を読み込みました。確認して反映してください。'), true, 2000); }
+      try { ta.value = await f.text(); updateScriptMeta(); toast(L('Script loaded. Review and apply.', '台本を読み込みました。確認して反映してください。'), true, 2000); }
       catch (_) { toast(L("Couldn't read the file.", 'ファイルを読み込めませんでした。'), false, 2600); }
       file.value = '';
     });
+    // 長さの目安：ナレーションは日本語で約 5 文字/秒（英語は約 15 文字/秒）。30 秒を超えると警告（止めはしない）
+    const SCRIPT_LIMIT_SEC = 30;
+    function estimateSecs(text) {
+      const body = String(text || '').replace(/^(カット|cut|#)\s*\d+\s*[:：.．]?\s*/gim, '').replace(/\s+/g, '');
+      const ja = (body.match(/[ぁ-んァ-ン一-龥ー]/g) || []).length, other = body.length - ja;
+      return Math.round(ja / 5 + other / 15);
+    }
+    function updateScriptMeta() {
+      const meta = document.getElementById('ownScriptMeta'); if (!meta || !ta) return;
+      const text = (ta.value || '').trim(); if (!text) { meta.hidden = true; return; }
+      const secs = estimateSecs(text), over = secs > SCRIPT_LIMIT_SEC + 2;
+      meta.hidden = false; meta.classList.toggle('warn', over);
+      meta.textContent = over
+        ? L(`About ${secs} sec of narration — longer than the ${SCRIPT_LIMIT_SEC}-sec target. Trim it, or let AI shorten it.`, `ナレーションは約 ${secs} 秒。目安の ${SCRIPT_LIMIT_SEC} 秒を超えています。削るか、AI に短くまかせられます。`)
+        : L(`About ${secs} sec of narration (target ${SCRIPT_LIMIT_SEC} sec).`, `ナレーションは約 ${secs} 秒（目安 ${SCRIPT_LIMIT_SEC} 秒）。`);
+    }
+    if (ta) { ta.addEventListener('input', updateScriptMeta); ta.addEventListener('change', updateScriptMeta); }
     // P1: 持ち込み台本をカットに分ける。行頭「カット n:」「#n」があればそれを尊重、無ければ行（空行区切り）ごと。文章は変えない。
     function splitOwnScript(text) {
       const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
@@ -4815,6 +4852,8 @@
       const text = (ta.value || '').trim();
       if (!text) { toast(L('Paste or upload a script first.', '台本を貼り付けるかアップロードしてください。'), false, 2400); ta.focus(); return; }
       const parts = splitOwnScript(text);
+      const est = estimateSecs(text);
+      if (est > SCRIPT_LIMIT_SEC + 2) toast(L(`Heads-up: about ${est} sec — over the ${SCRIPT_LIMIT_SEC}-sec target. Narration may be sped up or cut.`, `約 ${est} 秒あります。目安の ${SCRIPT_LIMIT_SEC} 秒を超えるため、早口になるか末尾が切れることがあります。`), false, 3600);
       const cuts = Array.isArray(window.__scriptCuts) ? window.__scriptCuts : [];
       const capOf = t => { const f = String(t).split(/[。！!？?\n]/)[0].trim(); return (f.length > 18 ? f.split(/[、,]/)[0] : f).slice(0, 18); };
       const next = parts.map((p, i) => Object.assign({}, cuts[i] || { id: 'cut' + (i + 1), role: i === parts.length - 1 ? 'cta' : 'scene', type: i === parts.length - 1 ? 'cta' : 'live-action' }, { narration: p, caption: capOf(p) }));
@@ -5001,7 +5040,7 @@
   { const bn = document.getElementById('bottomNav'); if (bn) bn.addEventListener('click', e => {
       const b = e.target.closest('.bn-item'); if (!b) return; const a = b.dataset.act;
       if (a === 'home') gotoDash(); else if (a === 'new') document.getElementById('newCM').click(); else if (a === 'media') gotoMedia();
-      else if (a === 'help') { const m = document.querySelector('#acctMenu [data-act="help"]'); if (m) m.click(); }
+      else if (a === 'more' || a === 'help') { if (window.__openAcctMenu) window.__openAcctMenu(); }
     }); }
   function setBnActive(act) { const bn = document.getElementById('bottomNav'); if (!bn) return; bn.querySelectorAll('.bn-item').forEach(b => { if (b.dataset.act === act) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
   function gotoScript() {
@@ -5387,7 +5426,11 @@
     'AIが構成を組みました。気になるところは言葉で直せます。この台本で、次に必要な素材が決まります。': 'AI drafted the structure. Fix anything in plain words. This script decides which assets you need next.',
     'この台本で進む：素材をアップ': 'Continue: upload assets', 'この台本で必要な素材': 'Assets this script needs',
     'AIが台本をつくっています…': 'AI is writing the script…', '台本': 'Script',
-    'AIの台本を待って、確認する': 'Wait for the AI script, then review it', '素材を確認して、初稿をつくる': 'Check the assets, then create the first cut',
+    'AIの台本を待って、確認する': 'Wait for the AI script, then review it', 'その他': 'More', 'メニュー': 'Menu',
+    '3 つまで選べます。冒頭は最初に選んだ相手に合わせます。': 'Pick up to 3. The opening follows the first one you picked.',
+    '3 つ選びました（上限）。冒頭は最初の相手に合わせます。': '3 picked (the limit). The opening follows the first one.',
+    '見る人によって、最初の2秒の見せ方とテンポが変わります。3つまで選べます。複数のときは、最初に選んだ相手に冒頭を合わせます。': 'The first two seconds and the tempo change with the viewer. Pick up to 3; with several, the opening follows the first one you picked.',
+    'お持ちの台本を貼り付けるか、テキストファイルをアップロードしてください。行頭に「カット1:」「#1」と書くとそのカット割りを使い、無ければ空行ごとに分けます（最大8カット）。文章は変えません。各カットのナレーションと指示は下のカードで編集できます。': 'Paste your script or upload a text file. Start a line with “Cut 1:” or “#1” to keep your own cut breaks; otherwise each blank-line block becomes a cut (max 8). Your wording is kept as is. Edit each cut’s narration and notes in the cards below.', '素材を確認して、初稿をつくる': 'Check the assets, then create the first cut',
     '台本が決まってから': 'Only after the script is set', '素材をお願いするので、使わない素材を用意せずに済みます。実写の人物・背景はAIがつくります。': 'do we ask for assets, so you never prepare anything unused. AI creates the live-action people and backgrounds.',
     'ナレーション': 'Narration', '文字': 'Caption', '必要な素材': 'Asset needed', '映像:': 'Footage:',
     'AIが台本をつくります（生成時に確定）': 'AI writes this when generating', 'ナレーションから自動でつくります': 'Made from the narration automatically',
