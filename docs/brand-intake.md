@@ -117,6 +117,7 @@ create index if not exists brand_sources_status_idx on public.brand_sources(stat
 ```
 
 - `jobs` は `project_id not null` で動画ジョブ専用のため流用しない。`brand_sources.status` 自体をキューにし、ワーカーが `pending` を拾う。
+- 実装メモ（P2）: `brand_sources` に `file_name` 列を追加。`org_id`/`created_by` はトリガで補完。アプリは `window.brandIntake`（load/addUrl/saveText/addFiles/remove/start/openCard/save）。ユーザー確認済みの項目は `confidence=high`、未入力は未設定表示、`low` のみ「要確認」。
 - 原文（HTML・PDF 全文）は保存しない。`extracted` には要約・構造化結果・画像 URL のみ。
 
 ---
@@ -162,7 +163,7 @@ create index if not exists brand_sources_status_idx on public.brand_sources(stat
 
 | 段階 | 内容 | 依存 |
 |---|---|---|
-| A | スキーマ（`brands.profile`、`brand_sources`、RLS、Realtime）＋アプリ側 3 画面（入力／読み込み中／確認）。ワーカー未接続時は 3 問入力のみで保存できる | なし |
+| A ✅ 2026-10-06 | スキーマ（`027_brand_intake.sql`: `brands.profile`、`brand_sources`、RLS、Realtime）＋アプリ側 3 画面（入力／読み込み中／確認）。ワーカー未接続時は 3 問入力のみで保存できる。読み込み中は Realtime で進捗、90 秒で「答えだけで進む」 | なし |
 | B | ワーカー `brand_ingest`（URL・貼り付け）。ロゴ・色・要約・既定値 | A、ワーカー `--live` 環境 |
 | C | ファイル取り込み（PDF/PPTX）、製品画面候補の収集 | B |
 | D | 生成への注入＝ブランドメモリ Phase 2（色・ロゴ・few-shot・発音・NG） | B |

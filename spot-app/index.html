@@ -813,6 +813,71 @@
   .goal[aria-pressed="true"] .g-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .goals-start .free-add { margin-top: var(--s-3); }
   #view-dash.has-work .dash-hero { display: none; }
+  /* P2: ブランド取り込み */
+  .intake-grid { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 56px; align-items: start; }
+  .intake-main { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
+  .intake-main .panel.focus { border: 2px solid var(--accent-ink); }
+  .src-list { display: flex; flex-direction: column; gap: 8px; padding: 0 var(--s-4) var(--s-3); }
+  .src { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 10px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface-2); font-size: var(--t-body-sm); min-width: 0; }
+  .src .sname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .src .badge { flex: none; }
+  .src .rm { width: 32px; height: 32px; border-radius: var(--r-xs); display: grid; place-items: center; color: var(--muted); flex: none; }
+  .src .rm:hover { background: var(--hover); color: var(--ink); }
+  .src .rm .ic { width: 14px; height: 14px; }
+  .src-add { display: flex; gap: 8px; padding: 0 var(--s-4) var(--s-4); align-items: center; flex-wrap: wrap; }
+  .src-add input[type=url] { flex: 1; min-width: 220px; min-height: 42px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink); font-size: var(--t-body-sm); }
+  .src-add input[type=url]:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .intake-2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--s-4); }
+  .dropzone { margin: 0 var(--s-4) var(--s-4); padding: 18px; border: 2px dashed var(--line-strong); border-radius: var(--r-md); background: var(--surface-low); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: var(--t-body-sm); color: var(--muted); cursor: pointer; }
+  .dropzone.over { border-color: var(--accent-ink); background: var(--accent-soft); }
+  .dropzone .ic { width: 22px; height: 22px; color: var(--accent-ink); }
+  .intake-text { margin: 0 var(--s-4) var(--s-4); width: calc(100% - 2 * var(--s-4)); min-height: 150px; resize: vertical; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink); font: inherit; font-size: var(--t-body-sm); line-height: 1.6; }
+  .intake-text:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .q3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--s-3); padding: 0 var(--s-4) var(--s-4); }
+  .q3 .fld { margin: 0; }
+  .q3 .seg { align-self: flex-start; }
+  .q3 .seg button { font-family: var(--font-jp); }
+  .prog { padding: var(--s-3) var(--s-4) var(--s-4); display: flex; flex-direction: column; gap: 8px; }
+  .prog .pr { display: flex; align-items: center; gap: 10px; font-size: var(--t-body-sm); min-height: 32px; }
+  .prog .pr .sname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .prog .spin { width: 14px; height: 14px; }
+  .intake-wait { margin: 0 var(--s-4) var(--s-4); padding: 12px 14px; border-radius: var(--r-sm); background: var(--warn-soft); color: var(--warn); font-size: var(--t-body-sm); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  /* 確認カード */
+  .pf-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--s-3); }
+  .pf { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--s-3) var(--s-4); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .pf.flag { border-color: var(--warn); }
+  .pf-h { display: flex; align-items: center; gap: 8px; }
+  .pf-h .lbl { font-size: var(--t-label-sm); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .pf-h .badge { margin-left: auto; }
+  .pf input[type=text], .pf textarea { width: 100%; min-height: 40px; padding: 8px 12px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface-2); color: var(--ink); font: inherit; font-size: var(--t-body-sm); }
+  .pf textarea { min-height: 72px; resize: vertical; line-height: 1.55; }
+  .pf input:focus, .pf textarea:focus, .pf select:focus { outline: none; border-color: var(--accent-ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .pf .sel { width: 100%; }
+  .pf .row2 { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; align-items: center; }
+  .pf .row2 button, .pf .rowx button { width: 36px; height: 36px; border-radius: var(--r-xs); display: grid; place-items: center; color: var(--muted); }
+  .pf .row2 button:hover, .pf .rowx button:hover { background: var(--hover); color: var(--ink); }
+  .pf .rowx { display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center; }
+  .pf .hint { font-size: var(--t-label-sm); color: var(--faint); }
+  .swatches { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .swatch { position: relative; width: 36px; height: 36px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); overflow: hidden; }
+  .swatch input[type=color] { position: absolute; inset: -6px; width: calc(100% + 12px); height: calc(100% + 12px); border: 0; padding: 0; cursor: pointer; background: none; }
+  .swatch .x { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: var(--ground); display: grid; place-items: center; font-size: 10px; }
+  .logo-box { width: 64px; height: 64px; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center; overflow: hidden; flex: none; }
+  .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .card-foot-note { font-size: var(--t-label); color: var(--muted); }
+  /* ホームの CTA */
+  .cta-card { display: grid; grid-template-columns: 48px minmax(0,1fr) auto; gap: var(--s-4); align-items: center; padding: var(--s-4) var(--s-5); margin: var(--s-6) 0 var(--s-3);
+    background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); border: 2px solid var(--accent-ink); border-radius: var(--r-lg); }
+  .cta-card .ci { width: 48px; height: 48px; border-radius: var(--r-md); background: var(--accent); color: var(--on-accent); display: grid; place-items: center; }
+  .cta-card .ci .ic { width: 24px; height: 24px; }
+  .cta-card h2 { font-family: var(--font-display); font-size: 18px; font-weight: 800; margin: 2px 0 2px; }
+  .cta-card p { font-size: var(--t-body-sm); color: var(--muted); }
+  .brand-profile { margin-top: var(--s-4); padding: var(--s-3) var(--s-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2); display: flex; flex-direction: column; gap: 8px; }
+  .brand-profile .bp-h { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: var(--t-body-sm); }
+  .brand-profile .bp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .brand-profile .bp-chips span { font-size: var(--t-label); padding: 3px 10px; border-radius: var(--r-full); background: var(--surface-3); color: var(--muted); }
+  @media (max-width: 1080px) { .intake-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 720px) { .intake-2, .q3, .pf-grid { grid-template-columns: 1fr; } .cta-card { grid-template-columns: 48px minmax(0,1fr); } .cta-card .btn { grid-column: 1 / -1; } }
   /* モバイル：ボトムナビ（HIG タブバー相当） */
   .bottom-nav { display: none; }
   @media (max-width: 720px) {
@@ -2057,6 +2122,16 @@
     </div>
   </section>
 
+  <section class="cta-card" id="brandIntakeCta" hidden>
+    <div class="ci"><svg class="ic"><use href="#i-sparkle"/></svg></div>
+    <div>
+      <div class="r-eye" style="font-family:var(--font-mono);font-size:var(--t-label-sm);letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink)">はじめてガイド 1 / 5</div>
+      <h2>まず、AIにブランドを知らせましょう</h2>
+      <p>「<span id="brandCtaName">ブランド</span>」の Web ページや資料から、ロゴ・色・伝え方を AI が学びます。約 1 分。あとから直せます。</p>
+    </div>
+    <button type="button" class="btn btn-primary auto" id="brandCtaBtn"><span>ブランドを登録</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
+  </section>
+
   <section class="resume" id="resumeCard" hidden>
     <div class="r-thumb" id="resumeThumb"></div>
     <div>
@@ -2088,6 +2163,148 @@
     </div>
   </div>
   <div class="proj-grid" id="projGrid"></div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ BRAND INTAKE（P2: ブランドを登録・入力） ============================ -->
+<main class="wrap" id="view-brand-intake" hidden>
+  <section class="context">
+    <div>
+      <div class="wiz-eyebrow"><span>はじめてガイド 1 / 5 ・ ブランドを登録</span></div>
+      <h1 class="title-h1" style="margin-top:6px">まず、AI にブランドを知らせましょう</h1>
+      <div class="title-sub">Web ページや資料があれば AI が読んで学びます。なくても大丈夫です。自由に書いてもらった内容や、3 つの質問の答えからも学びます。</div>
+    </div>
+  </section>
+  <div class="intake-grid">
+    <div class="intake-main">
+      <div class="panel focus">
+        <div class="panel-h">Web ページ <span class="badge badge--neutral">任意・あると精度が上がります</span></div>
+        <p class="muted" style="margin:8px 16px 10px;font-size:var(--t-label)">サービス紹介・会社トップ・記事・プレスリリースなど。いくつでも追加できます。</p>
+        <div class="src-list" id="intakeUrls"></div>
+        <div class="src-add"><input type="url" id="intakeUrl" placeholder="https:// を貼り付け" aria-label="Web ページの URL" inputmode="url"><button type="button" class="btn btn-ghost wauto" id="intakeUrlAdd"><svg class="ic"><use href="#i-plus"/></svg><span>追加</span></button></div>
+      </div>
+      <div class="intake-2">
+        <div class="panel">
+          <div class="panel-h">資料ファイル <span class="badge badge--neutral">任意</span></div>
+          <p class="muted" style="margin:8px 16px 10px;font-size:var(--t-label)">PDF・PPTX・画像（PNG / JPG）。会社案内・サービス資料・画面写真など。</p>
+          <div class="src-list" id="intakeFiles"></div>
+          <div class="dropzone" id="intakeDrop" role="button" tabindex="0"><svg class="ic"><use href="#i-plus"/></svg><div><b>ここにドラッグ</b>、または クリックして選ぶ（複数可）</div></div>
+          <input type="file" id="intakeFileInput" accept=".pdf,.pptx,.png,.jpg,.jpeg,.webp,application/pdf,image/*" multiple hidden>
+        </div>
+        <div class="panel">
+          <div class="panel-h">自由に書く <span class="badge badge--neutral">任意</span></div>
+          <p class="muted" style="margin:8px 16px 10px;font-size:var(--t-label)">こだわり・言いたいこと・使ってほしくない言葉など、何でも。SNS の投稿文をそのまま貼ってもOK。</p>
+          <textarea id="intakeText" class="intake-text" placeholder="例: 現場監督向けの工事写真アプリ。スマホで撮るだけで台帳と PDF ができる。"></textarea>
+        </div>
+      </div>
+      <div class="panel" id="intakeQ3">
+        <div class="panel-h">3 つの質問 <span class="badge badge--neutral">何も入れない場合はこちら</span></div>
+        <p class="muted" style="margin:8px 16px 12px;font-size:var(--t-label)">AI の読み取りを待たずに、この答えだけでも登録できます。</p>
+        <div class="q3">
+          <div class="fld"><label for="q3What">何のサービスですか?</label><input type="text" id="q3What" maxlength="60" placeholder="例: 工事写真を台帳にするアプリ"></div>
+          <div class="fld"><label for="q3Who">誰向けですか?</label><input type="text" id="q3Who" maxlength="60" placeholder="例: 建設会社の現場監督"></div>
+          <div class="fld"><label>言葉づかい</label><div class="seg" role="group" aria-label="言葉づかい"><button type="button" data-reg="polite" aria-pressed="true">ていねい</button><button type="button" data-reg="casual" aria-pressed="false">くだけた</button></div></div>
+        </div>
+      </div>
+      <div class="panel" id="intakeProgress" hidden>
+        <div class="panel-h">読み込んでいます <span class="count" id="intakeProgCount"></span></div>
+        <div class="prog" id="intakeProgList"></div>
+        <div class="intake-wait" id="intakeWait" hidden><span>AI の読み取りに時間がかかっています。3 つの質問の答えだけで先に登録することもできます。</span><button type="button" class="btn btn-tonal wauto" id="intakeProceed"><span>答えだけで進む</span></button></div>
+      </div>
+    </div>
+    <aside class="panel">
+      <div class="panel-h">AI が学ぶこと</div>
+      <div class="needs-list">
+        <div class="nr"><span class="badge badge--accent">1</span><span>ロゴと色</span></div>
+        <div class="nr"><span class="badge badge--accent">2</span><span>サービスのひとこと説明と、誰向けか</span></div>
+        <div class="nr"><span class="badge badge--accent">3</span><span>言葉づかい（ていねい・くだけた）と読み方</span></div>
+        <div class="nr"><span class="badge badge--accent">4</span><span>動画に使えそうな製品の画面</span></div>
+      </div>
+      <div class="ai-shot">公開されている情報と、あなたが入れた内容だけを読みます。読み取った内容は次の画面で確認でき、あとから直したり足したりできます。</div>
+    </aside>
+  </div>
+  <div class="wiz-nav">
+    <button type="button" class="btn btn-ghost" id="intakeSkip"><span>あとで登録する</span></button>
+    <div class="grow"></div>
+    <span class="faint" style="font-size:var(--t-label)">入れた分だけ読みます・約 1 分</span>
+    <button type="button" class="btn btn-primary auto" id="intakeStart"><span>読み込んで学習する</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
+  </div>
+  <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
+</main>
+
+<!-- ============================ BRAND CARD（P2: こう理解しました・確認） ============================ -->
+<main class="wrap" id="view-brand-card" hidden>
+  <section class="context">
+    <div>
+      <div class="wiz-eyebrow"><span>はじめてガイド 1 / 5 ・ ブランドを登録</span></div>
+      <h1 class="title-h1" style="margin-top:6px">こう理解しました。合っていますか?</h1>
+      <div class="title-sub" id="cardSub">AI が読み取った内容です。間違っていることがあります。どの項目も直せます。足りなければ項目を追加できます。</div>
+    </div>
+  </section>
+  <div class="intake-grid">
+    <div class="intake-main">
+      <div class="pf-grid">
+        <div class="pf" id="pfVisual">
+          <div class="pf-h"><span class="lbl">ロゴと色</span><span class="badge" id="pfVisualBadge"></span></div>
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+            <div class="logo-box" id="cardLogo"><svg class="ic" style="color:var(--faint)"><use href="#i-film"/></svg></div>
+            <div class="swatches" id="cardColors"></div>
+            <button type="button" class="btn btn-ghost wauto" id="cardColorAdd"><svg class="ic"><use href="#i-plus"/></svg><span>色を追加</span></button>
+          </div>
+          <div class="hint">ロゴはプロフィール設定の「ブランド」から差し替えられます。</div>
+        </div>
+        <div class="pf" id="pfOneLiner">
+          <div class="pf-h"><span class="lbl">ひとこと説明</span><span class="badge" id="pfOneLinerBadge"></span></div>
+          <input type="text" id="cardOneLiner" maxlength="80" placeholder="例: 現場で写真を撮るだけで、工事台帳が自動でできるアプリ">
+        </div>
+        <div class="pf" id="pfAudience">
+          <div class="pf-h"><span class="lbl">誰向けか</span><span class="badge" id="pfAudienceBadge"></span></div>
+          <input type="text" id="cardAudience" maxlength="80" placeholder="例: 建設会社の現場監督・施工管理の担当者">
+        </div>
+        <div class="pf" id="pfValues">
+          <div class="pf-h"><span class="lbl">伝えたいこと</span><span class="badge" id="pfValuesBadge"></span></div>
+          <div class="free-chips" id="cardValuesChips"></div>
+          <div class="rowx"><input type="text" id="cardValuesIn" maxlength="40" placeholder="例: 持ち帰りゼロ"><button type="button" id="cardValuesAdd" aria-label="追加"><svg class="ic"><use href="#i-plus"/></svg></button></div>
+        </div>
+        <div class="pf" id="pfVoice">
+          <div class="pf-h"><span class="lbl">言葉づかいと読み方</span><span class="badge" id="pfVoiceBadge"></span></div>
+          <div class="seg" id="cardRegister" role="group" aria-label="言葉づかい"><button type="button" data-reg="polite" aria-pressed="true">ていねい</button><button type="button" data-reg="casual" aria-pressed="false">くだけた</button></div>
+          <div class="hint">読み方（表記 → 読み）</div>
+          <div id="cardTerms"></div>
+          <div class="row2"><input type="text" id="cardTermText" maxlength="30" placeholder="表記（例: ミライ工事）"><input type="text" id="cardTermRead" maxlength="30" placeholder="読み（例: ミライこうじ）"><button type="button" id="cardTermAdd" aria-label="追加"><svg class="ic"><use href="#i-plus"/></svg></button></div>
+          <div class="hint">使わない表現</div>
+          <div class="free-chips" id="cardAvoidChips"></div>
+          <div class="rowx"><input type="text" id="cardAvoidIn" maxlength="30" placeholder="例: 業界最安"><button type="button" id="cardAvoidAdd" aria-label="追加"><svg class="ic"><use href="#i-plus"/></svg></button></div>
+        </div>
+        <div class="pf" id="pfDefaults">
+          <div class="pf-h"><span class="lbl">動画の初期設定</span><span class="badge" id="pfDefaultsBadge"></span></div>
+          <div class="fld" style="margin:0"><label for="cardIndustry">業種</label><select id="cardIndustry" class="sel"></select></div>
+          <div class="fld" style="margin:0"><label for="cardTarget">届ける相手</label><select id="cardTarget" class="sel"></select></div>
+          <div class="fld" style="margin:0"><label for="cardTone">雰囲気</label><select id="cardTone" class="sel"></select></div>
+          <div class="hint">新しく作るときの最初の選択肢になります。</div>
+        </div>
+      </div>
+      <div class="pf" id="pfCustom">
+        <div class="pf-h"><span class="lbl">項目を追加</span></div>
+        <div class="hint">例: 競合との違い、使ってはいけない表現、キャッチコピー、料金の言い方</div>
+        <div id="cardCustom"></div>
+        <div class="row2"><input type="text" id="cardCustomLabel" maxlength="20" placeholder="項目名"><input type="text" id="cardCustomValue" maxlength="120" placeholder="内容"><button type="button" id="cardCustomAdd" aria-label="追加"><svg class="ic"><use href="#i-plus"/></svg></button></div>
+      </div>
+    </div>
+    <aside class="intake-main">
+      <div class="panel">
+        <div class="panel-h">読み込んだ元 <span class="count" id="cardSrcCount"></span></div>
+        <div class="src-list" id="cardSources" style="padding-top:10px"></div>
+        <div class="src-add"><button type="button" class="btn btn-ghost wauto" id="cardRelearn"><svg class="ic"><use href="#i-plus"/></svg><span>元を追加してもう一度学習する</span></button></div>
+      </div>
+      <div class="panel"><div class="ai-shot" style="border-top:none">保存すると、動画を作るときの初期設定とロゴが自動で入ります。いつでもプロフィール設定の「ブランド」から直せます。</div></div>
+    </aside>
+  </div>
+  <div class="wiz-nav">
+    <button type="button" class="btn btn-ghost" id="cardBack"><svg class="ic"><use href="#i-arrow-left"/></svg><span>入力に戻る</span></button>
+    <div class="grow"></div>
+    <button type="button" class="btn btn-primary auto" id="cardSave"><span>この内容で保存</span><svg class="ic"><use href="#i-arrow-right"/></svg></button>
+  </div>
   <div class="foot">Spot ・ 選ぶだけで、広告動画。 — プロトタイプ</div>
 </main>
 
@@ -2801,6 +3018,14 @@
     <div class="brand-list" id="brandList"></div>
     <div class="cta-row">
       <button type="button" class="btn btn-ghost wauto" id="brandAddBtn"><svg class="ic"><use href="#i-plus"/></svg><span>ブランドを追加</span></button>
+    </div>
+    <div class="brand-profile" id="brandProfileCard" hidden>
+      <div class="bp-h"><svg class="ic" style="color:var(--accent-ink)"><use href="#i-sparkle"/></svg><span>AI が理解しているブランド</span><span class="badge badge--neutral" id="bpState"></span></div>
+      <div class="bp-chips" id="bpChips"></div>
+      <div class="cta-row" style="margin:0">
+        <button type="button" class="btn btn-tonal wauto" id="bpEdit" data-write-only><span>内容を直す</span></button>
+        <button type="button" class="btn btn-ghost wauto" id="bpRelearn" data-write-only><span>もう一度学習する</span></button>
+      </div>
     </div>
   </div>
 
@@ -4676,6 +4901,8 @@
   const vWork = document.getElementById('view-workspace');
   const vExport = document.getElementById('view-export');
   const vAssets = document.getElementById('view-assets');
+  const vBrandIntake = document.getElementById('view-brand-intake');
+  const vBrandCard = document.getElementById('view-brand-card');
   const vSettings = document.getElementById('view-settings');
   const vBilling = document.getElementById('view-billing');
   const vTeam = document.getElementById('view-team');
@@ -4700,7 +4927,7 @@
   }
   navBack.addEventListener('click', () => { if (backFn) backFn(); });
   function hideAll(){
-    [vDash,vWiz,vScript,vAssets,vWork,vExport,vSettings,vAccount,vBilling,vTeam,vMedia,vCollections,vCredits].forEach(v=>v.hidden=true);
+    [vDash,vWiz,vScript,vAssets,vWork,vExport,vSettings,vAccount,vBilling,vTeam,vMedia,vCollections,vCredits,vBrandIntake,vBrandCard].forEach(v=>v.hidden=true);
     window.scrollTo(0,0);
   }
   function focusView(v) {   // move focus to the new view so keyboard/AT users land on it
@@ -4715,8 +4942,38 @@
   document.getElementById('newCM').addEventListener('click', () => {
     const b = window.__getBrand && window.__getBrand();
     if (b && b.frozen) { toast(L('This brand is read-only. Switch brands or upgrade your plan.', 'このブランドは読み取り専用です。別のブランドに切り替えるか、プランを変更してください。'), false, 3200); return; }
+    if (window.__needsBrandIntake && window.__needsBrandIntake()) { gotoBrandIntake('wizard'); return; }   // P2: 初回はブランド登録から（スキップ可）
     gotoWizard();
   });
+  // ---- P2: ブランドを登録（入力）／こう理解しました（確認） ----
+  let __intakeReturn = 'home';
+  function gotoBrandIntake(ret) {
+    __intakeReturn = ret || 'home';
+    hideAll(); vBrandIntake.hidden = false; focusView(vBrandIntake); _nav(true, null);
+    setCrumb([['ホーム', gotoDash], ['ブランドを登録']], gotoDash);
+    if (window.brandIntake) window.brandIntake.open();
+  }
+  function gotoBrandCard() {
+    hideAll(); vBrandCard.hidden = false; focusView(vBrandCard); _nav(true, null);
+    setCrumb([['ホーム', gotoDash], ['ブランドを登録', () => gotoBrandIntake(__intakeReturn)], ['こう理解しました']], () => gotoBrandIntake(__intakeReturn));
+    if (window.brandIntake) window.brandIntake.openCard();
+  }
+  window.gotoBrandIntake = gotoBrandIntake; window.gotoBrandCard = gotoBrandCard;
+  window.__afterBrandSaved = function () { if (__intakeReturn === 'wizard') gotoWizard(); else if (__intakeReturn === 'settings') gotoSettings(); else gotoDash(); };
+  document.getElementById('intakeSkip').addEventListener('click', () => {
+    const b = window.__getBrand && window.__getBrand();
+    try { if (b) localStorage.setItem('spot-intake-skip:' + b.id, '1'); } catch (_) {}
+    if (window.__refreshBrandCta) window.__refreshBrandCta();
+    if (__intakeReturn === 'wizard') gotoWizard(); else if (__intakeReturn === 'settings') gotoSettings(); else gotoDash();
+  });
+  document.getElementById('brandCtaBtn').addEventListener('click', () => gotoBrandIntake('home'));
+  document.getElementById('cardBack').addEventListener('click', () => gotoBrandIntake(__intakeReturn));
+  document.getElementById('cardRelearn').addEventListener('click', () => gotoBrandIntake(__intakeReturn));
+  { const e = document.getElementById('bpEdit'), r = document.getElementById('bpRelearn');
+    if (e) e.addEventListener('click', () => { __intakeReturn = 'settings'; gotoBrandCard(); });
+    if (r) r.addEventListener('click', () => gotoBrandIntake('settings')); }
+  // ウィザードの選択肢（業種・相手・雰囲気）を確認カードのセレクトに流用
+  window.__wizardOptions = function (key) { return [...document.querySelectorAll(`#view-wizard .opt-grid[data-key="${key}"] .opt`)].map(o => o.dataset.val); };
   { const fab = document.getElementById('fabNew'); if (fab) fab.addEventListener('click', () => document.getElementById('newCM').click()); }   // モバイルFAB → 同じ導線
   // P1: モバイルのボトムナビ
   { const bn = document.getElementById('bottomNav'); if (bn) bn.addEventListener('click', e => {
@@ -5072,6 +5329,37 @@
       'For Gen Z, tempo and aesthetic come first — pull them in within the first 0.5 seconds.',
     // --- script / storyboard ---
     '台本と絵コンテ': 'Script & storyboard',
+    // --- P2: brand intake ---
+    'はじめてガイド 1 / 5': 'Getting started 1 / 5', 'はじめてガイド 1 / 5 ・ ブランドを登録': 'Getting started 1 / 5 · Register your brand',
+    'まず、AIにブランドを知らせましょう': 'First, tell AI about your brand', 'まず、AI にブランドを知らせましょう': 'First, tell AI about your brand',
+    'の Web ページや資料から、ロゴ・色・伝え方を AI が学びます。約 1 分。あとから直せます。': ': AI learns the logo, colors and tone from its web pages and documents. About a minute. Editable later.',
+    'ブランドを登録': 'Register the brand', 'こう理解しました': 'Here is what AI understood',
+    'Web ページや資料があれば AI が読んで学びます。なくても大丈夫です。自由に書いてもらった内容や、3 つの質問の答えからも学びます。': 'If you have web pages or documents, AI reads them. If not, that is fine — it also learns from what you write and from three quick questions.',
+    'Web ページ': 'Web pages', '任意・あると精度が上がります': 'Optional · improves accuracy', 'サービス紹介・会社トップ・記事・プレスリリースなど。いくつでも追加できます。': 'Product page, company site, articles, press releases. Add as many as you like.',
+    'https:// を貼り付け': 'Paste a https:// address', 'Web ページの URL': 'Web page URL', '資料ファイル': 'Files', 'PDF・PPTX・画像（PNG / JPG）。会社案内・サービス資料・画面写真など。': 'PDF, PPTX, images (PNG / JPG). Company deck, product sheets, screenshots.',
+    'ここにドラッグ': 'Drag files here', '、または クリックして選ぶ（複数可）': ', or click to choose (several at once)',
+    '自由に書く': 'Write freely', 'こだわり・言いたいこと・使ってほしくない言葉など、何でも。SNS の投稿文をそのまま貼ってもOK。': 'Anything: what matters, what to say, words to avoid. Pasting social posts is fine.',
+    '例: 現場監督向けの工事写真アプリ。スマホで撮るだけで台帳と PDF ができる。': 'e.g. A site-photo app for construction managers. Shoot on your phone and the ledger and PDF build themselves.',
+    '3 つの質問': 'Three questions', '何も入れない場合はこちら': 'If you add nothing, answer these', 'AI の読み取りを待たずに、この答えだけでも登録できます。': 'You can register from these answers alone, without waiting for AI.',
+    '何のサービスですか?': 'What is the product?', '例: 工事写真を台帳にするアプリ': 'e.g. An app that turns site photos into ledgers', '誰向けですか?': 'Who is it for?', '例: 建設会社の現場監督': 'e.g. Construction site managers',
+    '言葉づかい': 'Tone of voice', 'ていねい': 'Polite', 'くだけた': 'Casual',
+    '読み込んでいます': 'Reading', 'AI の読み取りに時間がかかっています。3 つの質問の答えだけで先に登録することもできます。': 'AI is taking a while. You can register from your three answers now.', '答えだけで進む': 'Continue with answers',
+    'AI が学ぶこと': 'What AI learns', 'ロゴと色': 'Logo and colors', 'サービスのひとこと説明と、誰向けか': 'A one-line description and the audience', '言葉づかい（ていねい・くだけた）と読み方': 'Tone of voice and pronunciations', '動画に使えそうな製品の画面': 'Product screens usable in the ad',
+    '公開されている情報と、あなたが入れた内容だけを読みます。読み取った内容は次の画面で確認でき、あとから直したり足したりできます。': 'AI reads only public information and what you add. You review everything on the next screen and can edit or add later.',
+    'あとで登録する': 'Register later', '入れた分だけ読みます・約 1 分': 'Reads what you added · about a minute', '読み込んで学習する': 'Read and learn',
+    'こう理解しました。合っていますか?': 'Here is what AI understood. Is it right?', 'AI が読み取った内容です。間違っていることがあります。どの項目も直せます。足りなければ項目を追加できます。': 'AI read this. It can be wrong. Every item is editable; add anything missing.',
+    '色を追加': 'Add color', 'ロゴはプロフィール設定の「ブランド」から差し替えられます。': 'Replace the logo under Profile settings › Brands.',
+    'ひとこと説明': 'One-line description', '例: 現場で写真を撮るだけで、工事台帳が自動でできるアプリ': 'e.g. An app that builds the site ledger from photos you take on site',
+    '誰向けか': 'Audience', '例: 建設会社の現場監督・施工管理の担当者': 'e.g. Site managers at construction companies',
+    '伝えたいこと': 'Key messages', '例: 持ち帰りゼロ': 'e.g. Zero work taken home',
+    '言葉づかいと読み方': 'Tone and pronunciation', '読み方（表記 → 読み）': 'Pronunciation (spelling → reading)', '表記（例: ミライ工事）': 'Spelling (e.g. Mirai Koji)', '読み（例: ミライこうじ）': 'Reading (e.g. mi-rai-ko-ji)',
+    '使わない表現': 'Words to avoid', '例: 業界最安': 'e.g. cheapest in the industry',
+    '動画の初期設定': 'Defaults for new ads', '業種': 'Industry', '届ける相手': 'Audience', '雰囲気': 'Mood', '新しく作るときの最初の選択肢になります。': 'These become the first choices when you create an ad.', '未設定': 'Not set',
+    '項目を追加': 'Add an item', '例: 競合との違い、使ってはいけない表現、キャッチコピー、料金の言い方': 'e.g. what sets you apart, banned phrases, tagline, how to state prices', '項目名': 'Item', '内容': 'Details',
+    '読み込んだ元': 'Sources', '元を追加してもう一度学習する': 'Add sources and learn again',
+    '保存すると、動画を作るときの初期設定とロゴが自動で入ります。いつでもプロフィール設定の「ブランド」から直せます。': 'After saving, new ads start with these defaults and your logo. Edit anytime under Profile settings › Brands.',
+    '入力に戻る': 'Back to input', 'この内容で保存': 'Save', 'AI が理解しているブランド': 'What AI knows about this brand', '内容を直す': 'Edit', 'もう一度学習する': 'Learn again',
+    '待機中': 'Waiting', '読み込み中': 'Reading', '読み取り済み': 'Read', '読めませんでした': 'Could not read',
     // --- P1: script / assets / review / home ---
     'AIが構成を組みました。気になるところは言葉で直せます。この台本で、次に必要な素材が決まります。': 'AI drafted the structure. Fix anything in plain words. This script decides which assets you need next.',
     'この台本で進む：素材をアップ': 'Continue: upload assets', 'この台本で必要な素材': 'Assets this script needs',
@@ -6081,7 +6369,7 @@
     currentBrand = null; window.__brands = [];
     if (!currentOrg) { window.__brandId = null; return null; }
     try {
-      const { data, error } = await sb.from('brands').select('id,name,assets,frozen,created_at').eq('org_id', currentOrg.id).order('created_at', { ascending: true });
+      const { data, error } = await sb.from('brands').select('id,name,assets,frozen,created_at,profile').eq('org_id', currentOrg.id).order('created_at', { ascending: true });
       if (error) throw error;
       window.__brands = (data || []).map(b => ({ ...b, frozen: !!b.frozen }));
       let pref = null; try { pref = localStorage.getItem('spot-brand:' + currentOrg.id); } catch (_) {}
@@ -6092,6 +6380,7 @@
       } catch (_) {}
     } catch (_) { /* brands 未適用でも動く（単一ブランド相当） */ }
     window.__brandId = currentBrand ? currentBrand.id : null;
+    if (window.__refreshBrandCta) window.__refreshBrandCta();
     return currentBrand;
   }
   window.__getBrand = () => currentBrand;
@@ -6522,6 +6811,7 @@
           ${owner && brands.length > 1 ? `<button type="button" class="btn btn-ghost" data-brand-del="${b.id}"><span>${L('Delete', '削除')}</span></button>` : ''}
         </div></div>`;
     }).join('');
+    renderBrandProfileCard();
   }
   window.loadBrandPanel = loadBrandPanel;
   { const list = document.getElementById('brandList'); const addBtn = document.getElementById('brandAddBtn');
@@ -7224,7 +7514,11 @@
         if (r.data && r.data.length >= 2) { data = r.data; approvedBased = true; }
       } catch (_) {}
       if (!data) { const r = await base(); data = r.data; }
-      if (!data || data.length < 2) return null;   // 最低2本たまってからブランド既定を出す
+      if (!data || data.length < 2) {   // 履歴が乏しい間は、ブランド登録（P2）の既定値を使う
+        const pf = currentBrand && currentBrand.profile;
+        if (pf && pf.confirmed_at && pf.defaults) { const d = pf.defaults; return { count: 0, fromProfile: true, media: [], industry: d.industry || null, target: d.target || null, angle: null, tone: d.tone || null }; }
+        return null;
+      }
       const tally = { media: {}, industry: {}, target: {}, angle: {}, tone: {} };
       const bump = (o, k) => { if (k != null && k !== '') o[k] = (o[k] || 0) + 1; };
       for (const row of data) {
@@ -8191,6 +8485,279 @@
     await sb.from('projects').update({ status: 'done' }).eq('id', projectId);
     return 'devRun complete';
   };
+  // ============================ P2: ブランド取り込み（UI＋DB。AI 読み取りは worker の brand_ingest＝P3） ============================
+  window.__needsBrandIntake = function () {
+    const b = currentBrand; if (!b || !sb) return false;
+    if (b.profile && b.profile.confirmed_at) return false;
+    try { if (localStorage.getItem('spot-intake-skip:' + b.id)) return false; } catch (_) {}
+    return true;
+  };
+  window.__refreshBrandCta = function () {
+    const c = document.getElementById('brandIntakeCta'); const b = currentBrand;
+    if (c) { c.hidden = !(b && sb && !(b.profile && b.profile.confirmed_at) && canWrite()); setText('brandCtaName', (b && b.name) || 'ブランド'); }
+    renderBrandProfileCard();
+  };
+  function renderBrandProfileCard() {
+    const card = document.getElementById('brandProfileCard'); if (!card) return;
+    const b = currentBrand; if (!b || !sb) { card.hidden = true; return; }
+    card.hidden = false;
+    const pf = b.profile || {}; const ok = !!pf.confirmed_at;
+    setText('bpState', ok ? L('Registered', '登録済み') : L('Not yet', '未登録'));
+    const chips = []; const sm = pf.summary || {}, df = pf.defaults || {}, vo = pf.voice || {};
+    if (sm.one_liner) chips.push(sm.one_liner); if (sm.audience) chips.push(L('For: ', '向け: ') + sm.audience);
+    if (df.industry) chips.push(df.industry); if (df.tone) chips.push(df.tone);
+    if (vo.register) chips.push(vo.register === 'casual' ? L('Casual', 'くだけた') : L('Polite', 'ていねい'));
+    const box = document.getElementById('bpChips'); if (box) box.innerHTML = chips.length ? chips.map(c => `<span>${escHtml(c)}</span>`).join('') : `<span>${L('Nothing registered yet. Register the brand so AI knows it.', 'まだ登録がありません。ブランドを登録すると AI が理解します。')}</span>`;
+    const e = document.getElementById('bpEdit'), r = document.getElementById('bpRelearn');
+    if (e) e.querySelector('span').textContent = ok ? L('Edit', '内容を直す') : L('Register the brand', 'ブランドを登録');
+    if (r) r.hidden = !ok;
+  }
+  window.__renderBrandProfileCard = renderBrandProfileCard;
+
+  const brandIntake = { sources: [], answers: { what: '', who: '', register: 'polite' }, channel: null, timer: null, draft: null };
+  window.brandIntake = brandIntake;
+  const SRC_STATUS = { pending: ['badge--neutral', '待機中'], running: ['badge--accent', '読み込み中'], done: ['badge--success', '読み取り済み'], failed: ['badge--warn', '読めませんでした'] };
+  function srcLabel(r) { return r.kind === 'url' ? r.url : r.kind === 'file' ? (r.file_name || (r.storage_path || '').split('/').pop()) : L('Free text', '自由に書いた説明'); }
+
+  brandIntake.load = async function () {
+    brandIntake.sources = [];
+    if (!sb || !currentBrand) return;
+    try { const { data } = await sb.from('brand_sources').select('*').eq('brand_id', currentBrand.id).order('created_at', { ascending: true }); brandIntake.sources = data || []; }
+    catch (e) { console.warn('brand_sources:', e.message); }
+  };
+  brandIntake.open = async function () {
+    await brandIntake.load();
+    const t = brandIntake.sources.find(r => r.kind === 'text'); const ta = document.getElementById('intakeText'); if (ta) ta.value = t ? (t.text || '') : '';
+    const pf = (currentBrand && currentBrand.profile) || {}; const sm = pf.summary || {}, vo = pf.voice || {};
+    const w = document.getElementById('q3What'), who = document.getElementById('q3Who'); if (w) w.value = sm.one_liner || ''; if (who) who.value = sm.audience || '';
+    brandIntake.answers.register = vo.register || 'polite';
+    document.querySelectorAll('#intakeQ3 [data-reg]').forEach(b => b.setAttribute('aria-pressed', b.dataset.reg === brandIntake.answers.register ? 'true' : 'false'));
+    const prog = document.getElementById('intakeProgress'); if (prog) prog.hidden = true;
+    brandIntake.renderLists();
+  };
+  brandIntake.renderLists = function () {
+    const urls = document.getElementById('intakeUrls'), files = document.getElementById('intakeFiles'); if (!urls || !files) return;
+    const row = r => { const [cls, lab] = SRC_STATUS[r.status] || SRC_STATUS.pending; return `<div class="src" data-src="${r.id}"><span class="sname" title="${escHtml(srcLabel(r))}">${escHtml(srcLabel(r))}</span><span class="badge ${cls}">${lab}</span>${canWrite() ? `<button type="button" class="rm" data-rm="${r.id}" aria-label="削除"><svg class="ic"><use href="#i-x"/></svg></button>` : ''}</div>`; };
+    urls.innerHTML = brandIntake.sources.filter(r => r.kind === 'url').map(row).join('');
+    files.innerHTML = brandIntake.sources.filter(r => r.kind === 'file').map(row).join('');
+  };
+  brandIntake.addUrl = async function (url) {
+    url = (url || '').trim(); if (!/^https?:\/\/\S+/i.test(url)) { toast(L('Paste a web address starting with https://', 'https:// から始まる URL を貼り付けてください。'), false, 2600); return; }
+    if (!canWrite()) { toast(L('View-only access.', '閲覧のみの権限です。'), false, 2200); return; }
+    try { const { error } = await sb.from('brand_sources').insert({ brand_id: currentBrand.id, org_id: currentOrg.id, kind: 'url', url }); if (error) throw error; await brandIntake.load(); brandIntake.renderLists(); }
+    catch (e) { toast(L("Couldn't add it.", '追加できませんでした。'), false, 2600); console.warn(e.message); }
+  };
+  brandIntake.saveText = async function () {
+    const ta = document.getElementById('intakeText'); const text = ((ta && ta.value) || '').trim();
+    const cur = brandIntake.sources.find(r => r.kind === 'text');
+    try {
+      if (!text && cur) { await sb.from('brand_sources').delete().eq('id', cur.id); }
+      else if (text && cur && cur.text !== text) { await sb.from('brand_sources').update({ text, status: 'pending', error: null }).eq('id', cur.id); }
+      else if (text && !cur) { await sb.from('brand_sources').insert({ brand_id: currentBrand.id, org_id: currentOrg.id, kind: 'text', text }); }
+    } catch (e) { console.warn('saveText:', e.message); }
+  };
+  brandIntake.addFiles = async function (fileList) {
+    if (!canWrite()) { toast(L('View-only access.', '閲覧のみの権限です。'), false, 2200); return; }
+    const files = [...(fileList || [])].slice(0, 10); if (!files.length) return;
+    const scope = (currentOrg && currentOrg.id) || currentUid; let n = 0;
+    for (const f of files) {
+      if (f.size > 20 * 1024 * 1024) { toast(L(`${f.name} is too large (max 20 MB).`, `${f.name} は大きすぎます（最大20MB）。`), false, 2600); continue; }
+      try {
+        const path = `${scope}/brand/${currentBrand.id}/sources/${Date.now()}_${safeName(f.name)}`;
+        const { error } = await sb.storage.from('assets').upload(path, f, { upsert: true, contentType: f.type || 'application/octet-stream' });
+        if (error) throw error;
+        const { error: ie } = await sb.from('brand_sources').insert({ brand_id: currentBrand.id, org_id: currentOrg.id, kind: 'file', storage_path: path, file_name: f.name });
+        if (ie) throw ie; n++;
+      } catch (e) { console.warn('addFiles:', e.message); toast(L(`Couldn't upload ${f.name}.`, `${f.name} をアップロードできませんでした。`), false, 2600); }
+    }
+    if (n) toast(L(`Added ${n} file(s).`, `${n} 件を追加しました。`), true, 1600);
+    await brandIntake.load(); brandIntake.renderLists();
+  };
+  brandIntake.remove = async function (id) {
+    const r = brandIntake.sources.find(x => x.id === id); if (!r) return;
+    try { await sb.from('brand_sources').delete().eq('id', id); if (r.storage_path) { try { await sb.storage.from('assets').remove([r.storage_path]); } catch (_) {} } }
+    catch (e) { console.warn('remove:', e.message); }
+    await brandIntake.load(); brandIntake.renderLists();
+  };
+  // 3 問の答え → 最小プロフィール
+  brandIntake.fromAnswers = function (base) {
+    const what = (document.getElementById('q3What') || {}).value || '', who = (document.getElementById('q3Who') || {}).value || '';
+    const pf = Object.assign({ version: 1 }, base || {});
+    pf.summary = Object.assign({}, pf.summary || {}); if (what.trim()) pf.summary.one_liner = what.trim(); if (who.trim()) pf.summary.audience = who.trim();
+    pf.voice = Object.assign({}, pf.voice || {}, { register: brandIntake.answers.register || 'polite' });
+    pf.confidence = Object.assign({}, pf.confidence || {}); if (what.trim()) pf.confidence['summary.one_liner'] = 'high'; if (who.trim()) pf.confidence['summary.audience'] = 'high';
+    return pf;
+  };
+  brandIntake.start = async function () {
+    if (!sb || !currentBrand) { toast(L('Sign in to register a brand.', 'ブランド登録にはサインインが必要です。'), false, 2400); return; }
+    if (!canWrite()) { toast(L('View-only access.', '閲覧のみの権限です。'), false, 2200); return; }
+    await brandIntake.saveText(); await brandIntake.load();
+    const todo = brandIntake.sources.filter(r => r.status !== 'done');
+    brandIntake.draft = brandIntake.fromAnswers(currentBrand.profile || {});
+    if (!brandIntake.sources.length || !todo.length) { await brandIntake.persistDraft(false); if (window.gotoBrandCard) window.gotoBrandCard(); return; }
+    // 読み込み中：pending のまま worker（brand_ingest）を待つ。Realtime で進捗、90 秒で「答えだけで進む」を出す
+    try { await sb.from('brand_sources').update({ status: 'pending', error: null }).in('id', todo.filter(r => r.status === 'failed').map(r => r.id)); } catch (_) {}
+    await brandIntake.load();
+    const prog = document.getElementById('intakeProgress'); if (prog) { prog.hidden = false; prog.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    document.getElementById('intakeWait').hidden = true;
+    brandIntake.renderProgress();
+    brandIntake.subscribe();
+    clearTimeout(brandIntake.timer);
+    brandIntake.timer = setTimeout(() => { const w = document.getElementById('intakeWait'); if (w && !vHidden('view-brand-intake')) w.hidden = false; }, 90 * 1000);
+  };
+  function vHidden(id) { const v = document.getElementById(id); return !v || v.hidden; }
+  brandIntake.renderProgress = function () {
+    const list = document.getElementById('intakeProgList'), count = document.getElementById('intakeProgCount'); if (!list) return;
+    const srcs = brandIntake.sources; const done = srcs.filter(r => r.status === 'done' || r.status === 'failed').length;
+    if (count) count.textContent = `${done}/${srcs.length}`;
+    list.innerHTML = srcs.map(r => { const [cls, lab] = SRC_STATUS[r.status] || SRC_STATUS.pending;
+      return `<div class="pr">${r.status === 'running' || r.status === 'pending' ? '<span class="spin" aria-hidden="true"></span>' : `<svg class="ic" style="width:14px;height:14px;color:${r.status === 'done' ? 'var(--good)' : 'var(--warn)'}"><use href="#${r.status === 'done' ? 'i-check' : 'i-alert'}"/></svg>`}<span class="sname">${escHtml(srcLabel(r))}</span><span class="badge ${cls}">${r.status === 'running' && r.step ? escHtml(r.step) : lab}${r.status === 'failed' && r.error ? ' · ' + escHtml(r.error) : ''}</span></div>`; }).join('');
+    if (srcs.length && done === srcs.length) { brandIntake.unsubscribe(); clearTimeout(brandIntake.timer); setTimeout(() => brandIntake.finish(), 400); }
+  };
+  brandIntake.subscribe = function () {
+    brandIntake.unsubscribe();
+    brandIntake.channel = sb.channel('brand_sources:' + currentBrand.id)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'brand_sources', filter: `brand_id=eq.${currentBrand.id}` }, async () => { await brandIntake.load(); brandIntake.renderProgress(); })
+      .subscribe();
+  };
+  brandIntake.unsubscribe = function () { if (brandIntake.channel) { try { sb.removeChannel(brandIntake.channel); } catch (_) {} brandIntake.channel = null; } };
+  brandIntake.finish = async function () {   // worker が brands.profile を更新済み → 最新を読み、3 問の答えで補って確認へ
+    try { const { data } = await sb.from('brands').select('profile').eq('id', currentBrand.id).single(); if (data) currentBrand.profile = data.profile || {}; } catch (_) {}
+    brandIntake.draft = brandIntake.fromAnswers(currentBrand.profile || {});
+    await brandIntake.persistDraft(false);
+    if (window.gotoBrandCard) window.gotoBrandCard();
+  };
+  brandIntake.proceed = async function () {   // 「答えだけで進む」
+    brandIntake.unsubscribe(); clearTimeout(brandIntake.timer);
+    brandIntake.draft = brandIntake.fromAnswers(currentBrand.profile || {});
+    await brandIntake.persistDraft(false);
+    if (window.gotoBrandCard) window.gotoBrandCard();
+  };
+  brandIntake.persistDraft = async function (confirm) {
+    const pf = Object.assign({}, brandIntake.draft || {});
+    if (confirm) pf.confirmed_at = new Date().toISOString();
+    pf.learned_from = brandIntake.sources.filter(r => r.status === 'done').map(r => r.id);
+    try {
+      const patch = { profile: pf };
+      if (confirm) {   // 確定時は既存キット（assets.logo/colors）へ同期＝生成経路はそのまま
+        const assets = Object.assign({}, (currentBrand.assets || {}));
+        if (pf.visual && Array.isArray(pf.visual.colors) && pf.visual.colors.length) assets.colors = Object.assign({}, assets.colors || {}, { primary: pf.visual.colors[0], palette: pf.visual.colors });
+        if (pf.visual && pf.visual.logo && !assets.logo) assets.logo = pf.visual.logo;
+        patch.assets = assets;
+      }
+      const { error } = await sb.from('brands').update(patch).eq('id', currentBrand.id); if (error) throw error;
+      currentBrand.profile = pf; if (confirm && patch.assets) currentBrand.assets = patch.assets;
+      const i = (window.__brands || []).findIndex(b => b.id === currentBrand.id); if (i >= 0) window.__brands[i] = currentBrand;
+    } catch (e) { console.warn('persistDraft:', e.message); toast(L("Couldn't save.", '保存できませんでした。'), false, 2600); return false; }
+    return true;
+  };
+
+  // ---- 確認カード ----
+  const bcard = { colors: [], values: [], terms: [], avoid: [], custom: [] };
+  function badgeFor(pf, key) {
+    const c = (pf.confidence || {})[key];
+    if (c === 'low') return ['badge--warn', L('Please check', '要確認'), true];
+    if (c === 'high') return ['badge--success', L('Confident', '高い確度'), false];
+    return ['badge--neutral', L('Fill in', '入力してください'), false];
+  }
+  brandIntake.openCard = async function () {
+    const pf = brandIntake.draft || (currentBrand && currentBrand.profile) || {};
+    const sm = pf.summary || {}, vi = pf.visual || {}, vo = pf.voice || {}, df = pf.defaults || {};
+    bcard.colors = Array.isArray(vi.colors) ? vi.colors.slice() : []; bcard.values = Array.isArray(sm.values) ? sm.values.slice() : [];
+    bcard.terms = Array.isArray(vo.terms) ? vo.terms.map(t => ({ text: t.text || '', reading: t.reading || '' })) : []; bcard.avoid = Array.isArray(vo.avoid) ? vo.avoid.slice() : [];
+    bcard.custom = Array.isArray(pf.custom) ? pf.custom.map(c => ({ label: c.label || '', value: c.value || '' })) : [];
+    document.getElementById('cardOneLiner').value = sm.one_liner || ''; document.getElementById('cardAudience').value = sm.audience || '';
+    document.querySelectorAll('#cardRegister [data-reg]').forEach(b => b.setAttribute('aria-pressed', b.dataset.reg === (vo.register || 'polite') ? 'true' : 'false'));
+    // selects from wizard options
+    const fill = (id, key, cur) => { const el = document.getElementById(id); const opts = (window.__wizardOptions ? window.__wizardOptions(key) : []); el.innerHTML = `<option value="">${L('Not set', '未設定')}</option>` + opts.map(v => `<option value="${escHtml(v)}"${v === cur ? ' selected' : ''}>${escHtml(v)}</option>`).join(''); };
+    fill('cardIndustry', 'industry', df.industry || ''); fill('cardTarget', 'targets', df.target || ''); fill('cardTone', 'tone', df.tone || '');
+    // logo
+    const lb = document.getElementById('cardLogo'); const logo = (currentBrand && currentBrand.assets && currentBrand.assets.logo) || vi.logo || '';
+    if (lb) { let url = ''; try { url = /^https?:/.test(logo) ? logo : (logo ? ((await sb.storage.from('assets').createSignedUrl(logo, 3600)).data || {}).signedUrl : ''); } catch (_) {}
+      lb.innerHTML = url ? `<img src="${url}" alt="">` : '<svg class="ic" style="color:var(--faint)"><use href="#i-film"/></svg>'; }
+    // badges
+    let flags = 0;
+    [['pfVisualBadge', 'visual.colors'], ['pfOneLinerBadge', 'summary.one_liner'], ['pfAudienceBadge', 'summary.audience'], ['pfValuesBadge', 'summary.values'], ['pfVoiceBadge', 'voice.register'], ['pfDefaultsBadge', 'defaults.industry']].forEach(([id, key]) => {
+      const [cls, lab, flag] = badgeFor(pf, key); const el = document.getElementById(id); if (el) { el.className = 'badge ' + cls; el.textContent = lab; }
+      const box = el && el.closest('.pf'); if (box) box.classList.toggle('flag', flag); if (flag) flags++;
+    });
+    setText('cardSub', flags ? L(`AI read this. It can be wrong — ${flags} item(s) need a check. Every item is editable.`, `AI が読み取った内容です。間違っていることがあります。要確認が ${flags} 件あります。どの項目も直せます。`)
+      : (pf.learned_from && pf.learned_from.length ? L('AI read this. Every item is editable; add anything missing.', 'AI が読み取った内容です。どの項目も直せます。足りなければ項目を追加できます。') : L('Check and complete what AI should know about this brand. Every item is editable.', 'AI に知らせておきたいことを確認して、足りなければ足してください。どの項目も直せます。')));
+    brandIntake.renderCard();
+    // sources
+    await brandIntake.load();
+    const sl = document.getElementById('cardSources'), sc = document.getElementById('cardSrcCount');
+    if (sl) sl.innerHTML = brandIntake.sources.length ? brandIntake.sources.map(r => { const [cls, lab] = SRC_STATUS[r.status] || SRC_STATUS.pending; return `<div class="src"><span class="sname" title="${escHtml(srcLabel(r))}">${escHtml(srcLabel(r))}</span><span class="badge ${cls}">${lab}</span></div>`; }).join('') : `<div class="muted" style="font-size:var(--t-label)">${L('Nothing was read. This card comes from your answers.', '読み込んだ元はありません。このカードは質問の答えからつくっています。')}</div>`;
+    if (sc) sc.textContent = brandIntake.sources.length ? `${brandIntake.sources.length}` : '';
+  };
+  brandIntake.renderCard = function () {
+    const chips = (id, arr) => { const b = document.getElementById(id); if (b) b.innerHTML = arr.map((v, i) => `<span class="free-chip"><span>${escHtml(v)}</span><button type="button" data-rm="${i}" aria-label="削除"><svg class="ic"><use href="#i-x"/></svg></button></span>`).join(''); };
+    chips('cardValuesChips', bcard.values); chips('cardAvoidChips', bcard.avoid);
+    const sw = document.getElementById('cardColors'); if (sw) sw.innerHTML = bcard.colors.map((c, i) => `<span class="swatch" style="background:${escHtml(c)}"><input type="color" value="${escHtml(c)}" data-ci="${i}" aria-label="色 ${i + 1}"><button type="button" class="x" data-crm="${i}" aria-label="削除">×</button></span>`).join('');
+    const tl = document.getElementById('cardTerms'); if (tl) tl.innerHTML = bcard.terms.map((t, i) => `<div class="row2" style="margin-bottom:6px"><input type="text" value="${escHtml(t.text)}" data-tt="${i}" aria-label="表記"><input type="text" value="${escHtml(t.reading)}" data-tr="${i}" aria-label="読み"><button type="button" data-trm="${i}" aria-label="削除"><svg class="ic"><use href="#i-x"/></svg></button></div>`).join('');
+    const cl = document.getElementById('cardCustom'); if (cl) cl.innerHTML = bcard.custom.map((c, i) => `<div class="row2" style="margin-bottom:6px"><input type="text" value="${escHtml(c.label)}" data-cl="${i}" aria-label="項目名"><input type="text" value="${escHtml(c.value)}" data-cv="${i}" aria-label="内容"><button type="button" data-crm2="${i}" aria-label="削除"><svg class="ic"><use href="#i-x"/></svg></button></div>`).join('');
+  };
+  brandIntake.collect = function () {
+    const pf = Object.assign({ version: 1 }, brandIntake.draft || (currentBrand && currentBrand.profile) || {});
+    const reg = (document.querySelector('#cardRegister [aria-pressed="true"]') || {}).dataset; const register = (reg && reg.reg) || 'polite';
+    pf.summary = Object.assign({}, pf.summary || {}, { one_liner: document.getElementById('cardOneLiner').value.trim(), audience: document.getElementById('cardAudience').value.trim(), values: bcard.values.slice() });
+    pf.visual = Object.assign({}, pf.visual || {}, { colors: bcard.colors.slice() });
+    pf.voice = Object.assign({}, pf.voice || {}, { register, terms: bcard.terms.filter(t => t.text), avoid: bcard.avoid.slice() });
+    pf.defaults = Object.assign({}, pf.defaults || {}, { industry: document.getElementById('cardIndustry').value || null, target: document.getElementById('cardTarget').value || null, tone: document.getElementById('cardTone').value || null });
+    pf.custom = bcard.custom.filter(c => c.label || c.value);
+    pf.confidence = Object.assign({}, pf.confidence || {}); ['summary.one_liner', 'summary.audience', 'summary.values', 'visual.colors', 'voice.register', 'defaults.industry'].forEach(k => { pf.confidence[k] = 'high'; });   // ユーザーが確認した
+    return pf;
+  };
+  brandIntake.save = async function () {
+    if (!canWrite()) { toast(L('View-only access.', '閲覧のみの権限です。'), false, 2200); return; }
+    brandIntake.draft = brandIntake.collect();
+    if (!brandIntake.draft.summary.one_liner) { toast(L('Add a one-line description first.', 'ひとこと説明を入れてください。'), false, 2600); document.getElementById('cardOneLiner').focus(); return; }
+    const ok = await brandIntake.persistDraft(true); if (!ok) return;
+    try { localStorage.removeItem('spot-intake-skip:' + currentBrand.id); } catch (_) {}
+    if (window.__refreshBrandCta) window.__refreshBrandCta();
+    toast(L('Brand saved. AI will use it from your next ad.', 'ブランドを保存しました。次のCMから AI が使います。'), true, 2600);
+    if (window.__afterBrandSaved) window.__afterBrandSaved();
+  };
+
+  // ---- wiring ----
+  (function wireIntake() {
+    const $ = id => document.getElementById(id);
+    if (!$('intakeStart')) return;
+    $('intakeStart').addEventListener('click', () => brandIntake.start());
+    $('intakeProceed').addEventListener('click', () => brandIntake.proceed());
+    $('intakeUrlAdd').addEventListener('click', async () => { await brandIntake.addUrl($('intakeUrl').value); $('intakeUrl').value = ''; });
+    $('intakeUrl').addEventListener('keydown', async e => { if (e.key === 'Enter') { e.preventDefault(); await brandIntake.addUrl($('intakeUrl').value); $('intakeUrl').value = ''; } });
+    $('intakeText').addEventListener('blur', () => { if (sb && currentBrand) brandIntake.saveText().then(() => brandIntake.load()); });
+    const drop = $('intakeDrop'), fin = $('intakeFileInput');
+    drop.addEventListener('click', () => fin.click());
+    drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fin.click(); } });
+    ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+    ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+    drop.addEventListener('drop', e => brandIntake.addFiles(e.dataTransfer && e.dataTransfer.files));
+    fin.addEventListener('change', () => { brandIntake.addFiles(fin.files); fin.value = ''; });
+    ['intakeUrls', 'intakeFiles'].forEach(id => $(id).addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (b) brandIntake.remove(b.dataset.rm); }));
+    $('intakeQ3').addEventListener('click', e => { const b = e.target.closest('[data-reg]'); if (!b) return; brandIntake.answers.register = b.dataset.reg; $('intakeQ3').querySelectorAll('[data-reg]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false')); });
+    // card
+    $('cardSave').addEventListener('click', () => brandIntake.save());
+    $('cardRegister').addEventListener('click', e => { const b = e.target.closest('[data-reg]'); if (!b) return; $('cardRegister').querySelectorAll('[data-reg]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false')); });
+    const addChip = (inId, arr) => { const v = ($(inId).value || '').trim(); if (!v) { $(inId).focus(); return; } if (!arr.includes(v)) arr.push(v); $(inId).value = ''; brandIntake.renderCard(); };
+    $('cardValuesAdd').addEventListener('click', () => addChip('cardValuesIn', bcard.values));
+    $('cardValuesIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addChip('cardValuesIn', bcard.values); } });
+    $('cardAvoidAdd').addEventListener('click', () => addChip('cardAvoidIn', bcard.avoid));
+    $('cardAvoidIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addChip('cardAvoidIn', bcard.avoid); } });
+    $('cardValuesChips').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (b) { bcard.values.splice(+b.dataset.rm, 1); brandIntake.renderCard(); } });
+    $('cardAvoidChips').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (b) { bcard.avoid.splice(+b.dataset.rm, 1); brandIntake.renderCard(); } });
+    $('cardColorAdd').addEventListener('click', () => { if (bcard.colors.length >= 5) return; bcard.colors.push('#2F4BC8'); brandIntake.renderCard(); });
+    $('cardColors').addEventListener('input', e => { const i = e.target.dataset.ci; if (i != null) { bcard.colors[+i] = e.target.value; e.target.closest('.swatch').style.background = e.target.value; } });
+    $('cardColors').addEventListener('click', e => { const b = e.target.closest('[data-crm]'); if (b) { bcard.colors.splice(+b.dataset.crm, 1); brandIntake.renderCard(); } });
+    $('cardTermAdd').addEventListener('click', () => { const t = $('cardTermText').value.trim(), r = $('cardTermRead').value.trim(); if (!t) { $('cardTermText').focus(); return; } bcard.terms.push({ text: t, reading: r }); $('cardTermText').value = ''; $('cardTermRead').value = ''; brandIntake.renderCard(); });
+    $('cardTerms').addEventListener('input', e => { const t = e.target.dataset.tt, r = e.target.dataset.tr; if (t != null) bcard.terms[+t].text = e.target.value; if (r != null) bcard.terms[+r].reading = e.target.value; });
+    $('cardTerms').addEventListener('click', e => { const b = e.target.closest('[data-trm]'); if (b) { bcard.terms.splice(+b.dataset.trm, 1); brandIntake.renderCard(); } });
+    $('cardCustomAdd').addEventListener('click', () => { const l = $('cardCustomLabel').value.trim(), v = $('cardCustomValue').value.trim(); if (!l && !v) { $('cardCustomLabel').focus(); return; } bcard.custom.push({ label: l, value: v }); $('cardCustomLabel').value = ''; $('cardCustomValue').value = ''; brandIntake.renderCard(); });
+    $('cardCustom').addEventListener('input', e => { const l = e.target.dataset.cl, v = e.target.dataset.cv; if (l != null) bcard.custom[+l].label = e.target.value; if (v != null) bcard.custom[+v].value = e.target.value; });
+    $('cardCustom').addEventListener('click', e => { const b = e.target.closest('[data-crm2]'); if (b) { bcard.custom.splice(+b.dataset.crm2, 1); brandIntake.renderCard(); } });
+  })();
+
 })();
 </script>
 
