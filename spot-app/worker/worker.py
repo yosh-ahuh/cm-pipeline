@@ -488,11 +488,35 @@ def process_project(sb: Supa, project_id: str, owner: str, live: bool) -> int:
                             proj[0].get("product") or proj[0].get("name"), proj[0].get("org_id"), proj[0].get("brand_id"))
         return runner
 
+    header_shown = False
+
+    def header():
+        nonlocal header_shown
+        if not header_shown:
+            print(f"project {project_id} …", flush=True)
+            header_shown = True
+
     for _ in range(500):
         jobs = sb.select("jobs", project_id=f"eq.{project_id}")
+        # 依存先が failed のまま残る pending は永久に ready にならない → blocked として failed に倒す（UI に理由を出す）
+        changed = True
+        while changed:   # 連鎖（review 失敗 → animate → build）を同じ tick で伝播させる
+            changed = False
+            failed_keys = {job_key(x): (x.get("detail") or {}).get("error", "") for x in jobs if x["status"] == "failed"}
+            for j in jobs:
+                if j["status"] != "pending":
+                    continue
+                bad = [d for d in (j.get("deps") or []) if d in failed_keys]
+                if bad:
+                    header()
+                    detail = {"error": f"blocked: {bad[0]} failed ({failed_keys[bad[0]][:120]})"[:300], "blocked_by": bad}
+                    sb.update("jobs", {"id": f"eq.{j['id']}"}, {"status": "failed", "detail": detail})
+                    print(f"  BLOCK {job_key(j):16} ← {bad[0]} failed", flush=True)
+                    j["status"] = "failed"; j["detail"] = detail; changed = True
         pend = [j for j in jobs if ready(j, jobs)]
         if not pend:
             break
+        header()
         for j in pend:
             sb.update("jobs", {"id": f"eq.{j['id']}"}, {"status": "running"})
             try:
@@ -601,8 +625,7 @@ def tick(sb: Supa, only_project: str | None, live: bool, only_brand: str | None 
         if not proj:
             continue
         owner = proj[0]["owner"]
-        print(f"project {pid} …", flush=True)
-        total += process_project(sb, pid, owner, live)
+        total += process_project(sb, pid, owner, live)   # 見出しは実際にジョブが動くときだけ出す
     return total
 
 

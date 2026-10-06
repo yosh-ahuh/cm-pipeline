@@ -119,6 +119,19 @@ def review_one(proj: Project, ctx: Ctx, cut: dict, *, retake: bool = False) -> d
     return {"status": "pass", "cut": cid}
 
 
+def _clip_duration(cut: dict, model: str) -> str | None:
+    """カットの尺（dur フレーム）に合わせてクリップ長を選ぶ。Veo 3.1 は 4s/6s/8s、Kling は秒数（"5"/"10"）。"""
+    dur = cut.get("dur")
+    if not dur:
+        return None
+    secs = float(dur) / 30.0
+    if "veo" in (model or ""):
+        return "8s" if secs > 6.5 else "6s" if secs > 4.5 else "4s"
+    if "kling" in (model or ""):
+        return "10" if secs > 7 else "5"
+    return None
+
+
 def animate_one(proj: Project, ctx: Ctx, cut: dict) -> dict:
     cid = cut["id"]
     still = state.artifact(proj, f"{cid}.still", "png")
@@ -137,6 +150,7 @@ def animate_one(proj: Project, ctx: Ctx, cut: dict) -> dict:
         prompt=cut.get("motion", {}).get("prompt") or _motion_prompt(cut),
         image_path=str(still),
         resolution=cut.get("motion", {}).get("resolution"),
+        duration=cut.get("motion", {}).get("duration") or _clip_duration(cut, model),
     )
     res = adapter.generate(req, str(out), key=ctx.key, dry_run=ctx.dry_run)
     state.mark_done(out, model=res.model, usd=res.usd, dry=res.dry, provider=res.provider)

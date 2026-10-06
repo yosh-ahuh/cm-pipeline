@@ -1863,6 +1863,8 @@
   .frame-copy .fc-note { margin-top: 14px; font-size: clamp(9px, 2.6cqw, 11px); font-weight: 500; letter-spacing: .04em; color: rgba(255,255,255,.62); }
   /* 実プレビュー（生成静止画）が入ったら、冗長な補助ノートは隠して写真を活かす */
   .frame.has-real .fc-note { display: none; }
+  .frame video.frame-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; border-radius: inherit; }
+  .frame.has-video .frame-copy, .frame.has-video .play, .frame.has-video .frame-logo, .frame.has-video .frame-badge { display: none; }
 </style>
 </head>
 <body class="booting">
@@ -5385,6 +5387,7 @@
     'AIが構成を組みました。気になるところは言葉で直せます。この台本で、次に必要な素材が決まります。': 'AI drafted the structure. Fix anything in plain words. This script decides which assets you need next.',
     'この台本で進む：素材をアップ': 'Continue: upload assets', 'この台本で必要な素材': 'Assets this script needs',
     'AIが台本をつくっています…': 'AI is writing the script…', '台本': 'Script',
+    'AIの台本を待って、確認する': 'Wait for the AI script, then review it', '素材を確認して、初稿をつくる': 'Check the assets, then create the first cut',
     '台本が決まってから': 'Only after the script is set', '素材をお願いするので、使わない素材を用意せずに済みます。実写の人物・背景はAIがつくります。': 'do we ask for assets, so you never prepare anything unused. AI creates the live-action people and backgrounds.',
     'ナレーション': 'Narration', '文字': 'Caption', '必要な素材': 'Asset needed', '映像:': 'Footage:',
     'AIが台本をつくります（生成時に確定）': 'AI writes this when generating', 'ナレーションから自動でつくります': 'Made from the narration automatically',
@@ -7642,9 +7645,14 @@
     const a = b.assets || {}, pf = b.profile || {}, vi = pf.visual || {}, vo = pf.voice || {}, sm = pf.summary || {};
     const palette = (a.colors && Array.isArray(a.colors.palette) && a.colors.palette.length) ? a.colors.palette : (Array.isArray(vi.colors) ? vi.colors : []);
     const colors = {};
-    if ((a.colors && a.colors.primary) || palette[0]) colors.primary = (a.colors && a.colors.primary) || palette[0];
-    if (palette[1]) colors.accent = palette[1];
-    if (palette[2]) colors.dark = palette[2];
+    const sat = h => { const m = /^#?([0-9a-f]{6})$/i.exec(String(h || '').trim()); if (!m) return 0; const v = parseInt(m[1], 16), r = v >> 16, g = (v >> 8) & 255, b = v & 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b); return mx ? (mx - mn) / mx : 0; };
+    const vivid = palette.slice().sort((x, y) => sat(y) - sat(x));   // 彩度順（抽出結果が灰色先頭でも primary は有彩色に）
+    const chosen = a.colors && a.colors.primary;   // 登録済み primary が灰色（彩度 < .2）で有彩色がパレットにあるなら有彩色を優先
+    colors.primary = (chosen && (sat(chosen) >= 0.2 || !vivid.some(c => sat(c) >= 0.2))) ? chosen : (vivid[0] || chosen);
+    if (!colors.primary) delete colors.primary;
+    const rest = vivid.filter(c => c !== colors.primary);
+    if (rest[0]) colors.accent = rest[0];
+    if (rest[1]) colors.dark = rest[1];
     if (palette.length) colors.palette = palette.slice(0, 5);
     const pron = {}; (vo.terms || []).forEach(t => { if (t && t.text && t.reading) pron[t.text] = t.reading; });
     const out = { name: b.name || '', colors };
@@ -7807,13 +7815,21 @@
     const card = document.getElementById('resumeCard'); if (!card) return;
     const p = (list || []).find(x => x.status && x.status !== 'done');
     if (!p) { card.hidden = true; return; }
-    const r = RESUME[p.status] || RESUME.draft;
+    let r = RESUME[p.status] || RESUME.draft;
+    const cutsOf = (p.spec && Array.isArray(p.spec.cuts)) ? p.spec.cuts : [];
+    const hasAssets = cutsOf.some(c => Array.isArray(c.assets) && c.assets.length);
+    const hasScript = cutsOf.some(c => c.narration) || !!(p.spec && p.spec.script && p.spec.script.source);
+    if (p.status === 'draft' && hasAssets) r = { step: 6, label: 'ステップ 6 / 7', next: '素材を確認して、初稿をつくる' };
+    else if (p.status === 'draft' && !hasScript) r = { step: 5, label: 'ステップ 5 / 7', next: 'AIの台本を待って、確認する' };
     const i = Math.max(0, (list || []).indexOf(p)); const [c1, c2] = GRAD[i % GRAD.length];
     const th = document.getElementById('resumeThumb'); if (th) th.style.background = `linear-gradient(150deg, ${c1}, ${c2})`;
     setText('resumeName', p.name || 'プロジェクト'); setText('resumeStep', r.label); setText('resumeNext', r.next);
     const m = document.getElementById('resumeMeter'); if (m) { m.style.width = Math.round((r.step - 1) / 7 * 100) + '%'; m.parentElement.setAttribute('aria-valuenow', String(r.step - 1)); }
     const btn = document.getElementById('resumeBtn');
-    btn.onclick = () => { if (p.status === 'draft' && window.resumeAtScript) window.resumeAtScript(p); else window.openWorkspace(p.id); };
+    btn.onclick = () => {
+      if (p.status === 'draft' && hasAssets && window.gotoAssets) { window.__currentProjectId = p.id; window.__currentProjectName = p.name; window.__scriptCuts = cutsOf; window.gotoAssets(); return; }
+      if (p.status === 'draft' && window.resumeAtScript) window.resumeAtScript(p); else window.openWorkspace(p.id);
+    };
     card.hidden = false;
   }
   window.loadMedia = () => renderVideos('mediaGrid');
@@ -8290,7 +8306,7 @@
     }
     const frame = document.getElementById('frame');
     const primary = brand.colors && brand.colors.primary;
-    if (frame) { frame.classList.remove('has-real'); frame.style.background = primary ? `linear-gradient(150deg, ${primary}, color-mix(in srgb, ${primary} 52%, #000))` : ''; }
+    if (frame) { frame.classList.remove('has-real', 'has-video'); const ov = frame.querySelector('video.frame-video'); if (ov) ov.remove(); frame.style.background = primary ? `linear-gradient(150deg, ${primary}, color-mix(in srgb, ${primary} 52%, #000))` : ''; }
     // 実プレビュー: 生成済みの静止画(generations.kind='still')があれば背景に差し込む。無ければ上のプレースホルダーのまま。
     (async () => {
       try {
@@ -8306,6 +8322,17 @@
           // スクリムを同じ background に重ねて、上に乗るロゴ/タイトル/再生ボタンの可読性を確保
           frame.style.background = `linear-gradient(180deg, rgba(0,0,0,.14), rgba(0,0,0,.44)), center/cover no-repeat url("${su.signedUrl}")`;
           frame.classList.add('has-real');
+        }
+        // 完成レンダー（A 案・横）があれば、プレビュー枠で実動画を再生できるようにする
+        const { data: rends } = await sb.from('renders').select('variant,format,storage_path').eq('project_id', pid).not('storage_path', 'is', null);
+        const pick = (rends || []).find(r => r.variant === 'A' && /^(youtube|wide|site)$/.test(r.format || '')) || (rends || [])[0];
+        if (pick && window.__currentProjectId === pid) {
+          const { data: vu } = await sb.storage.from('assets').createSignedUrl(pick.storage_path, 3600);
+          if (vu && vu.signedUrl && window.__currentProjectId === pid) {
+            let v = frame.querySelector('video.frame-video');
+            if (!v) { v = document.createElement('video'); v.className = 'frame-video'; v.playsInline = true; v.preload = 'metadata'; v.controls = true; v.setAttribute('aria-label', L('Finished ad preview', '完成した初稿のプレビュー')); frame.appendChild(v); }
+            v.src = vu.signedUrl; frame.classList.add('has-video');
+          }
         }
       } catch (_) { /* 署名URL失敗時はプレースホルダーのまま（安全に degrade） */ }
     })();

@@ -67,6 +67,16 @@ def plan_cuts(spec: dict) -> list[dict]:
     ws = [ROLE.get(c.get("role") or "", {}).get("w", 1.0) for c in cuts]
     secs = [max(2, round(total * w / sum(ws))) for w in ws]
     secs[-1] += total - sum(secs)                      # 端数は最後のカットで調整
+    # 実写カットは動画モデルの 1 クリップ上限（Veo 3.1 = 8 秒）まで。超過分は後ろの非実写カット（UI / CTA）へ回す
+    LIVE_MAX = 8
+    for i, c in enumerate(cuts):
+        if (c.get("type") or "live-action") == "live-action" and secs[i] > LIVE_MAX:
+            extra, secs[i] = secs[i] - LIVE_MAX, LIVE_MAX
+            j = next((k for k in range(i + 1, len(cuts)) if (cuts[k].get("type") or "live-action") != "live-action"), None)
+            if j is None:
+                j = next((k for k in range(len(cuts) - 1, -1, -1) if k != i and (cuts[k].get("type") or "live-action") != "live-action"), None)
+            if j is not None:
+                secs[j] += extra
     out = []
     for c, s in zip(cuts, secs):
         d = dict(c)

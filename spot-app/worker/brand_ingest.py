@@ -186,7 +186,14 @@ def _is_neutral(h: str) -> bool:
     return (mx - mn) < 18 and (mx > 235 or mx < 30)   # ほぼ白／ほぼ黒
 
 
+def _saturation(h: str) -> float:
+    r, g, b = (int(h[i:i + 2], 16) for i in (1, 3, 5))
+    mx, mn = max(r, g, b), min(r, g, b)
+    return 0.0 if mx == 0 else (mx - mn) / mx
+
+
 def color_candidates(css_texts: list[str], limit: int = 4) -> list[str]:
+    """CSS に現れる色を、出現回数 × 彩度で順位付け。灰色系（彩度 < 0.2）は有彩色の後ろに回す＝primary が灰色にならない。"""
     cnt: dict[str, int] = {}
     for t in css_texts:
         for m in HEX.finditer(t):
@@ -194,7 +201,11 @@ def color_candidates(css_texts: list[str], limit: int = 4) -> list[str]:
             if _is_neutral(h):
                 continue
             cnt[h] = cnt.get(h, 0) + 1
-    return [h for h, _ in sorted(cnt.items(), key=lambda kv: -kv[1])[:limit]]
+    def score(kv):
+        h, n = kv
+        sat = _saturation(h)
+        return (sat >= 0.2, n * (0.5 + sat))
+    return [h for h, _ in sorted(cnt.items(), key=score, reverse=True)[:limit]]
 
 
 def extract_html(text: str, url: str, fetch_css: bool = True) -> dict:
