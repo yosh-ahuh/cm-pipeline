@@ -2094,7 +2094,7 @@
 <!-- ============================ WIZARD VIEW ============================ -->
 <main class="wrap" id="view-wizard" hidden>
   <div class="wiz-head">
-    <div class="wiz-eyebrow"><span>新規CM ・ ステップ <span id="stepNum">1</span> / 7<span class="page-ind" id="pageInd" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></span></span><span class="wiz-progress" aria-hidden="true"><i id="wizProg"></i></span></div>
+    <div class="wiz-eyebrow"><span>新規CM ・ ステップ <span id="stepNum">1</span> / 7</span></div>
     <h1 class="wiz-title">つくりたいCMを、選ぶだけ。
       <small>プロンプトは書かなくて大丈夫。選択肢の裏に、広告制作の勝ちパターンが入っています。</small>
     </h1>
@@ -4324,14 +4324,11 @@
   const wizNext = document.getElementById('wizNext');
   const wizBack = document.getElementById('wizBack');
   const wizNextText = document.getElementById('wizNextText');
-  const wizProg = document.getElementById('wizProg');
   function showStep(n) {
     step = n;
     steps.forEach(s => s.classList.toggle('on', +s.dataset.step === n));
     window.renderFlowSteps(stepNavEl, n);
     document.getElementById('stepNum').textContent = n + 1;
-    if (wizProg) wizProg.style.width = ((n + 1) / 7 * 100) + '%';
-    document.querySelectorAll('#pageInd i').forEach((d, i) => { d.classList.toggle('on', i === n); d.classList.toggle('done', i < n); });   // R20
     wizBack.style.visibility = n === 0 ? 'hidden' : 'visible';
     wizNextText.textContent = n === 3 ? 'AIが台本をつくる' : '次へ';
     validateStep();
