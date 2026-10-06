@@ -813,6 +813,12 @@
   .goal[aria-pressed="true"] .g-tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .goals-start .free-add { margin-top: var(--s-3); }
   #view-dash.has-work .dash-hero { display: none; }
+  /* P4: 台本ステージの状態バナー */
+  .script-state { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: var(--r-md); margin-bottom: var(--s-3); font-size: var(--t-body-sm); background: var(--accent-soft); color: var(--accent-ink); }
+  .script-state.warn { background: var(--warn-soft); color: var(--warn); }
+  .script-state.ok { background: var(--good-soft); color: var(--good); }
+  .script-state .spin { width: 14px; height: 14px; flex: none; }
+  .script-state .btn { margin-left: auto; }
   /* P2: ブランド取り込み */
   .intake-grid { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: var(--s-6); padding-bottom: 56px; align-items: start; }
   .intake-main { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
@@ -2675,6 +2681,7 @@
   <div class="flow-bar"><ol class="steps" id="flowStepsScript" aria-label="ステップ"></ol></div>
   <div class="script-board">
     <div class="board-main">
+      <div class="script-state" id="scriptState" hidden aria-live="polite"><span class="spin" aria-hidden="true"></span><span id="scriptStateText">AIが台本をつくっています…</span></div>
       <!-- 台本を持ち込む：貼り付け or アップロード -->
       <div class="own-script" id="ownScript" hidden>
         <div class="os-head">台本を持ち込む</div>
@@ -4728,6 +4735,16 @@
       </article>`).join('');
   }
   window.__renderBoard = function () { renderBoard(); renderScriptNeeds(); };   // データ層/遷移から再描画できるよう公開
+  // P4: 台本ステージの状態（pending/running/done/failed/none）をバナーに反映
+  window.__setScriptState = function (state, extra) {
+    const box = document.getElementById('scriptState'), txt = document.getElementById('scriptStateText'); if (!box) return;
+    box.classList.remove('warn', 'ok'); const spin = box.querySelector('.spin');
+    if (state === 'pending' || state === 'running') { box.hidden = false; spin.hidden = false; txt.textContent = L('AI is writing the script… (usually under a minute)', 'AIが台本をつくっています…（通常 1 分以内）'); }
+    else if (state === 'slow') { box.hidden = false; box.classList.add('warn'); spin.hidden = true; txt.textContent = L('Taking longer than usual. You can continue to assets — the script is finalized when generating.', '時間がかかっています。素材へ進めます（台本は生成時に確定します）。'); }
+    else if (state === 'failed') { box.hidden = false; box.classList.add('warn'); spin.hidden = true; txt.textContent = L('AI could not write the script. A standard structure is shown; you can edit it or bring your own.', 'AIが台本をつくれませんでした。標準の構成を表示しています。直すか、台本を持ち込めます。'); }
+    else if (state === 'done') { box.hidden = false; box.classList.add('ok'); spin.hidden = true; txt.textContent = extra && extra.source === 'user' ? L('Your script is set. Cuts, captions and assets are assigned.', '持ち込んだ台本を反映しました。カット・文字・必要な素材を割り当てています。') : L('The script is ready. Fix anything in plain words.', '台本ができました。気になるところは言葉で直せます。'); }
+    else box.hidden = true;
+  };
   renderBoard(); renderScriptNeeds();
 
   document.getElementById('scriptMode').addEventListener('click', e => {
@@ -4795,7 +4812,8 @@
       if (!text) { toast(L('Paste or upload a script first.', '台本を貼り付けるかアップロードしてください。'), false, 2400); ta.focus(); return; }
       const parts = splitOwnScript(text);
       const cuts = Array.isArray(window.__scriptCuts) ? window.__scriptCuts : [];
-      const next = parts.map((p, i) => Object.assign({}, cuts[i] || { id: 'cut' + (i + 1), role: i === parts.length - 1 ? 'cta' : 'scene', type: i === parts.length - 1 ? 'cta' : 'live-action' }, { narration: p }));
+      const capOf = t => { const f = String(t).split(/[。！!？?\n]/)[0].trim(); return (f.length > 18 ? f.split(/[、,]/)[0] : f).slice(0, 18); };
+      const next = parts.map((p, i) => Object.assign({}, cuts[i] || { id: 'cut' + (i + 1), role: i === parts.length - 1 ? 'cta' : 'scene', type: i === parts.length - 1 ? 'cta' : 'live-action' }, { narration: p, caption: capOf(p) }));
       window.__scriptCuts = next;
       saveSpecPatch((spec) => { if (spec) { spec.script = spec.script || {}; spec.script.userScript = text; spec.script.source = 'user'; spec.cuts = next; } });
       renderBoard(); renderScriptNeeds();
@@ -5030,6 +5048,7 @@
     window.__currentProjectId = p.id; window.__currentProjectName = p.name;
     window.__scriptCuts = (p.spec && Array.isArray(p.spec.cuts)) ? p.spec.cuts : [];
     gotoScript();
+    if (window.__watchScriptJob) window.__watchScriptJob(p.id);
   };
   function gotoWizard() {
     hideAll(); vWiz.hidden = false; focusView(vWiz); _nav(true, 'new');
@@ -5363,6 +5382,7 @@
     // --- P1: script / assets / review / home ---
     'AIが構成を組みました。気になるところは言葉で直せます。この台本で、次に必要な素材が決まります。': 'AI drafted the structure. Fix anything in plain words. This script decides which assets you need next.',
     'この台本で進む：素材をアップ': 'Continue: upload assets', 'この台本で必要な素材': 'Assets this script needs',
+    'AIが台本をつくっています…': 'AI is writing the script…', '台本': 'Script',
     '台本が決まってから': 'Only after the script is set', '素材をお願いするので、使わない素材を用意せずに済みます。実写の人物・背景はAIがつくります。': 'do we ask for assets, so you never prepare anything unused. AI creates the live-action people and backgrounds.',
     'ナレーション': 'Narration', '文字': 'Caption', '必要な素材': 'Asset needed', '映像:': 'Footage:',
     'AIが台本をつくります（生成時に確定）': 'AI writes this when generating', 'ナレーションから自動でつくります': 'Made from the narration automatically',
@@ -7582,7 +7602,35 @@
       if (error) throw error;
       window.__currentProjectId = data.id;   // 後続（生成ジョブ投入）で使用
       if (window.__projectReadyResolve) window.__projectReadyResolve(data.id);
+      // P4: 台本ジョブ（クレジット消費なし）。worker が narration / caption / 必要な素材を書き込む
+      try {
+        await sb.from('jobs').insert({ project_id: data.id, stage: 'script', cut: null, deps: [] });
+        if (window.__setScriptState) window.__setScriptState('pending');
+        subscribeJobs(data.id); await refreshJobs(data.id);
+        clearTimeout(window.__scriptSlowT);
+        window.__scriptSlowT = setTimeout(() => { const j = Object.values(jobsState).find(x => x.stage === 'script'); if (j && (j.status === 'pending' || j.status === 'running') && window.__setScriptState) window.__setScriptState('slow'); }, 60 * 1000);
+      } catch (e) { console.warn('script job:', e.message); }
     } catch (e) { console.error('project create failed:', e.message); }
+  };
+  // 台本ジョブ完了 → spec.cuts を読み直して台本画面を更新
+  async function reloadScriptCuts(projectId) {
+    try {
+      const { data } = await sb.from('projects').select('spec').eq('id', projectId).single();
+      const spec = (data && data.spec) || {};
+      if (Array.isArray(spec.cuts)) window.__scriptCuts = spec.cuts;
+      if (window.__renderBoard) window.__renderBoard();
+      if (window.__setScriptState) window.__setScriptState('done', spec.script || {});
+    } catch (e) { console.warn('reloadScriptCuts:', e.message); }
+  }
+  window.__reloadScriptCuts = reloadScriptCuts;
+  window.__watchScriptJob = async function (projectId) {   // 再開時: 台本ジョブの状態をバナーに反映
+    try {
+      subscribeJobs(projectId); await refreshJobs(projectId);
+      const j = Object.values(jobsState).find(x => x.stage === 'script');
+      const hasText = (window.__scriptCuts || []).some(c => c.narration);
+      if (!j) { if (window.__setScriptState) window.__setScriptState(hasText ? 'none' : 'none'); return; }
+      if (window.__setScriptState) window.__setScriptState(j.status === 'done' ? 'done' : j.status === 'failed' ? 'failed' : j.status);
+    } catch (_) {}
   };
 
   // ---------- 撮影指示リスト（実案件）: UI カットのスクショとブランド素材を Storage に上げ、spec に配線 ----------
@@ -8105,7 +8153,7 @@
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
   // ============================ generation: jobs DAG + Realtime ============================
-  const JOB_USD = { still: 0.05, review: 0.01, animate: 3.5, audio: 0.28, build: 0 }; // cm-pipeline 概算
+  const JOB_USD = { script: 0.02, still: 0.05, review: 0.01, animate: 3.5, audio: 0.28, build: 0 }; // cm-pipeline 概算
   const DEFAULT_CUTS = ['cut01', 'cut02', 'cut03', 'cut05', 'cut05b']; // 旧 project（spec.cuts 無し）用フォールバック
 
   // 伝え方(angle)ごとの「勝ちパターン構成」→ カット列を自動生成。
@@ -8121,7 +8169,7 @@
     const struct = ANGLE_STRUCT[sel && sel.angle] || ANGLE_STRUCT['課題解決'];
     return struct.map(([role, type], i) => ({ id: `cut${i + 1}`, role, type }));
   }
-  const STAGE_LABEL = { still: 'Still', review: 'Review', animate: 'Animate', audio: 'Audio', build: 'Build' };
+  const STAGE_LABEL = { script: '台本', still: 'Still', review: 'Review', animate: 'Animate', audio: 'Audio', build: 'Build' };
   const JOB_COLOR = { pending: 'var(--faint)', running: 'var(--accent)', done: 'var(--good)',
     skipped: 'var(--muted)', failed: 'var(--crit)', blocked: 'var(--crit)' };
   let jobsChannel = null;
@@ -8171,8 +8219,10 @@
     try {
       window.__currentProjectId = projectId;
       // 既に生成中/済みなら購読だけして戻る（二重課金・二重投入の防止）
-      const { data: existing } = await sb.from('jobs').select('id').eq('project_id', projectId).limit(1);
-      if (existing && existing.length) { subscribeJobs(projectId); await refreshJobs(projectId); return; }
+      const { data: existing } = await sb.from('jobs').select('id,stage,status').eq('project_id', projectId);
+      const genJobs = (existing || []).filter(j => j.stage !== 'script');
+      if (genJobs.length) { subscribeJobs(projectId); await refreshJobs(projectId); return; }
+      const scriptJob = (existing || []).find(j => j.stage === 'script');
       // 残高ガード＋消費（原子的・改ざん耐性のサーバ側RPC）
       const { data: ok, error: se } = await sb.rpc('spend_credits',
         { p_project: projectId, p_amount: CREDITS_PER_GENERATION });
@@ -8182,7 +8232,10 @@
       const { data: proj } = await sb.from('projects').select('spec').eq('id', projectId).single();
       const specCuts = proj && proj.spec && Array.isArray(proj.spec.cuts) ? proj.spec.cuts : null;
       const cuts = specCuts && specCuts.length ? specCuts : DEFAULT_CUTS.map(id => ({ id, type: 'live-action' }));
-      await sb.from('jobs').insert(buildJobRows(projectId, cuts));
+      const rows = buildJobRows(projectId, cuts);
+      if (!scriptJob) rows.unshift({ project_id: projectId, stage: 'script', cut: null, deps: [] });   // 台本ジョブが無ければ先に
+      if (!scriptJob || scriptJob.status !== 'done') rows.forEach(r => { if (r.stage !== 'script' && !r.deps.includes('script')) r.deps = ['script', ...r.deps]; });   // 台本確定まで生成を待つ
+      await sb.from('jobs').insert(rows);
       await sb.from('projects').update({ status: 'generating' }).eq('id', projectId);
       subscribeJobs(projectId);
       await refreshJobs(projectId);
@@ -8334,6 +8387,11 @@
           const row = payload.new || payload.old;
           if (payload.eventType === 'DELETE') delete jobsState[row.id]; else jobsState[row.id] = row;
           renderJobs();
+          if (row && row.stage === 'script' && payload.eventType !== 'DELETE') {   // P4
+            if (row.status === 'done') { clearTimeout(window.__scriptSlowT); reloadScriptCuts(projectId); }
+            else if (row.status === 'failed') { clearTimeout(window.__scriptSlowT); if (window.__setScriptState) window.__setScriptState('failed'); }
+            else if (window.__setScriptState) window.__setScriptState(row.status);
+          }
         })
       .subscribe();
   }

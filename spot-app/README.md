@@ -52,6 +52,8 @@ source .env
 python3 worker.py            # 全プロジェクトの pending を処理して終了（既定 DRY-RUN）
 python3 worker.py --watch    # 5秒間隔で常駐
 python3 worker.py --live     # 実生成: cm-pipeline のステージを実行し assets へアップロード（FAL_KEY or ../../.fal_key）
+# 台本ステージ（script）: --live かつ ANTHROPIC_API_KEY があれば Claude（claude-opus-5-5）が台本を書く。無ければテンプレート台本。
+#   依存: cm-pipeline/.venv/bin/python -m pip install -r worker/requirements.txt
 ```
 
 `--live` の流れ: `projects.spec` → `cm-pipeline/projects/_supabase/<project_id>/project.yaml` に写像 →

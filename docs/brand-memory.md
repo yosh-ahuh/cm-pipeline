@@ -34,6 +34,6 @@
 ## 進捗
 - ✅ **Phase 1 実装済**：`window.__brandDefaults()`（現org の projects.spec.selections を最大30件集計→各軸の最頻値・媒体は4割以上）。`applyBrandDefaults()`＋`applySelToUI()` を `gotoWizard` で呼び、ウィザードの初期選択をブランドの“いつもの設定”に。注記「このブランドのいつもの設定を反映しました」。履歴2本未満/未サインインは demo 既定のまま。スキーマ変更なし。stub履歴で動作確認済み。
 - ✅ **Phase 1 可視化**：ワークスペースのプロフィールに「このブランドの傾向」（媒体/業種/ターゲット/伝え方/トーンのタグ＋N本から）＝`renderBrandInsights()`。ブランドメモリを見える化。
-- ⏳ Phase 2/3 未着手（worker側の参照注入／学習）。
+- 🟡 Phase 2 一部（2026-10-06）: 台本ステージ（`worker/script_gen.py`）が `brands.profile`（ひとこと・相手・伝えたいこと・言葉づかい・使わない表現・自由項目・読み方）を Claude の台本生成に注入。ビジュアル参照（色・ロゴのレンダー注入）と過去採用レンダーの参照は未。Phase 3 未着手。
 
 関連: [[workspace-brand-model]] [[multi-seat-design]] [[consistency-audit-2026-09]]。

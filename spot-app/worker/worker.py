@@ -14,6 +14,8 @@ build は spec.compliance / spec.delivery を読み、開示テロップ・C2PA�
   SUPABASE_URL                 例: https://xxxx.supabase.co
   SUPABASE_SERVICE_ROLE_KEY    service_role キー（サーバ専用・絶対に公開しない）
   FAL_KEY                      （--live）fal.ai キー。未設定なら ../../.fal_key を読む
+  ANTHROPIC_API_KEY            （--live・任意）台本ステージ（script）で Claude に台本を書かせる。未設定ならテンプレート台本
+  SPOT_SCRIPT_MODEL            （任意）台本生成モデル。既定 claude-opus-5-5
   CM_PIPELINE_DIR              （任意）cm-pipeline のパス。既定は ../../cm-pipeline
   RESEND_API_KEY               （任意）制作完了メールを送る Resend の API キー。未設定ならメールは送らない
   RESEND_FROM                  （任意）差出人。既定 "Spot <no-reply@creativepunx.com>"
@@ -39,11 +41,13 @@ import urllib.error
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import script_gen  # noqa: E402  台本ステージ（P4）
 SPOT_ROOT = HERE.parent.parent                                   # SPOT/
 CM_DIR = Path(os.environ.get("CM_PIPELINE_DIR") or SPOT_ROOT / "cm-pipeline")
 
 # cm-pipeline の概算原価と揃える（実生成時は実測に置換）。
-JOB_USD = {"still": 0.05, "review": 0.01, "animate": 3.50, "audio": 0.28, "build": 0.0}
+JOB_USD = {"script": 0.02, "still": 0.05, "review": 0.01, "animate": 3.50, "audio": 0.28, "build": 0.0}
 CREDIT_USD = 0.30
 SUCCESS = {"done", "skipped"}
 
@@ -175,27 +179,40 @@ def spec_to_project(project_id: str, spec: dict, product: str | None) -> dict:
     out = spec.get("output", {}) or {}
     formats = out.get("formats") or [{"id": "wide", "w": 1920, "h": 1080}]
     cuts = []
-    for c in spec.get("cuts") or []:
+    narration = []   # P4: 台本ステージが付けたナレーション → script.narration（TTS は読み方適用済みの tts を優先）
+    for i, c in enumerate(spec.get("cuts") or [], 1):
         if isinstance(c, str):
             c = {"id": c, "type": "live-action"}
         cut = {"id": c["id"], "type": c.get("type", "live-action")}
         role = c.get("role") or c["id"]
+        label = script_gen.ROLE.get(role, {}).get("label", role)
+        telop = c.get("telop") or ([c["caption"]] if c.get("caption") else [label])
+        if c.get("narration"):
+            nid = c.get("narration_id") or f"na{i}"
+            narration.append({"id": nid, "text": c.get("narration_tts") or c["narration"], "display": c["narration"]})
+            cut["narration"] = nid
         if cut["type"] == "live-action":
-            subj = c.get("subject") or f"{sel.get('industry') or product or 'プロダクト'}の{sel.get('target') or '利用者'}。{role}"
+            subj = c.get("subject") or f"{sel.get('industry') or product or 'プロダクト'}の{sel.get('target') or '利用者'}。{label}"
             cut["still"] = {"subject": subj}
             cut["motion"] = {"resolution": "1080p"}
-            cut["telop"] = c.get("telop") or [role]
+            cut["telop"] = telop
         elif cut["type"] == "cta":
             cut.update({"button": c.get("button") or "今すぐ 無料ではじめる", "badges": c.get("badges") or [],
-                        "search": c.get("search") or product, "note": c.get("note")})
+                        "search": c.get("search") or product, "note": c.get("note"), "telop": telop})
         elif cut["type"] == "graphic":
-            cut["value"] = c.get("value") or {"label": role}
+            cut["value"] = c.get("value") or {"label": c.get("caption") or label}
         elif cut["type"] == "ui":
             # assets: アプリが Storage に上げたスクショのパス配列（LiveRunner が assets/ にダウンロードして差し替え）
-            cut.update({"assets": list(c.get("assets") or []), "caption": c.get("caption") or role, "telop": c.get("telop") or [role]})
+            cut.update({"assets": list(c.get("assets") or []), "caption": c.get("caption") or label, "telop": telop})
         else:
             cut["role"] = role
+        if c.get("secs"):
+            cut["dur"] = int(round(float(c["secs"]) * 30))
         cuts.append(cut)
+    script = dict(spec.get("script") or {})
+    if narration:
+        script["narration"] = narration
+    script.pop("userScript", None)
     return {
         "meta": {"name": project_id, "client": meta.get("client"), "product": product or meta.get("name"),
                  "goal": meta.get("goal") or sel.get("angle"), "source": "spot-app"},
@@ -203,7 +220,7 @@ def spec_to_project(project_id: str, spec: dict, product: str | None) -> dict:
                    "variants": out.get("variants") or [{"id": "A"}, {"id": "B"}, {"id": "C"}]},
         "brand": spec.get("brand") or {},
         "style": {"tone": _TONE.get(sel.get("tone"), "documentary"), "grade": "broadcast-cool"},
-        "script": spec.get("script") or {},
+        "script": script,
         "cuts": cuts,
         "audio": spec.get("audio") or {"bgm": [{"id": "main", "model": "lyria2", "mood": "uplifting-corporate"}]},
         "compliance": spec.get("compliance") or {},
@@ -336,6 +353,30 @@ class LiveRunner:
         return self._usd_delta(before)
 
 
+def run_script_stage(sb: Supa, project_id: str, live: bool) -> float:
+    """台本ステージ: projects.spec に narration / caption / 必要な素材 / 秒数を書き込む（brands.profile を参照）。"""
+    proj = sb.select("projects", id=f"eq.{project_id}", select="spec,product,name,brand_id")
+    if not proj:
+        raise RuntimeError("project not found")
+    spec = proj[0].get("spec") or {}
+    spec.setdefault("meta", {})
+    spec["meta"].setdefault("product", proj[0].get("product") or proj[0].get("name"))
+    profile = {}
+    if proj[0].get("brand_id"):
+        br = sb.select("brands", id=f"eq.{proj[0]['brand_id']}", select="name,profile")
+        if br:
+            profile = dict(br[0].get("profile") or {})
+            profile.setdefault("name", br[0].get("name"))
+    patch, detail = script_gen.run(spec, profile, live)
+    spec["cuts"] = patch["cuts"]
+    spec["script"] = patch["script"]
+    sb.update("projects", {"id": f"eq.{project_id}"}, {"spec": spec})
+    src = patch["script"].get("source")
+    print(f"  script: {src} ({len(patch['cuts'])} cuts)" + (f" model={detail.get('model')}" if detail.get("model") else "")
+          + (f" warn={detail.get('warnings')}" if detail.get("warnings") else "") + (f" note={detail.get('note')}" if detail.get("note") else ""), flush=True)
+    return JOB_USD["script"] if src == "ai" else 0.0
+
+
 def execute(job: dict, live: bool, runner: "LiveRunner | None" = None) -> float:
     """ジョブを実行して実コスト(USD)を返す。
 
@@ -354,18 +395,19 @@ def process_project(sb: Supa, project_id: str, owner: str, live: bool) -> int:
     """1プロジェクトの ready ジョブを可能な限り進める。処理件数を返す。"""
     processed = 0
     runner = None
-    if live:
+
+    def ensure_runner():
+        """LiveRunner は台本ステージの後に（最初の生成ジョブで）作る＝ナレーション入りの project.yaml を使う。"""
+        nonlocal runner
+        if not live or runner is not None:
+            return runner
         proj = sb.select("projects", id=f"eq.{project_id}", select="spec,product,name,org_id")
         if not proj:
-            return 0
-        try:
-            runner = LiveRunner(sb, project_id, owner, proj[0].get("spec") or {},
-                                proj[0].get("product") or proj[0].get("name"), proj[0].get("org_id"))
-        except Exception as e:  # noqa: BLE001
-            print(f"  FAIL  project setup: {e}", flush=True)
-            sb.update("jobs", {"project_id": f"eq.{project_id}", "status": "eq.pending"},
-                      {"status": "failed", "detail": {"error": f"setup: {e!r}"[:300]}})
-            return 0
+            raise RuntimeError("project not found")
+        runner = LiveRunner(sb, project_id, owner, proj[0].get("spec") or {},
+                            proj[0].get("product") or proj[0].get("name"), proj[0].get("org_id"))
+        return runner
+
     for _ in range(500):
         jobs = sb.select("jobs", project_id=f"eq.{project_id}")
         pend = [j for j in jobs if ready(j, jobs)]
@@ -374,7 +416,18 @@ def process_project(sb: Supa, project_id: str, owner: str, live: bool) -> int:
         for j in pend:
             sb.update("jobs", {"id": f"eq.{j['id']}"}, {"status": "running"})
             try:
-                usd = execute(j, live, runner)
+                if j["stage"] == "script":
+                    usd = run_script_stage(sb, project_id, live)
+                else:
+                    try:
+                        ensure_runner()
+                    except Exception as e:  # noqa: BLE001
+                        print(f"  FAIL  project setup: {e}", flush=True)
+                        sb.update("jobs", {"project_id": f"eq.{project_id}", "status": "eq.pending"},
+                                  {"status": "failed", "detail": {"error": f"setup: {e!r}"[:300]}})
+                        sb.update("jobs", {"id": f"eq.{j['id']}"}, {"status": "failed", "detail": {"error": f"setup: {e!r}"[:300]}})
+                        return processed
+                    usd = execute(j, live, runner)
                 sb.update("jobs", {"id": f"eq.{j['id']}"}, {"status": "done", "usd": usd})
                 if usd > 0:
                     # コストのみ記録（credits=0）。残高消費は生成時に spend_credits(RPC) で実施済み。
@@ -390,7 +443,7 @@ def process_project(sb: Supa, project_id: str, owner: str, live: bool) -> int:
             processed += 1
     # 全 build まで終わっていれば done に
     jobs = sb.select("jobs", project_id=f"eq.{project_id}")
-    if jobs and all(j["status"] in SUCCESS for j in jobs):
+    if jobs and any(j["stage"] != "script" for j in jobs) and all(j["status"] in SUCCESS for j in jobs):
         sb.update("projects", {"id": f"eq.{project_id}"}, {"status": "done"})
         if live:
             notify_done(sb, project_id, owner)   # 完了メール（RESEND_API_KEY があるときだけ送る）
