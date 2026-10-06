@@ -53,13 +53,15 @@
 | 危険 | `--crit` (+`-soft`) | `#E07A64` | 枯渇・失敗・削除 |
 | 強調赤 | `--brand-red` | `#D7000F` | 実写カット等の限定用途 |
 
-**面上の文字色（on-*）**: `--on-accent` `#FFFFFF`（accent面）/ `--on-good` `#0F1A14`（good面）。
+**面上の文字色（on-*）**: `--on-accent` `#FFFFFF`（accent面）/ `--on-good` `#0F1A14`（good面）/ `--on-warn` `#1A1406`（warn面）/ `--on-crit` `#FFFFFF`（crit面＝`.btn-danger`）/ `--on-brand-red` `#FFFFFF`。
+**容器（-soft）**: `--accent-soft` / `--good-soft` / `--warn-soft` `#3A2E12` / `--crit-soft` / `--cool-soft`。容器の上の文字は同名の無印（`--warn-soft` 地に `--warn`）。
+**アバター径**: `--av-xs` 24 / `--av-sm` 32 / `--av-md` 42 / `--av-lg` 50 / `--av-xl` 60 / `--av-2xl` 72（サイドバー=sm・メニュー頭=md・プロフィール=2xl・メンバー行=sm）。
 **光彩（indigo=光源）**: `--glow`（放射グラデの塗り＝ヒーロー/FAB/結果リビールの疑似要素）/ `--glow-shadow`（選択面・FABの色付き影）。
 **暗幕**: `--scrim`（モーダル/ボトムシートの dimmer）。
 **状態レイヤー（M3）**: `--hover`（ink 6%）/ `--pressed`（ink 10%）
 **影**: `--shadow-1`（カード）/ `--shadow`（浮上）/ `--shadow-lift`（ドラッグ・ホバー浮上）
 
-> `--on-accent`/`--on-good` で主要な「色の上の文字色」を規約化済み（§10-F 一部対応）。warn/brand-red 面の on-* と `-soft` 変種は未整備。
+> ✅ §10-F 完了（LINE R8・2026-10-06）: 意味色は **無印=ink（面上の文字）／`-soft`=容器／`on-*`=塗り面の上の文字** の三つ組で揃えた。新しい意味色を足すときは必ず三つ揃えてから使う。
 
 ### 2.2 タイポグラフィ
 
@@ -108,6 +110,7 @@
   - `.panel-h .count`（右寄せ・mono）／`.panel-h .rt`（faint・"Realtime"等の副題）。
 
 ### 3.2 ナビゲーション
+> **意思決定表（LINE R12・2026-10-06）**: ドロワー/サイドバーの項目は **3〜5**、それを超える機能はタブや設定内のセクションへ逃がす（現サイドバーは 3 基本＋オーナー限定 3）。モバイルのドロワー dimmer は **40%**（`.sb-scrim`）。**ナビの入れ子は 2 階層まで**（3 階層のネスト禁止。コレクション内のサブ分類はタブ/フィルタで表現する）。
 - **`.sidebar`**（`body.signed-in` で表示、幅248px固定、`padding-left:248px`）。折りたたみ=`.sb-collapsed`（66px）。≤1080px はオフキャンバス drawer。
   - 構成: ブランド → ワークスペースカード(`.sb-wscard`：切替＋残クレジット) → ナビ(`.sb-nav`) → 下部アカウント(`.sb-acct`)。
   - ナビ項目: **ホーム / メディア / コレクション** ｜（区切り）**プランと請求 / チーム・メンバー / クレジットを追加**（`data-owner-only`）｜ プロフィール・設定。
@@ -127,6 +130,7 @@
 > 主役は **白(アプリ内)／青(ヒーロー)** の2系統のみ。旧 `.btn-accent`（未使用のデッドコード）は撤去。1画面に主は1つ、白と青を併置しない（§11）。
 
 ### 3.4 バッジ・ピル・チップ ✅（P1-Bで正準化）
+> **タブ/フィルタの状態規格（LINE R11・2026-10-06）**: Box タブ（`.tabs > .tab[aria-selected]`・`.mode-switch`）＝セグメント型、フィルタ pill（`.filter[aria-pressed]`）＝黒塗り＋✓。状態は 選択=100 / 非選択=`--muted` / 無効=opacity .5。Fixed タブは **2〜4** まで、超える一覧フィルタは **折り返さず横スクロール**（`.filters` はスクロールバー非表示）。下線型テキストタブは未使用（導入時は下線 2px・状態 100/70/50）。
 **正準コンポーネント**: `.badge` ＋ `.badge--accent / --neutral / --success / --warn / --danger`（面soft＋同系ink文字, `--r-full`, `--t-label-sm`）。**新規は必ずこれを使う。**
 移行済み: `.member-row .badge`（枠線→variant）。
 未移行（幾何は近いが独自クラスのまま・positioning都合）: `.badge-cur` / `.col-badge` / `.pk-tag` / `.sb-badge` / `.proj-status` / `.filter[aria-pressed]`。→ 見た目はaccent系で概ね揃っているが、順次 `.badge--*` へ寄せる。
@@ -141,6 +145,8 @@
 残量で色を変える場合は塗り `<i>` の `background` を呼び出し側で `--good/--warn/--crit` に上書き（請求ヒーローが実施）。ダッシュボード/サイドバー/請求で共用。
 
 ### 3.6 カード
+> **リスト規格（LINE R13・2026-10-06）**: 左メディアのアスペクトは 1:1 / 4:3 / 16:9 のいずれか（動画カードは 16:9・縦素材は 9:16 の内包表示）。**行の右アクションは 2 つまで**（動画カード＝移動・削除、メンバー行＝ロールバッジ・除外）。**新規（24 時間以内）の行はハイライト**＝`.proj.is-new`（枠 accent＋「新着」バッジ）。読み込み中は Skeleton（`skelRows`）。
+> **空状態（LINE R14）**: `.empty` ＝ pictogram（`.e-ic`）＋ 題（h4）＋ 説明（p, 40ch）＋ **ボタン 1 つ（最大 2）**、中央寄せ、煽り文言なし。例: ホーム「まずは1本、いっしょに作ってみましょう」＋「最初のCMをつくる」／コレクション空「メディアを開く」。
 - **`.proj`**: 動画カード（サムネ＋名前＋メタ＋フッタ。hoverで浮上）。`.proj-grid` は `minmax(255px,1fr)`。
 - **`.u-card`**: 使用状況の数値カード（大数字＋メーター＋補足）。
 - **`.plan-card`**: プランカード（価格＋✓特徴リスト＋アクション。`.popular`でaccent枠＋人気バッジ、`.current`で淡色化）。`.plan-grid` は `minmax(210px,1fr)`。
@@ -151,6 +157,7 @@
 - **`.fld`**: `label(--t-label,muted)` + `input`（`--control-h`40, `--r-sm`, `bg:--surface-2/線 line-strong`, focusで accent リング）。※ P0/P2で `--card`未定義・9px角丸・高さを是正済み。
 - **`.sel`**: セレクト（`--control-h`40, `--r-sm`, `bg:--surface-2`）。
 - **`.switch-row`**: チェックボックス＋ラベル（自動チャージ等）。`.inline-input`（数値＋単位）。
+  **選択コントロールの使い分け（LINE R10・2026-10-06）**: **多選=checkbox**（`.switch-row`。Indeterminate は `input.indeterminate=true`、エラーは `.switch-row.err`、無効はラベルも .5）／**単一の即時選択=checkmark**（ウィザードの `.opt` ✓）／**確認を伴う単一=radio**（登録の利用形態カード）／**ON/OFF 設定=switch**（`role="switch"`、行の右端）。
 - **`.field`**: **末尾アクション付き入力**（送信ボタン・パスワードの目トグル等）。`.fld` とは別用途の意図的パターン。
 > ✅ **入力の共有スタイルはトークン統一済み**（border=line-strong / radius=r-sm / bg=surface-2 / focus=accent-soft リング / 高さ=`--control-h`）。`.fld`=プレーン、`.field`=末尾アクション付き の2パターン。認証(`.auth-form .field`)のみ h48 の意図的な大サイズ（スコープ限定）。
 

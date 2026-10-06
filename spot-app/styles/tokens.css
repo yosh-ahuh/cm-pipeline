@@ -37,9 +37,13 @@
   --good-soft: #17281E;
   --on-good: #0F1A14;       /* 緑塗り面の上の文字（--on-accent と同じ役割・従来の直書きを正準化） */
   --warn: #E4B14C;
+  --warn-soft: #3A2E12;     /* warn 容器（LINE R8: -soft は「面」、同名の無印は「面上の ink」） */
+  --on-warn: #1A1406;       /* warn 塗り面の上の文字 */
   --crit: #E07A64;
   --crit-soft: #3A1F1A;
+  --on-crit: #FFFFFF;       /* crit 塗り面（.btn-danger 等）の上の文字 */
   --brand-red: #D7000F;
+  --on-brand-red: #FFFFFF;
 
   /* --- state layers (M3) --- */
   --hover: color-mix(in srgb, var(--ink) 6%, transparent);
@@ -90,6 +94,9 @@
   --dur-fast: 120ms;
   --dur: 200ms;
   --dur-slow: 320ms;
+
+  /* --- avatar scale（LINE R9: 24/32/42/50/60/72。散在していた 34/40 を規格に寄せた） --- */
+  --av-xs: 24px; --av-sm: 32px; --av-md: 42px; --av-lg: 50px; --av-xl: 60px; --av-2xl: 72px;
 
   /* --- sizes --- */
   --topbar-h: 60px;

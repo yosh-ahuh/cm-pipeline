@@ -133,7 +133,7 @@
   .sb-acct .menu-email { font-size: var(--t-label); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .sb-acct .icon-btn { flex: none; }
   /* 下部プロフィール / メニューヘッダ：氏名＋プラン / メール（参考デザイン） */
-  .sb-acct .avatar { width: 32px; height: 32px; border-radius: 50%; flex: none; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-sm); text-transform: uppercase; }
+  .sb-acct .avatar { width: var(--av-sm); height: var(--av-sm); border-radius: 50%; flex: none; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-sm); text-transform: uppercase; }
   .acct-id { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 1px; }
   .acct-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
   .acct-name { font-size: var(--t-body-sm); font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -144,7 +144,7 @@
   .avatar.has-dot { position: relative; }
   .avatar.has-dot::after { content: ""; position: absolute; right: -1px; bottom: -1px; width: 10px; height: 10px; border-radius: 50%; background: var(--good); border: 2px solid var(--surface-low); }
   .menu-head .avatar.has-dot::after { border-color: var(--surface-2); }
-  .sb-scrim { position: fixed; inset: 0; z-index: 39; background: rgba(0,0,0,.45); }
+  .sb-scrim { position: fixed; inset: 0; z-index: 39; background: rgba(0,0,0,.4); }   /* R12（LINE準拠）: drawer dimmer 40% */
   .sb-brand { position: relative; }
   .sb-collapse { margin-left: auto; flex: none; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-xs); color: var(--muted); }
   .sb-collapse:hover { background: var(--hover); color: var(--ink); }
@@ -252,14 +252,14 @@
   }
   @keyframes menu-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } }
   .menu-head { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-3) var(--s-4) var(--s-2); }
-  .menu-head .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-lg); text-transform: uppercase; flex: none; }
+  .menu-head .avatar { width: var(--av-md); height: var(--av-md); border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-lg); text-transform: uppercase; flex: none; }
   .menu-head-btn { width: 100%; border: none; background: none; cursor: pointer; color: inherit; font: inherit; text-align: left; border-radius: var(--r-sm); }
   .menu-head-btn:hover { background: var(--hover); }
   .menu-head .mh-chev { margin-left: auto; flex: none; width: 16px; height: 16px; color: var(--faint); transition: transform var(--dur-fast); }
   .menu-head-btn[aria-expanded="true"] .mh-chev { transform: rotate(-90deg); }
   .as-current, .as-acct { align-items: center; }
   .as-acct { width: calc(100% - 8px); margin: 0 var(--s-1); border-radius: var(--r-sm); }
-  .as-current .avatar, .as-acct .avatar { position: relative; width: 34px; height: 34px; border-radius: 50%; flex: none; overflow: hidden; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-sm); text-transform: uppercase; }
+  .as-current .avatar, .as-acct .avatar { position: relative; width: var(--av-sm); height: var(--av-sm); border-radius: 50%; flex: none; overflow: hidden; background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; display: grid; place-items: center; font-size: var(--t-body-sm); text-transform: uppercase; }
   .avatar .av-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
   .as-check { margin-left: auto; flex: none; color: var(--accent); opacity: 0; }
   .as-current .as-check, .as-acct[aria-checked="true"] .as-check { opacity: 1; }
@@ -313,7 +313,7 @@
   #view-media > .context, #view-collections > .context, #view-settings > .context, #view-account > .context { padding-bottom: 0; }
   /* プロフィールアイコン（アバター） */
   .avatar-row { display: flex; align-items: center; gap: var(--s-4); }
-  .avatar-lg { width: 72px; height: 72px; border-radius: 50%; flex: none; display: grid; place-items: center; overflow: hidden;
+  .avatar-lg { width: var(--av-2xl); height: var(--av-2xl); border-radius: 50%; flex: none; display: grid; place-items: center; overflow: hidden;
     background: var(--accent-soft); color: var(--accent-ink); font-weight: 800; font-size: 28px; text-transform: uppercase; box-shadow: var(--shadow-1); }
   .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
   .avatar-side { display: flex; flex-direction: column; gap: 2px; }
@@ -874,6 +874,11 @@
   .filter { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-full); min-height: var(--control-h-sm); padding: 0 14px; font-size: var(--t-label); color: var(--muted); font-weight: 500; transition: border-color var(--dur-fast), color var(--dur-fast), background var(--dur-fast); }
   .filter:hover { color: var(--ink); background: var(--hover); }
   .filter[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--ground); font-weight: 700; }
+  /* R11（LINE準拠）: Box タブ＝フィルタ pill。状態は 選択100 / 非選択=muted / 無効50。項目が収まらないときは折り返さず横スクロール */
+  .filter:disabled, .tab:disabled, .mode-switch button:disabled { opacity: .5; cursor: not-allowed; }
+  .filters { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .filters::-webkit-scrollbar { display: none; }
+  .filters .filter { flex: none; }
   /* R4（LINE準拠）: 選択中のチップは色だけでなく ✓ でも示す（色覚・低ITリテラシー配慮） */
   .filter[aria-pressed="true"]::before { content: "✓"; font-weight: 700; margin-right: 5px; font-size: .9em; }
 
@@ -882,6 +887,9 @@
   .proj:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); border-color: var(--line-strong); }
   .proj:active { transform: translateY(-1px) scale(.99); }
   .proj[hidden] { display: none; }
+  /* R13（LINE準拠）: 新規（24時間以内）の行はハイライト＝枠を accent にし「新着」バッジ。右アクションは 2 つまで（移動・削除） */
+  .proj.is-new { border-color: color-mix(in srgb, var(--accent-ink) 55%, var(--line)); }
+  .proj .proj-meta .badge--num, .proj .proj-meta .badge { vertical-align: middle; }
   .proj-thumb { height: 132px; position: relative; display: grid; place-items: center; overflow: hidden; }
   .proj-thumb .pt-mini { display: flex; gap: 6px; }
   .proj-thumb .pt-mini i { width: 34px; height: 60px; border-radius: 6px; background: rgba(255,255,255,.18); border: 1.5px solid rgba(255,255,255,.5); }
@@ -925,7 +933,7 @@
   .empty .e-ic .ic { width: 26px; height: 26px; }
   .empty h4 { margin: 0; font-size: var(--t-title); color: var(--ink); font-weight: 700; }
   .empty p { font-size: var(--t-body-sm); max-width: 40ch; }
-  .empty .hn-btn { align-self: center; margin-top: 4px; }
+  .empty .hn-btn, .empty .btn { align-self: center; margin-top: 4px; }   /* R14（LINE準拠）: 空状態は pictogram＋題＋説明＋ボタン1つ（最大2）・中央・煽らない */
 
   /* ==========================================================================
      Export / delivery
@@ -1331,6 +1339,12 @@
   .u-card .u-v, .cost-big { font-variant-numeric: tabular-nums; }
   .switch-row { display: flex; align-items: center; gap: 10px; font-size: var(--t-body); cursor: pointer; }
   .switch-row input { width: 18px; height: 18px; flex: none; accent-color: var(--accent); }
+  /* R10（LINE準拠）: チェックボックスの Indeterminate / Error / Disabled 状態。使い分け＝多選=checkbox・単一=checkmark(.opt ✓)・確認=radio(.auth-type) */
+  .switch-row input:indeterminate { accent-color: var(--accent); }
+  .switch-row.err { color: var(--crit); }
+  .switch-row.err input { outline: 2px solid var(--crit); outline-offset: 2px; border-radius: 3px; }
+  .switch-row input:disabled { cursor: not-allowed; }
+  .switch-row input:disabled + span { opacity: .5; }
   .topup-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s-3); margin-top: 12px; }
   .topup-fields[hidden] { display: none; }
   .inline-input { display: flex; align-items: center; gap: 8px; }
@@ -1405,7 +1419,7 @@
   .badge--accent  { color: var(--accent-ink); background: var(--accent-soft); }
   .badge--neutral { color: var(--muted);      background: var(--surface-3); }
   .badge--success { color: var(--good);       background: var(--good-soft); }
-  .badge--warn    { color: var(--warn);        background: color-mix(in srgb, var(--warn) 16%, transparent); }
+  .badge--warn    { color: var(--warn);        background: var(--warn-soft); }
   .badge--danger  { color: var(--crit);        background: var(--crit-soft); }
   /* R4（LINE準拠）: 数値バッジは高さ規格 18/20、等幅数字、溢れは fmtCount() で 99+ */
   .badge--num { min-width: 18px; height: 18px; padding: 0 6px; justify-content: center; font-variant-numeric: tabular-nums; font-weight: 700; }
@@ -1413,7 +1427,7 @@
   /* team / members */
   .member-list { display: flex; flex-direction: column; gap: 6px; }
   .member-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
-  .member-row .m-avatar { position: relative; width: 34px; height: 34px; flex: none; border-radius: var(--r-full); background: var(--surface-3); border: 1.5px solid var(--line-strong); overflow: hidden;
+  .member-row .m-avatar { position: relative; width: var(--av-sm); height: var(--av-sm); flex: none; border-radius: var(--r-full); background: var(--surface-3); border: 1.5px solid var(--line-strong); overflow: hidden;
     display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: var(--t-body-sm); color: var(--muted); }
   .member-row .m-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .member-row .m-id { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
@@ -1556,7 +1570,7 @@
   @media (max-width: 480px) { .modal-card { max-width: 320px; padding: 20px; } #confirmActions { flex-direction: column-reverse; } #confirmActions .btn { width: 100%; } }
   .confirm-input { display: block; margin: 14px 0 0; font-size: var(--t-label); color: var(--muted); }
   .confirm-input input { display: block; width: 100%; margin-top: 6px; }
-  .btn-danger { background: var(--crit); color: #fff; border: 1px solid transparent; }
+  .btn-danger { background: var(--crit); color: var(--on-crit); border: 1px solid transparent; }
   .btn-danger:hover { background: color-mix(in srgb, var(--crit) 86%, #000); }
   .danger-zone { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
   .danger-zone .dz-h { font-size: var(--t-body-sm); font-weight: 700; color: var(--crit); margin-bottom: 8px; }
@@ -6399,7 +6413,7 @@
     const ren = document.getElementById('colRename'); if (ren) ren.hidden = (id === '__uncat__') || !write;
     const emptyMsg = id === '__uncat__'
       ? `<div class="empty"><div class="e-ic"><svg class="ic"><use href="#i-folder"/></svg></div><h4>${L('No uncategorized videos', '未分類の動画はありません')}</h4><p>${L('All videos are organized into collections.', 'すべての動画がコレクションに整理されています。')}</p></div>`
-      : `<div class="empty"><div class="e-ic"><svg class="ic"><use href="#i-folder"/></svg></div><h4>${L('This collection is empty', 'このコレクションは空です')}</h4><p>${L('Use a video’s “Move” button in Media or Home to move it here.', 'メディアやホームで動画の「移動」ボタンから、ここに移動できます。')}</p></div>`;
+      : `<div class="empty"><div class="e-ic"><svg class="ic"><use href="#i-folder"/></svg></div><h4>${L('This collection is empty', 'このコレクションは空です')}</h4><p>${L('Use a video’s “Move” button in Media or Home to move it here.', 'メディアやホームで動画の「移動」ボタンから、ここに移動できます。')}</p><button type="button" class="btn btn-tonal wauto" onclick="var b=document.querySelector('#sbNav [data-act=&quot;media&quot;]'); if (b) b.click();"><svg class="ic"><use href="#i-film"/></svg><span>${L('Open Media', 'メディアを開く')}</span></button></div>`;
     renderVideos('colVideos', id === '__uncat__' ? { uncategorized: true, emptyMsg } : { collectionId: id, emptyMsg });
   }
   async function createCollection(thenMoveProject) {
@@ -6561,8 +6575,9 @@
     const fmts = ((p.spec && p.spec.output && p.spec.output.formats) || [])
       .map(f => GLYPH[f.id] || [11, 11]);
     const [c1, c2] = GRAD[i % GRAD.length];
+    const isNew = !!p.created_at && (Date.now() - new Date(p.created_at).getTime()) < 24 * 3600 * 1000;   // R13: 新規ハイライト
     return `
-    <div class="proj" data-open="work" data-id="${p.id}" data-group="${s.group}" role="button" tabindex="0">
+    <div class="proj${isNew ? ' is-new' : ''}" data-open="work" data-id="${p.id}" data-group="${s.group}" role="button" tabindex="0">
       <div class="proj-thumb" style="background:linear-gradient(150deg, ${c1}, ${c2})">
         <span class="proj-status ${s.cls}"><span class="sd"></span>${s.st}</span>
         <button class="proj-move" data-move="${p.id}" title="コレクションに移動" aria-label="コレクションに移動"><svg class="ic"><use href="#i-folder"/></svg></button>
@@ -6571,7 +6586,7 @@
       </div>
       <div class="proj-body">
         <div class="proj-name">${esc(p.name)}</div>
-        <div class="proj-meta"><span>${esc(tag)}</span> ・ <span>${rel(p.updated_at)}</span>
+        <div class="proj-meta">${isNew ? `<span class="badge badge--accent">${L('New', '新着')}</span> ` : ''}<span>${esc(tag)}</span> ・ <span>${rel(p.updated_at)}</span>
           <span class="fmts">${fmts.map(([w, h]) => `<i style="width:${w}px;height:${h}px"></i>`).join('')}</span>
           ${p.collection_id && colName(p.collection_id) ? `<span class="col-badge"><svg class="ic"><use href="#i-folder"/></svg>${esc(colName(p.collection_id))}</span>` : ''}</div>
         <div class="proj-foot"><span>消費クレジット</span><span class="cost">${p.status && p.status !== 'draft' ? '1' : '—'}</span></div>
