@@ -15,6 +15,9 @@ build は spec.compliance / spec.delivery を読み、開示テロップ・C2PA�
   SUPABASE_SERVICE_ROLE_KEY    service_role キー（サーバ専用・絶対に公開しない）
   FAL_KEY                      （--live）fal.ai キー。未設定なら ../../.fal_key を読む
   CM_PIPELINE_DIR              （任意）cm-pipeline のパス。既定は ../../cm-pipeline
+  RESEND_API_KEY               （任意）制作完了メールを送る Resend の API キー。未設定ならメールは送らない
+  RESEND_FROM                  （任意）差出人。既定 "Spot <no-reply@creativepunx.com>"
+  APP_URL                      （任意）メール内のリンク先（例 https://app.spot.video/）。既定は SUPABASE_URL
 
 使い方:
   export SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=...
@@ -82,6 +85,16 @@ class Supa:
 
     def insert(self, table, body: dict):
         return self._req("POST", f"/{table}", None, body, prefer="return=representation")
+
+    def admin_user(self, user_id: str) -> dict | None:
+        """auth.admin: ユーザーのメール・メタデータ（service_role）。"""
+        url = self.base.replace("/rest/v1", "/auth/v1") + f"/admin/users/{user_id}"
+        req = urllib.request.Request(url, headers={k: v for k, v in self.h.items() if k != "Content-Type"})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode() or "null")
+        except urllib.error.HTTPError:
+            return None
 
     def download(self, bucket: str, path: str, dest: Path) -> Path:
         """Storage からダウンロード（service_role）。"""
@@ -379,7 +392,58 @@ def process_project(sb: Supa, project_id: str, owner: str, live: bool) -> int:
     jobs = sb.select("jobs", project_id=f"eq.{project_id}")
     if jobs and all(j["status"] in SUCCESS for j in jobs):
         sb.update("projects", {"id": f"eq.{project_id}"}, {"status": "done"})
+        if live:
+            notify_done(sb, project_id, owner)   # 完了メール（RESEND_API_KEY があるときだけ送る）
     return processed
+
+
+# ---------------------------------------------------------------- 完了メール（Resend）
+def send_email(to: str, subject: str, html: str, text: str) -> bool:
+    key = os.environ.get("RESEND_API_KEY")
+    if not key or not to:
+        return False
+    body = {"from": os.environ.get("RESEND_FROM", "Spot <no-reply@creativepunx.com>"),
+            "to": [to], "subject": subject, "html": html, "text": text}
+    req = urllib.request.Request("https://api.resend.com/emails", data=json.dumps(body).encode(),
+                                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            r.read()
+        return True
+    except urllib.error.HTTPError as e:
+        print(f"  WARN  resend HTTP {e.code}: {e.read().decode()[:200]}", flush=True)
+        return False
+
+
+def notify_done(sb: Supa, project_id: str, owner: str) -> None:
+    """制作完了をオーナーにメール（profiles.notify_done が ON のときだけ・1 回だけ）。"""
+    try:
+        proj = sb.select("projects", id=f"eq.{project_id}", select="name,notified_at")
+        if not proj or proj[0].get("notified_at"):
+            return
+        prof = sb.select("profiles", id=f"eq.{owner}", select="notify_done")
+        if prof and prof[0].get("notify_done") is False:
+            return
+        user = sb.admin_user(owner) or {}
+        to = user.get("email")
+        if not to:
+            return
+        lang = ((user.get("user_metadata") or {}).get("lang")) or "ja"
+        name = proj[0].get("name") or ("your ad" if lang == "en" else "CM")
+        link = os.environ.get("APP_URL") or os.environ.get("SUPABASE_URL", "")
+        if lang == "en":
+            subject = f"Your ad is ready — {name}"
+            text = f"{name} has finished generating. Open Spot to review and export your files: {link}"
+            html = f"<p><b>{name}</b> has finished generating.</p><p><a href=\"{link}\">Open Spot</a> to review the 3 patterns and export your files.</p><p style=\"color:#888\">You can turn these emails off in Spot → Sign-in &amp; security.</p>"
+        else:
+            subject = f"CMができあがりました — {name}"
+            text = f"「{name}」の生成が終わりました。Spot を開いて確認・書き出しできます: {link}"
+            html = f"<p>「<b>{name}</b>」の生成が終わりました。</p><p><a href=\"{link}\">Spot を開く</a>と、3パターンを確認して書き出せます。</p><p style=\"color:#888\">このメールは Spot → ログインとセキュリティ で停止できます。</p>"
+        if send_email(to, subject, html, text):
+            sb.update("projects", {"id": f"eq.{project_id}"}, {"notified_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
+            print("  mail  completion email sent", flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"  WARN  notify_done failed: {e}", flush=True)
 
 
 def tick(sb: Supa, only_project: str | None, live: bool) -> int:

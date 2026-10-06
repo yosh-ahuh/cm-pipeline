@@ -2291,6 +2291,11 @@
         <button class="btn btn-ghost" id="shareLink"><svg class="ic"><use href="#i-share"/></svg><span>共有リンクを作成</span></button>
         <button class="btn btn-ghost" id="backToWork"><span>制作画面に戻る</span></button>
       </div>
+      <div class="fld" id="shareResult" hidden style="margin-top:10px">
+        <label for="shareUrl">共有リンク（サインイン不要・30日間有効）</label>
+        <input id="shareUrl" type="text" readonly onclick="this.select()">
+        <p class="muted" style="margin:6px 0 0;font-size:var(--t-label)">リンクを知っている人は動画を再生・保存できます。<button type="button" class="linkbtn" id="shareRevoke">リンクを無効にする</button></p>
+      </div>
       <div class="panel pad">
         <div class="panel-h">サムネイル（静止画）</div>
         <div class="qc-note" style="border:none">各パターンのカバー画像も同梱。YouTube等のサムネイルにそのまま使えます。</div>
@@ -2563,9 +2568,9 @@
     </div>
     <div class="panel pad">
       <div class="panel-h">通知設定</div>
-      <label class="switch-row"><input type="checkbox" id="notifDone"><span>制作が完了したらメールで知らせる</span><span class="feat-soon">近日</span></label>
+      <label class="switch-row"><input type="checkbox" id="notifDone"><span>制作が完了したらメールで知らせる</span></label>
       <hr class="soft-sep">
-      <label class="switch-row"><input type="checkbox" id="notifNews"><span>Spot からのお知らせ・新機能を受け取る</span><span class="feat-soon">近日</span></label>
+      <label class="switch-row"><input type="checkbox" id="notifNews"><span>Spot からのお知らせ・新機能を受け取る</span></label>
       <p class="muted" id="notifNote" style="margin:12px 0 0;font-size:var(--t-label-sm)">メール通知は近日対応予定です。いまは設定の保存のみできます。クレジットが少なくなったときのお知らせメールは「クレジットを追加」で設定できます。</p>
     </div>
     <div class="panel pad">
@@ -2787,8 +2792,9 @@
       <button class="btn btn-primary wauto" id="crBuy"><span>選んだクレジットを購入</span></button>
     </div>
   </div>
-  <div class="panel pad">
-    <div class="panel-h">自動チャージ <span class="feat-soon">近日</span> <span class="count" id="autoTopupState" style="color:var(--muted)">オフ</span></div>
+  <!-- 自動チャージ: 実行するバックエンドが無いため非表示（判断 2026-10-06「隠す」）。実装時に hidden を外す。 -->
+  <div class="panel pad" id="autoTopupPanel" hidden>
+    <div class="panel-h">自動チャージ <span class="count" id="autoTopupState" style="color:var(--muted)">オフ</span></div>
     <p class="muted" style="margin:0 0 14px">残高が少なくなったら、自動でクレジットを補充します。作業が途中で止まりません。</p>
     <label class="switch-row"><input type="checkbox" id="topupEnabled"><span>自動チャージを有効にする</span></label>
     <div class="topup-fields" id="topupFields" hidden>
@@ -3103,6 +3109,7 @@
   // ---- a11y: メニュー（role=menu）とタブ（role=tab）の矢印キー操作 ----
   document.addEventListener('keydown', e => {
     const key = e.key;
+    if (!(e.target instanceof Element)) return;   // document/テキストノード宛のイベントは対象外
     const menu = e.target.closest('[role="menu"]');
     if (menu && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) {
       const items = [...menu.querySelectorAll('button:not([disabled]), [role="menuitem"]:not([disabled])')].filter(x => x.offsetParent !== null);
@@ -3236,7 +3243,16 @@
   }
   freeEdit.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); sendFreeEdit(); } });
   document.getElementById('freeEditSend').addEventListener('click', sendFreeEdit);
-  document.getElementById('wsShare').addEventListener('click', () => toast(L('Shareable links are coming soon.', '共有リンクの発行は準備中です。'), false, 2600));
+  document.getElementById('wsShare').addEventListener('click', async () => {
+    const pid = window.__currentProjectId;
+    if (!window.sb || !pid) { toast(L('Open a video first.', '先に動画を開いてください。'), false, 2400); return; }
+    try {   // 書き出し済み（renders あり）のときだけ共有できる。無ければ正直に伝える
+      const { data: rends } = await window.sb.from('renders').select('id').eq('project_id', pid).not('storage_path', 'is', null).limit(1);
+      if (!rends || !rends.length) { toast(L('Nothing to share yet — export the videos first.', 'まだ共有できる動画がありません。先に書き出してください。'), false, 3200); return; }
+    } catch (_) {}
+    gotoExport();
+    setTimeout(() => { if (window.createShareLink) window.createShareLink(document.getElementById('shareLink')); }, 400);
+  });
   document.getElementById('playBtn').addEventListener('click', () => toast(L('Preview playback is coming in the next build','プレビュー再生は次のビルドで有効になります'), false, 2000));
 
   // ---- keyboard: arrow-key navigation for tablists / radiogroups / segmented controls (M3 & HIG) ----
@@ -3647,13 +3663,76 @@
     // 実レンダーが無い＝まだ書き出されていない。正直に伝える（偽の「開始しました」は出さない）。
     toast(L('This video is not exported yet. It will be ready to save once generation finishes.', 'この動画はまだ書き出されていません。生成が終わると保存できます。'), false, 3200);
   });
-  document.getElementById('dlAll').addEventListener('click', () => {
+  // ---- 一括 ZIP：実レンダー（署名URL）を取得して JSZip（無圧縮）でまとめ、ブラウザから保存 ----
+  function loadJSZip() {
+    if (window.JSZip) return Promise.resolve(window.JSZip);
+    return new Promise((resolve, reject) => {
+      const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; sc.async = true;
+      sc.onload = () => resolve(window.JSZip); sc.onerror = () => reject(new Error('jszip load failed')); document.head.appendChild(sc);
+    });
+  }
+  const safeFile = (t) => String(t || 'spot').replace(/[\\/:*?"<>|\s]+/g, '_').slice(0, 60);
+  document.getElementById('dlAll').addEventListener('click', async () => {
     if (dlGuard()) return;
-    const real = document.querySelectorAll('#delivList .dfile.is-real').length;
-    if (real > 0) toast(L('Bulk ZIP is coming soon. For now, save each video from its ↓ button.', '一括ZIPは準備中です。各動画は ↓ ボタンから個別に保存できます。'), false, 3400);
-    else toast(L('Your videos are not exported yet. They will be ready once generation finishes.', 'まだ書き出しが完了していません。生成が終わると保存できます。'), false, 3200);
+    const btn = document.getElementById('dlAll');
+    const items = [...document.querySelectorAll('#delivList .dl[data-path]')].map(b => ({ path: b.dataset.path, variant: b.dataset.variant, format: b.dataset.format }));
+    if (!items.length || !sb) { toast(L('Your videos are not exported yet. They will be ready once generation finishes.', 'まだ書き出しが完了していません。生成が終わると保存できます。'), false, 3200); return; }
+    btnBusy(btn, true, L('Preparing ZIP… 0/' + items.length, 'ZIPを準備中… 0/' + items.length));
+    try {
+      const JSZip = await loadJSZip();
+      const { data: signed, error } = await sb.storage.from('assets').createSignedUrls(items.map(i => i.path), 3600);
+      if (error) throw error;
+      const zip = new JSZip(); const base = safeFile(window.__currentProjectName || 'spot'); let done = 0;
+      for (const [i, it] of items.entries()) {
+        const u = signed && signed[i] && signed[i].signedUrl; if (!u) continue;
+        const res = await fetch(u); if (!res.ok) throw new Error('fetch ' + res.status);
+        zip.file(`${base}_${it.variant}_${it.format}.mp4`, await res.blob(), { compression: 'STORE' });
+        done++; const lbl = btn.querySelector('.btn-busy span:last-child'); if (lbl) lbl.textContent = L(`Preparing ZIP… ${done}/${items.length}`, `ZIPを準備中… ${done}/${items.length}`);
+      }
+      if (!done) throw new Error('no files');
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${base}_all.zip`; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+      toast(L(`ZIP ready — ${done} videos`, `ZIPを作成しました（${done}本）`), false, 2600);
+    } catch (e) {
+      console.warn('zip failed:', e);
+      toast(L("Couldn't build the ZIP. Please save each video from its ↓ button.", 'ZIPをつくれませんでした。各動画は ↓ ボタンから個別に保存してください。'), false, 3400);
+    } finally { btnBusy(btn, false); }
   });
-  document.getElementById('shareLink').addEventListener('click', () => { if (dlGuard()) return; toast(L('Shareable links are coming soon.', '共有リンクの発行は準備中です。'), false, 2600); });
+  // ---- 共有リンク：project_shares（025）のトークン → share.html?t=…（サインイン不要・30日） ----
+  window.createShareLink = async function (fromBtn) {
+    if (dlGuard()) return null;
+    const pid = window.__currentProjectId;
+    if (!sb || !pid) { toast(L('Open a video first.', '先に動画を開いてください。'), false, 2400); return null; }
+    const real = document.querySelectorAll('#delivList .dfile.is-real').length;
+    if (!real) { toast(L('Nothing to share yet — the videos are not exported. Share once generation finishes.', 'まだ共有できる動画がありません。生成が終わってから共有できます。'), false, 3400); return null; }
+    if (fromBtn) btnBusy(fromBtn, true, L('Creating link…', 'リンクを作成中…'));
+    try {
+      const { data: token, error } = await sb.rpc('create_share', { p_project: pid });
+      if (error) throw error;
+      const url = location.origin + location.pathname.replace(/[^/]*$/, '') + 'share.html?t=' + token;
+      const box = document.getElementById('shareResult'); const inp = document.getElementById('shareUrl');
+      if (inp) inp.value = url; if (box) box.hidden = false;
+      try { await navigator.clipboard.writeText(url); toast(L('Share link copied', '共有リンクをコピーしました'), false, 2200); }
+      catch (_) { toast(L('Share link created', '共有リンクを作成しました'), false, 2200); }
+      if (window.announce) window.announce(L('Share link ready', '共有リンクを作成しました'));
+      return url;
+    } catch (e) {
+      console.warn('share failed:', e);
+      toast(/function|create_share/i.test(String(e && e.message)) ? L('Sharing is not enabled on this server yet.', 'このサーバではまだ共有が有効になっていません。')
+        : L("Couldn't create the link. Please try again.", '共有リンクをつくれませんでした。もう一度お試しください。'), false, 3000);
+      return null;
+    } finally { if (fromBtn) btnBusy(fromBtn, false); }
+  };
+  document.getElementById('shareLink').addEventListener('click', (e) => window.createShareLink(e.currentTarget));
+  document.getElementById('shareRevoke').addEventListener('click', async () => {
+    const pid = window.__currentProjectId; if (!sb || !pid) return;
+    const r = await openConfirm({ title: L('Disable this share link?', '共有リンクを無効にしますか？'), message: L('People with the link will no longer be able to open it. You can create a new link anytime.', 'リンクを知っている人は開けなくなります。新しいリンクはいつでも作れます。'),
+      actions: [{ id: 'ok', label: L('Disable link', 'リンクを無効にする'), variant: 'danger' }, { id: 'cancel', label: L('Cancel', 'キャンセル'), variant: 'ghost' }] });
+    if (r !== 'ok') return;
+    try { const { error } = await sb.rpc('revoke_share', { p_project: pid }); if (error) throw error; document.getElementById('shareResult').hidden = true; toast(L('Share link disabled', '共有リンクを無効にしました'), false, 2200); }
+    catch (e) { console.warn('revoke failed:', e); toast(L("Couldn't disable it. Please try again.", '無効にできませんでした。もう一度お試しください。'), false, 2600); }
+  });
   document.getElementById('backToWork').addEventListener('click', gotoWorkspace);
   // お手本（採用）トグル：projects.approved を切替。ブランドメモリが優先的に学ぶ。
   (function wireKeepToggle() {
@@ -4710,6 +4789,10 @@
     '今日': 'Today', '2分前': '2 min ago', '1時間前': '1 hr ago',
     '昨日': 'Yesterday', '3日前': '3 days ago', '先週': 'Last week',
     '制作画面': 'Editor', '制作画面に戻る': 'Back to the editor',
+    // --- share link ---
+    '共有リンク（サインイン不要・30日間有効）': 'Share link (no sign-in needed · valid 30 days)',
+    'リンクを知っている人は動画を再生・保存できます。': 'Anyone with the link can play and save the videos.',
+    'リンクを無効にする': 'Disable link',
     // --- brand access scope (team) ---
     'アクセスできるブランド': 'Brand access', '（未選択＝すべてのブランド）': '(none selected = all brands)',
     'チェックしたブランドだけを表示・制作できます。すべて外すと、アカウント内の全ブランドにアクセスできます。席は変わりません。':
@@ -5612,6 +5695,7 @@
     deviceGateCheck(session.user.email);   // 新デバイスOTP（config.deviceOtp が true のときだけ）
     loadProjects(); refreshCredits(); refreshUsage(); maybeShowOnboarding(); maybeAcceptInvite();
     refreshAccountChip();   // 氏名＋アバター画像をサイドバー下部/メニューへ反映
+    if (window.__loadNotifyPrefs) window.__loadNotifyPrefs();   // 完了メールの ON/OFF（profiles）
   };
   // 下部プロフィール/メニューの「氏名」と「アバター画像」を実データで反映（015: avatar_url）
   async function refreshAccountChip() {
@@ -6293,17 +6377,26 @@
       } catch (err) { console.warn('delete account failed:', err); btnBusy(btn, false); if (window.toast) window.toast(L("Couldn't delete the account. Please try again.", 'アカウントを削除できませんでした。もう一度お試しください。'), false, 3000); }
     });
   })();
-  // 通知設定（端末ごとの表示設定・localStorage）
+  // 通知設定（profiles.notify_done / notify_news。ワーカーが完了メールの送信可否に使う＝025）
   (function wireNotifications() {
     const done = document.getElementById('notifDone'), news = document.getElementById('notifNews');
     if (!done || !news) return;
-    try {
-      done.checked = localStorage.getItem('spot-notif-done') !== '0';   // 既定ON
-      news.checked = localStorage.getItem('spot-notif-news') !== '0';
-    } catch (_) {}
-    const save = (k, el) => { try { localStorage.setItem(k, el.checked ? '1' : '0'); } catch (_) {} };
-    done.addEventListener('change', () => save('spot-notif-done', done));
-    news.addEventListener('change', () => save('spot-notif-news', news));
+    window.__loadNotifyPrefs = async function () {
+      if (!sb || !currentUid) return;
+      try {
+        const { data } = await sb.from('profiles').select('notify_done, notify_news').eq('id', currentUid).single();
+        if (data) { done.checked = data.notify_done !== false; news.checked = !!data.notify_news; }
+      } catch (_) { /* 025 未適用: 既定値のまま */ }
+    };
+    const save = async () => {
+      if (!sb) return;
+      try {
+        const { error } = await sb.rpc('update_notify_prefs', { p_done: done.checked, p_news: news.checked }); if (error) throw error;
+        toast(L('Notification settings saved', '通知設定を保存しました'), false, 1800);
+      } catch (e) { console.warn('notify prefs failed:', e); toast(L("Couldn't save. Please try again.", '保存できませんでした。もう一度お試しください。'), false, 2600); }
+    };
+    done.addEventListener('change', save);
+    news.addEventListener('change', save);
   })();
 
   // ---- billing screen ----
