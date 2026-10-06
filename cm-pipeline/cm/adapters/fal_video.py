@@ -14,7 +14,9 @@ VEO_GUARD = (
     "Subtle realistic motion, documentary style, natural muted colors."
 )
 VEO_NEGATIVE = ("looking at camera, eye contact, facing the viewer, morphing face, changing face, "
-                "distortion, motion blur, ghosting, trailing, soft focus, blurry")
+                "distortion, motion blur, ghosting, trailing, soft focus, blurry, "
+                "new objects appearing, duplicated objects, objects multiplying, page turning, pasting, writing, "
+                "text changing, extra hands, extra fingers")
 KLING_NEGATIVE = ("blur, distortion, low quality, extra fingers, morphing face, changing face, "
                   "changing clothes, oversaturated")
 

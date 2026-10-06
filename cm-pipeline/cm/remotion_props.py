@@ -85,6 +85,31 @@ def timeline(proj: Project) -> tuple[int, int, list[tuple[dict, int, int]]]:
     return total, body_start, rows
 
 
+def _clip_seconds(path: Path) -> float | None:
+    """ffprobe でクリップ長（秒）。無ければ None。"""
+    if not path.is_file() or not shutil.which("ffprobe"):
+        return None
+    try:
+        import subprocess
+        out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(path)],
+                             capture_output=True, text=True, timeout=20).stdout.strip()
+        return float(out) if out else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _fill_rate(clip: Path, dur_frames: int, fps: int = 30, floor: float = 0.75) -> float:
+    """クリップがカットより短いとき、途中で止まる／ループするのを避けるため再生速度を落として埋める。
+    0.75 倍まで（それ以上遅いと不自然）。長いときは 1.0（末尾を切る）。"""
+    secs = _clip_seconds(clip)
+    if not secs or dur_frames <= 0:
+        return 1.0
+    need = dur_frames / fps
+    if secs >= need:
+        return 1.0
+    return round(max(floor, secs / need), 3)
+
+
 def _cut_props(proj: Project, prototype: Path, cut: dict, start: int, dur: int) -> dict:
     t = cut.get("type")
     base = {"id": cut["id"], "type": t, "from": start, "dur": dur, "telop": cut.get("telop") or []}
@@ -94,10 +119,13 @@ def _cut_props(proj: Project, prototype: Path, cut: dict, start: int, dur: int) 
         src = _stage(proj, prototype, cut.get("src") or f"{cid}.mp4")
         srcv = _stage(proj, prototype, cut.get("src_vertical") or (f"{crop['portrait_native']}.mp4" if crop.get("portrait_native") else None))
         still = _stage(proj, prototype, cut.get("still_src") or f"{cid}.still.png")
+        rate = (cut.get("motion", {}) or {}).get("rate")
+        if rate is None:
+            rate = _fill_rate(proj.generated / (cut.get("src") or f"{cid}.mp4"), dur)
         base.update({"src": src, "srcVertical": srcv, "still": still,
                      "anchorX": crop.get("anchor_x", 50),
                      "subject": (cut.get("still", {}) or {}).get("subject") or cut.get("role"),
-                     "rate": (cut.get("motion", {}) or {}).get("rate", 1)})
+                     "rate": rate})
     elif t == "ui":
         assets = cut.get("assets") or {}
         vals = list(assets.values()) if isinstance(assets, dict) else list(assets)

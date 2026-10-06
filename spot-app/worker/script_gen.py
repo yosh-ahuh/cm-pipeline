@@ -142,6 +142,7 @@ def template_script(spec: dict, profile: dict, cuts: list[dict]) -> list[dict]:
         d["caption"] = cap
         if d.get("type") == "live-action":
             d["subject"] = f"{who}。{ROLE.get(c.get('role') or '', {}).get('label', '')}の場面"
+            d["motion_en"] = "subtle natural movement, slowly looks up, soft breathing"
         out.append(d)
     return out
 
@@ -159,8 +160,9 @@ SCHEMA = {
                     "narration": {"type": "string"},
                     "caption": {"type": "string"},
                     "subject": {"type": "string"},
+                    "motion_en": {"type": "string"},
                 },
-                "required": ["id", "narration", "caption", "subject"],
+                "required": ["id", "narration", "caption", "subject", "motion_en"],
                 "additionalProperties": False,
             },
         }
@@ -171,9 +173,12 @@ SCHEMA = {
 
 SYSTEM = (
     "あなたは B2B 向け動画広告（15〜30 秒）の放送作家です。日本語で、指定されたカット構成に沿ってナレーションと画面の文字を書きます。"
-    "ルール: ナレーションは 1 カットあたり秒数×5 文字以内（例: 6 秒なら 30 文字以内）。最初のカットは 2 秒で『見る人の困りごと』に触れる。"
+    "ルール: ナレーションは 1 カットあたり（秒数−1）×5 文字以内（例: 6 秒なら 25 文字以内）。読み終わりがカットの切り替わりより 1 秒早く終わるように。最初のカットは 2 秒で『見る人の困りごと』に触れる。"
     "文字（caption）は 18 文字以内の体言止めかひとこと。専門用語・誇張・比較広告・断定的な効果保証（No.1、最安、必ず）は使わない。"
     "『使わない表現』は絶対に使わない。ブランドの言葉づかい（ていねい／くだけた）に合わせる。"
+    "実写カットの subject は『動きの少ない場面』にする: 見る・持つ・立つ・座る・歩く・顔を上げる程度。ページをめくる、貼る、書く、めくる、積む、細かな手作業、"
+    "文字が読める書類や画面のアップは禁止（動画化で破綻する）。困りごとは表情・姿勢・散らかった環境・時計や夕暮れで見せる。"
+    "motion_en は各実写カットの動きを英語 12 語以内で（例: she slowly looks up from the phone and exhales）。カメラはゆっくり寄るだけ。手で物を操作する動きは書かない。"
     "subject は実写カットの映像の説明（誰が・どこで・何をしている）を 40 文字以内の日本語で。アプリ画面カットは『提供されたアプリ画面』、CTA は『ロゴと問い合わせ先』と書く。"
     "出力は JSON のみ。"
 )
@@ -240,6 +245,8 @@ def llm_script(spec: dict, profile: dict, cuts: list[dict], model: str = DEFAULT
         d["caption"] = (g.get("caption") or "").strip()[:18] or caption_from(d["narration"])
         if d.get("type") == "live-action" and g.get("subject"):
             d["subject"] = g["subject"].strip()[:60]
+        if d.get("type") == "live-action" and g.get("motion_en"):
+            d["motion_en"] = " ".join(str(g["motion_en"]).split())[:120]
         out.append(d)
     usage = getattr(res, "usage", None)
     meta = {"model": getattr(res, "model", model),

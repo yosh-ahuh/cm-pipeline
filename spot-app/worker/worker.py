@@ -197,6 +197,8 @@ def spec_to_project(project_id: str, spec: dict, product: str | None) -> dict:
             subj = c.get("subject") or f"{sel.get('industry') or product or 'プロダクト'}の{sel.get('target') or '利用者'}。{label}"
             cut["still"] = {"subject": subj}
             cut["motion"] = {"resolution": "1080p"}
+            if c.get("motion_en"):   # 台本ステージが書いた最小限の動き（英語）。手作業・ページめくり等は台本側で禁止済み
+                cut["motion"]["prompt"] = f"{subj}. {c['motion_en']}. Camera slowly pushes in. Hands stay still; no objects are picked up, moved, pasted, written or turned; nothing new appears."
             cut["telop"] = telop
         elif cut["type"] == "cta":
             # ボタン文言は台本の字幕（例「お問い合わせはこちら」）を優先。検索語は CM 名ではなくブランド名

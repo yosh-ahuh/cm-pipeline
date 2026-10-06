@@ -45,6 +45,7 @@ def _motion_prompt(cut: dict) -> str:
     if subject:
         bits.append(subject)
     bits.append("Subtle realistic motion, camera slowly pushes in")
+    bits.append("hands stay still; no objects are picked up, moved, pasted, written or turned; nothing new appears; the scene composition stays the same")
     if m.get("gaze") == "downcast":
         bits.append("gaze stays downcast, never toward the camera")
     lw = m.get("living_world")
