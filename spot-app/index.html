@@ -1550,6 +1550,13 @@
   .brand-row .br-sub { font-size: var(--t-label); color: var(--muted); }
   .brand-row .br-actions { display: flex; gap: 6px; flex-wrap: wrap; }
   .brand-row .br-actions .btn { min-height: 34px; padding: 0 12px; font-size: var(--t-label); }
+  /* ブランド範囲（招待・メンバー） */
+  .scope-list { display: flex; flex-direction: column; gap: 4px; margin: 8px 0 4px; }
+  .scope-list .switch-row { padding: 6px 4px; font-size: var(--t-body-sm); }
+  .scope-note { font-size: var(--t-label); color: var(--muted); margin: 6px 0 0; }
+  .member-row .m-scope { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; margin-top: 3px; }
+  .member-row .m-scope .badge { cursor: default; }
+  .member-row .m-scope .linkbtn { font-size: var(--t-label-sm); padding: 0 2px; }
   .brand-quota { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font-size: var(--t-label); color: var(--muted); flex-wrap: wrap; }
   .brand-quota .u-meter { width: 120px; }
   .brand-over { color: var(--warn); font-size: var(--t-label); margin: 0 0 12px; display: flex; gap: 6px; align-items: flex-start; line-height: 1.5; }
@@ -2598,6 +2605,10 @@
         </select>
         <button class="btn btn-primary wauto" id="inviteCreate"><span>招待リンクを作成</span></button>
       </div>
+      <div id="inviteScope" hidden style="margin-top:10px">
+        <div class="panel-subh">アクセスできるブランド <span class="muted" style="font-weight:400">（未選択＝すべてのブランド）</span></div>
+        <div class="scope-list" id="inviteBrands"></div>
+      </div>
       <p class="muted" id="seatFullNote" hidden style="margin:8px 0 0;font-size:var(--t-label)">席が満席です。メンバーを増やすにはプランを変更してください（閲覧のみは無料・無制限）。</p>
       <div class="fld" id="inviteResult" hidden style="margin-top:10px">
         <label>招待リンク（コピーして相手に共有）</label>
@@ -2663,6 +2674,17 @@
 <div class="move-menu" id="moveMenu" role="menu" aria-label="コレクションに移動" hidden></div>
 
 <!-- name modal (create / rename collection) -->
+<div class="modal-scrim" id="scopeModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="scopeModalTitle">
+    <h2 class="modal-h" id="scopeModalTitle">アクセスできるブランド</h2>
+    <p class="modal-msg">チェックしたブランドだけを表示・制作できます。すべて外すと、アカウント内の全ブランドにアクセスできます。席は変わりません。</p>
+    <div class="scope-list" id="scopeList"></div>
+    <div class="cta-row" style="justify-content:flex-end;gap:8px;margin-top:8px">
+      <button class="btn btn-ghost" id="scopeCancel"><span>キャンセル</span></button>
+      <button class="btn btn-primary" id="scopeOk"><span>保存</span></button>
+    </div>
+  </div>
+</div>
 <div class="modal-scrim" id="nameModal" hidden>
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="nameModalTitle">
     <h2 class="modal-h" id="nameModalTitle">新規コレクション</h2>
@@ -4687,6 +4709,10 @@
     // dates
     '今日': 'Today', '2分前': '2 min ago', '1時間前': '1 hr ago',
     '昨日': 'Yesterday', '3日前': '3 days ago', '先週': 'Last week',
+    // --- brand access scope (team) ---
+    'アクセスできるブランド': 'Brand access', '（未選択＝すべてのブランド）': '(none selected = all brands)',
+    'チェックしたブランドだけを表示・制作できます。すべて外すと、アカウント内の全ブランドにアクセスできます。席は変わりません。':
+      'They can see and create only in the checked brands. Uncheck all to allow every brand in the account. Seats are unaffected.',
     // --- brands ---
     'ブランド': 'Brands', 'ブランドを追加する': 'Add a brand', 'ブランドを追加': 'Add brand',
     'ブランド＝1つの製品やクライアント。ブランドごとに名前・ロゴを持ち、AIはブランド単位で傾向を覚えます。クレジットと席はアカウント全体で共有です。':
@@ -5956,6 +5982,7 @@
     let members = [];
     try { const { data } = await sb.rpc('list_members', { p_org: currentOrg.id }); members = data || []; }
     catch (_) { members = []; }
+    loadMembers._members = members;
     const seats = plan ? Number(plan.seats) : 1;   // 0 = 無制限
     const used = members.filter(m => m.role === 'owner' || m.role === 'member').length;
     const seatTxt = (seats === 0)
@@ -5966,6 +5993,15 @@
     setText('teamSeats', seatTxt + viewerTxt);
     const roleLabel = { owner: window.L('Owner', 'オーナー'), member: window.L('Member', 'メンバー'), viewer: window.L('Viewer', '閲覧のみ') };
     const youTxt = window.L('(you)', '（あなた）'), rmTxt = window.L('Remove', '削除'), userTxt = window.L('User', 'ユーザー');
+    const brands = window.__brands || []; const multiBrand = brands.length > 1;
+    const brandName = id => { const b = brands.find(x => x.id === id); return b ? b.name : window.L('(hidden brand)', '（非表示のブランド）'); };
+    const scopeHtml = (m) => {   // ブランド範囲: オーナー/無指定＝全ブランド。オーナーだけ変更できる
+      if (!multiBrand) return '';
+      const all = m.role === 'owner' || !m.brand_ids || !m.brand_ids.length;
+      const chips = all ? `<span class="badge badge--neutral">${window.L('All brands', '全ブランド')}</span>` : m.brand_ids.map(id => `<span class="badge badge--accent">${esc(brandName(id))}</span>`).join('');
+      const edit = (isOwner && m.role !== 'owner') ? `<button type="button" class="linkbtn" data-scope="${m.user_id}">${window.L('Change', '変更')}</button>` : '';
+      return `<span class="m-scope">${chips}${edit}</span>`;
+    };
     // アバターURLを解決：http/data はそのまま、Storageパス(自前アップロード)は署名URL化。列が無い旧RPCでも安全にスキップ。
     await Promise.all(members.map(async m => {
       const a = m.avatar;
@@ -5985,6 +6021,7 @@
         <span class="m-id">
           <span class="m-name-row"><span class="mn">${esc(nm)}</span>${m.user_id === currentUid ? `<span class="me">${youTxt}</span>` : ''}</span>
           ${emailRow}
+          ${scopeHtml(m)}
         </span>
         <span class="badge ${m.role === 'owner' ? 'badge--accent' : 'badge--neutral'}">${roleLabel[m.role] || m.role}</span>
         ${canRemove ? `<button class="rm" data-remove="${m.user_id}" title="${rmTxt}">${rmTxt}</button>` : ''}
@@ -5992,6 +6029,10 @@
     }).join('');
     document.getElementById('inviteBox').hidden = !isOwner;
     document.getElementById('teamViewerNote').hidden = isOwner;
+    // 招待の範囲（ブランドが 2 つ以上あるときだけ）
+    { const box = document.getElementById('inviteScope'); const list = document.getElementById('inviteBrands');
+      if (box && list) { box.hidden = !(isOwner && multiBrand);
+        list.innerHTML = brands.map(b => `<label class="switch-row"><input type="checkbox" data-invite-brand="${b.id}"><span>${esc(b.name)}</span>${b.frozen ? `<span class="badge badge--warn">${window.L('Read-only', '読み取り専用')}</span>` : ''}</label>`).join(''); } }
     // 席が満杯なら member 招待を弾く（UI 予防。最終判定は accept_invite RPC）。
     const full = seats !== 0 && used >= seats;
     const roleSel = document.getElementById('inviteRole');
@@ -6081,7 +6122,11 @@
       const role = document.getElementById('inviteRole').value;
       btnBusy(create, true, L('Creating…', '作成中…'));
       try {
-        const { data: token, error } = await sb.rpc('create_invite', { p_org: currentOrg.id, p_email: null, p_role: role });
+        const scoped = [...document.querySelectorAll('[data-invite-brand]:checked')].map(x => x.getAttribute('data-invite-brand'));
+        const args = { p_org: currentOrg.id, p_email: null, p_role: role };
+        if (scoped.length) args.p_brand_ids = scoped;   // 024 未適用の DB では引数不一致で失敗 → 下で範囲なしに再試行
+        let { data: token, error } = await sb.rpc('create_invite', args);
+        if (error && scoped.length && /p_brand_ids|function/i.test(String(error.message))) ({ data: token, error } = await sb.rpc('create_invite', { p_org: currentOrg.id, p_email: null, p_role: role }));
         if (error) throw error;
         const url = location.origin + location.pathname + '?invite=' + token;
         const box = document.getElementById('inviteResult'); const inp = document.getElementById('inviteLink');
@@ -6091,6 +6136,20 @@
       finally { btnBusy(create, false); }
     });
     panel.addEventListener('click', async (e) => {
+      const sc = e.target.closest('[data-scope]');
+      if (sc && currentOrg) {
+        const uid = sc.getAttribute('data-scope');
+        const m = (loadMembers._members || []).find(x => x.user_id === uid);
+        const ids = await openScopeModal(m && m.brand_ids ? m.brand_ids : []);
+        if (ids === null) return;
+        try {
+          const { error } = await sb.rpc('set_member_brands', { p_org: currentOrg.id, p_user: uid, p_brand_ids: ids.length ? ids : null });
+          if (error) throw error;
+          if (window.toast) window.toast(window.L('Access updated', 'アクセス範囲を更新しました'), true, 1800);
+          loadMembers(await currentPlan());
+        } catch (err) { console.warn('scope update failed:', err); if (window.toast) window.toast(window.L("Couldn't update access. Please try again.", 'アクセス範囲を変更できませんでした。もう一度お試しください。'), false, 2600); }
+        return;
+      }
       const rm = e.target.closest('[data-remove]'); if (!rm || !currentOrg) return;
       if (await openConfirm({ title: window.L('Remove this member?', 'このメンバーを削除しますか？'),
         message: window.L('They will lose access to this workspace.', 'このワークスペースにアクセスできなくなります。'),
@@ -6102,6 +6161,25 @@
       } catch (err) { console.warn('member remove failed:', err); if (window.toast) window.toast(window.L("Couldn't remove them. Please try again.", '削除できませんでした。もう一度お試しください。'), false, 2600); }
     });
   })();
+  // ブランド範囲の選択モーダル。戻り値: 選んだ brand id 配列（空=全ブランド）／キャンセルは null
+  function openScopeModal(selected) {
+    return new Promise(resolve => {
+      const scrim = document.getElementById('scopeModal'); const list = document.getElementById('scopeList');
+      const ok = document.getElementById('scopeOk'), cancel = document.getElementById('scopeCancel');
+      if (!scrim || !list) { resolve(null); return; }
+      const brands = window.__brands || [];
+      list.innerHTML = brands.map(b => `<label class="switch-row"><input type="checkbox" data-scope-brand="${b.id}" ${selected.includes(b.id) ? 'checked' : ''}><span>${esc(b.name)}</span></label>`).join('');
+      const release = window.trapFocus ? window.trapFocus(scrim.querySelector('.modal-card')) : null;
+      scrim.hidden = false;
+      const done = (v) => { scrim.hidden = true; ok.onclick = cancel.onclick = scrim.onclick = null; document.removeEventListener('keydown', onKey); if (release) release(); resolve(v); };
+      const onKey = (e) => { if (e.key === 'Escape') { e.preventDefault(); done(null); } };
+      document.addEventListener('keydown', onKey);
+      ok.onclick = () => done([...list.querySelectorAll('[data-scope-brand]:checked')].map(x => x.getAttribute('data-scope-brand')));
+      cancel.onclick = () => done(null);
+      scrim.onclick = (e) => { if (e.target === scrim) done(null); };
+      setTimeout(() => { const f = list.querySelector('input'); if (f) f.focus(); }, 30);
+    });
+  }
   async function currentPlan() {
     if (!currentOrg) return null;
     const r = await sb.from('plans').select('id,name,spots_per_month,seats').eq('id', currentOrg.plan).single();
@@ -6120,9 +6198,11 @@
       if (inv.accepted) { if (window.toast) window.toast(window.L('This invite was already used.', 'この招待は使用済みです。'), false, 3000); return stripInvite(); }
       if (inv.expired) { if (window.toast) window.toast(window.L('This invite has expired.', 'この招待は期限切れです。'), false, 3000); return stripInvite(); }
       const roleLabel = { member: window.L('member', 'メンバー'), viewer: window.L('viewer', '閲覧のみ') };
+      const scopeTxt = (inv.brand_names && inv.brand_names.length)
+        ? window.L(` Access: ${inv.brand_names.join(', ')}.`, ` アクセスできるブランド: ${inv.brand_names.join('、')}。`) : '';
       const joinRes = await openConfirm({
         title: window.L(`Join “${inv.org_name}”?`, `「${inv.org_name}」に参加しますか？`),
-        message: window.L(`You'll join as ${roleLabel[inv.role] || inv.role}.`, `${roleLabel[inv.role] || inv.role}として参加します。`),
+        message: window.L(`You'll join as ${roleLabel[inv.role] || inv.role}.`, `${roleLabel[inv.role] || inv.role}として参加します。`) + scopeTxt,
         actions: [{ id: 'ok', label: window.L('Join', '参加する'), variant: 'primary' }, { id: 'cancel', label: window.L('Cancel', 'キャンセル'), variant: 'ghost' }] });
       if (joinRes !== 'ok') return stripInvite();
       const { data: orgId, error } = await sb.rpc('accept_invite', { p_token: token });

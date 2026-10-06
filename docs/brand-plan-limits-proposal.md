@@ -136,7 +136,10 @@
 - ✅ **F0/F1/F2 実装**：`023_brands_multi.sql`（既定ブランド `default_brand`/`ensure_default_brand`・`fill_brand_id` トリガで projects/collections に brand_id 自動補完＋凍結ブランドへの書き込み拒否・`create_brand` オーナー限定＋`plans.brands` 上限（凍結中は枠外）・`delete_brand` 最後の1つ保護＋中身を既定ブランドへ退避・`set_brand_frozen`（解除は上限内のみ）・`brand_quota`・コレクション上限トリガ `plans.collections`・brands の INSERT/DELETE を RPC 限定）。ローカル PG14 で RLS/RPC/トリガのシナリオを実証（owner/member/viewer・free→team→starter の上限と凍結・削除の退避・コレクション上限）。
 - ✅ **アプリ**：ブランド切替（アカウントメニュー＋サイドバー2行目）・「ブランドを追加する」（上限到達時はプランへ誘導）・設定の「ブランド」パネル（残数メーター・切替・名前変更・読取専用/再開・削除）・動画/コレクション/ブランドメモリをブランドで絞り込み（既定ブランドは旧データ＝brand_id 未設定も含む）・凍結ブランドでは作成を止める・プランカードの「複数ブランド管理」から「近日」を外し「ブランド N つまで」に。
 - ⏳ **DB 適用待ち**：021 → 022 → 023 を SQL Editor で順に Run（023 単体でも 021 の列を保険で作るが、順番どおりが安全）。
-- ⏳ **F3 ブランド単位の招待・席**（§12）と **F4 用語の「ブランド」一括化／ブランドメモリ Phase 2** は未着手。「ワークスペース」の文言はアカウント＝ワークスペースとしてそのまま。
+- ✅ **F3 ブランド単位の招待・席**（§12）: `024_brand_members.sql`。席は従来どおり **アカウント全体のユニーク人数**（org_members の owner/member）。`brand_members` でメンバーごとの「見える/作れるブランド」を限定（行が無ければ全ブランド、オーナーは常に全部）。招待は `create_invite(..., p_brand_ids)` で範囲付き、`accept_invite` が範囲を書き込み、`set_member_brands` で後から変更、`remove_member` が範囲を掃除。RLS は brands/projects/collections/generations/renders/jobs に `brand_visible()`/`project_visible()` を追加（緩める変更なし）。ローカル PG14 で実証（範囲付き招待→受諾→可視範囲・他ブランドへの作成拒否・範囲変更・解除・オーナー限定）。
+  アプリ: チーム画面で招待時にブランドを選択（未選択＝全ブランド）、メンバー行に範囲チップ＋オーナーの「変更」（チェックボックスのモーダル）、参加確認にブランド名表示。
+- ⏳ **DB 適用待ち: 024**（023 の後）。
+- ⏳ **F4 用語の「ブランド」一括化／ブランドメモリ Phase 2（worker）** は未着手。
 
 ## 13. 実装フェーズ（改訂）
 1. **F0 データモデル移行**：`collections.brand_id` 追加＋org直下データを既定ブランドへ割当／`plans.collections` 追加＋値投入／brands 複数対応／§11の既存org束ね（空振り可）。

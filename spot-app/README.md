@@ -122,7 +122,9 @@ Supabase Studio → SQL Editor に **[`supabase/migrations/APPLY.sql`](supabase/
 - [x] **複数ブランド**（アカウント＞ブランド＞コレクション＞動画）: [`supabase/migrations/023_brands_multi.sql`](supabase/migrations/023_brands_multi.sql) を適用すると、
       Team 以上で複数ブランド（製品/クライアント）を作成・切替・名前変更・読取専用化・削除できる。上限は `plans.brands`（Free/Starter 1・Team 3・Business 10・Enterprise ∞）、
       コレクション上限は `plans.collections`（Free のみ 12/ブランド）。動画・コレクション・ブランドメモリはブランド単位。⚠ 適用順: 021 → 022 → 023。
-- [ ] ブランド単位の招待・席（`brand_members`）、用語の「ブランド」一括化（docs/brand-plan-limits-proposal.md §12/§13）
+- [x] ブランド単位のアクセス範囲（招待・メンバー）: [`supabase/migrations/024_brand_members.sql`](supabase/migrations/024_brand_members.sql)。席はアカウント全体のユニーク人数のまま、
+      メンバーごとに「見える/作れるブランド」を限定できる（招待時の選択・チーム画面で変更）。⚠ 適用順: 023 → 024。
+- [ ] 用語の「ブランド」一括化（docs/brand-plan-limits-proposal.md §13 F4）
 - [ ] AIカット生成: `spec.cuts` を自動生成（現状は既定カットセットで代用）
 - [x] 配信前チェック（書き出し画面）: AI利用表記（JIAA 2026-04）・C2PA の ON/OFF を `spec.compliance` に保存、媒体仕様を表示
 - [x] ワーカー build: `spec.compliance` / `spec.delivery` → 開示テロップ焼き込み（`ad-prototype/src/Compliance.tsx`）・C2PA マニフェスト（c2patool があれば埋め込み、無ければ `.c2pa.json` サイドカー）・媒体別セーフゾーン／ラウドネス（`cm-pipeline/cm/delivery.py`）
