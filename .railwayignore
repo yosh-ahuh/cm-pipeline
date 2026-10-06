@@ -1,0 +1,34 @@
+# railway up がアップロードしないもの（CLI は .dockerignore を見ないので別に置く。gitignore 構文）
+.git
+.fal_key
+**/.env
+*.env
+**/node_modules
+**/.venv
+.venv
+**/__pycache__
+**/.DS_Store
+# 生成物・レンダー・取り込み済み案件（合計 1.5GB 超。イメージには不要）
+generated
+cm-pipeline/projects/*/generated
+cm-pipeline/projects/*/out
+cm-pipeline/projects/_supabase
+ad-prototype/public/projects
+ad-prototype/out
+# 資料・フロント・サイト（ワーカーに不要）
+LINE Design System
+docs
+research
+site
+mirai-assets
+spot-app/index.html
+spot-app/share.html
+spot-app/assets
+spot-app/styles
+spot-app/supabase
+*.html
+*.png
+*.jpg
+*.mp4
+*.mov
+*.pdf
