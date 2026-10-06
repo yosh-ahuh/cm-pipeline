@@ -7589,6 +7589,7 @@
       // 配信前チェックの既定（書き出し時に onExportSettings で上書き）。cm-pipeline の compliance ブロックと同形。
       compliance: { ai_disclosure: true, content_credentials: true, likeness_check: true, real_ui_only: true },
       delivery: { platforms: sel.media || [] },
+      brand: brandSnapshot(),    // P5: ブランドの見た目・言葉を生成に渡す（ワーカー側でも最新のブランドで補完）
       cuts: generateCuts(sel),   // 伝え方から構成（カット列）を自動生成
     };
     window.__scriptCuts = spec.cuts;   // 台本・絵コンテ画面を実 cuts に連動（renderBoard が参照）
@@ -7632,6 +7633,29 @@
       if (window.__setScriptState) window.__setScriptState(j.status === 'done' ? 'done' : j.status === 'failed' ? 'failed' : j.status);
     } catch (_) {}
   };
+
+  // P5: 現在のブランド（assets ＋ 確認済み profile）から spec.brand を組む。色は確認済みの palette を優先。
+  function brandSnapshot() {
+    const b = currentBrand; if (!b) return {};
+    const a = b.assets || {}, pf = b.profile || {}, vi = pf.visual || {}, vo = pf.voice || {}, sm = pf.summary || {};
+    const palette = (a.colors && Array.isArray(a.colors.palette) && a.colors.palette.length) ? a.colors.palette : (Array.isArray(vi.colors) ? vi.colors : []);
+    const colors = {};
+    if ((a.colors && a.colors.primary) || palette[0]) colors.primary = (a.colors && a.colors.primary) || palette[0];
+    if (palette[1]) colors.accent = palette[1];
+    if (palette[2]) colors.dark = palette[2];
+    if (palette.length) colors.palette = palette.slice(0, 5);
+    const pron = {}; (vo.terms || []).forEach(t => { if (t && t.text && t.reading) pron[t.text] = t.reading; });
+    const out = { name: b.name || '', colors };
+    if (a.logo || vi.logo) out.logo = a.logo || vi.logo;
+    if (a.app_icon) out.app_icon = a.app_icon;
+    if (sm.one_liner) out.tagline = sm.one_liner;
+    if (Object.keys(pron).length) out.pronunciation = pron;
+    if (vi.imagery) out.imagery = vi.imagery;
+    if (vo.register) out.register = vo.register;
+    if (Array.isArray(vo.avoid) && vo.avoid.length) out.avoid = vo.avoid.slice(0, 20);
+    return out;
+  }
+  window.__brandSnapshot = brandSnapshot;
 
   // ---------- 撮影指示リスト（実案件）: UI カットのスクショとブランド素材を Storage に上げ、spec に配線 ----------
   // パス規約: assets/<uid>/<projectId>/ui/<cutId>/<file> ・ assets/<uid>/<projectId>/brand/<file>

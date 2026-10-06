@@ -166,7 +166,7 @@ create index if not exists brand_sources_status_idx on public.brand_sources(stat
 | A ✅ 2026-10-06 | スキーマ（`027_brand_intake.sql`: `brands.profile`、`brand_sources`、RLS、Realtime）＋アプリ側 3 画面（入力／読み込み中／確認）。ワーカー未接続時は 3 問入力のみで保存できる。読み込み中は Realtime で進捗、90 秒で「答えだけで進む」 | なし |
 | B | ワーカー `brand_ingest`（URL・貼り付け）。ロゴ・色・要約・既定値 | A、ワーカー `--live` 環境 |
 | C | ファイル取り込み（PDF/PPTX）、製品画面候補の収集 | B |
-| D 🟡 | 生成への注入＝ブランドメモリ Phase 2。台本（文体・価値・読み方・NG）は P4 で注入済み。色・ロゴのレンダー注入は P5 | B |
+| D ✅ 2026-10-06 | 生成への注入＝ブランドメモリ Phase 2。台本（P4）と、レンダーへの色・ロゴ・読み方、実写スチルの差し色、お手本スチルの同梱（P5） | B |
 | E | 再学習と手修正の優先マージ、ブランド設定画面の常設カード | A〜D |
 
 ## 8. 未決事項

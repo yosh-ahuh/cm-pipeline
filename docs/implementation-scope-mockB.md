@@ -94,7 +94,7 @@
 | **P2 ブランド取り込み（UI＋DB）** ✅ 2026-10-06 `feat/p1-flow` | `027_brand_intake.sql`（brands.profile・brand_sources・RLS・Realtime、⏳ 適用待ち）、入力／読み込み中／確認の 3 画面、3 問フォールバック、ホームの CTA、「新しく作る」初回ゲート（スキップ可）、設定のブランドカード、ウィザード既定値の profile フォールバック。ワーカー未接続時は 3 問と手入力だけで保存できる | P1 と独立 | M |
 | **P3 ワーカー: brand_ingest** ✅ 2026-10-06 `feat/p1-flow` | `worker/brand_ingest.py`: URL（robots.txt 尊重・15 秒・2 MB）／自由記述／PDF（pypdf）／PPTX／画像を取り込み、Claude でプロフィール（スキーマ出力）。キー無し・失敗時はヒューリスティック（確度 low）。色・ロゴ候補・画面候補を補充、ロゴ候補は Storage へ保存。確認済み項目は上書きしない。`worker.py --watch` の同じループで処理（`--brand <id>` で単体実行） | P2、`--live` 環境 | M |
 | **P4 ワーカー: script ステージ** ✅ 2026-10-06 `feat/p1-flow` | `worker/script_gen.py`: Claude（Anthropic SDK・`claude-opus-5-5`・JSON schema 出力）で台本、キー無し／失敗時はテンプレート台本。持ち込みは文章を変えず分割。秒数配分・文字・必要な素材・読み方辞書（TTS 用）。`jobs.stage='script'` をウィザード完了時に投入（クレジット消費なし）、生成 DAG は script 完了に依存。アプリは Realtime で台本画面を更新、60 秒で「素材へ進める」案内 | P1、P3（プロフィール参照） | L |
-| **P5 生成への注入** | 色・ロゴ・文体・NG をレンダー／台本に反映（ブランドメモリ Phase 2） | P3、P4 | M |
+| **P5 生成への注入** ✅ 2026-10-06 `feat/p1-flow` | アプリは案件作成時に `spec.brand`（名前・ロゴ・色・ひとこと・読み方・見た目・言葉づかい・NG）を書き、ワーカーは最新の `brands.assets/profile` で補完（`merge_brand`）。色は Remotion の primary/accent/dark、ロゴ・アイコンは Storage から取得、読み方は配信レポートへ。実写スチルにはブランドカラーを差し色として控えめに指示（`compose.still_prompt`）。お手本案件（approved）の生成スチルを `brand.references` として同梱（人物一貫性・スタイル参照の土台） | P3、P4 | M |
 
 P1 と P2 は並行可能。ユーザーが体感できる順は P1 → P2 → P4 → P3 → P5。
 

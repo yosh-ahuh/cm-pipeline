@@ -251,6 +251,8 @@ def localize_assets(sb: Supa, root: Path, d: dict, prefixes: list[str]) -> int:
     for k in ("app_icon", "logo"):
         if brand.get(k):
             brand[k] = fetch(brand[k])
+    if isinstance(brand.get("references"), list):
+        brand["references"] = [fetch(x) for x in brand["references"]]
     for cut in d.get("cuts") or []:
         a = cut.get("assets")
         if isinstance(a, list):
@@ -260,10 +262,68 @@ def localize_assets(sb: Supa, root: Path, d: dict, prefixes: list[str]) -> int:
     return n
 
 
+# ---------------------------------------------------------------- P5: ブランドの見た目・言葉を生成へ（ブランドメモリ Phase 2）
+def merge_brand(sb: Supa, spec: dict, brand_id: str | None) -> dict:
+    """spec.brand（アプリのスナップショット）を、最新の brands.assets / profile で補完する。既にある値は保たれる。"""
+    b = dict(spec.get("brand") or {})
+    if not brand_id:
+        return b
+    rows = sb.select("brands", id=f"eq.{brand_id}", select="name,assets,profile")
+    if not rows:
+        return b
+    a = rows[0].get("assets") or {}; pf = rows[0].get("profile") or {}
+    vi, vo, sm = pf.get("visual") or {}, pf.get("voice") or {}, pf.get("summary") or {}
+    b.setdefault("name", rows[0].get("name") or "")
+    if not b.get("logo") and (a.get("logo") or vi.get("logo")):
+        b["logo"] = a.get("logo") or vi.get("logo")
+    if not b.get("app_icon") and a.get("app_icon"):
+        b["app_icon"] = a["app_icon"]
+    palette = ((a.get("colors") or {}).get("palette")) or vi.get("colors") or []
+    colors = dict(b.get("colors") or {})
+    if not colors.get("primary") and (((a.get("colors") or {}).get("primary")) or palette):
+        colors["primary"] = (a.get("colors") or {}).get("primary") or palette[0]
+    if not colors.get("accent") and len(palette) > 1:
+        colors["accent"] = palette[1]
+    if not colors.get("dark") and len(palette) > 2:
+        colors["dark"] = palette[2]
+    if colors:
+        b["colors"] = colors
+    if not b.get("tagline") and sm.get("one_liner"):
+        b["tagline"] = sm["one_liner"]
+    pron = dict(b.get("pronunciation") or {})
+    for t in vo.get("terms") or []:
+        if t.get("text") and t.get("reading"):
+            pron.setdefault(t["text"], t["reading"])
+    if pron:
+        b["pronunciation"] = pron
+    for k, v in (("imagery", vi.get("imagery")), ("register", vo.get("register"))):
+        if v and not b.get(k):
+            b[k] = v
+    return b
+
+
+def reference_stills(sb: Supa, brand_id: str | None, exclude_project: str, limit: int = 3) -> list[str]:
+    """同じブランドで「お手本」（projects.approved）にした案件の生成スチルを参照画像として集める（Storage パス）。"""
+    if not brand_id:
+        return []
+    try:
+        projs = sb.select("projects", brand_id=f"eq.{brand_id}", approved="eq.true", select="id", order="updated_at.desc", limit="5")
+        ids = [p["id"] for p in projs if p["id"] != exclude_project]
+        if not ids:
+            return []
+        gens = sb.select("generations", project_id=f"in.({','.join(ids)})", kind="eq.still", status="eq.done",
+                         select="storage_path,created_at", order="created_at.desc", limit=str(limit))
+        return [g["storage_path"] for g in gens if g.get("storage_path")]
+    except Exception as e:  # noqa: BLE001
+        print(f"  WARN  reference stills: {e}", flush=True)
+        return []
+
+
 class LiveRunner:
     """1プロジェクト分の cm-pipeline 実行コンテキスト（spec → project.yaml → ステージ）。"""
 
-    def __init__(self, sb: Supa, project_id: str, owner: str, spec: dict, product: str | None, org: str | None = None):
+    def __init__(self, sb: Supa, project_id: str, owner: str, spec: dict, product: str | None, org: str | None = None,
+                 brand_id: str | None = None):
         _load_cm()
         import yaml
         from cm import ledger, pipeline, project as project_mod
@@ -271,6 +331,11 @@ class LiveRunner:
         self.pipeline, self.ledger = pipeline, ledger
         root = CM_DIR / "projects" / "_supabase" / project_id
         root.mkdir(parents=True, exist_ok=True)
+        spec = dict(spec)
+        spec["brand"] = merge_brand(sb, spec, brand_id)                  # P5: 最新のブランドで色・ロゴ・読み方を補完
+        refs = reference_stills(sb, brand_id, project_id)
+        if refs:
+            spec["brand"]["references"] = refs                           # お手本案件のスチル（人物一貫性・スタイル参照用）
         d = spec_to_project(project_id, spec, product)
         got = localize_assets(sb, root, d, [org, owner])   # 新 <org_id>/… と旧 <owner>/… の両対応
         if got:
@@ -403,11 +468,11 @@ def process_project(sb: Supa, project_id: str, owner: str, live: bool) -> int:
         nonlocal runner
         if not live or runner is not None:
             return runner
-        proj = sb.select("projects", id=f"eq.{project_id}", select="spec,product,name,org_id")
+        proj = sb.select("projects", id=f"eq.{project_id}", select="spec,product,name,org_id,brand_id")
         if not proj:
             raise RuntimeError("project not found")
         runner = LiveRunner(sb, project_id, owner, proj[0].get("spec") or {},
-                            proj[0].get("product") or proj[0].get("name"), proj[0].get("org_id"))
+                            proj[0].get("product") or proj[0].get("name"), proj[0].get("org_id"), proj[0].get("brand_id"))
         return runner
 
     for _ in range(500):

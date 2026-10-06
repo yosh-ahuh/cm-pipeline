@@ -27,6 +27,11 @@ def still_prompt(proj: Project, cut: dict) -> tuple[str, str]:
     light = (tone.get("light_design", {}) or {}).get("templates", {}).get(scene)
     if light:
         parts.append(light)
+    # P5: ブランドカラーを小物・衣装の差し色として控えめに（spec.brand.colors.primary。実写カットのみ・支配的にしない）
+    brand = proj.spec.get("brand", {}) or {}
+    primary = (brand.get("colors") or {}).get("primary")
+    if primary and cut.get("type") == "live-action" and brand.get("color_hint", True):
+        parts.append(f"a subtle touch of the brand color {primary} on one small prop or clothing detail, never dominant")
     parts += list(base.get("positive", []))
     parts += list(tone.get("japan_check", []))
 
