@@ -8,7 +8,7 @@ def _hero(lang):
         return f"""<header class="hero"><div class="wrap">
   <span class="eyebrow">AI commercial studio for marketing teams</span>
   <h1>Every spot,<br>in a day.</h1>
-  <p class="sub">Pick your platform, industry and audience. Spot generates the footage, your real product UI, the voiceover and the music — and delivers a ready-to-ship commercial the same day.</p>
+  <p class="sub">The structure and the prompts live inside Spot. You pick the platform, industry and audience, then review the first cut. Built on your real app screens, with the AI-use disclosure included — the same day.</p>
   <div class="cta"><a class="btn btn-primary" href="{APP_URL}">Start free</a><a class="btn btn-ghost" href="{DEMO_URL}">Book a demo</a><span class="micro">No prompt writing. No editing skills.</span></div>
   <div class="stage" aria-hidden="true">
     <div class="fr vert"><span class="lbl">9:16</span><div class="cap">Done on site.</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
@@ -20,7 +20,7 @@ def _hero(lang):
     return f"""<header class="hero"><div class="wrap">
   <span class="eyebrow">マーケティングチームのための AI 動画広告・CM 制作ツール</span>
   <h1>動画広告が、<br>その日のうちに。</h1>
-  <p class="sub">配信先・業種・ターゲットを選ぶだけ。実写もアプリ画面もナレーションも AI が自動生成し、YouTube・リール・SNS 向けの動画広告を、その日のうちにお届けします。</p>
+  <p class="sub">構成もプロンプトも、Spot が持っています。あなたは配信先・業種・ターゲットを選んで、できた初稿を確認するだけ。実際のアプリ画面を使い、AI 利用の表記までついて、その日のうちに。</p>
   <div class="cta"><a class="btn btn-primary" href="{APP_URL}">無料ではじめる</a><a class="btn btn-ghost" href="{DEMO_URL}">デモを予約</a><span class="micro">プロンプトも動画編集スキルも必要ありません。</span></div>
   <div class="stage" aria-hidden="true">
     <div class="fr vert"><span class="lbl">9:16</span><div class="cap">現場で、その場で。</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
