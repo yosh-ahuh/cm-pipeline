@@ -7,7 +7,8 @@
 | 役割 | 状態 |
 |---|---|
 | アプリ `spot-app/` | **Vercel にデプロイ済み**。チーム `creative-punx`、プロジェクト `spot`、本番 URL `https://spot-smoky-six.vercel.app`（2026-09-25 作成、最終デプロイ 2026-10-01）。ローカルの `spot-app` で `vercel --prod` を実行＝ローカルの `config.js` ごとアップロード。**Vercel Authentication が有効で、Vercel にログインした人しか開けない**（外部は 302） |
-| ランディング / サイト | 未デプロイ。`spot-landing.html`（1 ページ）と `site/dist/`（生成サイト）はローカルと claude.ai の非公開アーティファクトのみ |
+| ランディング（1 ページ `spot-landing.html`） | **Vercel にデプロイ済み**（2026-10-08）。プロジェクト `spot-landing`、URL `https://spot-landing-seven.vercel.app`。`bash site/deploy_landing.sh` で更新。アプリ同様 Vercel Authentication で非公開、`X-Robots-Tag: noindex` 付き |
+| 生成サイト `site/dist/`（多ページ） | 未デプロイ。ローカルのみ |
 | カスタムドメイン | なし（Vercel のドメイン 0 件）。`spot.video` は第三者所有 |
 | Supabase | Site URL は Vercel の URL、Redirect URLs に `http://localhost:5500/**` 追加済み（2026-10-07） |
 | ワーカー | Railway（停止中）。Vercel では動かせない（常駐プロセス） |
