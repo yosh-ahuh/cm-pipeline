@@ -8,7 +8,7 @@
 |---|---|
 | アプリ `spot-app/` | **Vercel にデプロイ済み**。チーム `creative-punx`、プロジェクト `spot`、本番 URL `https://spot-smoky-six.vercel.app`（2026-09-25 作成、最終デプロイ 2026-10-01）。ローカルの `spot-app` で `vercel --prod` を実行＝ローカルの `config.js` ごとアップロード。**Vercel Authentication が有効で、Vercel にログインした人しか開けない**（外部は 302） |
 | ランディング（1 ページ `spot-landing.html`） | **Vercel にデプロイ済み**（2026-10-08）。プロジェクト `spot-landing`、URL `https://spot-landing-seven.vercel.app`。`bash site/deploy_landing.sh` で更新。アプリ同様 Vercel Authentication で非公開、`X-Robots-Tag: noindex` 付き |
-| 生成サイト `site/dist/`（多ページ） | 未デプロイ。ローカルのみ |
+| 生成サイト `site/dist/`（多ページ） | **Vercel にデプロイ済み**（2026-10-08）。プロジェクト `spot-site`、URL `https://spot-site-six.vercel.app`。`bash site/deploy_site.sh`（ビルド込み）で更新。Vercel Authentication（`all`）で非公開、`X-Robots-Tag: noindex` 付き（`PUBLIC=1` で外す） |
 | カスタムドメイン | なし（Vercel のドメイン 0 件）。`spot.video` は第三者所有 |
 | Supabase | Site URL は Vercel の URL、Redirect URLs に `http://localhost:5500/**` 追加済み（2026-10-07） |
 | ワーカー | Railway（停止中）。Vercel では動かせない（常駐プロセス） |
@@ -19,7 +19,7 @@
 
 | 役割 | URL（仮） | Vercel プロジェクト | ソース | 検索 |
 |---|---|---|---|---|
-| ランディング / サイト | `https://spot.creativepunx.com/` | `spot-site`（新規） | `site/dist/`（`python3 site/build.py` の出力） | index |
+| ランディング / サイト | `https://spot.creativepunx.com/` | `spot-site`（既存） | `site/dist/`（`bash site/deploy_site.sh`） | index |
 | アプリ | `https://app.spot.creativepunx.com/` | `spot`（既存） | `spot-app/` | noindex（`spot-app/vercel.json`） |
 
 同一オリジン（`/app` パス）にしない理由: 両方が `index.html` の SPA でルーティング/キャッシュ設定が衝突する、Supabase の Site URL / Redirect URL をアプリだけに向けたい、ランディングは計測タグ・OGP・SEO 重視でアプリは noindex と要件が逆。
@@ -31,8 +31,8 @@
 2. Settings → Domains に `app.spot.creativepunx.com` を追加 → 表示された CNAME を creativepunx.com の DNS に追加
 3. デプロイは従来どおり `cd spot-app && vercel --prod`（`vercel.json` の noindex / no-cache ヘッダが付く）
 
-**ランディング（新規 `spot-site`）**
-1. `python3 site/build.py` → `cd site/dist && vercel --prod`（初回はプロジェクト名 `spot-site` で作成。`static/vercel.json` が `dist/` にコピーされ、トレーリングスラッシュとヘッダを設定）
+**サイト（既存 `spot-site`）**
+1. Settings → Deployment Protection → Vercel Authentication を OFF（現在 `all`）。`PUBLIC=1 bash site/deploy_site.sh` で noindex なしで再デプロイ
 2. Settings → Domains に `spot.creativepunx.com` を追加 → CNAME を DNS に追加
 3. Git 連携にする場合: Root Directory `site`、Build Command `python3 build.py`、Output Directory `dist`
 
