@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Cloudflare Pages のビルドコマンド（アプリ）。config.js は .gitignore 済みなので、環境変数から生成する。
-#   Pages → Settings → Environment variables:
+# Git 連携でデプロイする場合のビルドコマンド（アプリ）。config.js は .gitignore 済みなので、環境変数から生成する。
+#   ※ 現状は `vercel --prod` をローカルの spot-app で実行してローカルの config.js ごと上げているので不要。
+#   Vercel / Cloudflare Pages → Settings → Environment variables:
 #     SUPABASE_URL      = https://<ref>.supabase.co
 #     SUPABASE_ANON_KEY = sb_publishable_...（publishable / anon。sb_secret_ や service_role は絶対に入れない）
 #     SUPPORT_EMAIL     = （任意）ヘルプ＆フィードバックの宛先
-#   Build command: bash build.sh   /  Build output directory: /   /  Root directory: spot-app
+#   Build command: bash build.sh   /  Output directory: .   /  Root directory: spot-app
 set -euo pipefail
 cd "$(dirname "$0")"
 : "${SUPABASE_URL:?SUPABASE_URL is required}"

@@ -35,7 +35,7 @@ python3 site/build.py --serve    # http://localhost:5510/
 
 ## デプロイ
 
-`dist/` をそのまま Cloudflare Pages に配置（手順は [`../docs/hosting.md`](../docs/hosting.md)。トレーリングスラッシュの URL）。
+`dist/` をそのまま Vercel に配置（アプリと同じアカウント。手順は [`../docs/hosting.md`](../docs/hosting.md)。トレーリングスラッシュの URL＝`static/vercel.json` の `trailingSlash`）。
 公開後:
 
 1. Google Search Console と **Bing Webmaster Tools** に `sitemap-index.xml` を登録。
