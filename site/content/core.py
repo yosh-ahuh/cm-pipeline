@@ -1,6 +1,6 @@
 """Core pages: home, pricing, how-it-works, brand-safety, security."""
 from . import common
-from .common import SITE, APP_URL, DEMO_URL, PRICE_DATE
+from .common import SITE, APP_URL, DEMO_URL, PRICE_DATE, app_link
 
 
 def _hero(lang):
@@ -9,7 +9,7 @@ def _hero(lang):
   <span class="eyebrow">AI commercial studio for marketing teams</span>
   <h1>Every spot,<br>in a day.</h1>
   <p class="sub">The structure and the prompts live inside Spot. You pick the platform, industry and audience, then review the first cut. Built on your real app screens, with the AI-use disclosure included — the same day.</p>
-  <div class="cta"><a class="btn btn-primary" href="{APP_URL}">Start free</a><a class="btn btn-ghost" href="{DEMO_URL}">Book a demo</a><span class="micro">No prompt writing. No editing skills.</span></div>
+  <div class="cta"><a class="btn btn-primary" href="{app_link('hero')}">Start free</a><a class="btn btn-ghost" href="{DEMO_URL}">Book a demo</a><span class="micro">No prompt writing. No editing skills.</span></div>
   <div class="stage" aria-hidden="true">
     <div class="fr vert"><span class="lbl">9:16</span><div class="cap">Done on site.</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
     <div class="fr wide"><span class="lbl">16:9</span><div class="cap">Every spot, in a day.</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
@@ -21,7 +21,7 @@ def _hero(lang):
   <span class="eyebrow">マーケティングチームのための AI 動画広告・CM 制作ツール</span>
   <h1>動画広告が、<br>その日のうちに。</h1>
   <p class="sub">構成もプロンプトも、Spot が持っています。あなたは配信先・業種・ターゲットを選んで、できた初稿を確認するだけ。実際のアプリ画面を使い、AI 利用の表記までついて、その日のうちに。</p>
-  <div class="cta"><a class="btn btn-primary" href="{APP_URL}">無料ではじめる</a><a class="btn btn-ghost" href="{DEMO_URL}">デモを予約</a><span class="micro">プロンプトも動画編集スキルも必要ありません。</span></div>
+  <div class="cta"><a class="btn btn-primary" href="{app_link('hero')}">無料ではじめる</a><a class="btn btn-ghost" href="{DEMO_URL}">デモを予約</a><span class="micro">プロンプトも動画編集スキルも必要ありません。</span></div>
   <div class="stage" aria-hidden="true">
     <div class="fr vert"><span class="lbl">9:16</span><div class="cap">現場で、その場で。</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
     <div class="fr wide"><span class="lbl">16:9</span><div class="cap">動画広告が、その日のうちに。</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>

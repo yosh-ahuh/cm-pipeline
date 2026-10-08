@@ -27,15 +27,15 @@ python3 site/build.py --serve    # http://localhost:5510/
 
 ## 公開前に置き換えるもの（`content/common.py`）
 
-- `SITE` — 本番ドメイン（現在 `https://spot.video` は仮）
-- `APP_URL` — アプリのログイン URL
+- `DOMAIN` — 本番ドメイン（現在 `creativepunx.com` は仮。`SITE` = `https://spot.<DOMAIN>`、`APP_URL` = `https://app.spot.<DOMAIN>/` が派生）
 - `DEMO_URL` — デモ予約（現在は mailto）
+- CTA は `app_link(campaign, plan)` で `utm_source=site&utm_medium=cta&utm_campaign=…&plan=…` を付けてアプリへ送る（アプリが登録時に保存）
 - `org_jsonld()` の `sameAs` — G2 / LinkedIn / YouTube / X のプロフィール URL ができたら追加
 - `PRICE_DATE` — 競合価格を再確認した日付。比較ページ・料金ページ・ガイドの「最終更新」に出る
 
 ## デプロイ
 
-`dist/` をそのまま Vercel / Netlify / Cloudflare Pages に配置（トレーリングスラッシュの URL）。
+`dist/` をそのまま Cloudflare Pages に配置（手順は [`../docs/hosting.md`](../docs/hosting.md)。トレーリングスラッシュの URL）。
 公開後:
 
 1. Google Search Console と **Bing Webmaster Tools** に `sitemap-index.xml` を登録。

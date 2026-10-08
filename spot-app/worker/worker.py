@@ -20,7 +20,7 @@ build は spec.compliance / spec.delivery を読み、開示テロップ・C2PA�
   CM_PIPELINE_DIR              （任意）cm-pipeline のパス。既定は ../../cm-pipeline
   RESEND_API_KEY               （任意）制作完了メールを送る Resend の API キー。未設定ならメールは送らない
   RESEND_FROM                  （任意）差出人。既定 "Spot <no-reply@creativepunx.com>"
-  APP_URL                      （任意）メール内のリンク先（例 https://app.spot.video/）。既定は SUPABASE_URL
+  APP_URL                      （任意）メール内のリンク先（例 https://app.spot.creativepunx.com/ ＝仮ドメイン）。既定は SUPABASE_URL
 
 使い方:
   export SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=...

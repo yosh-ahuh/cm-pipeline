@@ -4,7 +4,7 @@ komadori の UI（ダーク・EN/JA）を土台に、**Supabase（認証・DB・
 生成ワーカーは既存の Python `../cm-pipeline` を再利用する（次スライスで `jobs` テーブル駆動に接続）。
 
 > ⚠️ Supabase を繋いだ時点で **claude.ai アーティファクトでは動きません**（CSPが Supabase 通信を遮断）。
-> ローカル開発サーバ、または Vercel/Netlify 等でホストして動かします。
+> ローカル開発サーバ、または Cloudflare Pages 等でホストして動かします（本番の配置・ドメイン・Supabase URL 設定は [`../docs/hosting.md`](../docs/hosting.md)。`build.sh` が env から `config.js` を生成）。
 
 ## セットアップ
 

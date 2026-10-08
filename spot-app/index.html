@@ -6,6 +6,7 @@
 <title>Spot</title>
 <meta name="theme-color" content="#131318">
 <meta name="description" content="Spot — 選ぶだけで、広告動画。">
+<meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
@@ -5815,6 +5816,38 @@
 (function () {
   const cfg = window.SPOT_CONFIG || {};
   const authEl = document.getElementById('auth');
+
+  // ---- 流入元（ランディング/サイトの CTA が付ける utm_* と plan）----
+  //   URL から拾って localStorage に保持し、登録時 metadata（attribution）と、サインイン後の RPC
+  //   set_signup_attribution（030）で profiles に保存する。OAuth 登録は metadata を渡せないので RPC 側が本線。
+  //   拾ったキーは URL から消す（OAuth の ?code= などは触らない）。
+  const ATTR_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'plan', 'ref'];
+  const ATTR_LS = 'spot_attr';
+  (function captureAttribution() {
+    try {
+      const u = new URL(window.location.href);
+      const got = {};
+      ATTR_KEYS.forEach(k => { const v = u.searchParams.get(k); if (v) got[k] = String(v).slice(0, 80); });
+      if (!Object.keys(got).length) return;
+      got.landed_at = new Date().toISOString();
+      got.referrer = (document.referrer || '').slice(0, 200);
+      localStorage.setItem(ATTR_LS, JSON.stringify(got));
+      localStorage.removeItem(ATTR_LS + '_sent');
+      ATTR_KEYS.forEach(k => u.searchParams.delete(k));
+      history.replaceState(null, '', u.pathname + (u.search || '') + u.hash);
+    } catch (_) { /* localStorage 不可・URL 不正は無視 */ }
+  })();
+  function readAttribution() { try { return JSON.parse(localStorage.getItem(ATTR_LS) || 'null'); } catch (_) { return null; } }
+  window.__spotAttribution = readAttribution;   // データ層（plan 誘導など）から参照できるように公開
+  async function sendAttribution(session) {
+    try {
+      const a = readAttribution(); if (!a) return;
+      if (localStorage.getItem(ATTR_LS + '_sent') === session.user.id) return;
+      const { error } = await sb.rpc('set_signup_attribution', { p_attr: a });
+      if (error) throw error;
+      localStorage.setItem(ATTR_LS + '_sent', session.user.id);
+    } catch (_) { /* 030 未適用・ネットワーク不可：次回サインイン時に再試行 */ }
+  }
   const errEl = document.getElementById('authErr');
   const form = document.getElementById('authForm');
   const hEl = document.getElementById('authH');
@@ -6217,6 +6250,7 @@
           account_type: acctType,
           company_name: acctType === 'org' ? companyName : null,
           lang: window.L('en', 'ja'),   // メール言語切替用（Send Email テンプレートが {{ .Data.lang }} で参照）
+          attribution: readAttribution(),   // 流入元（utm_* / plan）。030 のトリガが profiles.signup_attribution へ写す
         } } });
         if (error) throw error;
         if (!data.session) fail('確認メールを送信しました。メール内のリンクで認証してからサインインしてください。メールが届かない場合は、迷惑メールフォルダもご確認ください。', true);
@@ -6309,6 +6343,7 @@
     if (window.mountUserChip) window.mountUserChip(email);   // user chip + account menu (UI layer); sign-out lives in the menu
     // クレジット残の反映はデータ層 refreshCredits（org 残高が正）に一本化する。
     if (window.onAppReady) window.onAppReady(session, sb);   // データ層を起動
+    sendAttribution(session);   // 流入元を profiles へ（未適用/失敗は黙って次回）
   }
 
   // ---- プロフィール補完（OAuth で不足する利用形態・お名前を尋ねる）----

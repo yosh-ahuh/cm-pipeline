@@ -1,9 +1,20 @@
 """Shared strings, plans, competitor data, and Organization JSON-LD."""
 
-# ---- Replace once the real domain / app / booking URLs are confirmed ----------
-SITE = "https://spot.video"
-APP_URL = "https://app.spot.video/"
-DEMO_URL = "mailto:hello@spot.video?subject=Spot%20demo"
+# ---- ドメインは仮（2026-10-08）。本番ドメインが決まったら DOMAIN だけ差し替える --------
+# ランディング/サイト = https://spot.<DOMAIN>/   アプリ = https://app.spot.<DOMAIN>/
+# （spot-landing.html と spot-app の _headers / README、Supabase の Site URL も同時に更新すること）
+DOMAIN = "creativepunx.com"
+SITE = f"https://spot.{DOMAIN}"
+APP_URL = f"https://app.spot.{DOMAIN}/"
+DEMO_URL = f"mailto:hello@{DOMAIN}?subject=Spot%20demo"
+
+
+def app_link(campaign: str, plan: str | None = None, source: str = "site") -> str:
+    """ランディング/サイトの CTA → アプリ。流入元を utm_* で付け、アプリ側が signup 時に保存する。"""
+    q = f"utm_source={source}&utm_medium=cta&utm_campaign={campaign}"
+    if plan:
+        q += f"&plan={plan}"
+    return f"{APP_URL}?{q}"
 PRICE_DATE = "2026-09-10"   # date competitor prices were checked
 
 T = {

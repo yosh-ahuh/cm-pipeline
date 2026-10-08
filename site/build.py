@@ -253,7 +253,7 @@ def final_cta(lang: str, page: dict) -> str:
     h, p = page.get("cta", (t["cta_h"], t["cta_p"]))
     return f"""<section class="final"><div class="wrap">
   <h2>{esc(h)}</h2><p>{esc(p)}</p>
-  <a class="btn btn-primary" style="padding:15px 28px;font-size:16px" href="{common.APP_URL}">{esc(t['start'])}</a>
+  <a class="btn btn-primary" style="padding:15px 28px;font-size:16px" href="{common.app_link('final')}">{esc(t['start'])}</a>
   <a class="btn btn-ghost" style="padding:15px 28px;font-size:16px;margin-left:10px" href="{common.DEMO_URL}">{esc(t['demo'])}</a>
 </div></section>"""
 
@@ -347,7 +347,7 @@ def block_plans(b, lang):
         feats = "".join(f"<li>{esc(x)}</li>" for x in p["features"][lang])
         hl = ' hl' if p.get("hl") else ""
         badge = f'<span class="pop">{poplabel}</span>' if p.get("hl") else ""
-        cta_href = common.DEMO_URL if p["id"] in ("business", "enterprise") else common.APP_URL
+        cta_href = common.DEMO_URL if p["id"] in ("business", "enterprise") else common.app_link("pricing", p["id"])
         cta_txt = t["talk"] if p["id"] in ("business", "enterprise") else t["start"]
         cards += f"""<div class="plan{hl}">{badge}<div class="nm">{esc(name)}</div>
   <div class="pr">{esc(price)}<small> {per}</small></div><div class="jp">{esc(jp)}{(' ' + t['per_month']) if isinstance(p['jpy'], int) else ''}</div>
