@@ -23,7 +23,7 @@
 
 同一オリジン（`/app` パス）にしない理由: 両方が `index.html` の SPA でルーティング/キャッシュ設定が衝突する、Supabase の Site URL / Redirect URL をアプリだけに向けたい、ランディングは計測タグ・OGP・SEO 重視でアプリは noindex と要件が逆。
 
-## 3. 公開手順（ユーザー作業）
+## 3. 公開手順（ユーザー作業）— **保留中**（2026-10-08 ユーザー判断「公開まではしない」。Vercel Authentication は ON のまま、ドメインも付けない。公開を決めたらここから）
 
 **アプリ（既存 `spot`）**
 1. Vercel → Project `spot` → Settings → Deployment Protection → **Vercel Authentication を OFF**（これをしないと一般ユーザーが開けない）
