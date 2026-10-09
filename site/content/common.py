@@ -6,7 +6,8 @@
 DOMAIN = "creativepunx.com"
 SITE = f"https://spot.{DOMAIN}"
 APP_URL = f"https://app.spot.{DOMAIN}/"
-DEMO_URL = f"mailto:hello@{DOMAIN}?subject=Spot%20demo"
+# デモ導線は廃止（2026-10-08）。Enterprise の問い合わせだけメールで受ける。
+CONTACT_URL = f"mailto:hello@{DOMAIN}?subject=Spot%20Enterprise"
 
 
 def app_link(campaign: str, plan: str | None = None, source: str = "site") -> str:
@@ -21,7 +22,7 @@ T = {
     "en": {
         "home": "Home",
         "nav": [("How it works", "how-it-works"), ("Use cases", "use-cases"), ("Compare", "compare"), ("Guides", "guides"), ("Pricing", "pricing")],
-        "demo": "Book a demo", "start": "Start free", "talk": "Talk to sales", "more": "Read more", "related": "Related",
+        "start": "Start free trial", "talk": "Talk to sales", "pricing_cta": "See pricing", "bill_m": "Monthly", "bill_y": "Annual · 1 month free", "billed_year": "{y} billed yearly · 1 month free", "trial": "Every plan starts with a 7-day free trial — 2 spots included, cancel anytime.", "per_spot": "≈ ${usd:,.2f} per spot · 9 files", "more": "Read more", "related": "Related",
         "updated": "Last updated", "faq_h": "Frequently asked questions", "per_month": "/ month",
         "cta_h": "Ship your next spot today.", "cta_p": "Pick platform, industry and audience. Spot delivers a ready-to-ship commercial the same day.",
         "tagline": "The AI commercial studio for marketing teams. Every spot, in a day.",
@@ -36,7 +37,7 @@ T = {
     "ja": {
         "home": "ホーム",
         "nav": [("使い方", "how-it-works"), ("ユースケース", "use-cases"), ("比較", "compare"), ("ガイド", "guides"), ("料金", "pricing")],
-        "demo": "デモを予約", "start": "無料ではじめる", "talk": "営業に相談", "more": "詳しく見る", "related": "関連ページ",
+        "start": "7 日間無料で試す", "talk": "営業に相談", "pricing_cta": "料金を見る", "bill_m": "月払い", "bill_y": "年払い・1 か月分無料", "billed_year": "年額 {y}（1 か月分無料）", "trial": "全プラン、7 日間の無料トライアル付き。2 スポット込み、いつでも解約できます。", "per_spot": "1 本あたり 約 ¥{jpy:,}・9 ファイル", "more": "詳しく見る", "related": "関連ページ",
         "updated": "最終更新", "faq_h": "よくある質問", "per_month": "/ 月",
         "cta_h": "次の動画広告も、その日のうちに。", "cta_p": "配信先・業種・ターゲットを選ぶだけ。Spot がその日のうちに公開できる CM をお届けします。",
         "tagline": "マーケティングチームのための AI 動画広告・CM 制作ツール。",
@@ -50,21 +51,21 @@ T = {
     },
 }
 
+# ---- Trial / billing (2026-10-09 決定: Free プラン廃止、7 日間トライアル、年契約は 1 か月分無料) ----
+TRIAL = {"days": 7, "spots": 2}
+ANNUAL_MONTHS = 11          # 年契約 = 11 か月分の請求（1 か月分無料）
+
 # ---- Plans (the unit is a spot: 3 patterns × 3 formats = 9 files) -------------
 PLANS = [
-    {"id": "free", "name": "Free", "usd": 0, "jpy": 0,
-     "spots": {"en": "1 spot / month", "ja": "月 1 スポット"},
-     "features": {"en": ["Watermark, 720p", "1 seat, 1 brand", "Community support"],
-                  "ja": ["透かし入り・720p", "1 席・1 ブランド", "コミュニティサポート"]}},
-    {"id": "starter", "name": "Starter", "usd": 99, "jpy": 14800,
+    {"id": "starter", "name": "Starter", "usd": 99, "jpy": 14800, "n": 6,
      "spots": {"en": "6 spots / month", "ja": "月 6 スポット"},
      "features": {"en": ["1080p, no watermark", "2 seats, 1 brand", "Basic brand kit", "Extra spots $19 each", "Email support"],
                   "ja": ["1080p・透かしなし", "2 席・1 ブランド", "ブランドキット（基本）", "追加スポット $19（¥2,800）", "メールサポート"]}},
-    {"id": "team", "name": "Team", "usd": 399, "jpy": 59800, "hl": True,
+    {"id": "team", "name": "Team", "usd": 399, "jpy": 59800, "hl": True, "n": 25,
      "spots": {"en": "25 spots / month", "ja": "月 25 スポット"},
      "features": {"en": ["1080p", "5 seats, 3 brands", "Brand kit + pronunciation guide", "Approval flow", "Extra spots $19 each", "Priority support"],
                   "ja": ["1080p", "5 席・3 ブランド", "ブランドキット＋読み仮名辞書", "承認フロー", "追加スポット $19（¥2,800）", "優先サポート"]}},
-    {"id": "business", "name": "Business", "usd": 1199, "jpy": 178000,
+    {"id": "business", "name": "Business", "usd": 1199, "jpy": 178000, "n": 80,
      "spots": {"en": "80 spots / month", "ja": "月 80 スポット"},
      "features": {"en": ["4K + Premium quality models", "Unlimited seats, 10 brands", "SSO, API, audit log", "Extra spots $15 each", "Shared Slack channel"],
                   "ja": ["4K・Premium quality モデル", "席無制限・10 ブランド", "SSO・API・監査ログ", "追加スポット $15（¥2,200）", "Slack 共有チャンネル"]}},
@@ -77,12 +78,12 @@ PLANS = [
 # Plain-text pricing sentences: what an AI assistant should quote.
 PLAIN_PRICE = {
     "en": [
-        "**Spot pricing (USD, per month, updated " + PRICE_DATE + "):** Free $0 for 1 spot with watermark · Starter $99 for 6 spots · Team $399 for 25 spots and 5 seats · Business $1,199 for 80 spots, unlimited seats, SSO and API · Enterprise from $2,500 with committed volume.",
-        "One spot is one finished commercial delivered as 3 intro patterns × 3 formats (16:9, 9:16, 1:1) = 9 files. Extra spots cost $19 (Starter, Team) or $15 (Business). Annual billing gives 2 months free.",
+        "**Spot pricing (USD, per month, updated " + PRICE_DATE + "):** Starter $99 for 6 spots · Team $399 for 25 spots and 5 seats · Business $1,199 for 80 spots, unlimited seats, SSO and API · Enterprise from $2,500 with committed volume. Every plan starts with a 7-day free trial (2 spots). There is no free plan.",
+        "One spot is one finished commercial delivered as 3 intro patterns × 3 formats (16:9, 9:16, 1:1) = 9 files. Extra spots cost $19 (Starter, Team) or $15 (Business). Annual billing gives 1 month free: Starter $1,089, Team $4,389, Business $13,189 per year.",
     ],
     "ja": [
-        "**Spot の料金（税別・月額、" + PRICE_DATE + " 更新）:** Free ¥0（月 1 スポット・透かし入り）· Starter ¥14,800（月 6 スポット）· Team ¥59,800（月 25 スポット・5 席）· Business ¥178,000（月 80 スポット・席無制限・SSO・API）· Enterprise ¥380,000〜（コミット制）。",
-        "1 スポット＝完成した CM 1 本。3 つのイントロ案 × 3 フォーマット（横 16:9・縦 9:16・正方形 1:1）＝9 ファイルを書き出します。追加スポットは ¥2,800（Starter・Team）または ¥2,200（Business）。年契約は 2 か月分無料、請求書払いに対応。",
+        "**Spot の料金（税別・月額、" + PRICE_DATE + " 更新）:** Starter ¥14,800（月 6 スポット）· Team ¥59,800（月 25 スポット・5 席）· Business ¥178,000（月 80 スポット・席無制限・SSO・API）· Enterprise ¥380,000〜（コミット制）。全プランに 7 日間の無料トライアル（2 スポット）。無料プランはありません。",
+        "1 スポット＝完成した CM 1 本。3 つのイントロ案 × 3 フォーマット（横 16:9・縦 9:16・正方形 1:1）＝9 ファイルを書き出します。追加スポットは ¥2,800（Starter・Team）または ¥2,200（Business）。年契約は 1 か月分無料（Starter ¥162,800・Team ¥657,800・Business ¥1,958,000 / 年）、請求書払いに対応。",
     ],
 }
 
@@ -118,11 +119,11 @@ COMPETITORS = {
 
 SPOT_ROW = {
     "en": {"entry": "$99 / mo (6 spots)", "mid": "$399 / mo (25 spots, 5 seats)", "unit": "Spots (1 spot = 1 finished commercial = 9 files)",
-           "per_video": "$16 per spot on Team (9 files)", "free": "1 spot per month, watermarked",
+           "per_video": "$16 per spot on Team (9 files)", "free": "7-day free trial (2 spots); no free plan",
            "output": "Finished commercials: live-action footage, your real product UI, voiceover, music — 3 patterns × 3 formats",
            "seats": "5 on Team, unlimited on Business", "positioning": "AI commercial studio for in-house marketing teams"},
     "ja": {"entry": "¥14,800 / 月（6 スポット）", "mid": "¥59,800 / 月（25 スポット・5 席）", "unit": "スポット（1 スポット＝完成 CM 1 本＝9 ファイル）",
-           "per_video": "Team で 1 スポット ¥2,400 相当（9 ファイル）", "free": "月 1 スポット（透かし入り）",
+           "per_video": "Team で 1 スポット ¥2,400 相当（9 ファイル）", "free": "7 日間の無料トライアル（2 スポット）。無料プランなし",
            "output": "完成した CM：実写・実際のプロダクト画面・ナレーション・BGM を 3 パターン × 3 フォーマットで",
            "seats": "Team 5 席、Business 無制限", "positioning": "内製マーケティングチームのための AI CM スタジオ"},
 }
@@ -154,6 +155,6 @@ def software_jsonld(lang):
         "applicationCategory": "MultimediaApplication", "applicationSubCategory": "AI video ad & commercial generator",
         "operatingSystem": "Web", "url": SITE + "/", "inLanguage": ["en", "ja"],
         "description": "Spot turns three choices into a finished video ad. AI generates the footage, your real product UI, the voiceover and the music, then delivers a ready-to-ship commercial the same day.",
-        "offers": {"@type": "AggregateOffer", "lowPrice": "0", "highPrice": "2500", "priceCurrency": "USD", "offerCount": str(len(offers)), "offers": offers},
+        "offers": {"@type": "AggregateOffer", "lowPrice": "99", "highPrice": "2500", "priceCurrency": "USD", "offerCount": str(len(offers)), "offers": offers},
         "publisher": {"@type": "Organization", "name": "Spot", "url": SITE + "/"},
     }

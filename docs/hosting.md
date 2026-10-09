@@ -48,10 +48,11 @@
 
 | CTA | リンク |
 |---|---|
-| ヒーロー「無料ではじめる」 | `app/?utm_source=landing&utm_medium=cta&utm_campaign=hero` |
-| 料金カード | `…&utm_campaign=pricing&plan=free|starter|team` |
+| ヒーロー「7 日間無料で試す」 | `app/?utm_source=landing&utm_medium=cta&utm_campaign=hero` |
+| 料金カード | `…&utm_campaign=pricing&plan=starter|team|business`（Free プランは廃止・2026-10-09） |
 | 最下部 | `…&utm_campaign=final` |
-| デモ / 営業 | `mailto:hello@creativepunx.com`（予約ツールが決まったら差し替え） |
+| ナビ「7 日間無料で試す」 | `…&utm_campaign=nav` |
+| 営業（Enterprise カードのみ） | `mailto:hello@creativepunx.com?subject=Spot%20Enterprise`（**デモ予約の導線は廃止**・2026-10-08。メールボックスの実在は未確認） |
 
 アプリ側（`spot-app/index.html` 認証ブロック）: URL の `utm_*` / `plan` / `ref` を `localStorage.spot_attr` に保存して URL から消す → メール登録では `signUp` の metadata に同梱（030 のトリガが `profiles.signup_attribution` へ）、OAuth 登録や別タブでのサインインではサインイン後に RPC `set_signup_attribution` で保存（本人のみ、未設定のときだけ）。030 は本番適用済・通し検証済（2026-10-08）。
 
@@ -62,7 +63,7 @@ select signup_attribution->>'utm_source' as src, signup_attribution->>'utm_campa
 from public.profiles where signup_attribution is not null group by 1,2,3 order by 4 desc;
 ```
 
-サイト側の訪問計測（CTA クリック率）は未設定。Vercel Web Analytics（プロジェクトで Enable するだけ）が最小構成。
+サイト側の訪問計測: **Vercel Web Analytics を `spot-landing` / `spot-site` で有効化済み**（2026-10-08）。静的 HTML なので各ページが `/_vercel/insights/script.js` を読み込む（`spot-landing.html` 末尾、`site/build.py` の head）。Vercel → Project → Analytics で PV / 参照元 / 国を確認。CTA クリック率は「アプリ側の `signup_attribution` 件数 ÷ サイトの PV」で見る。Deployment Protection ON の間は Vercel ログイン者の閲覧しか計上されない。
 
 ## 5. 本番ドメインへの差し替え手順
 

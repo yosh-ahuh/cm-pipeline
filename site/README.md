@@ -28,7 +28,7 @@ python3 site/build.py --serve    # http://localhost:5510/
 ## 公開前に置き換えるもの（`content/common.py`）
 
 - `DOMAIN` — 本番ドメイン（現在 `creativepunx.com` は仮。`SITE` = `https://spot.<DOMAIN>`、`APP_URL` = `https://app.spot.<DOMAIN>/` が派生）
-- `DEMO_URL` — デモ予約（現在は mailto）
+- `CONTACT_URL` — Enterprise の問い合わせ先（mailto）。デモ予約の導線は廃止（2026-10-08）
 - CTA は `app_link(campaign, plan)` で `utm_source=site&utm_medium=cta&utm_campaign=…&plan=…` を付けてアプリへ送る（アプリが登録時に保存）
 - `org_jsonld()` の `sameAs` — G2 / LinkedIn / YouTube / X のプロフィール URL ができたら追加
 - `PRICE_DATE` — 競合価格を再確認した日付。比較ページ・料金ページ・ガイドの「最終更新」に出る

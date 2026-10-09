@@ -1,6 +1,6 @@
 """Core pages: home, pricing, how-it-works, brand-safety, security."""
 from . import common
-from .common import SITE, APP_URL, DEMO_URL, PRICE_DATE, app_link
+from .common import SITE, APP_URL, PRICE_DATE, app_link
 
 
 def _hero(lang):
@@ -9,7 +9,7 @@ def _hero(lang):
   <span class="eyebrow">AI commercial studio for marketing teams</span>
   <h1>Every spot,<br>in a day.</h1>
   <p class="sub">The structure and the prompts live inside Spot. You pick the platform, industry and audience, then review the first cut. Built on your real app screens, with the AI-use disclosure included — the same day.</p>
-  <div class="cta"><a class="btn btn-primary" href="{app_link('hero')}">Start free</a><a class="btn btn-ghost" href="{DEMO_URL}">Book a demo</a><span class="micro">No prompt writing. No editing skills.</span></div>
+  <div class="cta"><a class="btn btn-primary" href="{app_link('hero')}">Start free trial</a><a class="btn btn-ghost" href="{SITE}/pricing/">See pricing</a><span class="micro">No prompt writing. No editing skills.</span></div>
   <div class="stage" aria-hidden="true">
     <div class="fr vert"><span class="lbl">9:16</span><div class="cap">Done on site.</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
     <div class="fr wide"><span class="lbl">16:9</span><div class="cap">Every spot, in a day.</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
@@ -21,7 +21,7 @@ def _hero(lang):
   <span class="eyebrow">マーケティングチームのための AI 動画広告・CM 制作ツール</span>
   <h1>動画広告が、<br>その日のうちに。</h1>
   <p class="sub">構成もプロンプトも、Spot が持っています。あなたは配信先・業種・ターゲットを選んで、できた初稿を確認するだけ。実際のアプリ画面を使い、AI 利用の表記までついて、その日のうちに。</p>
-  <div class="cta"><a class="btn btn-primary" href="{app_link('hero')}">無料ではじめる</a><a class="btn btn-ghost" href="{DEMO_URL}">デモを予約</a><span class="micro">プロンプトも動画編集スキルも必要ありません。</span></div>
+  <div class="cta"><a class="btn btn-primary" href="{app_link('hero')}">7 日間無料で試す</a><a class="btn btn-ghost" href="{SITE}/ja/pricing/">料金を見る</a><span class="micro">プロンプトも動画編集スキルも必要ありません。</span></div>
   <div class="stage" aria-hidden="true">
     <div class="fr vert"><span class="lbl">9:16</span><div class="cap">現場で、その場で。</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
     <div class="fr wide"><span class="lbl">16:9</span><div class="cap">動画広告が、その日のうちに。</div><span class="play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
@@ -70,7 +70,7 @@ def home(lang):
             "faq": [
                 ("What is Spot?", "Spot is an AI commercial studio for in-house marketing teams. You choose platform, industry, audience and tone; Spot writes the script, generates live-action footage, composites your real product UI, adds voiceover and music, and exports a finished commercial in three patterns and three formats."),
                 ("How is Spot different from UGC ad generators like Creatify or Arcads?", "UGC tools render a talking avatar reading a script, one format at a time. Spot produces a full commercial with live-action shots, your actual product screens and a sound design, and delivers nine files per spot. See the [comparison](/compare/)."),
-                ("How much does Spot cost?", "Starter is $99 a month for 6 spots, Team is $399 for 25 spots and 5 seats, Business is $1,199 for 80 spots with unlimited seats, SSO and API. A free plan gives one watermarked spot a month."),
+                ("How much does Spot cost?", "Starter is $99 a month for 6 spots, Team is $399 for 25 spots and 5 seats, Business is $1,199 for 80 spots with unlimited seats, SSO and API. Every plan starts with a 7-day free trial that includes 2 spots; there is no free plan. Annual billing gives 1 month free."),
                 ("Do I need to write prompts?", "No. The expertise is built into the options. You pick from menus, review three intro patterns, and tweak in plain language such as “make the second shot brighter”."),
             ],
         }
@@ -106,7 +106,7 @@ def home(lang):
         "faq": [
             ("Spot とは何ですか？", "内製マーケティングチーム向けの AI CM 制作ツールです。配信先・業種・ターゲット・トーンを選ぶと、AI が台本を書き、実写映像を生成し、実際のプロダクト画面を合成、ナレーションと BGM を付けて、3 パターン × 3 フォーマットの完成 CM を書き出します。"),
             ("Creatify や Arcads のような UGC 広告ツールと何が違いますか？", "UGC ツールはアバターが台本を読む動画を 1 フォーマットずつ生成します。Spot は実写カット・実際のプロダクト画面・音響設計を含む「CM」を、1 スポットあたり 9 ファイルで納品します。[比較ページ](/ja/compare/)をご覧ください。"),
-            ("料金はいくらですか？", "Starter は月額 ¥14,800 で 6 スポット、Team は ¥59,800 で 25 スポット・5 席、Business は ¥178,000 で 80 スポット・席無制限・SSO・API。無料プランは月 1 スポット（透かし入り）です。"),
+            ("料金はいくらですか？", "Starter は月額 ¥14,800 で 6 スポット、Team は ¥59,800 で 25 スポット・5 席、Business は ¥178,000 で 80 スポット・席無制限・SSO・API。全プランに 7 日間の無料トライアル（2 スポット込み）が付き、無料プランはありません。年契約は 1 か月分無料です。"),
             ("プロンプトを書く必要はありますか？", "ありません。専門知識は選択肢に埋め込まれています。メニューから選び、3 つのイントロ案を確認し、「2 カット目をもう少し明るく」のように言葉で修正します。"),
         ],
     }
@@ -118,7 +118,7 @@ def pricing(lang):
         return {
             "path": "pricing", "crumbs": [], "eyebrow": "Pricing",
             "title": "Spot pricing — plans from $99 a month, priced per finished commercial",
-            "desc": "Spot plans: Free (1 spot), Starter $99 for 6 spots, Team $399 for 25 spots and 5 seats, Business $1,199 for 80 spots with SSO and API, Enterprise from $2,500. One spot = one finished commercial in 3 patterns × 3 formats.",
+            "desc": "Spot plans: Starter $99 for 6 spots, Team $399 for 25 spots and 5 seats, Business $1,199 for 80 spots with SSO and API, Enterprise from $2,500. One spot = one finished commercial in 3 patterns × 3 formats.",
             "h1": "Priced per spot.<br>Not per second.", "jsonld": [common.software_jsonld("en")],
             "lede": "One spot is one finished commercial — 3 intro patterns × 3 formats (16:9, 9:16, 1:1) = 9 ready-to-ship files. Every plan includes the script, live-action generation, your real product UI, voiceover and music.",
             "updated": PRICE_DATE,
@@ -146,9 +146,9 @@ def pricing(lang):
             ],
             "faq": [
                 ("What exactly is a spot?", "A spot is one finished commercial: three intro patterns rendered in three formats, so nine files. It is the unit on every plan, and the balance in the app is shown in spots."),
-                ("What happens if I use all my spots?", "You can buy extra spots at $19 each on Starter and Team, or $15 on Business, without changing plans. Unused spots do not roll over on monthly billing; annual plans pool spots across the year."),
-                ("Is there a free plan?", "Yes. The Free plan gives one watermarked 720p spot a month, with one seat and one brand, so you can see a real result before paying."),
-                ("Do you offer annual billing and invoicing?", "Annual billing gives two months free. Business and Enterprise can pay by invoice; Japanese customers can be billed in JPY."),
+                ("What happens if I use all my spots?", "You can buy extra spots at $19 each on Starter and Team, or $15 on Business, without changing plans. Unused spots do not roll over; the allowance resets each month on both monthly and annual billing."),
+                ("Is there a free plan or trial?", "There is no free plan. Every plan starts with a 7-day free trial that includes 2 spots, so you see a real finished commercial before you pay. Cancel during the trial and you are not charged."),
+                ("Do you offer annual billing and invoicing?", "Annual billing gives one month free (you pay for 11 months). Business and Enterprise can pay by invoice; Japanese customers can be billed in JPY."),
                 ("Which plan has SSO and an API?", "Business and Enterprise include SSO, an API and an audit log. Enterprise adds white-label output for agencies, a DPA and a security review."),
                 ("Do prices include the AI models?", "Yes. Model costs are included. Business and Enterprise unlock Premium quality models and 4K output; other plans use Spot’s default model routing."),
             ],
@@ -157,7 +157,7 @@ def pricing(lang):
     return {
         "path": "pricing", "crumbs": [], "eyebrow": "料金",
         "title": "Spot の料金｜月額 ¥14,800 から、完成 CM 1 本単位の料金プラン",
-        "desc": "Spot の料金プラン：Free（月 1 スポット）、Starter ¥14,800（6 スポット）、Team ¥59,800（25 スポット・5 席）、Business ¥178,000（80 スポット・SSO・API）、Enterprise ¥380,000〜。1 スポット＝完成 CM 1 本（3 パターン × 3 フォーマット）。",
+        "desc": "Spot の料金プラン：Starter ¥14,800（6 スポット）、Team ¥59,800（25 スポット・5 席）、Business ¥178,000（80 スポット・SSO・API）、Enterprise ¥380,000〜。1 スポット＝完成 CM 1 本（3 パターン × 3 フォーマット）。",
         "h1": "秒ではなく、<br>スポットで。", "jsonld": [common.software_jsonld("ja")],
         "lede": "1 スポット＝完成した CM 1 本。3 つのイントロ案 × 3 フォーマット（16:9・9:16・1:1）＝すぐ入稿できる 9 ファイル。台本・実写生成・実際のプロダクト画面・ナレーション・BGM は全プランに含まれます。",
         "updated": PRICE_DATE,
@@ -185,9 +185,9 @@ def pricing(lang):
         ],
         "faq": [
             ("スポットとは何ですか？", "完成した CM 1 本のことです。3 つのイントロ案を 3 フォーマットで書き出すので 9 ファイルになります。全プラン共通の単位で、アプリ内の残高もスポットで表示されます。"),
-            ("スポットを使い切ったらどうなりますか？", "プランを変えずに追加スポットを購入できます（Starter・Team は ¥2,800、Business は ¥2,200）。月払いでは未使用分は繰り越されません。年契約は年間分をまとめて使えます。"),
-            ("無料プランはありますか？", "あります。月 1 スポット（透かし入り・720p）、1 席・1 ブランドで、支払い前に実際の仕上がりを確認できます。"),
-            ("年契約や請求書払いはできますか？", "年契約は 2 か月分無料です。Business 以上は請求書払い・日本円請求に対応します。"),
+            ("スポットを使い切ったらどうなりますか？", "プランを変えずに追加スポットを購入できます（Starter・Team は ¥2,800、Business は ¥2,200）。未使用分は繰り越されず、月払い・年契約とも毎月リセットされます。"),
+            ("無料プランやトライアルはありますか？", "無料プランはありません。すべてのプランに 7 日間の無料トライアル（2 スポット込み）が付き、支払い前に実際の完成 CM を確認できます。トライアル中に解約すれば請求は発生しません。"),
+            ("年契約や請求書払いはできますか？", "年契約は 1 か月分無料（11 か月分の請求）です。Business 以上は請求書払い・日本円請求に対応します。"),
             ("SSO や API はどのプランですか？", "Business と Enterprise に SSO・API・監査ログが含まれます。Enterprise は代理店向けのホワイトラベル出力、DPA、セキュリティ審査対応が加わります。"),
             ("AI モデルの利用料は含まれていますか？", "含まれています。Business 以上は Premium quality モデルと 4K 出力が使えます。その他のプランは Spot 標準のモデル振り分けです。"),
         ],

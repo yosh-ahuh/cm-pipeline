@@ -220,7 +220,7 @@ def best(lang):
                     "We update this page every eight to twelve weeks. Vendors change credit allowances at the same price often — AdCreative.ai halved Professional credits in 2026, HeyGen raised Video Agent consumption in July 2026 — so check the linked pages before buying."]},
             ],
             "faq": [("Which tool is cheapest per video?", "Predis and Pencil are cheapest per generation for simple social output. Among commercial-grade tools, Spot’s Team plan is $16 per spot with nine files, versus $87–200 per finalized video on Waymark."),
-                    ("Which tools have a free plan?", "Spot (1 spot a month), Creatify (10 credits), HeyGen (3 videos), Pencil (6 ads), Predis and Captions have free tiers. Arcads and Poolday do not."),
+                    ("Which tools have a free plan or trial?", "Creatify (10 credits), HeyGen (3 videos), Pencil (6 ads), Predis and Captions have free tiers. Spot has no free plan but gives every plan a 7-day free trial with 2 spots. Arcads and Poolday offer neither."),
                     ("Which is best for Japanese-language ads?", "Spot generates scripts and voiceover in Japanese with a pronunciation guide. HeyGen supports Japanese dubbing. Most UGC tools are English-first.")],
             "related": [("All comparisons", "compare"), ("Pricing", "pricing"), ("Cost of a 15-second commercial", "guides/how-much-does-a-15-second-commercial-cost")],
         })
@@ -253,7 +253,7 @@ def best(lang):
                 "このページは 8〜12 週ごとに更新します。同じ価格でクレジット付与を減らす改定が多く（AdCreative.ai は 2026 年に Professional のクレジットを半減、HeyGen は 2026 年 7 月に Video Agent の消費を増加）、購入前にリンク先を確認してください。"]},
         ],
         "faq": [("動画 1 本あたり最も安いのは？", "解説動画なら NoLang、SNS 投稿なら Predis や Pencil が最安です。CM 品質のツールでは、Spot の Team が 1 スポット（9 ファイル）約 ¥2,400、Waymark は完成 1 本 $87〜200、Kaizen Ad は 1 本 ¥5 万〜です。"),
-                ("無料プランがあるのは？", "Spot（月 1 スポット）、NoLang（3 本）、Creatify（10 クレジット）、HeyGen（3 本）に無料枠があります。Arcads・Poolday にはありません。RICHKA は無料トライアルがあります。"),
+                ("無料プランやトライアルがあるのは？", "NoLang（3 本）、Creatify（10 クレジット）、HeyGen（3 本）に無料枠があります。Spot は無料プランの代わりに全プランに 7 日間の無料トライアル（2 スポット込み）が付きます。Arcads・Poolday にはありません。RICHKA は無料トライアルがあります。"),
                 ("日本語のナレーションに対応しているのは？", "Spot は日本語の台本とナレーションを読み仮名辞書付きで生成します。NoLang は日本語ネイティブ、HeyGen は日本語吹き替えに対応。UGC ツールの多くは英語中心です。")],
         "related": [("すべての比較", "compare"), ("料金", "pricing"), ("15 秒 CM の制作費用と相場", "guides/how-much-does-a-15-second-commercial-cost")],
     })

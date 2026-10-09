@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import html
 import json
+import math
 import os
 import shutil
 import sys
@@ -108,7 +109,9 @@ blockquote.pull{margin:28px 0 0;padding:22px 26px;border-left:3px solid var(--bl
 .band{background:var(--ink);color:var(--ground);border-radius:22px;padding:48px;margin:8px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:30px;box-shadow:var(--shadow-lift)}.metric .n{font-family:var(--fd);font-weight:800;font-size:clamp(36px,5vw,54px);letter-spacing:-.03em;line-height:1}.metric .n em{color:#7E97FF;font-style:normal}.metric .k{color:color-mix(in srgb,var(--ground) 62%,transparent);font-size:14px;margin-top:10px}
 .plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:34px}.plan{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px 22px;display:flex;flex-direction:column;gap:8px}.plan.hl{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue) inset}
 .plan .nm{font-family:var(--fd);font-weight:800;font-size:20px}.plan .pr{font-family:var(--fd);font-weight:800;font-size:34px;letter-spacing:-.02em;line-height:1;margin-top:4px}.plan .pr small{font-size:14px;color:var(--muted);font-weight:500;letter-spacing:0}.plan .jp{font-family:var(--fm);font-size:12px;color:var(--muted)}
-.plan .sp{font-size:15px;margin-top:8px}.plan ul{margin:8px 0 0;padding:0;list-style:none;font-size:13.5px;color:var(--muted);display:grid;gap:5px}.plan ul li::before{content:"— ";color:var(--faint)}.plan .btn{margin-top:auto;justify-content:center;padding:11px 16px;font-size:14px}
+.plan .sp{font-size:15px;margin-top:8px}.plan .ps{font-family:var(--fm);font-size:12px;color:var(--muted)}.plan .pb{font-family:var(--fm);font-size:12px;color:var(--muted);min-height:1.2em}
+.billing{display:inline-flex;margin-top:22px;border:1px solid var(--line-strong);border-radius:11px;overflow:hidden;font-family:var(--fm);font-size:13px}.billing button{border:none;background:transparent;padding:10px 16px;color:var(--muted);cursor:pointer}.billing button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+.trial{margin-top:16px;font-size:15px;color:var(--blue-ink)}.plan ul{margin:8px 0 0;padding:0;list-style:none;font-size:13.5px;color:var(--muted);display:grid;gap:5px}.plan ul li::before{content:"— ";color:var(--faint)}.plan .btn{margin-top:auto;justify-content:center;padding:11px 16px;font-size:14px}
 .plain{margin-top:18px;padding:18px 22px;background:var(--surface-2);border-radius:var(--r);font-size:15px;line-height:1.75;font-family:var(--fm);color:var(--muted)}.plain b{color:var(--ink);font-weight:500}
 .final{text-align:center;padding:84px 0}.final h2{font-family:var(--fd);font-size:clamp(32px,5vw,56px);font-weight:800}html[lang=ja] .final h2{font-size:clamp(28px,4vw,44px)}.final p{color:var(--muted);font-size:18px;margin:16px auto 30px;max-width:44ch}
 .related{margin-top:48px;padding-top:28px;border-top:1px solid var(--line)}.related h2{font-size:14px;font-family:var(--fm);font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.related ul{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:10px}.related li a{display:inline-block;padding:8px 14px;border:1px solid var(--line-strong);border-radius:9px;font-size:14px;color:var(--ink)}.related li a:hover{border-color:var(--blue);color:var(--blue-ink)}
@@ -151,6 +154,7 @@ def head(lang: str, page: dict) -> str:
     other = url("ja" if lang == "en" else "en", path)
     title = page["title"]
     desc = page["desc"]
+    og_name = "spot-cover.png" if lang == "en" else "spot-cover-ja.png"
     og_title = page.get("og_title", title)
     ld = [common.org_jsonld(lang), common.website_jsonld(lang)]
     ld += page.get("jsonld", [])
@@ -191,16 +195,17 @@ def head(lang: str, page: dict) -> str:
 <meta property="og:locale:alternate" content="{'ja_JP' if lang=='en' else 'en_US'}">
 <meta property="og:title" content="{esc(og_title)}">
 <meta property="og:description" content="{esc(desc)}">
-<meta property="og:image" content="{SITE}/og/spot-cover.png">
+<meta property="og:image" content="{SITE}/og/{og_name}">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Spot — the AI commercial studio for marketing teams.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{esc(og_title)}">
 <meta name="twitter:description" content="{esc(desc)}">
-<meta name="twitter:image" content="{SITE}/og/spot-cover.png">
+<meta name="twitter:image" content="{SITE}/og/{og_name}">
 {FONTS}
 <style>{CSS}</style>
 {''.join(jsonld(x) for x in ld)}
+<script defer src="/_vercel/insights/script.js"></script>
 <script>var _d=document.documentElement;_d.classList.add('js');addEventListener('DOMContentLoaded',function(){{var e=document.querySelectorAll('.reveal'),r=function(x){{x.classList.add('in')}};if(!('IntersectionObserver'in window)){{e.forEach(r);return}}var io=new IntersectionObserver(function(es){{es.forEach(function(en){{if(en.isIntersecting){{r(en.target);io.unobserve(en.target)}}}})}},{{rootMargin:'0px 0px -8% 0px'}});e.forEach(function(x){{io.observe(x)}});setTimeout(function(){{e.forEach(r)}},1500);}});</script>
 </head>
 <body>"""
@@ -218,7 +223,7 @@ def nav(lang: str, current: str) -> str:
   <div class="nav-links">{links}</div>
   <div class="nav-right">
     <div class="lang" role="group" aria-label="Language"><a href="{en_here}" hreflang="en"{' aria-current="true"' if lang=='en' else ''}>EN</a><a href="{ja_here}" hreflang="ja"{' aria-current="true"' if lang=='ja' else ''}>日本語</a></div>
-    <a class="btn btn-primary" style="padding:10px 18px" href="{common.DEMO_URL}">{esc(t['demo'])}</a>
+    <a class="btn btn-primary" style="padding:10px 18px" href="{common.app_link('nav')}">{esc(t['start'])}</a>
   </div>
 </div></nav>"""
 
@@ -254,7 +259,7 @@ def final_cta(lang: str, page: dict) -> str:
     return f"""<section class="final"><div class="wrap">
   <h2>{esc(h)}</h2><p>{esc(p)}</p>
   <a class="btn btn-primary" style="padding:15px 28px;font-size:16px" href="{common.app_link('final')}">{esc(t['start'])}</a>
-  <a class="btn btn-ghost" style="padding:15px 28px;font-size:16px;margin-left:10px" href="{common.DEMO_URL}">{esc(t['demo'])}</a>
+  <a class="btn btn-ghost" style="padding:15px 28px;font-size:16px;margin-left:10px" href="{url(lang, 'pricing')}">{esc(t['pricing_cta'])}</a>
 </div></section>"""
 
 
@@ -347,15 +352,32 @@ def block_plans(b, lang):
         feats = "".join(f"<li>{esc(x)}</li>" for x in p["features"][lang])
         hl = ' hl' if p.get("hl") else ""
         badge = f'<span class="pop">{poplabel}</span>' if p.get("hl") else ""
-        cta_href = common.DEMO_URL if p["id"] in ("business", "enterprise") else common.app_link("pricing", p["id"])
-        cta_txt = t["talk"] if p["id"] in ("business", "enterprise") else t["start"]
-        cards += f"""<div class="plan{hl}">{badge}<div class="nm">{esc(name)}</div>
+        cta_href = common.CONTACT_URL if p["id"] == "enterprise" else common.app_link("pricing", p["id"])
+        cta_txt = t["talk"] if p["id"] == "enterprise" else t["start"]
+        per_spot = ""
+        if isinstance(p["usd"], int) and p["usd"] > 0 and p.get("n"):
+            per_spot = f'<div class="ps">{esc(t["per_spot"].format(usd=p["usd"] / p["n"], jpy=int(math.floor(p["jpy"] / p["n"] / 10 + 0.5) * 10)))}</div>'
+        data = f' data-usd="{p["usd"]}" data-jpy="{p["jpy"]}" data-n="{p["n"]}"' if isinstance(p["usd"], int) and p.get("n") else ""
+        cards += f"""<div class="plan{hl}"{data}>{badge}<div class="nm">{esc(name)}</div>
   <div class="pr">{esc(price)}<small> {per}</small></div><div class="jp">{esc(jp)}{(' ' + t['per_month']) if isinstance(p['jpy'], int) else ''}</div>
-  <div class="sp"><strong>{esc(p['spots'][lang])}</strong></div><ul>{feats}</ul>
+  <div class="sp"><strong>{esc(p['spots'][lang])}</strong></div>{per_spot}<div class="pb"></div><ul>{feats}</ul>
   <a class="btn {'btn-primary' if p.get('hl') else 'btn-ghost'}" href="{cta_href}">{esc(cta_txt)}</a></div>"""
     plain = "<br>".join(md_inline(x) for x in common.PLAIN_PRICE[lang])
     head_ = f'<div class="sec-head"><span class="eyebrow">{esc(b.get("eyebrow",""))}</span><h2>{esc(b["h"])}</h2>{("<p>"+md_inline(b["p"])+"</p>") if b.get("p") else ""}</div>' if b.get("h") else ""
-    return f'{head_}<div class="plans">{cards}</div><div class="plain">{plain}</div>'
+    trial = f'<p class="trial">{esc(t["trial"])}</p>'
+    toggle = (f'<div class="billing" role="group" aria-label="Billing period"><button type="button" data-bill="m" aria-pressed="true">{esc(t["bill_m"])}</button>'
+              f'<button type="button" data-bill="y" aria-pressed="false">{esc(t["bill_y"])}</button></div>')
+    billed = json.dumps(t["billed_year"], ensure_ascii=False)
+    js = f"""<script>(function(){{var M={common.ANNUAL_MONTHS},B='m',ja={'true' if lang=='ja' else 'false'},T={billed};
+function f(v,j){{return (j?'¥':'$')+Math.round(v).toLocaleString(j?'ja-JP':'en-US')}}
+function r(){{document.querySelectorAll('.plan[data-usd]').forEach(function(c){{var u=+c.dataset.usd,y=+c.dataset.jpy,n=+c.dataset.n,k=B==='y'?M/12:1;
+var pr=c.querySelector('.pr'),jp=c.querySelector('.jp'),ps=c.querySelector('.ps'),pb=c.querySelector('.pb');
+if(pr)pr.innerHTML=f(u*k,false)+'<small> {esc(t["per_month"])}</small>';if(jp)jp.textContent=f(y*k,true)+' {esc(t["per_month"])}';
+if(ps)ps.textContent=ja?('1 本あたり 約 '+f(Math.round(y*k/n/10)*10,true)+'・9 ファイル'):('≈ $'+(u*k/n).toFixed(2)+' per spot · 9 files');
+if(pb)pb.textContent=B==='y'?T.replace('{{y}}',ja?f(y*M,true):f(u*M,false)):'';}});
+document.querySelectorAll('.billing button').forEach(function(b){{b.setAttribute('aria-pressed',b.dataset.bill===B)}});}}
+document.querySelectorAll('.billing button').forEach(function(b){{b.addEventListener('click',function(){{B=b.dataset.bill;r()}})}});r();}})();</script>"""
+    return f'{head_}{trial}{toggle}<div class="plans">{cards}</div><div class="plain">{plain}</div>{js}'
 
 
 def render_blocks(blocks, lang):
@@ -401,8 +423,8 @@ def render_page(lang: str, page: dict) -> str:
 
 
 # --------------------------------------------------------------------------- assets
-def og_image(path: Path):
-    """1200×630 social card — dark, branded (star logo + tagline). Uses Pillow; skips if absent."""
+def og_image(path: Path, lang: str = "en"):
+    """1200×630 social card — dark, branded (star logo + tagline), per language. Uses Pillow; skips if absent."""
     try:
         from PIL import Image, ImageDraw, ImageFont, ImageFilter
     except Exception:
@@ -419,8 +441,12 @@ def og_image(path: Path):
     d = ImageDraw.Draw(im)
 
     def font(size, bold=True):
-        for cand in (["/System/Library/Fonts/SF-Pro-Display-Black.otf", "/System/Library/Fonts/Supplemental/Arial Bold.ttf"]
-                     if bold else ["/System/Library/Fonts/SF-Pro-Display-Regular.otf", "/System/Library/Fonts/Supplemental/Arial.ttf"]):
+        ja_b, ja_r = "/System/Library/Fonts/ヒラギノ角ゴシック W7.ttc", "/System/Library/Fonts/ヒラギノ角ゴシック W4.ttc"
+        cands = (["/System/Library/Fonts/SF-Pro-Display-Black.otf", "/System/Library/Fonts/Supplemental/Arial Bold.ttf"]
+                 if bold else ["/System/Library/Fonts/SF-Pro-Display-Regular.otf", "/System/Library/Fonts/Supplemental/Arial.ttf"])
+        if lang == "ja":
+            cands = [ja_b if bold else ja_r] + cands
+        for cand in cands:
             if os.path.exists(cand):
                 try:
                     return ImageFont.truetype(cand, size)
@@ -436,10 +462,15 @@ def og_image(path: Path):
         logo = logo.resize((int(logo.width * lh / logo.height), lh), Image.LANCZOS)
         im.paste(logo, (PAD, 116), logo)
     d = ImageDraw.Draw(im)
-    d.text((PAD, 288), "Ad videos,", font=font(96), fill=INK)
-    d.text((PAD, 288 + 104), "just by choosing.", font=font(96), fill=ACCENT)
-    d.text((PAD + 3, 288 + 104 + 128), "AI writes the script and generates the footage, UI and voice —", font=font(30, False), fill=MUTED)
-    d.text((PAD + 3, 288 + 104 + 128 + 42), "a client-ready first cut, the same day.", font=font(30, False), fill=MUTED)
+    if lang == "ja":
+        d.text((PAD, 288), "選ぶだけで、", font=font(92), fill=INK)
+        d.text((PAD, 288 + 108), "広告動画。", font=font(92), fill=ACCENT)
+        d.text((PAD + 3, 288 + 108 + 132), "AIが台本・実写・UI・音声を生成。その日のうちに、初稿。", font=font(30, False), fill=MUTED)
+    else:
+        d.text((PAD, 288), "Ad videos,", font=font(96), fill=INK)
+        d.text((PAD, 288 + 104), "just by choosing.", font=font(96), fill=ACCENT)
+        d.text((PAD + 3, 288 + 104 + 128), "AI writes the script and generates the footage, UI and voice —", font=font(30, False), fill=MUTED)
+        d.text((PAD + 3, 288 + 104 + 128 + 42), "a client-ready first cut, the same day.", font=font(30, False), fill=MUTED)
     path.parent.mkdir(parents=True, exist_ok=True)
     im.save(path, "PNG", optimize=True)
 
@@ -513,7 +544,8 @@ def build():
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst)
 
-    og_image(DIST / "og" / "spot-cover.png")
+    og_image(DIST / "og" / "spot-cover.png", "en")
+    og_image(DIST / "og" / "spot-cover-ja.png", "ja")
 
     # url list for IndexNow / manual submission
     write(DIST / "urls.txt", "\n".join(url(l, p["path"]) for l, p in all_pages) + "\n")
