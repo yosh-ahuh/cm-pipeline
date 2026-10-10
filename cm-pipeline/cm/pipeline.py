@@ -391,7 +391,14 @@ def build(proj: Project, ctx: Ctx) -> dict:
                     ctx.log(f"  SKIP  render {raw.name}（既存。--force で再レンダ）")
                 else:
                     ctx.log(f"  RENDER {raw.name}  ←  {comp_id}")
-                    subprocess.run(cmd, cwd=prototype, check=True)
+                    # 出力を取り込み、失敗時は stderr 末尾を例外に含める（コンテナでは jobs.detail からしか原因を追えない）
+                    r = subprocess.run(cmd, cwd=prototype, text=True, capture_output=True)
+                    tail = "\n".join([ln for ln in (r.stderr or r.stdout or "").splitlines() if ln.strip()][-25:])
+                    if r.returncode != 0:
+                        ctx.log("  ---- remotion stderr (tail) ----\n" + tail)
+                        raise RuntimeError(f"remotion render failed (exit {r.returncode}) {comp_id} {fmt['w']}x{fmt['h']}: " + tail[-1500:])
+                    if tail:
+                        ctx.log("  remotion: " + tail.splitlines()[-1][:160])
             rep = delivery.postprocess(raw, target, pkey, pspec, ctx.log, dry=ctx.dry_run)
             rep.update({"variant": v["id"], "format": fmt["id"], "composition": comp_id, "props": props})
             if comp.get("content_credentials", True):
