@@ -369,6 +369,15 @@ def build(proj: Project, ctx: Ctx) -> dict:
             conc = os.environ.get("REMOTION_CONCURRENCY", "1").strip()
             if conc:
                 cmd.append(f"--concurrency={conc}")
+            # コンテナでの安定化（Remotion 推奨）: Linux 既定の single-process Chrome は "Page crashed!" を起こしやすい
+            if os.environ.get("REMOTION_MULTIPROCESS", "1").strip() == "1":
+                cmd.append("--enable-multiprocess-on-linux")
+            gl = os.environ.get("REMOTION_GL", "").strip()            # 例: swangle（ソフトウェア GL。GPU の無いコンテナ向け）
+            if gl:
+                cmd.append(f"--gl={gl}")
+            cache_mb = os.environ.get("REMOTION_OFFTHREADVIDEO_CACHE_MB", "").strip()   # OffthreadVideo のフレームキャッシュ上限（低メモリ環境で小さく）
+            if cache_mb.isdigit():
+                cmd.append(f"--offthreadvideo-cache-size-in-bytes={int(cache_mb) * 1024 * 1024}")
             # REMOTION_SCALE（未設定＝1.0）: 描画解像度の倍率。0.6667 で 1920×1080 → 1280×720 相当になり Chrome のメモリが大きく下がる。
             scale = os.environ.get("REMOTION_SCALE", "").strip()
             if scale and scale not in ("1", "1.0"):
