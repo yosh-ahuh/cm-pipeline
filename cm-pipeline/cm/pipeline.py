@@ -353,6 +353,10 @@ def build(proj: Project, ctx: Ctx) -> dict:
             conc = os.environ.get("REMOTION_CONCURRENCY", "1").strip()
             if conc:
                 cmd.append(f"--concurrency={conc}")
+            # REMOTION_SCALE（未設定＝1.0）: 描画解像度の倍率。0.6667 で 1920×1080 → 1280×720 相当になり Chrome のメモリが大きく下がる。
+            scale = os.environ.get("REMOTION_SCALE", "").strip()
+            if scale and scale not in ("1", "1.0"):
+                cmd.append(f"--scale={scale}")
             planned += 1
             if ctx.dry_run:
                 target.parent.mkdir(parents=True, exist_ok=True)
