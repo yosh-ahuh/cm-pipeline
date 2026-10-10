@@ -4,7 +4,7 @@
 
 ## 1. 現状（2026-10-08 時点の事実）
 
-> **2026-10-10 決定: アプリの正本は https://github.com/yosh-ahuh/spot.git（main、作業ツリー `/Users/yosh/work/spot-app`）。** このモノレポ（yosh-ahuh/cm-pipeline、master）の `spot-app/` は非正本のコピーで、アプリコードの変更は spot 側に入れる。`cm-pipeline/`（worker が clone）・`site/`・`spot-landing.html`・`docs/` は当面このモノレポに置く（docs の最終置き場は追って決定）。
+> **2026-10-10 決定（同日に更新）: 正本はこのモノレポ https://github.com/yosh-ahuh/cm-pipeline.git（master、作業ツリー `/Users/yosh/work/SPOT`）。** 一時的に yosh-ahuh/spot（main）を正本とする判断が出たが、spot 側に 10/6〜10/10 のアプリ・ワーカー変更（7 ステップ制作フロー、ブランド取り込み、台本ステージ、検品、027〜029）が無いため撤回。yosh-ahuh/spot は旧リポとして凍結し、アプリ・ワーカー・サイト・LP・docs はすべてここで管理する。Railway のワーカーはこのモノレポから `railway up`（実装セッションに一元化）。差分の記録は docs/port-to-spot-2026-10.md。
 
 | 役割 | 状態 |
 |---|---|
