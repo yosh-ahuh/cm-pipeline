@@ -448,8 +448,9 @@ def build(proj: Project, ctx: Ctx) -> dict:
                     # 出力を取り込み、失敗時は stderr 末尾を例外に含める（コンテナでは jobs.detail からしか原因を追えない）
                     r = subprocess.run(cmd, cwd=prototype, text=True, capture_output=True)
                     # \r 区切りの進捗行（ffmpeg の frame=… / Remotion の Rendered …）を除いて、意味のある末尾だけ残す
-                    raw = (r.stderr or "") + "\n" + (r.stdout or "")
-                    lines = [ln.strip() for ln in raw.replace("\r", "\n").splitlines() if ln.strip()]
+                    # 注意: raw はレンダ出力 mp4 の Path。ログ用には別変数を使う（過去にここで raw を上書きし postprocess に巨大ログが渡る回帰があった）
+                    out_log = (r.stderr or "") + "\n" + (r.stdout or "")
+                    lines = [ln.strip() for ln in out_log.replace("\r", "\n").splitlines() if ln.strip()]
                     meaningful = [ln for ln in lines if not ln.startswith(("frame=", "Rendered ", "Encoding", "Bundling", "Copying", "Downloading", "↓ "))]
                     last_progress = next((ln for ln in reversed(lines) if ln.startswith(("Rendered ", "frame="))), "")
                     tail = "\n".join(meaningful[-25:] + ([f"(last progress: {last_progress})"] if last_progress else []))
