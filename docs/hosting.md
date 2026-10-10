@@ -4,6 +4,8 @@
 
 ## 1. 現状（2026-10-08 時点の事実）
 
+> **2026-10-10 決定: アプリの正本は https://github.com/yosh-ahuh/spot.git（main、作業ツリー `/Users/yosh/work/spot-app`）。** このモノレポ（yosh-ahuh/cm-pipeline、master）の `spot-app/` は非正本のコピーで、アプリコードの変更は spot 側に入れる。`cm-pipeline/`（worker が clone）・`site/`・`spot-landing.html`・`docs/` は当面このモノレポに置く（docs の最終置き場は追って決定）。
+
 | 役割 | 状態 |
 |---|---|
 | アプリ `spot-app/` | **Vercel にデプロイ済み**。チーム `creative-punx`、プロジェクト `spot`、本番 URL `https://spot-smoky-six.vercel.app`（2026-09-25 作成、最終デプロイ 2026-10-01）。ローカルの `spot-app` で `vercel --prod` を実行＝ローカルの `config.js` ごとアップロード。**Vercel Authentication が有効で、Vercel にログインした人しか開けない**（外部は 302） |
