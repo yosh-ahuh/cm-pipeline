@@ -34,6 +34,9 @@ import argparse
 import json
 import mimetypes
 import os
+import re
+import shutil
+import subprocess
 import sys
 import time
 import urllib.request
@@ -59,6 +62,33 @@ def env(name: str) -> str:
     if not v:
         sys.exit(f"環境変数 {name} が未設定です（README 参照）。")
     return v
+
+
+_ALERTED: set[str] = set()   # 同一プロセス内での重複通知防止
+
+
+def alert_ops(subject: str, text: str, dedup_key: str = "") -> None:
+    """運用アラート。Resend が設定されていればメール送信、無ければログ出力のみ（無害）。
+    env: RESEND_API_KEY / SPOT_ALERT_EMAIL(宛先) / SPOT_ALERT_FROM(検証済み差出人)。"""
+    if dedup_key:
+        if dedup_key in _ALERTED:
+            return
+        _ALERTED.add(dedup_key)
+    print(f"  ALERT  {subject} — {text[:200]}", flush=True)
+    key = os.environ.get("RESEND_API_KEY")
+    to = os.environ.get("SPOT_ALERT_EMAIL")
+    frm = os.environ.get("SPOT_ALERT_FROM")
+    if not (key and to and frm):
+        return   # 通知先未設定なら print のみ
+    try:
+        data = json.dumps({"from": frm, "to": [to], "subject": subject, "text": text}).encode()
+        req = urllib.request.Request(
+            "https://api.resend.com/emails", data=data, method="POST",
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
+                     "User-Agent": "SpotWorker/1.0 (+ops alert)"})
+        urllib.request.urlopen(req, timeout=15).read()
+    except Exception as e:  # noqa: BLE001
+        print(f"  ALERT send failed: {e}", flush=True)
 
 
 class Supa:
@@ -177,57 +207,122 @@ def _fal_key() -> str | None:
 
 # spot-app の spec（ウィザード生成）→ cm-pipeline project.yaml。
 # cuts は {id, role, type} なので role を被写体に、業種/トーンを語彙に落とす。
+#
+# spec はクライアントが自由に書ける（projects の RLS）＝信頼できない入力。
+# cm-pipeline は spec の値をファイル名・ローカルパス・レンダ設定としてそのまま使うため、
+# ここで「許可したキー・型・形式だけ」を組み立て直す（Allow List）。特に:
+#   ・render（prototype/entry/composition）は spec から一切受け取らない（任意コード実行の防止）
+#   ・ファイル名になる id は SAFE_ID のみ（パストラバーサル防止）
+#   ・素材パスは自組織プレフィックス配下の Storage パスのみ（ローカル読み出し・他テナント参照の防止）
 _TONE = {"ドキュメンタリー": "documentary", "documentary": "documentary"}
+SAFE_ID = re.compile(r"^[A-Za-z0-9_-]{1,32}$")
+CUT_TYPES = {"live-action", "ui", "graphic", "cta"}
+RENDER = {"composition": "SpotAd", "prototype": str(SPOT_ROOT / "ad-prototype")}
+MAX_CUTS, MAX_FORMATS, MAX_VARIANTS, MAX_NARRATION, MAX_BGM, MAX_UI_ASSETS = 24, 3, 3, 24, 2, 8
+# 生成モデルは既定（検証済み）のみ。spec 経由の任意モデル指定で原価が跳ねないように。
+VOICE_MODELS = {"minimax-speech-02-hd"}
+BGM_MODELS = {"lyria2"}
+SFX_MODELS = {"elevenlabs-sfx-v2"}
+
+
+def _id(v) -> str:
+    if not isinstance(v, str) or not SAFE_ID.match(v):
+        raise ValueError(f"不正な id: {v!r}")
+    return v
+
+
+def _txt(v, n: int = 200) -> str | None:
+    return v[:n] if isinstance(v, str) else None
+
+
+def _num(v, lo: float, hi: float) -> float | None:
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        return None
+    return min(max(float(v), lo), hi)
+
+
+def _txts(v, n: int = 200, k: int = 8) -> list[str]:
+    return [x[:n] for x in (v or [])[:k] if isinstance(x, str)] if isinstance(v, list) else []
+
+
+def _clean(d: dict) -> dict:
+    return {k: v for k, v in d.items() if v is not None}
 
 
 def spec_to_project(project_id: str, spec: dict, product: str | None) -> dict:
-    sel = spec.get("selections", {}) or {}
-    meta = spec.get("meta", {}) or {}
-    out = spec.get("output", {}) or {}
-    formats = out.get("formats") or [{"id": "wide", "w": 1920, "h": 1080}]
+    spec = spec if isinstance(spec, dict) else {}
+    sel = spec.get("selections") if isinstance(spec.get("selections"), dict) else {}
+    meta = spec.get("meta") if isinstance(spec.get("meta"), dict) else {}
+    out = spec.get("output") if isinstance(spec.get("output"), dict) else {}
+
+    formats = []
+    for f in (out.get("formats") or [])[:MAX_FORMATS]:
+        if isinstance(f, dict) and _num(f.get("w"), 16, 3840) and _num(f.get("h"), 16, 3840):
+            formats.append({"id": _id(f.get("id")), "w": int(f["w"]), "h": int(f["h"])})
+    formats = formats or [{"id": "wide", "w": 1920, "h": 1080}]
+    variants = []
+    for v in (out.get("variants") or [])[:MAX_VARIANTS]:
+        if isinstance(v, dict):
+            variants.append(_clean({"id": _id(v.get("id")), "splash": _txt(v.get("splash"), 60)}))
+    variants = variants or [{"id": "A"}, {"id": "B"}, {"id": "C"}]
+
     cuts = []
     narration = []   # P4: 台本ステージが付けたナレーション → script.narration（TTS は読み方適用済みの tts を優先）
-    for i, c in enumerate(spec.get("cuts") or [], 1):
+    raw_cuts = spec.get("cuts") or []
+    if not isinstance(raw_cuts, list) or len(raw_cuts) > MAX_CUTS:
+        raise ValueError("cuts が不正です")
+    for i, c in enumerate(raw_cuts, 1):
         if isinstance(c, str):
             c = {"id": c, "type": "live-action"}
-        cut = {"id": c["id"], "type": c.get("type", "live-action")}
-        role = c.get("role") or c["id"]
+        if not isinstance(c, dict):
+            raise ValueError(f"不正な cut: {c!r}")
+        cut = {"id": _id(c.get("id")), "type": c.get("type") or "live-action"}
+        if cut["type"] not in CUT_TYPES:
+            raise ValueError(f"不正な cut type: {cut['type']!r}")
+        role = _txt(c.get("role"), 60) or cut["id"]
         label = script_gen.ROLE.get(role, {}).get("label", role)
-        telop = c.get("telop") or ([c["caption"]] if c.get("caption") else [label])
-        if c.get("narration"):
-            nid = c.get("narration_id") or f"na{i}"
-            narration.append({"id": nid, "text": c.get("narration_tts") or c["narration"], "display": c["narration"]})
+        telop = _txts(c.get("telop"), 80) or ([_txt(c.get("caption"), 80)] if _txt(c.get("caption"), 80) else [label])
+        nar = _txt(c.get("narration"), 400)
+        if nar:
+            nid = _id(c.get("narration_id")) if c.get("narration_id") else f"na{i}"
+            narration.append({"id": nid, "text": _txt(c.get("narration_tts"), 400) or nar, "display": nar})
             cut["narration"] = nid
         if cut["type"] == "live-action":
-            subj = c.get("subject") or f"{sel.get('industry') or product or 'プロダクト'}の{sel.get('target') or '利用者'}。{label}"
+            subj = _txt(c.get("subject"), 400) or f"{_txt(sel.get('industry'), 60) or product or 'プロダクト'}の{_txt(sel.get('target'), 60) or '利用者'}。{label}"
             cut["still"] = {"subject": subj}
             cut["motion"] = {"resolution": "1080p"}
-            if c.get("motion_en"):   # 台本ステージが書いた最小限の動き（英語）。手作業・ページめくり等は台本側で禁止済み
-                cut["motion"]["prompt"] = f"{subj}. {c['motion_en']}. Camera slowly pushes in. Hands stay still; no objects are picked up, moved, pasted, written or turned; nothing new appears."
+            motion_en = _txt(c.get("motion_en"), 300)
+            if motion_en:   # 台本ステージが書いた最小限の動き（英語）。手作業・ページめくり等は台本側で禁止済み
+                cut["motion"]["prompt"] = f"{subj}. {motion_en}. Camera slowly pushes in. Hands stay still; no objects are picked up, moved, pasted, written or turned; nothing new appears."
             cut["telop"] = telop
         elif cut["type"] == "cta":
             # ボタン文言は台本の字幕（例「お問い合わせはこちら」）を優先。検索語は CM 名ではなくブランド名
-            brand_name = ((spec.get("brand") or {}).get("name") or "").strip()
-            cut.update({"button": c.get("button") or c.get("caption") or "今すぐ 無料ではじめる", "badges": c.get("badges") or [],
-                        "search": c.get("search") or brand_name or product, "note": c.get("note"), "telop": telop})
+            brand_name = _txt((spec.get("brand") or {}).get("name") if isinstance(spec.get("brand"), dict) else None, 60)
+            cut.update({"button": _txt(c.get("button"), 60) or _txt(c.get("caption"), 60) or "今すぐ 無料ではじめる",
+                        "badges": _txts(c.get("badges"), 40),
+                        "search": _txt(c.get("search"), 60) or brand_name or product, "note": _txt(c.get("note"), 120), "telop": telop})
         elif cut["type"] == "graphic":
-            cut["value"] = c.get("value") or {"label": c.get("caption") or label}
-        elif cut["type"] == "ui":
-            # assets: アプリが Storage に上げたスクショのパス配列（LiveRunner が assets/ にダウンロードして差し替え）
+            v = c.get("value") if isinstance(c.get("value"), dict) else {}
+            num = v.get("number")
+            cut["value"] = _clean({"label": _txt(v.get("label"), 60) or _txt(c.get("caption"), 60) or label,
+                                   "unit": _txt(v.get("unit"), 20), "note": _txt(v.get("note"), 120),
+                                   "number": num if isinstance(num, (int, float, str)) and not isinstance(num, bool) else None})
+        else:  # ui
+            # assets: アプリが Storage に上げたスクショのパス配列（localize_assets が検証して assets/ にダウンロード）
             # UI カットは caption を画面下に描くので、同文の telop は重ねない（明示 telop がある場合のみ）
-            cut.update({"assets": list(c.get("assets") or []), "caption": c.get("caption") or label, "telop": c.get("telop") or []})
-        else:
-            cut["role"] = role
-        if c.get("secs"):
-            cut["dur"] = int(round(float(c["secs"]) * 30))
+            cut.update({"assets": _txts(c.get("assets"), 512, MAX_UI_ASSETS),
+                        "caption": _txt(c.get("caption"), 120) or label, "telop": _txts(c.get("telop"), 80)})
+        secs = _num(c.get("secs"), 0.5, 60)
+        if secs:
+            cut["dur"] = int(round(secs * 30))
         cuts.append(cut)
     # 尺を媒体上限（既定30s）に収める。台本は cuts.secs を上限ちょうどに作りがちで、そこへ
     # cover(1F)+splash(60F) が上乗せされると超過する（例: 30s + 2s = 961F = 32.1s）。
     # cover+splash+Σ(cut.dur) が上限を超えたら、各カット尺を比例縮小して収める。
     # ナレーションは各カット尺より十分短いため、数%の縮小で音声が切れることはない。
     _FPS = 30
-    _COVER_SPLASH = 1 + int(out.get("splash_frames", 60))   # remotion_props: COVER_FRAMES=1, SPLASH_FRAMES=60
-    _cap_f = int(round(float(out.get("max_seconds", 30)) * _FPS))
+    _COVER_SPLASH = 1 + int(_num(out.get("splash_frames"), 0, 300) or 60)   # remotion_props: COVER_FRAMES=1, SPLASH_FRAMES=60
+    _cap_f = int(round((_num(out.get("max_seconds"), 5, 600) or 30) * _FPS))
     _timed = [c for c in cuts if c.get("dur")]
     _content = sum(c["dur"] for c in _timed)
     _budget = _cap_f - _COVER_SPLASH
@@ -236,37 +331,89 @@ def spec_to_project(project_id: str, spec: dict, product: str | None) -> dict:
         for c in _timed:
             c["dur"] = max(1, int(c["dur"] * _scale))
         _content = sum(c["dur"] for c in _timed)
-    _duration_frames = out.get("duration_frames") or (_COVER_SPLASH + _content)
-    script = dict(spec.get("script") or {})
-    if narration:
-        script["narration"] = narration
-    script.pop("userScript", None)
+    _duration_frames = int(_num(out.get("duration_frames"), 150, 1800) or (_COVER_SPLASH + _content))
+
+    b = spec.get("brand") if isinstance(spec.get("brand"), dict) else {}
+    colors = b.get("colors") if isinstance(b.get("colors"), dict) else {}
+    wm = b.get("watermark")
+    brand = _clean({
+        "name": _txt(b.get("name"), 60), "tagline": _txt(b.get("tagline"), 120),
+        "colors": _clean({k: _txt(colors.get(k), 32) for k in ("primary", "accent", "dark")}) or None,
+        "watermark": wm if isinstance(wm, bool) else (_clean({"text": _txt(wm.get("text"), 60), "enabled": wm.get("enabled") if isinstance(wm.get("enabled"), bool) else None}) if isinstance(wm, dict) else None),
+        "app_icon": _txt(b.get("app_icon"), 512), "logo": _txt(b.get("logo"), 512),   # localize_assets で検証
+        "references": _txts(b.get("references"), 512, 3) or None,                      # reference_stills が入れるお手本スチル
+        "imagery": _txt(b.get("imagery"), 400), "register": _txt(b.get("register"), 400),   # ブランドの画作り・言葉遣いヒント
+        "pronunciation": {k[:40]: v[:80] for k, v in list(b["pronunciation"].items())[:20]
+                          if isinstance(k, str) and isinstance(v, str)} if isinstance(b.get("pronunciation"), dict) else None,
+    })
+
+    sc = spec.get("script") if isinstance(spec.get("script"), dict) else {}
+    voice = sc.get("voice") if isinstance(sc.get("voice"), dict) else {}
+    script = _clean({
+        "source": _txt(sc.get("source"), 20),
+        "voice": _clean({"model": voice.get("model") if voice.get("model") in VOICE_MODELS else None,
+                         "voice_id": _txt(voice.get("voice_id"), 64), "speed": _num(voice.get("speed"), 0.5, 2.0),
+                         "emotion": _txt(voice.get("emotion"), 32)}) or None,
+        "narration": narration or None,
+    })
+
+    au = spec.get("audio") if isinstance(spec.get("audio"), dict) else {}
+    bgm = [_clean({"id": _id(t.get("id") or "bgm"), "model": t.get("model") if t.get("model") in BGM_MODELS else None,
+                   "mood": _txt(t.get("mood"), 100), "seconds": _num(t.get("seconds"), 5, 60),
+                   "from": _num(t.get("from"), 0, 1800), "volume": _num(t.get("volume"), 0, 1)})
+           for t in (au.get("bgm") or [])[:MAX_BGM] if isinstance(t, dict)]
+    audio = {"bgm": bgm or [{"id": "main", "model": "lyria2", "mood": "uplifting-corporate"}]}
+    sl = au.get("sound_logo")
+    if isinstance(sl, dict):
+        audio["sound_logo"] = _clean({"model": sl.get("model") if sl.get("model") in SFX_MODELS else None})
+
+    comp = spec.get("compliance") if isinstance(spec.get("compliance"), dict) else {}
+    compliance = {k: comp[k] for k in ("ai_disclosure", "content_credentials", "likeness_check", "real_ui_only")
+                  if isinstance(comp.get(k), bool)}
+    if comp.get("disclosure_lang") in ("ja", "en", "both"):
+        compliance["disclosure_lang"] = comp["disclosure_lang"]
+    if isinstance(comp.get("claims_evidence"), list):
+        compliance["claims_evidence"] = _txts(comp["claims_evidence"], 300, 20)
+    dl = spec.get("delivery") if isinstance(spec.get("delivery"), dict) else {}
+
     return {
-        "meta": {"name": project_id, "client": meta.get("client"), "product": product or meta.get("name"),
-                 "goal": meta.get("goal") or sel.get("angle"), "source": "spot-app"},
-        "output": {"fps": 30, "duration_frames": _duration_frames, "formats": formats,
-                   "variants": out.get("variants") or [{"id": "A"}, {"id": "B"}, {"id": "C"}]},
-        "brand": spec.get("brand") or {},
+        "meta": {"name": project_id, "client": _txt(meta.get("client"), 80), "product": product or _txt(meta.get("name"), 80),
+                 "goal": _txt(meta.get("goal"), 200) or _txt(sel.get("angle"), 60), "source": "spot-app"},
+        "output": {"fps": 30, "duration_frames": _duration_frames, "formats": formats, "variants": variants},
+        "brand": brand,
         "style": {"tone": _TONE.get(sel.get("tone"), "documentary"), "grade": "broadcast-cool"},
         "script": script,
         "cuts": cuts,
-        "audio": spec.get("audio") or {"bgm": [{"id": "main", "model": "lyria2", "mood": "uplifting-corporate"}]},
-        "compliance": spec.get("compliance") or {},
-        "delivery": spec.get("delivery") or {},
-        # 既定は project.yaml 駆動の汎用コンポジション SpotAd（cm-pipeline/cm/remotion_props.py が props を組む）
-        "render": spec.get("render") or {"composition": "SpotAd", "prototype": str(SPOT_ROOT / "ad-prototype")},
+        "audio": audio,
+        "compliance": compliance,
+        "delivery": {"platforms": _txts(dl.get("platforms"), 32)},   # 既知の媒体キー以外は cm 側で無視される
+        # レンダ設定は固定（spec からは受け取らない）。project.yaml 駆動の汎用コンポジション SpotAd。
+        "render": dict(RENDER),
     }
 
 
+def storage_path_ok(p, prefixes: list[str]) -> bool:
+    """自組織（または旧 owner）プレフィックス配下の正規化済み Storage パスか。
+    絶対パス・..・バックスラッシュ・NUL・他テナント参照を弾く（ローカル読み出し/越境防止）。"""
+    if not isinstance(p, str) or len(p) > 512 or "\\" in p or "\x00" in p:
+        return False
+    segs = p.split("/")
+    if len(segs) < 2 or segs[0] not in [x for x in prefixes if x]:
+        return False
+    return all(s and s not in (".", "..") for s in segs)
+
+
 def localize_assets(sb: Supa, root: Path, d: dict, prefixes: list[str]) -> int:
-    """project.yaml 内の Storage パス（<org_id>/... または旧 <owner>/...）を root/assets/ にダウンロードして相対パスに置換。"""
+    """project.yaml 内の Storage パス（<org_id>/... または旧 <owner>/...）を root/assets/ にダウンロードして相対パスに置換。
+    許可外のパス（絶対パス・..・他組織・ローカル参照）は捨てる。"""
     n = 0
-    pres = [p for p in prefixes if p]
 
     def fetch(p):
         nonlocal n
-        if not isinstance(p, str) or not any(p.startswith(f"{pre}/") for pre in pres):
-            return p
+        if not storage_path_ok(p, prefixes):
+            if p:
+                print(f"  assets: rejected path {str(p)[:120]!r}", flush=True)
+            return None
         dest = root / "assets" / Path(p).name
         if not dest.is_file():
             sb.download("assets", p, dest)
@@ -276,15 +423,19 @@ def localize_assets(sb: Supa, root: Path, d: dict, prefixes: list[str]) -> int:
     brand = d.get("brand") or {}
     for k in ("app_icon", "logo"):
         if brand.get(k):
-            brand[k] = fetch(brand[k])
+            v = fetch(brand[k])
+            if v:
+                brand[k] = v
+            else:
+                del brand[k]
     if isinstance(brand.get("references"), list):
-        brand["references"] = [fetch(x) for x in brand["references"]]
+        brand["references"] = [v for v in (fetch(x) for x in brand["references"]) if v]
     for cut in d.get("cuts") or []:
         a = cut.get("assets")
         if isinstance(a, list):
-            cut["assets"] = [fetch(x) for x in a]
+            cut["assets"] = [v for v in (fetch(x) for x in a) if v]
         elif isinstance(a, dict):
-            cut["assets"] = {k: fetch(v) for k, v in a.items()}
+            cut["assets"] = {k: v for k, v in ((k, fetch(x)) for k, x in a.items()) if v}
     return n
 
 
@@ -430,6 +581,38 @@ class LiveRunner:
             row.update(extra or {})
         self.sb.insert(table, row)
 
+    def _make_poster(self, mp4: "Path | None") -> None:
+        """本編mp4の先頭付近から1フレームを切り出し、カバー（poster）として保存する。
+        assets/<scope>/<project_id>/poster.jpg にアップロードし projects.poster_path を更新。
+        ffmpeg が無い/失敗しても本処理は落とさない（カバーが無いだけ）。"""
+        if not mp4 or not mp4.is_file():
+            return
+        ff = shutil.which("ffmpeg")
+        if not ff:
+            print("  poster: ffmpeg not found; skip", flush=True)
+            return
+        out = self.proj.generated / "poster.jpg"
+        try:
+            # -ss 0.5: 先頭の黒みを避けて“再生前の画面”らしい1枚に。長辺640へ縮小。
+            subprocess.run(
+                [ff, "-y", "-ss", "0.5", "-i", str(mp4), "-frames:v", "1",
+                 "-vf", "scale='min(640,iw)':-2", "-q:v", "3", str(out)],
+                check=True, capture_output=True,
+            )
+        except Exception as e:  # noqa: BLE001
+            print(f"  poster: ffmpeg failed: {e}", flush=True)
+            return
+        if not out.is_file():
+            return
+        scope = self.org or self.owner
+        path = f"{scope}/{self.project_id}/poster.jpg"
+        try:
+            self.sb.upload("assets", path, out)
+            self.sb.update("projects", {"id": f"eq.{self.project_id}"}, {"poster_path": path})
+            print(f"  poster: {path}", flush=True)
+        except Exception as e:  # noqa: BLE001
+            print(f"  poster: upload/update failed: {e}", flush=True)
+
     def run(self, job: dict) -> float:
         stage, cut_id = job["stage"], job.get("cut")
         before = self._ledger_total()
@@ -496,14 +679,22 @@ class LiveRunner:
             report = Path(res.get("report", ""))
             if report.is_file():
                 self._put(report, "render", None, None, 0.0)
+            primary = None       # ポスター元（最初の1本）
+            primary_wide = None  # 横長を優先
             for item in (json.loads(report.read_text(encoding="utf-8")).get("items", []) if report.is_file() else []):
                 dst = Path(item["dst"])
                 if dst.is_file():
                     self._put(dst, "render", None, None, 0.0, table="renders",
                               extra={"variant": item.get("variant"), "format": item.get("platform")})
+                    if primary is None:
+                        primary = dst
+                    plat = str(item.get("platform") or "").lower()
+                    if primary_wide is None and any(k in plat for k in ("wide", "landscape", "16", "youtube", "yt")):
+                        primary_wide = dst
                 side = Path((item.get("credentials") or {}).get("sidecar", ""))
                 if side.is_file():
                     self._put(side, "render", None, None, 0.0)
+            self._make_poster(primary_wide or primary)   # カバー（再生前の1枚）を本編mp4から生成
         else:
             raise RuntimeError(f"未知のステージ: {stage}")
         return self._usd_delta(before)
@@ -621,16 +812,32 @@ def process_project(sb: Supa, project_id: str, owner: str, live: bool) -> int:
                     })
                 print(f"  done  {job_key(j):16} ${usd:.2f}", flush=True)
             except Exception as e:  # noqa: BLE001
+                err = repr(e)
                 sb.update("jobs", {"id": f"eq.{j['id']}"},
-                          {"status": "failed", "detail": {"error": repr(e)[:300]}})
+                          {"status": "failed", "detail": {"error": err[:300]}})
                 print(f"  FAIL  {job_key(j):16} {e}", flush=True)
+                if "FAL_BALANCE_OR_QUOTA" in err:   # 全生成が止まる重大事象 → 運用アラート
+                    alert_ops("[Spot] fal 残高/クォータ枯渇の可能性",
+                              "fal API がクレジット/クォータ不足で失敗しました。全生成が停止する恐れがあります。至急ご確認ください（残高の補充）。\n"
+                              f"project={project_id}\njob={job_key(j)}\nerror={err[:500]}",
+                              dedup_key="fal_balance")
             processed += 1
-    # 全 build まで終わっていれば done に
+    # 全 build まで終わっていれば done に。恒久失敗があれば failed に落とし、前払いクレジットを自動返却。
     jobs = sb.select("jobs", project_id=f"eq.{project_id}")
     if jobs and any(j["stage"] != "script" for j in jobs) and all(j["status"] in SUCCESS for j in jobs):
         sb.update("projects", {"id": f"eq.{project_id}"}, {"status": "done"})
         if live:
             notify_done(sb, project_id, owner)   # 完了メール（RESEND_API_KEY があるときだけ送る）
+    elif any(j["status"] == "failed" for j in jobs) and not any(j["status"] in ("pending", "running") for j in jobs):
+        # これ以上進めない（pending/running なし）＝終局失敗 → failed 遷移＋返金（詰まり/二重課金の防止）。
+        sb.update("projects", {"id": f"eq.{project_id}"}, {"status": "failed"})
+        if live:
+            try:
+                refunded = sb._req("POST", "/rpc/refund_project_credits",
+                                   body={"p_project": project_id, "p_reason": "generation_failed"})
+                print(f"  refund  project {project_id}: {refunded}", flush=True)
+            except Exception as e:  # noqa: BLE001
+                print(f"  refund FAILED for {project_id}: {e}", flush=True)
     return processed
 
 
