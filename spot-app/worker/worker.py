@@ -324,6 +324,37 @@ def reference_stills(sb: Supa, brand_id: str | None, exclude_project: str, limit
         return []
 
 
+def restore_generations(sb: Supa, proj, project_id: str) -> int:
+    """generations（kind=still/clip/audio, status=done）を Storage から generated/ に戻し、done マーカーを付ける。
+    ローカルに無いものだけ取得。失敗しても生成は続く（その場合は再生成される）。"""
+    try:
+        from cm import state
+        rows = sb.select("generations", project_id=f"eq.{project_id}", status="eq.done",
+                         select="kind,cut,model,usd,storage_path,created_at", order="created_at.asc")
+    except Exception as e:  # noqa: BLE001
+        print(f"  WARN  restore: generations を読めません: {e}", flush=True)
+        return 0
+    seen: dict[str, dict] = {}
+    for r in rows or []:
+        if r.get("kind") in ("still", "clip", "audio") and r.get("storage_path"):
+            seen[r["storage_path"]] = r          # 同じパスは最新行で上書き（作り直しスチル等）
+    n = 0
+    for path, r in seen.items():
+        name = Path(path).name
+        dest = proj.generated / ("audio" if r["kind"] == "audio" else "") / name if r["kind"] == "audio" else proj.generated / name
+        if dest.is_file() and state.is_done(dest):
+            continue
+        try:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            sb.download("assets", path, dest)
+            state.mark_done(dest, model=r.get("model") or "restored", usd=float(r.get("usd") or 0.0), dry=False,
+                            provider={"restored_from": path})
+            n += 1
+        except Exception as e:  # noqa: BLE001
+            print(f"  WARN  restore {name}: {e}", flush=True)
+    return n
+
+
 class LiveRunner:
     """1プロジェクト分の cm-pipeline 実行コンテキスト（spec → project.yaml → ステージ）。"""
 
@@ -353,6 +384,10 @@ class LiveRunner:
             raise RuntimeError("spec → project.yaml の検証NG: " + "; ".join(issues))
         self.ctx = pipeline.Ctx(dry_run=False, force=False, key=_fal_key())
         self.cuts = {c["id"]: c for c in self.proj.cuts}
+        # コンテナ再起動・再デプロイでローカルの生成物が消えても、Storage に上げた still / clip / audio を戻して続きから進める
+        got = restore_generations(sb, self.proj, project_id)
+        if got:
+            print(f"  restore: {got} generated file(s) from Storage", flush=True)
 
     def _usd_delta(self, before: float) -> float:
         return round(sum(r["usd"] for r in self.ledger.read(self.proj)) - before, 4)
