@@ -221,6 +221,22 @@ def spec_to_project(project_id: str, spec: dict, product: str | None) -> dict:
         if c.get("secs"):
             cut["dur"] = int(round(float(c["secs"]) * 30))
         cuts.append(cut)
+    # 尺を媒体上限（既定30s）に収める。台本は cuts.secs を上限ちょうどに作りがちで、そこへ
+    # cover(1F)+splash(60F) が上乗せされると超過する（例: 30s + 2s = 961F = 32.1s）。
+    # cover+splash+Σ(cut.dur) が上限を超えたら、各カット尺を比例縮小して収める。
+    # ナレーションは各カット尺より十分短いため、数%の縮小で音声が切れることはない。
+    _FPS = 30
+    _COVER_SPLASH = 1 + int(out.get("splash_frames", 60))   # remotion_props: COVER_FRAMES=1, SPLASH_FRAMES=60
+    _cap_f = int(round(float(out.get("max_seconds", 30)) * _FPS))
+    _timed = [c for c in cuts if c.get("dur")]
+    _content = sum(c["dur"] for c in _timed)
+    _budget = _cap_f - _COVER_SPLASH
+    if _content > _budget > 0 and _timed:
+        _scale = _budget / _content
+        for c in _timed:
+            c["dur"] = max(1, int(c["dur"] * _scale))
+        _content = sum(c["dur"] for c in _timed)
+    _duration_frames = out.get("duration_frames") or (_COVER_SPLASH + _content)
     script = dict(spec.get("script") or {})
     if narration:
         script["narration"] = narration
@@ -228,7 +244,7 @@ def spec_to_project(project_id: str, spec: dict, product: str | None) -> dict:
     return {
         "meta": {"name": project_id, "client": meta.get("client"), "product": product or meta.get("name"),
                  "goal": meta.get("goal") or sel.get("angle"), "source": "spot-app"},
-        "output": {"fps": 30, "duration_frames": out.get("duration_frames", 961), "formats": formats,
+        "output": {"fps": 30, "duration_frames": _duration_frames, "formats": formats,
                    "variants": out.get("variants") or [{"id": "A"}, {"id": "B"}, {"id": "C"}]},
         "brand": spec.get("brand") or {},
         "style": {"tone": _TONE.get(sel.get("tone"), "documentary"), "grade": "broadcast-cool"},
