@@ -7662,7 +7662,7 @@
     window.__scriptCuts = spec.cuts;   // 台本・絵コンテ画面を実 cuts に連動（renderBoard が参照）
     if (window.__renderBoard) window.__renderBoard();
     try {
-      const insertRow = { name: spec.meta.name, spec, status: 'draft' };
+      const insertRow = { name: spec.meta.name, spec };   // status は DB 既定 'draft'（列権限 028 に合わせ、クライアントからは送らない）
       if (currentOrg && currentOrg.id) insertRow.org_id = currentOrg.id;   // 現在の組織に所属させる（未解決時はトリガが個人orgを補完）
       if (currentBrand) { if (currentBrand.frozen) { toast(L('This brand is read-only.', 'このブランドは読み取り専用です。'), false, 2600); return; } insertRow.brand_id = currentBrand.id; }
       const { data, error } = await sb.from('projects')

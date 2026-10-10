@@ -1,4 +1,6 @@
-# モノレポ → 正本 `yosh-ahuh/spot` への移植一覧（2026-10-10）
+# モノレポ → `yosh-ahuh/spot` への移植一覧（2026-10-10）
+
+> **2026-10-10 夜に方針変更: 正本はモノレポ（cm-pipeline master）に確定、`yosh-ahuh/spot` は凍結。移植は中止。** 本書は両系列の差分記録として残す。§0 の権限是正は 031（projects 列権限）と 032（spend_credits 封鎖＝start_generation 採用後）の 2 段階に分けた。
 
 対象: モノレポ `yosh-ahuh/cm-pipeline`（master）で 2026-10-06〜10-10 に入れたアプリ・ワーカー・パイプラインの変更。
 正本 `yosh-ahuh/spot`（main、`/Users/yosh/work/spot-app`、`index.html`＋`js/{data,ui,i18n,auth}.js` に分割済み）へ**機能単位で再実装**する。
