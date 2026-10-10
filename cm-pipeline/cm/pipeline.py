@@ -121,6 +121,22 @@ def review_one(proj: Project, ctx: Ctx, cut: dict, *, retake: bool = False) -> d
     return {"status": "pass", "cut": cid}
 
 
+def _safe_scale(requested: float, w: int, h: int) -> float:
+    """Remotion の --scale は出力の幅・高さが偶数の整数でないと H.264 で失敗する（例: 0.6667 → 1280.064px）。
+    要求倍率以下で最大の、w*s と h*s がともに偶数整数になる倍率を返す（候補は 1/16 刻み）。"""
+    if requested >= 1.0:
+        return 1.0
+    best = 1.0
+    for k in range(16, 0, -1):
+        s = k / 16
+        if s > requested + 1e-9:
+            continue
+        ww, hh = w * s, h * s
+        if abs(ww - round(ww)) < 1e-9 and abs(hh - round(hh)) < 1e-9 and round(ww) % 2 == 0 and round(hh) % 2 == 0:
+            return s
+    return best
+
+
 def _clip_duration(cut: dict, model: str) -> str | None:
     """カットの尺（dur フレーム）に合わせてクリップ長を選ぶ。Veo 3.1 は 4s/6s/8s、Kling は秒数（"5"/"10"）。"""
     dur = cut.get("dur")
@@ -356,7 +372,11 @@ def build(proj: Project, ctx: Ctx) -> dict:
             # REMOTION_SCALE（未設定＝1.0）: 描画解像度の倍率。0.6667 で 1920×1080 → 1280×720 相当になり Chrome のメモリが大きく下がる。
             scale = os.environ.get("REMOTION_SCALE", "").strip()
             if scale and scale not in ("1", "1.0"):
-                cmd.append(f"--scale={scale}")
+                s_eff = _safe_scale(float(scale), int(fmt["w"]), int(fmt["h"]))
+                if s_eff != float(scale):
+                    ctx.log(f"  NOTE  REMOTION_SCALE={scale} → {s_eff}（幅・高さが偶数の整数になる倍率に丸め。H.264 は奇数・小数ピクセル不可）")
+                if s_eff < 1.0:
+                    cmd.append(f"--scale={s_eff}")
             planned += 1
             if ctx.dry_run:
                 target.parent.mkdir(parents=True, exist_ok=True)
