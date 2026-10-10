@@ -447,7 +447,12 @@ def build(proj: Project, ctx: Ctx) -> dict:
                     ctx.log(f"  RENDER {raw.name}  ←  {comp_id}")
                     # 出力を取り込み、失敗時は stderr 末尾を例外に含める（コンテナでは jobs.detail からしか原因を追えない）
                     r = subprocess.run(cmd, cwd=prototype, text=True, capture_output=True)
-                    tail = "\n".join([ln for ln in (r.stderr or r.stdout or "").splitlines() if ln.strip()][-25:])
+                    # \r 区切りの進捗行（ffmpeg の frame=… / Remotion の Rendered …）を除いて、意味のある末尾だけ残す
+                    raw = (r.stderr or "") + "\n" + (r.stdout or "")
+                    lines = [ln.strip() for ln in raw.replace("\r", "\n").splitlines() if ln.strip()]
+                    meaningful = [ln for ln in lines if not ln.startswith(("frame=", "Rendered ", "Encoding", "Bundling", "Copying", "Downloading", "↓ "))]
+                    last_progress = next((ln for ln in reversed(lines) if ln.startswith(("Rendered ", "frame="))), "")
+                    tail = "\n".join(meaningful[-25:] + ([f"(last progress: {last_progress})"] if last_progress else []))
                     if r.returncode != 0:
                         ctx.log("  ---- remotion stderr (tail) ----\n" + tail)
                         raise RuntimeError(f"remotion render failed (exit {r.returncode}) {comp_id} {fmt['w']}x{fmt['h']}: " + tail[-1500:])
