@@ -121,6 +121,46 @@ def review_one(proj: Project, ctx: Ctx, cut: dict, *, retake: bool = False) -> d
     return {"status": "pass", "cut": cid}
 
 
+def _prescale_media(proj: Project, ctx: Ctx, scale: float) -> int:
+    """REMOTION_SCALE < 1 のとき、実写クリップ（mp4）とスチル（png）を ffmpeg で scale 倍に縮小したコピーを作り、
+    cut["src"] / cut["still_src"] をそのコピーへ向ける。Chrome（OffthreadVideo）のデコード・画像メモリが面積比で下がる。"""
+    import shutil, subprocess
+    if scale >= 1.0 or not shutil.which("ffmpeg"):
+        return 0
+    n = 0
+    tag = f"s{int(round(scale * 100)):02d}"
+    for cut in proj.cuts:
+        if cut.get("type") != "live-action":
+            continue
+        cid = cut["id"]
+        clip = proj.generated / (cut.get("src") or f"{cid}.mp4")
+        if clip.is_file() and state.is_done(clip):
+            dst = proj.generated / f"{cid}.{tag}.mp4"
+            if not dst.is_file():
+                r = subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(clip), "-vf", f"scale=trunc(iw*{scale}/2)*2:trunc(ih*{scale}/2)*2",
+                                    "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-pix_fmt", "yuv420p", "-an", str(dst)],
+                                   capture_output=True, text=True, timeout=600)
+                if r.returncode != 0:
+                    ctx.log(f"  WARN  prescale {cid} clip: {r.stderr.strip()[-160:]}")
+                    continue
+                n += 1
+            cut["src"] = dst.name
+        still = proj.generated / (cut.get("still_src") or f"{cid}.still.png")
+        if still.is_file():
+            dsts = proj.generated / f"{cid}.still.{tag}.png"
+            if not dsts.is_file():
+                r = subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(still), "-vf", f"scale=trunc(iw*{scale}/2)*2:-2", str(dsts)],
+                                   capture_output=True, text=True, timeout=120)
+                if r.returncode != 0:
+                    ctx.log(f"  WARN  prescale {cid} still: {r.stderr.strip()[-160:]}")
+                    continue
+                n += 1
+            cut["still_src"] = dsts.name
+    if n:
+        ctx.log(f"  prescale: {n} file(s) → ×{scale}（Chrome のメモリ対策）")
+    return n
+
+
 def _safe_scale(requested: float, w: int, h: int) -> float:
     """Remotion の --scale は出力の幅・高さが偶数の整数でないと H.264 で失敗する（例: 0.6667 → 1280.064px）。
     要求倍率以下で最大の、w*s と h*s がともに偶数整数になる倍率を返す（候補は 1/16 刻み）。"""
@@ -352,6 +392,11 @@ def build(proj: Project, ctx: Ctx) -> dict:
     planned = 0
     if not plats:
         ctx.log("  WARN  配信先を解決できません（delivery.platforms / output.formats を確認）")
+    _scale_env = os.environ.get("REMOTION_SCALE", "").strip()
+    if _scale_env and _scale_env not in ("1", "1.0") and plats:
+        _f0 = delivery.format_for(proj, plats[0][1])
+        if _f0:
+            _prescale_media(proj, ctx, _safe_scale(float(_scale_env), int(_f0["w"]), int(_f0["h"])))
     for pkey, pspec in plats:
         fmt = delivery.format_for(proj, pspec)
         if not fmt:

@@ -133,9 +133,14 @@ def job_key(j: dict) -> str:
     return f"{j['stage']}:{j['cut']}" if j.get("cut") else j["stage"]
 
 
+ALLOWED_STAGES: set[str] | None = None   # --stages / WORKER_STAGES で限定（None＝全部）
+
+
 def ready(j: dict, all_jobs: list[dict]) -> bool:
     if j["status"] != "pending":
         return False
+    if ALLOWED_STAGES is not None and j.get("stage") not in ALLOWED_STAGES:
+        return False   # このワーカーの担当外（別のワーカーが拾う）
     deps = j.get("deps") or []
     done = {job_key(x) for x in all_jobs if x["status"] in SUCCESS}
     return all(d in done for d in deps)
@@ -695,7 +700,13 @@ def main(argv=None) -> int:
     ap.add_argument("--watch", action="store_true", help="ポーリング常駐")
     ap.add_argument("--interval", type=float, default=5.0, help="--watch のポーリング間隔秒")
     ap.add_argument("--live", action="store_true", help="実生成（既定は DRY-RUN）")
+    ap.add_argument("--stages", help="このワーカーが担当するステージをカンマ区切りで限定（例: script,still,review,animate,audio ／ build）。環境変数 WORKER_STAGES でも可")
     args = ap.parse_args(argv)
+    global ALLOWED_STAGES
+    st = (args.stages or os.environ.get("WORKER_STAGES") or "").strip()
+    if st:
+        ALLOWED_STAGES = {s.strip() for s in st.split(",") if s.strip()}
+        print(f"stages: {sorted(ALLOWED_STAGES)}", flush=True)
 
     sb = Supa(env("SUPABASE_URL"), env("SUPABASE_SERVICE_ROLE_KEY"))
     mode = "LIVE" if args.live else "DRY-RUN"
