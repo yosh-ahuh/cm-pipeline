@@ -34,9 +34,16 @@ def still_prompt(proj: Project, cut: dict) -> tuple[str, str]:
         parts.append(f"a subtle touch of the brand color {primary} on one small prop or clothing detail, never dominant")
     parts += list(base.get("positive", []))
     parts += list(tone.get("japan_check", []))
+    # 文字化け対策（検品で最多の NG「読める文字」）: 生成モデルは日本語を正しく描けないので、文字が載る面を無地にする。
+    #   実写・グラフィックとも、ヘルメット／制服／看板／書類／画面／パッケージの文字・ロゴを描かせない。
+    if cut.get("type") in (None, "live-action", "graphic"):
+        parts.append("no readable text or logos anywhere: helmets, uniforms, signs, posters, documents, labels, packaging and screens are plain and unmarked, or too small and out of focus to read")
 
     positive = ". ".join(p.strip().rstrip(".") for p in parts if p) + "."
     negative = ", ".join(base.get("negative", []))
+    negative = ", ".join(filter(None, [negative,
+        "text, letters, words, kanji, kana, Japanese characters, typography, logos, brand marks, signage, labels, "
+        "writing on clothing or helmets, printed documents with legible text, watermark, caption, subtitles"]))
     # 光の禁則（耳フレア等）を negative に畳み込む。
     forbid = (tone.get("light_design", {}) or {}).get("forbid", [])
     if forbid:
