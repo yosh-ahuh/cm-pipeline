@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import time
@@ -348,6 +349,10 @@ def build(proj: Project, ctx: Ctx) -> dict:
             if base in delivery.PROPS_DRIVEN:
                 props = {**remotion_props.spot_props(proj, v, prototype), **props}
             cmd = ["npx", "remotion", "render", entry, comp_id, str(raw), f"--props={json.dumps(props, ensure_ascii=False)}"]
+            # コンテナ（Railway 等）はメモリが小さく、既定の並列度だと Chrome が OOM で Killed になる。REMOTION_CONCURRENCY で制御（未設定＝1）
+            conc = os.environ.get("REMOTION_CONCURRENCY", "1").strip()
+            if conc:
+                cmd.append(f"--concurrency={conc}")
             planned += 1
             if ctx.dry_run:
                 target.parent.mkdir(parents=True, exist_ok=True)

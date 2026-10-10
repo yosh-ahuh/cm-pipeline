@@ -15,7 +15,7 @@ cm-pipeline/projects/*/out
 cm-pipeline/projects/_supabase
 ad-prototype/public/projects
 ad-prototype/out
-# 資料・フロント・サイト（ワーカーに不要）
+# 資料・フロント・サイト（ワーカーに不要）※ ad-prototype/public の画像は Remotion が使うので媒体拡張子の全体除外はしない
 LINE Design System
 docs
 research
@@ -26,9 +26,8 @@ spot-app/share.html
 spot-app/assets
 spot-app/styles
 spot-app/supabase
-*.html
-*.png
-*.jpg
-*.mp4
-*.mov
-*.pdf
+
+# 大容量の旧素材（MiraiCM 用の動画）は除外。public/spot（grain.png 等）と public/mirai の wav は残す
+ad-prototype/public/mirai/*.mp4
+ad-prototype/public/mirai/*.mov
+LINE Design System/**/*.pdf

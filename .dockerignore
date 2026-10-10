@@ -23,8 +23,8 @@ spot-app/styles
 spot-app/supabase
 docs
 LINE Design System
-*.html
-*.png
-*.jpg
-*.mp4
-*.mov
+
+# 大容量の旧素材（MiraiCM 用の動画）は除外。public/spot（grain.png 等）と public/mirai の wav は残す
+ad-prototype/public/mirai/*.mp4
+ad-prototype/public/mirai/*.mov
+LINE Design System/**/*.pdf
